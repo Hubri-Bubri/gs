@@ -2,6 +2,7 @@
 *.sublime-project
 *.sublime-workspace
 *.idea
+*/static/bundle
 dist
 build
 __pycache__
