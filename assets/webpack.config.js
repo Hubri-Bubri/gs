@@ -23,7 +23,11 @@ module.exports = {
         }
     },
     module: {
-        rules: [
+     rules: [
+            {
+                test: /\.styl$/i,
+                use: ['style-loader', 'css-loader', 'stylus-loader']
+            },
             {
                 test: /\.vue$/,
                 loader: 'vue-loader'
@@ -32,7 +36,14 @@ module.exports = {
                 test: /\.js$/,
                 loader: 'babel-loader',
                 include: [resolve('application')],
-                query: {presets: 'es2015'}
+                query: {
+                    presets: 'es2015',
+                    plugins: ['transform-es2015-destructuring', 'transform-object-rest-spread']
+                }
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
             }
         ]
     },
