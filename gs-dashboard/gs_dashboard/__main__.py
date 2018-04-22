@@ -1,5 +1,5 @@
-from gs_dashboard import run
+import gs_dashboard
 
 
 if __name__ == '__main__':
-    run()
+    gs_dashboard.run()

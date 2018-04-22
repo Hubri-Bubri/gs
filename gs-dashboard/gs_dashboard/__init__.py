@@ -8,10 +8,10 @@ from aiohttp.web import Application, run_app
 from jinja2 import FileSystemLoader
 
 from gs_api import dictionary
+from gs_security.authorization_policy import DatabaseAuthorizationPolicy
 
 from .action import routes
 from .environment import APPLICATION_DIR, configuration
-from .security.authorization_policy import DatabaseAuthorizationPolicy
 
 
 __version__ = '0.0.1'

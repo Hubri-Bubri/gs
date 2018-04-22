@@ -3,22 +3,13 @@ from aiohttp_jinja2 import template
 from aiohttp_session import get_session
 from uuid import uuid4
 import time
-from aiohttp_security import (
-    remember,
-    forget,
-    authorized_userid,
-    has_permission,
-    login_required
-)
-
-from gs_api.dictionary import User
+from aiohttp_security import remember, has_permission, login_required
 
 from .environment import APPLICATION_DIR
-from .security.authorization_policy import check_credentials
+from gs_security.authorization_policy import check_credentials
 
 
 routes = web.RouteTableDef()
-user_service = User()
 
 
 @routes.get('/security')
