@@ -3,8 +3,6 @@ from distutils.cmd import Command
 from subprocess import Popen
 import subprocess
 from gs import __version__
-from setuptools.command.test import test as TestCommand
-import sys
 
 
 class Npm(Command):
@@ -17,15 +15,18 @@ class Npm(Command):
     def _run(self, *args):
         return subprocess.run(args=args, cwd=r'./assets')
 
-    def initialize_options(self): ...
+    def initialize_options(self):
+        pass
 
-    def finalize_options(self): ...
+    def finalize_options(self):
+        pass
 
 
 prod_requires = [
     'aiohttp',
     'aiomysql',
-    'aiohttp_jinja2'
+    'aiohttp_jinja2',
+    'aiohttp_security'
 ]
 
 setup(
