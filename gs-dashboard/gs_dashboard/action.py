@@ -6,7 +6,7 @@ import time
 from aiohttp_security import remember, has_permission, login_required
 
 from .environment import APPLICATION_DIR
-from gs_security.authorization_policy import check_credentials
+from gs_security.authorization import check_credentials
 
 
 routes = web.RouteTableDef()

@@ -8,7 +8,7 @@ from aiohttp.web import Application, run_app
 from jinja2 import FileSystemLoader
 
 from gs_api import dictionary
-from gs_security.authorization_policy import DatabaseAuthorizationPolicy
+from gs_security.authorization import DatabaseAuthorizationPolicy
 
 from .action import routes
 from .environment import APPLICATION_DIR, configuration
