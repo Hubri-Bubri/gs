@@ -3,6 +3,10 @@ from aiomysql import create_pool, SSCursor, DictCursor
 from collections import defaultdict, OrderedDict, Sequence
 from sqlbuilder.smartsql import Q, T
 from sqlbuilder.smartsql.dialects.mysql import compile as mysql_compile
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 from gs_share import aiocontextmanager
 
@@ -17,19 +21,28 @@ class Database:
     _expression_type = None
     _cursor_type = None
 
-    def __init__(self, host, port, name, user, password, expression_type, cursor_type):
+    def __init__(self, *, host=None, port=None, name=None, user=None, password=None, expression_type=None, cursor_type=None):
         self._host = host
         self._port = port
         self._name = name
         self._user = user
         self._password = password
 
-        self._expression_type = expression_type
-        self._cursor_type = cursor_type
+        self._expression_type = self.SqlbuilderCursor
+        self._cursor_type = DictCursor
 
+    def set_configuration(self, host, port, name, user, password):
+        self._host = host
+        self._port = port
+        self._name = name
+        self._user = user
+        self._password = password
+
+    @aiocontextmanager
     def pool(self):
         raise NotImplementedError()
 
+    @aiocontextmanager
     def connection(self):
         raise NotImplementedError()
 
@@ -63,4 +76,5 @@ class Database:
         """ sqlbuilder.smartsql aware api """
         
         async def execute(self, query):
+            logger.info(f'SQL: {query}')
             return await self._cursor.execute(*mysql_compile(query))

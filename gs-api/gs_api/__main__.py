@@ -12,5 +12,3 @@ async def fetch_users():
 
 if __name__ == '__main__':
     users = get_event_loop().run_until_complete(fetch_users())
-
-    print(users)

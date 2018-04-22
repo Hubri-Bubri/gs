@@ -11,29 +11,35 @@ from aiohttp_security import (
     login_required
 )
 
+from gs_api.dictionary import User
+
 from .environment import APPLICATION_DIR
 from .security.authorization_policy import check_credentials
 
-routes = web.RouteTableDef()
 
+routes = web.RouteTableDef()
+user_service = User()
 
 
 @routes.get('/security')
+@has_permission('first')
 async def security(request):
     session = await get_session(request)
 
-    session['time'] = time.time()
-    
-    return web.Response(text='security')
+    return web.Response(text='Yes')
 
 
 @routes.get('/login')
 async def login(request):
+    login = request.query.get('login')
+    password = request.query.get('password')
+    response = web.Response(text='Hello')
 
-    # verified = await check_credentials(request.app.user_map, username, password)
-    response = web.Response(text='login')
-    await remember(request, response, 'username')
-    return response
+    if await check_credentials(login, password):
+        await remember(request, response, login)
+        return response
+
+    return web.HTTPUnauthorized(body=b'Invalid username/password combination')
 
 
 # register static routes

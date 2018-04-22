@@ -2,11 +2,10 @@
 *.sublime-project
 *.sublime-workspace
 *.idea
-*/static/bundle
-dist
-build
-__pycache__
-.cache/*
-.eggs/*
-**/node_modules/*
+**/dist
+**/build
+**/__pycache__
+**/.cache
+**/.eggs
+**/node_modules
 **/bundle

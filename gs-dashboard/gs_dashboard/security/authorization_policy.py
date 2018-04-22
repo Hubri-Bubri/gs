@@ -1,32 +1,30 @@
 from aiohttp_security.abc import AbstractAuthorizationPolicy
+from gs_api.dictionary import User
 
 
-user_map = {
-    'alex': {
-        'permission': ['read', 'write']
-    }
-}
+user_service = User()
 
 
 class DatabaseAuthorizationPolicy(AbstractAuthorizationPolicy):
     
     async def authorized_userid(self, identity):
-        
-        if identity in user_map.keys():
-            return identity
+        return True
 
     async def permits(self, identity, permission, context=None):
-        user = user_map.get(identity, None)
-        
+        user = await user_service.select_by_identity(identity)
+
         if user is None:
             return False
 
-        return permission in user.get('permission')
+        return permission in self.parse_permission_dsl(user.get('permissions', None))
+
+    def parse_permission_dsl(self, permission):
+        if permission is None:
+            return []
+
+        return permission.split(',')
 
 
-async def check_credentials(user_map, username, password):
-    user = user_map.get(username)
-    if not user:
-        return False
+async def check_credentials(username, password):
+    return True if await user_service.select_by_login_password(username, password) else False
 
-    return user.password == password

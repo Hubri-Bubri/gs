@@ -7,8 +7,10 @@ from aiohttp_security import SessionIdentityPolicy
 from aiohttp.web import Application, run_app
 from jinja2 import FileSystemLoader
 
+from gs_api import dictionary
+
 from .action import routes
-from .environment import APPLICATION_DIR
+from .environment import APPLICATION_DIR, configuration
 from .security.authorization_policy import DatabaseAuthorizationPolicy
 
 
@@ -23,5 +25,16 @@ def run():
     aiohttp_jinja2.setup(application, loader=FileSystemLoader(f"{APPLICATION_DIR}/static"))
     aiohttp_session.setup(application, SimpleCookieStorage())
     aiohttp_security.setup(application, SessionIdentityPolicy(), DatabaseAuthorizationPolicy())
+
+    # do load file configuraion
+    configuration.load()
+    # do load database configuraion
+    dictionary.database.set_configuration(
+        host=configuration['database']['host'],
+        port=configuration['database']['port'],
+        name=configuration['database']['name'],
+        user=configuration['database']['user'],
+        password=configuration['database']['password']
+    )
 
     return run_app(application, host='0.0.0.0', port=8080)
