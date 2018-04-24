@@ -11,7 +11,7 @@ module.exports = {
         application: resolve('./application/application.js')
     },
     output: {
-        path: resolve("../gs/static/bundle"),
+        path: resolve("../static/bundle"),
         filename: '[name].js',
         publicPath: '/static'
     },
@@ -51,8 +51,8 @@ module.exports = {
         new CopyWebpackPlugin([
             {from: resolve('node_modules/bootstrap/dist/css/bootstrap.css')},
             {from: resolve('node_modules/bootstrap-vue/dist/bootstrap-vue.css')},
-            {from: resolve('node_modules/font-awesome/css'), to: "font-awesome/css", ignore: ["*.map"]},
-            {from: resolve('node_modules/font-awesome/fonts'), to: "font-awesome/fonts"},
+            {from: resolve('node_modules/font-awesome/css'), to: "font-awesome/css", ignore: ["*.map"]}, 
+            // {from: resolve('node_modules/font-awesome/fonts'), to: "font-awesome/fonts"},
         ])
     ]
 }
