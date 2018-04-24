@@ -2,16 +2,13 @@ from aiohttp_security.abc import AbstractAuthorizationPolicy
 from gs_api.dictionary import User
 
 
-user_service = User()
-
-
 class DatabaseAuthorizationPolicy(AbstractAuthorizationPolicy):
 
     async def authorized_userid(self, identity):
         return True
 
     async def permits(self, identity, permission, context=None):
-        user = await user_service.select_by_identity(identity)
+        user = await User.select_by_identity(identity)
 
         if user is None:
             return False
@@ -26,5 +23,4 @@ class DatabaseAuthorizationPolicy(AbstractAuthorizationPolicy):
 
 
 async def check_credentials(username, password):
-    return True if await user_service.select_by_login_password(username, password) else False
-
+    return True if await User.select_by_login_password(username, password) else False

@@ -23,6 +23,13 @@ steps = [
         """DROP TABLE applications"""
     ),
 
+    # {
+    #     applications: [1, 2, 3],
+    #     permissions: {
+    #         order: [read, write]
+    #     }
+    # }
+
     step(
         """
         CREATE TABLE `access` (

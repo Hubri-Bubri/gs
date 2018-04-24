@@ -5,6 +5,7 @@ from sqlbuilder.smartsql import Q, T
 from sqlbuilder.smartsql.dialects.mysql import compile as mysql_compile
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 

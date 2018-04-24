@@ -4,9 +4,9 @@ from aiohttp_session import get_session
 from uuid import uuid4
 import time
 from aiohttp_security import remember, has_permission, login_required
+from gs_security.authorization import check_credentials
 
 from .environment import APPLICATION_DIR
-from gs_security.authorization import check_credentials
 
 
 routes = web.RouteTableDef()
@@ -16,7 +16,6 @@ routes = web.RouteTableDef()
 @has_permission('first')
 async def security(request):
     session = await get_session(request)
-
     return web.Response(text='Yes')
 
 
