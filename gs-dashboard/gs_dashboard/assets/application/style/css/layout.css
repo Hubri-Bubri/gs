@@ -1,0 +1,16 @@
+html, body {
+    position: absolute;
+    width: 100%;
+}
+
+html {
+    min-height: 100%;
+}
+
+.gs-dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+

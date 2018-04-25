@@ -5,6 +5,7 @@ from uuid import uuid4
 import time
 from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
+from gs_api.dictionary import Application 
 
 from .environment import APPLICATION_DIR
 
@@ -12,24 +13,37 @@ from .environment import APPLICATION_DIR
 routes = web.RouteTableDef()
 
 
-@routes.get('/security')
+@routes.get('/')
+@template('index.html')
+async def dashboard(request):
+    return {'nocache': hash(uuid4())}
+
+
+@routes.get('/application')
 @has_permission('first')
 async def security(request):
     session = await get_session(request)
-    return web.Response(text='Yes')
+    identity = session.get('AIOHTTP_SECURITY')
+
+    return web.json_response(await Application.select_by_login(identity))
 
 
-@routes.get('/login')
-async def login(request):
-    login = request.query.get('login')
-    password = request.query.get('password')
+@routes.post('/authenticate')
+async def authenticate(request):
+    form = await request.json()
+
+    login = form.get('login')
+    password = form.get('password')
+    
     response = web.Response(text='Hello')
 
     if await check_credentials(login, password):
         await remember(request, response, login)
         return response
 
-    return web.HTTPUnauthorized(body=b'Invalid username/password combination')
+    return web.HTTPUnauthorized()
+
+
 
 
 # register static routes

@@ -1,1 +1,1 @@
-from authorization import DatabaseAuthorizationPolicy
+from . authorization import DatabaseAuthorizationPolicy

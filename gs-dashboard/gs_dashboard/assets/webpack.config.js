@@ -23,7 +23,7 @@ module.exports = {
         }
     },
     module: {
-     rules: [
+        rules: [
             {
                 test: /\.styl$/i,
                 use: ['style-loader', 'css-loader', 'stylus-loader']
@@ -49,10 +49,10 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin([
-            {from: resolve('node_modules/bootstrap/dist/css/bootstrap.css')},
-            {from: resolve('node_modules/bootstrap-vue/dist/bootstrap-vue.css')},
-            {from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/css'), to: "font-awesome/css", ignore: ["*.map"]},
-            {from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/webfonts'), to: "font-awesome/fonts"},
+            { from: resolve('node_modules/bootstrap/dist/css/bootstrap.css') },
+            { from: resolve('node_modules/bootstrap-vue/dist/bootstrap-vue.css') },
+            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/css'), to: "font-awesome/css", ignore: ["*.map"] },
+            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/webfonts'), to: "font-awesome/webfonts" },
         ])
     ]
 }

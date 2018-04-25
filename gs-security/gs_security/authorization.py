@@ -19,7 +19,7 @@ class DatabaseAuthorizationPolicy(AbstractAuthorizationPolicy):
         if permission is None:
             return []
 
-        return permission.split(',')
+        return [_.strip() for _ in permission.split(',')]
 
 
 async def check_credentials(username, password):
