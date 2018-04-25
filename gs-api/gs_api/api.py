@@ -77,5 +77,4 @@ class Database:
         """ sqlbuilder.smartsql aware api """
         
         async def execute(self, query):
-            logger.info(f'SQL: {query}')
             return await self._cursor.execute(*mysql_compile(query))
