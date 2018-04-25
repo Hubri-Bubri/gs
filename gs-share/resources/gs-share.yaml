@@ -4,3 +4,9 @@ database:
     name: "gs"
     user: "root"
     password: "8888"
+
+application:
+    business:
+        listen: 8081
+    dashboard:
+        listen: 8080

@@ -18,12 +18,17 @@
                     <b-form-input :disabled="success === true" id="password" size="lg" type="password" placeholder="Enter password" v-model="password"></b-form-input>
                 </b-form-group>
 
-                <b-form-select :options="applications_options" v-model="application" v-if="success === true" class="mb-3" size="lg">
+                <b-form-select :options="applications_options" v-model="link" v-if="success === true" class="mb-3" size="lg">
                 </b-form-select>
 
                 <div class="gs-dashboard__login-footer">
                     
-                    <b-button :disabled="application == null" v-if="applications.length > 0" type="submit" size="lg" class="float-right" variant="primary">
+                    <b-button :disabled="link == null"
+                              @click="openApplication(link)"
+                              v-if="applications.length > 0"
+                              type="submit" size="lg"
+                              class="float-right"
+                              variant="primary">
                         <i class="fas fa-check-circle"></i>
                     </b-button>
 
@@ -48,7 +53,7 @@
                 login: null,
                 password: null,
                 success: null,
-                application: null,
+                link: null,
                 applications: []
             }
         },
@@ -75,6 +80,10 @@
                 }).catch(error => {
                     this.success = false;
                 });
+            },
+
+            openApplication(link) {
+                window.open(link, '_blank');
             },
 
             loadApplications() {
