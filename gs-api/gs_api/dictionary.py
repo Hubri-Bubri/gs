@@ -9,7 +9,6 @@ database = Database(
 
 
 class User:
-    
     @classmethod
     async def select_by_login_password(cls, login, password):
         async with database.cursor() as cursor:

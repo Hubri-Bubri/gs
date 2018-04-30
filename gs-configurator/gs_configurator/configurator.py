@@ -26,7 +26,7 @@ class Configurator:
         self._search_dirs = search_dirs
 
     def _read_config_file(self, name, dirs):
-        for fullname in (f'{dir}/{name}' for dir in dirs):
+        for fullname in [f'{dir}/{name}' for dir in dirs]:
             if isfile(fullname):
                 with open(fullname, 'rt') as file:
                     return load_yml(file.read(), RoundTripLoader), fullname

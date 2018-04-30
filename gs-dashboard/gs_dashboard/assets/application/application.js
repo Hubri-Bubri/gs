@@ -23,6 +23,6 @@ Vue.component('Login', Login);
 
 const application = new Vue({
     router,
-    el: ".application"
+    el: ".gs-dashboard"
 });
 

@@ -23,3 +23,28 @@ Query for users
     WHERE users.userName='{name}'
     AND users.password='{passw}'
     AND companies.companyId='{appid}'
+
+
+
+Ideas for security
+==================
+
+# Аналогичное на стороне javascript.
+# В первую очередь продумать императивный вариант!
+
+@has_permission(
+    {
+        'dashboard.order', ['write', 'delete'],
+        # AND
+        'dashboard.money', ['write']
+    },
+    # OR
+    {'dashboard.video', ['write', 'read']},
+    
+    {'dashboard/@view/@table/order', ['read']},
+    {'dashboard/@data/@table/order/@member/_*', ['invisible']},
+
+    {'dashboard/@view/@record/order/@member/_*', ['invisible']}
+)
+def security():
+    pass

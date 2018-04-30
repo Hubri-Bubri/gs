@@ -47,6 +47,10 @@
 <script>
     import axios from 'axios';
 
+    const buttonPermission = [
+        {'dashboard.order', ['write', 'delete']},
+    ];
+
     export default {
         data () {
             return {
@@ -69,7 +73,6 @@
 
         methods: {
             onSubmit() {
-                this.failure = false;
 
                 axios.post('/authenticate', {
                     login: this.login,
