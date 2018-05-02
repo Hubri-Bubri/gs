@@ -7,22 +7,26 @@ let resolve = (dir) => {
 
 module.exports = {
     entry: {
-        application: resolve('./application/application.js')
+        'gs-dashboard/gs_dashboard/static/bundle/gs-dashboard': resolve('./gs-dashboard/assets/application/application.js'),
+        'gs-business/gs_business/static/bundle/gs-business': resolve('./gs-business/assets/application/application.js')
     },
+
     output: {
-        path: resolve("../static/bundle"),
+        path: resolve("."),
         filename: '[name].js',
         publicPath: '/static'
     },
+
     resolve: {
         extensions: ['.js', '.vue'],
         alias: {
-            '@': resolve('application'),
-            '@share': resolve('../../../gs-share/assets/application'),
+            '@dashboard': resolve('./gs-dashboard/assets/application'),
+            '@business': resolve('./gs-business/assets/application'),
+            '@share': resolve('./gs-share/assets/application'),
             'vue$': 'vue/dist/vue.js'
-        },
-        modules: ["/home/alexander/projects/gs/gs-business/gs_business/assets/node_modules"]
+        }
     },
+
     module: {
         rules: [
             {
@@ -48,12 +52,20 @@ module.exports = {
             }
         ]
     },
+
     plugins: [
         new CopyWebpackPlugin([
-            { from: resolve('node_modules/bootstrap/dist/css/bootstrap.css') },
-            { from: resolve('node_modules/bootstrap-vue/dist/bootstrap-vue.css') },
-            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/css'), to: "font-awesome/css", ignore: ["*.map"] },
-            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/webfonts'), to: "font-awesome/webfonts" },
+            // gs-dashboard
+            { from: resolve('node_modules/bootstrap/dist/css/bootstrap.css'), to: './gs-dashboard/gs_dashboard/static/bundle' },
+            { from: resolve('node_modules/bootstrap-vue/dist/bootstrap-vue.css'), to: './gs-dashboard/gs_dashboard/static/bundle' },
+            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/css'), to: "./gs-dashboard/gs_dashboard/static/bundle/font-awesome/css", ignore: ["*.map"] },
+            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/webfonts'), to: "./gs-dashboard/gs_dashboard/static/bundle/font-awesome/webfonts" },
+            
+            // gs-business
+            { from: resolve('node_modules/bootstrap/dist/css/bootstrap.css'), to: './gs-business/gs_business/static/bundle' },
+            { from: resolve('node_modules/bootstrap-vue/dist/bootstrap-vue.css'), to: './gs-business/gs_business/static/bundle' },
+            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/css'), to: "./gs-business/gs_business/static/bundle/font-awesome/css", ignore: ["*.map"] },
+            { from: resolve('node_modules/@fortawesome/fontawesome-free-webfonts/webfonts'), to: "./gs-business/gs_business/static/bundle/font-awesome/webfonts" }
         ])
     ]
 }

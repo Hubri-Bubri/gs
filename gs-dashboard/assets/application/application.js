@@ -3,14 +3,14 @@ import BootstrapVue from 'bootstrap-vue';
 import VueRouter from 'vue-router';
 import VueI18n from 'vue-i18n';
 
-import {router} from '@/router';
-import Layout from '@/component/layout/index';
+import {router} from '@dashboard/router';
+import Layout from '@dashboard/component/layout/index';
 
-import Login from '@/component/login/index';
+import Login from '@dashboard/component/login/index';
 
 
-import '@/style/css/layout.css'
-import '@/style/css/login.css'
+import '@dashboard/style/css/layout.css'
+import '@dashboard/style/css/login.css'
 
 // include vue.js plugins
 Vue.use(VueRouter);

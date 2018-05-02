@@ -1,0 +1,10 @@
+@import '../_mixin.scss';
+
+
+.gs-container {
+    @include container();
+}
+
+.gs-container-body {
+    @include container-scrollable();
+}

@@ -1,0 +1,19 @@
+@mixin container() {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    align-content: stretch;
+}
+
+@mixin container-item() {
+    flex-grow: 1;
+    height: 0;
+    overflow: auto;
+}
+
+@mixin container-scrollable() {
+    @include container();
+    @include container-item();
+}
+

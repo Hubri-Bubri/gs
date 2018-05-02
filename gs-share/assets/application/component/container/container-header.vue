@@ -1,5 +1,5 @@
 <template>
-    <div class="gs-container">
+    <div class="gs-container-header">
         <slot></slot>
     </div>
 </template>

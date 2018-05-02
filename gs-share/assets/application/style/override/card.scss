@@ -1,0 +1,19 @@
+@import '../mixin.scss';
+
+
+.gs-container.card .card-body {
+    @include container-scrollable();
+    padding: 5px;
+}
+
+.gs-container.card .tabs {
+    @include container();
+
+    .tab-content {
+        @include container-scrollable();
+    }
+}
+
+.card-deck {
+    @include container-item();
+}

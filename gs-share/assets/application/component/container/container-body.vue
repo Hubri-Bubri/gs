@@ -1,5 +1,7 @@
 <template>
-    <div>Hello, World!</div>
+    <div class="gs-container-body">
+        <slot></slot>
+    </div>
 </template>
 
 

@@ -1,5 +1,5 @@
 import VueRouter from 'vue-router';
-import Login from '@/component/login/index';
+import Login from '@dashboard/component/login/index';
 
 
 const router = new VueRouter({

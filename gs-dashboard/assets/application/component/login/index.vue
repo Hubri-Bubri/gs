@@ -47,10 +47,6 @@
 <script>
     import axios from 'axios';
 
-    const buttonPermission = [
-        {'dashboard.order', ['write', 'delete']},
-    ];
-
     export default {
         data () {
             return {
