@@ -38,3 +38,9 @@ class Application:
                         (T.users.id == T.many_to_many_users_applications.user_id)))
                 .fields(T.applications.name, T.applications.link)
                 .where((T.users.user_name == login)))
+
+class Project:
+
+    @classmethod
+    async def select(cls):
+        pass

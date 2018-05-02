@@ -30,5 +30,11 @@ async def security(request):
 
 
 
+@routes.get('/info')
+async def info(request):
+
+    return web.json_response({})
+
+
 # register static routes
 routes.static('/static', f"{APPLICATION_DIR}/static")

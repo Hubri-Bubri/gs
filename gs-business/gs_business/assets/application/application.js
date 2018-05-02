@@ -5,6 +5,7 @@ import VueI18n from 'vue-i18n';
 
 import {router} from '@/router';
 import Layout from '@/component/layout/index';
+import TopMenu from '@/component/top-menu/index';
 
 import '@/style/css/layout.css'
 import '@/style/css/login.css'
@@ -16,6 +17,7 @@ Vue.use(BootstrapVue);
 
 // include own vue.js components
 Vue.component('Layout', Layout);
+Vue.component('TopMenu', TopMenu);
 
 const application = new Vue({
     router,

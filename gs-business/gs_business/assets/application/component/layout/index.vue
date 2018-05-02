@@ -1,5 +1,8 @@
 <template>
-    <router-view></router-view>
+    <div class="gs">
+        <top-menu></top-menu>
+        <router-view></router-view>
+    </div>
 </template>
 
 
