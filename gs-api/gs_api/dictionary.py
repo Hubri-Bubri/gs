@@ -13,27 +13,42 @@ class User:
     async def select_by_login_password(cls, login, password):
         async with database.cursor() as cursor:
             return await cursor.fetchone(Q()
-                .tables(T.users)
-                .fields(T.users.user_name)
-                .where((T.users.user_name == login) & (T.users.password == password)))
-
-    @classmethod
-    async def select_by_identity(cls, identity):
-        async with database.cursor() as cursor:
-            return await cursor.fetchone(Q()
-                .tables((T.users & T.access).on(T.users.id == T.access.user))
-                .fields(T.users.user_name, T.access.permissions)
-                .where((T.users.user_name == identity)))
+                .tables(T.user)
+                .fields(T.user.login)
+                .where((T.user.login == login) & (T.user.password == password)))
 
 
-class Application:
-
+class PermissionSchema:
     @classmethod
     async def select_by_login(cls, login):
         async with database.cursor() as cursor:
             return await cursor.fetchall(Q()
-                .tables((T.applications & T.users & T.many_to_many_users_applications)
-                    .on((T.applications.id == T.many_to_many_users_applications.application_id) &
-                        (T.users.id == T.many_to_many_users_applications.user_id)))
-                .fields(T.applications.name, T.applications.link)
-                .where((T.users.user_name == login)))
+                .tables((T.user & T.user_permission_schema).on(T.user.id == T.user_permission_schema.user_id))
+                .fields(T.user.user_name, T.user_permission_schema.target, T.user_permission_schema.permission)
+                .where(T.user.user_name == login))
+
+
+class Application:
+    @classmethod
+    async def select_by_login(cls, login):
+        async with database.cursor() as cursor:
+            return await cursor.fetchall(Q()
+                .tables((T.application & T.user & T.m2m_company_application).on(
+                    (T.application.id == T.m2m_company_application.application_id) &
+                    (T.users.id == T.m2m_company_application.user_id)
+                ))
+                .fields(T.application.name, T.application.link)
+                .where(T.users.user_name == login))
+
+
+class Company:
+    @classmethod
+    async def select_by_login(cls, login):
+        async with database.cursor() as cursor:
+            return await cursor.fetchall(Q()
+                .tables((T.company & T.user & T.m2m_user_company).on(
+                    (T.company.id == T.m2m_user_company.company_id) &
+                    (T.user.id == T.m2m_user_company.user_id)
+                ))
+                .fields(T.company.id, T.company.name)
+                .where(T.user.login == login))

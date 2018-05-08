@@ -1,5 +1,9 @@
+@mixin flex-item() {
+    flex: 1 1 auto;
+}
+
 @mixin container() {
-    flex-grow: 1;
+    @include flex-item();
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -7,7 +11,7 @@
 }
 
 @mixin container-item() {
-    flex-grow: 1;
+    @include flex-item();
     height: 0;
     overflow: auto;
 }

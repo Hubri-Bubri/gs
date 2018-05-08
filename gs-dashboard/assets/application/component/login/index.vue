@@ -75,7 +75,8 @@
                     password: this.password
                 }).then(response => {
                     this.success = true;
-                    this.loadApplications();
+                    // this.loadApplications();
+                    this.loadCompanies();
                 }).catch(error => {
                     this.success = false;
                 });
@@ -83,6 +84,12 @@
 
             openApplication(link) {
                 window.open(link, '_blank');
+            },
+
+            loadCompanies() {
+                axios.get('/company').then(response => {
+                    console.log(response);
+                });
             },
 
             loadApplications() {

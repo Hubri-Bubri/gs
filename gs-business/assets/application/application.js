@@ -10,7 +10,6 @@ import ContainerFooter from '@share/component/container/container-footer';
 
 import TopMenu from '@business/component/top-menu/index';
 
-
 import '@share/style/override/card.scss';
 import '@share/style/component/container.scss';
 import '@share/style/component/top-menu.scss';

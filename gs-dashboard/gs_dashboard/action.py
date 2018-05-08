@@ -1,11 +1,13 @@
 import time
+from enum import Enum
 from aiohttp import hdrs, web
 from aiohttp_jinja2 import template
 from aiohttp_session import get_session
 from uuid import uuid4
 from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
-from gs_api.dictionary import Application 
+from gs_security.permission import Permission
+from gs_api.dictionary import Application, Company
 
 from .environment import APPLICATION_DIR
 
@@ -20,12 +22,15 @@ async def dashboard(request):
 
 
 @routes.get('/application')
-@has_permission('first')
 async def security(request):
     session = await get_session(request)
-    identity = session.get('AIOHTTP_SECURITY')
+    return web.json_response(await Application.select_by_login(session.get('AIOHTTP_SECURITY')))
 
-    return web.json_response(await Application.select_by_login(identity))
+
+@routes.get('/company')
+async def security(request):
+    session = await get_session(request)
+    return web.json_response(await Company.select_by_login(session.get('AIOHTTP_SECURITY')))
 
 
 @routes.post('/authenticate')
@@ -42,8 +47,6 @@ async def authenticate(request):
         return response
 
     return web.HTTPUnauthorized()
-
-
 
 
 # register static routes
