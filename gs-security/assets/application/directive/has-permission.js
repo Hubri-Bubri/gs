@@ -1,22 +1,39 @@
-const READ = 1001;
-const WRITE = 1002;
+import _ from 'lodash';
 
-export default function hasPermission (el, bindings, vnode) {
-    const security = vnode.context.$security;
-    const {predicat, target} = parsePredicat(bindings.rawName);
 
-    security.table['access-user'].forEach(accesRule => {
-    });
+const PredicateCode = {
+    'read': 1001,
+    'write': 1002,
+    'update': 1003,
+    'delete': 1004
+};
 
-    el.style.display = 'none';
-}
 
-function parsePredicat(rawValue) {
+function parsePermission(rawValue) {
     const rawChunks = rawValue.split('.');
-    const [_directive, target, predicat] = rawChunks;
+    const [_directive, target, predicate] = rawChunks;
 
     return {
-        predicat: predicat,
+        predicate: predicate,
         target: target
+    }
+}
+
+export function hasPermission(accesRules, target, predicate) {
+
+    return _.chain(accesRules).map(accesRule => {
+            return _.startsWith(accesRule.target, target) && _.includes(accesRule.permission, PredicateCode[predicate]);
+        })
+        .includes(true)
+        .value();
+}
+
+export function hasPermissionDirective(el, bindings, vnode) {
+    const security = vnode.context.$security;
+    const { target, predicate } = parsePermission(bindings.rawName);
+    const isHasPermission = hasPermission(security.table['access-user'], target, predicate);
+
+    if (!isHasPermission) {
+        el.style.display = 'none';
     }
 }

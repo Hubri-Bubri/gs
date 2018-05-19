@@ -37,8 +37,8 @@ steps = [
         "DROP TABLE user_permission_schema"
     ),
 
-    step("INSERT `user_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project/master/table.project', '1001')"),
-    step("INSERT `user_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project/master/table.project/column.descr*', '-1001')"),
+    step("INSERT `user_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project@master@table-project', '1001')"),
+    step("INSERT `user_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project@master@table-project@column.descr*', '1001')"),
     step("INSERT `user_permission_schema` VALUES (NULL, 1, 1, 1, 'model', 'application', '1001, 1002')"),
 
     step(
@@ -57,8 +57,8 @@ steps = [
         "DROP TABLE role_permission_schema"
     ),
 
-    step("INSERT `role_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project/master/table.project', '1001')"),
-    step("INSERT `role_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project/master/table.project/column.descr*', '-1001')"),
+    step("INSERT `role_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project@master@table-project', '1001')"),
+    step("INSERT `role_permission_schema` VALUES (NULL, 1, 1, 1, 'view', 'project@master@table-project@column.descr*', '-1001')"),
     step("INSERT `role_permission_schema` VALUES (NULL, 1, 1, 1, 'model', 'application', '1001, 1002')"),
 
     step(

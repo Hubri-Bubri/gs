@@ -41,11 +41,11 @@ class Database:
 
     @aiocontextmanager
     def pool(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @aiocontextmanager
     def connection(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @aiocontextmanager
     async def cursor(self):
@@ -63,7 +63,7 @@ class Database:
             self._cursor = cursor
 
         async def execute(self):
-            raise NotImplementedError()
+            raise NotImplementedError
 
         async def fetchall(self, *args, **kwargs):
             await self.execute(*args, **kwargs)

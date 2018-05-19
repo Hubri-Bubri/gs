@@ -4,7 +4,7 @@ import VueRouter from 'vue-router';
 import VueI18n from 'vue-i18n';
 
 import Container from '@share/component/container/container';
-import Security from '@security/plugin/security';
+import Security from '@security/plugin/security/index';
 import ContainerHeader from '@share/component/container/container-header';
 import ContainerBody from '@share/component/container/container-body';
 import ContainerFooter from '@share/component/container/container-footer';

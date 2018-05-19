@@ -38,11 +38,11 @@
                         <b-dropdown-item href="#">Partner Sales</b-dropdown-item>
                     </b-nav-item-dropdown>
 
-                    <b-nav-item-dropdown text="Settings" right v-has-permission.view@button.read>
+                    <b-nav-item-dropdown text="Settings" right v-has-permission.project@master@table-project.read>
                         <b-dropdown-item href="#">Employee</b-dropdown-item>
                         <b-dropdown-item href="#">Settings</b-dropdown-item>
                         <b-dropdown-item href="#">Units</b-dropdown-item>
-                        <b-dropdown-item href="#">Fleet</b-dropdown-item>
+                        <b-dropdown-item href="#" v-has-permission.project@master@table-project.read>Fleet</b-dropdown-item>
                     </b-nav-item-dropdown>
                 </b-nav>
             </div>
@@ -77,8 +77,7 @@ export default {
     },
 
     created() {
-        console.log(this.$security.account);
-        // this.$access
+        console.log(this.$security.hasPermission('project@master@table-project', 'write'));
     }
 }
 </script>

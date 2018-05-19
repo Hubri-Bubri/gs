@@ -46,6 +46,7 @@ class User:
                 'access-role': await PermissionSchema.select_by_login(login)
             }
 
+
 class PermissionSchema:
     @classmethod
     async def select_by_login(cls, login):
