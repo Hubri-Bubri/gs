@@ -1,8 +1,3 @@
-"""
-TODO - do check for logger config exsisting!
-"""
-
-
 from ruamel.yaml import load as load_yml, RoundTripLoader
 from os.path import isfile, dirname, abspath
 from os import makedirs

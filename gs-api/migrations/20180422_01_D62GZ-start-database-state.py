@@ -94,15 +94,18 @@ steps = [
         """
         CREATE TABLE `user` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
-            `login` text,
-            `password` text,
+            `login` text NOT NULL,
+            `password` text NOT NULL,
+            `first_name` text,
+            `second_name` text,
+            `third_name` text,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8
         """,
         "DROP TABLE user"
     ),
 
-    step("INSERT `user` VALUES (1, 'admin', 'admin')"),
+    step("INSERT `user` VALUES (1, 'admin', 'admin', 'Vladimir', 'Putin', 'Vladimirovich')"),
 
     step(
         """
@@ -131,5 +134,20 @@ steps = [
     ),
 
     step("INSERT `m2m_company_application` VALUES (NULL, 1, 1)"),
-    step("INSERT `m2m_company_application` VALUES (NULL, 1, 2)")
+    step("INSERT `m2m_company_application` VALUES (NULL, 1, 2)"),
+
+    step(
+        """
+        CREATE TABLE `m2m_user_role` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `user_id` int(11) NOT NULL,
+            `role_id` int(11) NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+        """,
+        "DROP TABLE m2m_user_role"
+    ),
+
+    step("INSERT `m2m_user_role` VALUES (NULL, 1, 1)"),
+    step("INSERT `m2m_user_role` VALUES (NULL, 1, 2)")
 ]

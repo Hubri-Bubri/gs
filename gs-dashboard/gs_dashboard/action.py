@@ -21,16 +21,27 @@ async def dashboard(request):
     return {'nocache': hash(uuid4())}
 
 
-@routes.get('/application')
-async def security(request):
+@routes.post('/session')
+async def session(request):
     session = await get_session(request)
-    return web.json_response(await Application.select_by_login(session.get('AIOHTTP_SECURITY')))
+    form = await request.json()
+
+    session['COMPANY_ID'] = form.get('company-id')
+
+    return web.HTTPOk()
+
+
+@routes.get('/application')
+async def application(request):
+    return web.json_response(await Application.select_by_company(request.query.get('company-id')))
 
 
 @routes.get('/company')
-async def security(request):
+async def company(request):
     session = await get_session(request)
-    return web.json_response(await Company.select_by_login(session.get('AIOHTTP_SECURITY')))
+    login = session.get('AIOHTTP_SECURITY')
+
+    return web.json_response(await Company.select_by_login(login))
 
 
 @routes.post('/authenticate')
@@ -39,8 +50,7 @@ async def authenticate(request):
 
     login = form.get('login')
     password = form.get('password')
-    
-    response = web.Response(text='Hello')
+    response = web.HTTPOk()
 
     if await check_credentials(login, password):
         await remember(request, response, login)

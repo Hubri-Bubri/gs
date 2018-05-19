@@ -1,11 +1,11 @@
-from aiohttp import hdrs, web
+import time
+from aiohttp import web
 from aiohttp_jinja2 import template
 from aiohttp_session import get_session
 from uuid import uuid4
-import time
 from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
-from gs_api.dictionary import Application 
+from gs_api.dictionary import Application, User
 
 from .environment import APPLICATION_DIR
 
@@ -17,6 +17,12 @@ routes = web.RouteTableDef()
 @template('index.html')
 async def dashboard(request):
     return {'nocache': hash(uuid4())}
+
+
+@routes.get('/profile')
+async def profile(request):
+    session = await get_session(request)
+    return web.json_response(await User.select_profile(session.get('AIOHTTP_SECURITY'), session.get('COMPANY_ID')))
 
 
 # register static routes
