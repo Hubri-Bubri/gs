@@ -1,5 +1,5 @@
 from aiohttp_security.abc import AbstractAuthorizationPolicy
-from gs_api.dictionary import User
+from gs_api.dictionary import User, PermissionSchema
 
 
 class DatabaseAuthorizationPolicy(AbstractAuthorizationPolicy):
@@ -7,19 +7,19 @@ class DatabaseAuthorizationPolicy(AbstractAuthorizationPolicy):
     async def authorized_userid(self, identity):
         return True
 
-    async def permits(self, identity, permission, context=None):
-        user = await User.select_by_identity(identity)
+    async def permits(self, identity, permission, context):
+        user_permission_schema = await PermissionSchema.select_by_login(identity)
+        target, domen = context.split(':')
 
-        if user is None:
-            return False
+        return permission in self.parse_permission_schema(user_permission_schema, target)
 
-        return permission in self.parse_permission_dsl(user.get('permissions', None))
+    def parse_permission_schema(self, user_permission_schema, target):
 
-    def parse_permission_dsl(self, permission):
-        if permission is None:
-            return []
+        for user, target, tag in map(lambda _: _.values(), user_permission_schema):
+            if target in target:
+                return [int(_.strip()) for _ in tag.split(',')]
 
-        return [_.strip() for _ in permission.split(',')]
+        return []
 
 
 async def check_credentials(username, password):

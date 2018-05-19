@@ -27,7 +27,17 @@ Query for users
 
 
 Ideas for security
+
 ==================
+
+
+(user, application, 'view', 'project/master/table/column:name', 'read')
+(user, application, 'view', 'project/master/detail/button:ok', 'read')
+(user, application, 'database', 'table/column:na*', 'read')
+(user, application, 'action', ':data', 'read')
+
+(user_group, dashboard@data@table@column/name, 'read')
+
 
 # Аналогичное на стороне javascript.
 # В первую очередь продумать императивный вариант!
@@ -41,8 +51,9 @@ Ideas for security
     # OR
     {'dashboard.video', ['write', 'read']},
     
-    {'dashboard/@view/@table/order', ['read']},
-    {'dashboard/@data/@table/order/@member/_*', ['invisible']},
+    {'view@table@column:dashboard/order', ['read']},
+    
+    {'dashboard/@data.table/order/@member/_*', ['invisible']},
 
     {'dashboard/@view/@record/order/@member/_*', ['invisible']}
 )

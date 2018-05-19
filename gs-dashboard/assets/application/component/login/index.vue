@@ -18,13 +18,20 @@
                     <b-form-input :disabled="success === true" id="password" size="lg" type="password" placeholder="Enter password" v-model="password"></b-form-input>
                 </b-form-group>
 
-                <b-form-select :options="applications_options" v-model="link" v-if="success === true" class="mb-3" size="lg">
-                </b-form-select>
+                <b-form-select :options="companyOptions" 
+                               v-model="companyId"
+                               v-if="success === true"
+                               class="mb-3" size="lg"></b-form-select>
+
+                <b-form-select :options="applicationsOptions"
+                               v-model="applicationUri"
+                               v-if="applications.length > 0"
+                               class="mb-3" size="lg"></b-form-select>
 
                 <div class="gs-dashboard__login-footer">
                     
-                    <b-button :disabled="link == null"
-                              @click="openApplication(link)"
+                    <b-button :disabled="applicationUri === null"
+                              @click.prevent.stop="openApplication(companyId, applicationUri)"
                               v-if="applications.length > 0"
                               type="submit" size="lg"
                               class="float-right"
@@ -32,17 +39,20 @@
                         <i class="fas fa-check-circle"></i>
                     </b-button>
 
-                    <b-button v-else type="submit" size="lg" class="float-right" variant="primary">
+                    <b-button v-if="companies.length === 0"
+                              type="submit"
+                              size="lg"
+                              class="float-right"
+                              variant="primary">
                         <i class="fas fa-sign-in-alt"></i>
                     </b-button>
 
                 </div>
 
             </b-form>
-
         </div>
     </div>
-</template>    
+</template>
 
 <script>
     import axios from 'axios';
@@ -53,17 +63,38 @@
                 login: null,
                 password: null,
                 success: null,
-                link: null,
-                applications: []
+                companyId: null,
+                applicationUri: null,
+                applications: [],
+                companies: []
             }
         },
 
         computed: {
-            applications_options() {
+            applicationsOptions() {
                 return this.applications.concat([{
-                    text: "Please select appliction",
+                    text: "Please select application",
                     value: null
                 }])
+            },
+
+            companyOptions() {
+                return this.companies.concat([{
+                    text: "Please select company",
+                    value: null
+                }])
+            }
+        },
+
+        watch: {
+            companyId(value) {
+                if (value === null) {
+                    this.applications = []
+                } else {
+                    axios.post('/session', {"company-id": value}).then(response => {
+                        this.loadApplications(value);
+                    });
+                }
             }
         },
 
@@ -75,21 +106,33 @@
                     password: this.password
                 }).then(response => {
                     this.success = true;
-                    this.loadApplications();
+                    this.loadCompanies();
                 }).catch(error => {
                     this.success = false;
                 });
             },
 
-            openApplication(link) {
-                window.open(link, '_blank');
+            openApplication(companyId, applicationUri) {
+                window.open(this.applicationUri, "_blank");
             },
 
-            loadApplications() {
-
-                axios.get('/application').then(response => {
-                    this.applications = response.data.map(_ => ({
+            loadCompanies() {
+                axios.get('/company').then(response => {
+                    this.companies = response.data.map(_ => ({
                         text: _.name,
+                        value: _.id
+                    }))
+                });
+            },
+
+            loadApplications(companyId) {
+                return axios.get('/application', {
+                    params: {
+                        "company-id": companyId
+                    }
+                }).then(response => {
+                    return this.applications = response.data.map(_ => ({
+                        text: `${_.name} (${_.link})`,
                         value: _.link
                     }))
                 });

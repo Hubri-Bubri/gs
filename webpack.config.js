@@ -23,6 +23,7 @@ module.exports = {
             '@dashboard': resolve('./gs-dashboard/assets/application'),
             '@business': resolve('./gs-business/assets/application'),
             '@share': resolve('./gs-share/assets/application'),
+            '@security': resolve('./gs-security/assets/application'),
             'vue$': 'vue/dist/vue.js'
         }
     },
