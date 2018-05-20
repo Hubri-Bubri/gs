@@ -4,7 +4,7 @@
             <top-menu></top-menu>
         </container-header>
         <container-body>
-            <b-card header="Project" class="gs-container">
+            <b-card header="Project" footer="Card Footer" class="gs-container">
                 <container>
                     <container-header>
                         <b-form style="margin-bottom: 5px">
@@ -13,7 +13,7 @@
                     </container-header>
                     <container-body>
                         <b-table striped hover :items="items" @row-clicked="inItemClick"></b-table>
-                    </container-body>
+                     </container-body>
                 </container>
             </b-card>
         </container-body>
@@ -22,34 +22,28 @@
 
 
 <script>
+//const sel ='<select></select>';
 const items = [
-    { isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-    { isActive: false, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-    { isActive: false, age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
-    { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' }
+    { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
+    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
+    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
+    'Status':'open' },
+     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
+    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
+    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
+    'Status':'open' },
+     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
+    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
+    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
+    'Status':'open' },
+     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
+    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
+    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
+    'Status':'open' },
+     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
+    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
+    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
+    'Status':'open' },
 ]
 
 export default {
