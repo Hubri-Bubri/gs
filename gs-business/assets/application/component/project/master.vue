@@ -59,6 +59,11 @@ export default {
             this.$router.push({
                 path: `/project/detail/${item.age}`
             });
+        },
+        mounted(){
+            axiox.get('/projects', ).then(function (response){
+
+            })
         }
     }
 }
