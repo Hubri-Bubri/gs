@@ -24,7 +24,7 @@
 <script>
 //const sel ='<select></select>';
 const items = [
-    { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
+    { 'ProjectNumber': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
     'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
     'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
     'Status':'open' },
@@ -57,7 +57,7 @@ export default {
     methods: {
         inItemClick(item, index, event) {
             this.$router.push({
-                path: `/project/detail/${item.age}`
+                path: `/project/detail/${item.ProjectNumber}`
             });
         },
         mounted(){
