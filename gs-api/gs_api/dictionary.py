@@ -89,3 +89,14 @@ class Company:
                 .tables(T.company)
                 .fields(T.company.name)
                 .where(T.company.id == id))
+
+class Project:
+    @classmethod
+    async def select_project(cls, id):
+        async with database.cursor() as cursor:
+            return await cursor.fetchone(Q()
+                .tables(T.project & T.user).on(T.project.user_id == T.user.id)
+                .fields(T.project.project_number, T.project.date, T.project.street,
+                    T.project.city, T.project.zip, T.user.first_name, T.user.second_name)
+                .where(T.project.id == id))
+
