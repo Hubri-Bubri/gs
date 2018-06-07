@@ -187,6 +187,7 @@
 
 
 <script type="text/javascript">
+    import axios from 'axios';
 const items = [
     { isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
     { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' },
@@ -200,8 +201,8 @@ export default {
     data() {
         return {
           items: items,
-          project: {number: '777-2018', editor: 'Alexander Baer', date: '2018-02-01',
-          street: 'Frankfurter Strasse 39_0312', city: 'Darmstadt', zip: 'D-64293'},
+          project: {number: null, editor: null, date: null,
+          street: null, city: null, zip: null},
 
           customer: null,
           person: null,
@@ -230,7 +231,14 @@ export default {
         }
       },
       mounted(){
-        console.log(this.id);
+        axios.get('/project_detail', {params: {id: this.id}}).then(response => {
+            this.project.number = response.data.project_number,
+            this.project.date = response.data.date,
+            this.project.street = response.data.street,
+            this.project.city = response.data.city,
+            this.project.zip = response.data.zip,
+            this.project.editor = response.data.first_name+' '+response.data.second_name
+          })
       }
 }
 </script>

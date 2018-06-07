@@ -12,53 +12,154 @@
                         </b-form>
                     </container-header>
                     <container-body>
-                        <b-table striped hover :items="items" @row-clicked="inItemClick"></b-table>
-                     </container-body>
+                        <b-table striped hover :items="items" :fields="fields" @row-clicked="inItemClick" class="tableProject">
+                            <template slot="status" slot-scope="data">
+                                <b-form inline v-on:click.stop.prevent>
+                                    <b-form-select v-model="data.item.status_set" :options="options" @input="changeSelect(data.item.status_set, data.item.id)"/>
+                                 &nbsp;<i :ref="data.item.id" class="fas fa-circle fa-w-16 fa-2x"></i>
+                                </b-form>
+                            </template>
+                        </b-table>
+                    </container-body>
                 </container>
             </b-card>
         </container-body>
     </container>
 </template>
-
-
 <script>
-//const sel ='<select></select>';
-const items = [
-    { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
-    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
-    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
-    'Status':'open' },
-     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
-    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
-    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
-    'Status':'open' },
-     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
-    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
-    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
-    'Status':'open' },
-     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
-    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
-    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
-    'Status':'open' },
-     { 'Project number': '777-2018', 'type': 'L','Street': 'In den Leppsteinswiesen 8',
-    'ZIP': 'D-64293', 'City': 'Berlin', 'Calculation':'25.02.2018 send post',
-    'Release of costs':'no', 'Others':'Wir waren Vorort und haben nichts festgestellen können',
-    'Status':'open' },
+
+const items = [{
+        'project_number': '0001-2016', 
+        'type': 'L',
+        'street': 'In den Leppsteinswiesen 8',
+        'zip': 'D-64293',
+        'city': 'Berlin',
+        'start': '25.02.2018',
+        'others': 'Wir waren Vorort und haben nichts festgestellen können',
+        'status_set': 'Open',
+        'id': '1'
+    },
+    {
+        'project_number': '777-2018',
+        'type': 'L',
+        'street': 'In den Leppsteinswiesen 8',
+        'zip': 'D-64293',
+        'city': 'Berlin',
+        'start': '25.02.2018',
+        'others': 'Wir waren Vorort und haben nichts festgestellen können',
+        'status_set': 'Done',
+        'id': '2'
+    },
+    {
+        'project_number': '777-2018',
+        'type': 'L',
+        'street': 'In den Leppsteinswiesen 8',
+        'zip': 'D-64293',
+        'city': 'Berlin',
+        'start': '25.02.2018',
+        'others': 'Wir waren Vorort und haben nichts festgestellen können',
+        'status_set': 'Invoice',
+        'id': '3'
+    },
+    {
+        'project_number': '777-2018',
+        'type': 'L',
+        'street': 'In den Leppsteinswiesen 8',
+        'zip': 'D-64293',
+        'city': 'Berlin',
+        'start': '25.02.2018',
+        'others': 'Wir waren Vorort und haben nichts festgestellen können',
+        'status_set': 'Desiccation',
+        'id': '4'
+    },
+    {
+        'project_number': '777-2018',
+        'type': 'L',
+        'street': 'In den Leppsteinswiesen 8',
+        'zip': 'D-64293',
+        'city': 'Berlin',
+        'start': '25.02.2018',
+        'others': 'Wir waren Vorort und haben nichts festgestellen können',
+        'status_set': 'Leakage_Detection',
+        'id': '5'
+    },
 ]
 
 export default {
-    
-    data () {
+
+    data() {
         return {
-            items: items
+            fields: {
+                project_number: {
+                label: 'Project Number',
+                sortable: true
+                },
+                start: {
+                label: 'Start',
+                sortable: true
+                },
+                type: {
+                label: 'Type',
+                sortable: true
+                },
+                street: {
+                label: 'Street',
+                sortable: true
+                },
+                zip: {
+                label: 'ZIP',
+                sortable: true
+                },
+                city: {
+                label: 'City',
+                sortable: true
+                },
+                others: {
+                label: 'Others',
+                sortable: true
+                },
+                status: {
+                label: 'Status',
+                sortable: true
+                }
+                },
+
+               options: [
+                         { value: 'Open', text: 'Open' },
+                         { value: 'Done', text: 'Done'},
+                         { value: 'Invoice', text:'Invoice' },
+                         { value: 'Desiccation', text:'Desiccation' },
+                         { value: 'Leakage_Detection', text:'Leakage Detection' },
+                         { value: 'Restoration', text:'Restoration'}
+               ],
+            items: items,
+            idSpan: 0
         }
     },
 
     methods: {
         inItemClick(item, index, event) {
             this.$router.push({
-                path: `/project/detail/${item.age}`
+                path: `/project/detail/${item.id}`
             });
+        },
+        changeSelect(value, id) {
+        if ( value == 'Open' ) this.$refs[id].style='color:black';
+        if ( value == 'Done' ) this.$refs[id].style='color:green';
+        if ( value == 'Invoice' ) this.$refs[id].style='color:orange';
+        if ( value == 'Desiccation' ) this.$refs[id].style='color:grey';
+        if ( value == 'Leakage_Detection' ) this.$refs[id].style='color:red';
+        if ( value == 'Restoration' ) this.$refs[id].style='color:blue';
+        },
+
+        mounted() { 
+            console.log('121');
+            changeSelect('Done', '1');
+    //        axiox.get('/projects', ).then(function(response) {
+
+      //      }), 
+            
+
         }
     }
 }
