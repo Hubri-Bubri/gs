@@ -15,8 +15,8 @@
                         <b-table striped hover :items="items" :fields="fields" @row-clicked="inItemClick" class="tableProject">
                             <template slot="status" slot-scope="data">
                                 <b-form inline v-on:click.stop.prevent>
-                                    <b-form-select v-model="data.item.status_set" :options="options" @input="changeSelect(data.item.status_set, data.item.id)"/>
-                                 &nbsp;<i :ref="data.item.id" class="fas fa-circle fa-w-16 fa-2x"></i>
+                                    <b-form-select v-model="data.item.status_set" :options="options"/>
+                                    <i class="fas fa-circle fa-w-16 fa-2x" :style="computeStyle(data.item.status_set)"></i>
                                 </b-form>
                             </template>
                         </b-table>
@@ -143,13 +143,16 @@ export default {
                 path: `/project/detail/${item.id}`
             });
         },
-        changeSelect(value, id) {
-        if ( value == 'Open' ) this.$refs[id].style='color:black';
-        if ( value == 'Done' ) this.$refs[id].style='color:green';
-        if ( value == 'Invoice' ) this.$refs[id].style='color:orange';
-        if ( value == 'Desiccation' ) this.$refs[id].style='color:grey';
-        if ( value == 'Leakage_Detection' ) this.$refs[id].style='color:red';
-        if ( value == 'Restoration' ) this.$refs[id].style='color:blue';
+
+        computeStyle(value) {
+            switch (value) {
+                case 'Open': return {'color': 'black'};
+                case 'Done': return {'color': 'green'};
+                case 'Invoice': return {'color':'orange'};
+                case 'Desiccation': return {'color':'grey'};
+                case 'Leakage_Detection': return {'color':'red'};
+                case 'Restoration': return {'color':'blue'};
+            }
         },
 
         mounted() { 
