@@ -26,7 +26,7 @@ class Configurator:
                 with open(fullname, 'rt') as file:
                     return load_yml(file.read(), RoundTripLoader), fullname
         
-        raise RuntimeError('config file not found in - {}'.format(', '.join(dirs)))
+        raise RuntimeError(f"config file not found in - {', '.join(dirs)}")
 
     def load(self):
         self._config, self._path = self._read_config_file(self._search_file, self._search_dirs)

@@ -27,7 +27,6 @@ Query for users
 
 
 Ideas for security
-
 ==================
 
 

@@ -42,7 +42,7 @@
                         <b-dropdown-item href="#">Employee</b-dropdown-item>
                         <b-dropdown-item href="#">Settings</b-dropdown-item>
                         <b-dropdown-item href="#">Units</b-dropdown-item>
-                        <b-dropdown-item href="#" v-has-permission.project@master@table-project.read>Fleet</b-dropdown-item>
+                        <b-dropdown-item href="#" v-has-permission.project@master@table-project.write>Fleet</b-dropdown-item>
                     </b-nav-item-dropdown>
                 </b-nav>
             </div>

@@ -20,20 +20,19 @@ function parsePermission(rawValue) {
 }
 
 export function hasPermission(accesRules, target, predicate) {
-
-    return _.chain(accesRules).map(accesRule => {
-            return _.startsWith(accesRule.target, target) && _.includes(accesRule.permission, PredicateCode[predicate]);
-        })
+    const code = PredicateCode[predicate];
+    return _.chain(accesRules)
+        .map(accesRule => _.startsWith(accesRule.target, target) && _.includes(accesRule.permission, code))
         .includes(true)
         .value();
 }
 
-export function hasPermissionDirective(el, bindings, vnode) {
+export function hasPermissionDirective(element, bindings, vnode) {
     const security = vnode.context.$security;
     const { target, predicate } = parsePermission(bindings.rawName);
     const isHasPermission = hasPermission(security.table['access-user'], target, predicate);
 
     if (!isHasPermission) {
-        el.style.display = 'none';
+        element.style.display = 'none';
     }
 }

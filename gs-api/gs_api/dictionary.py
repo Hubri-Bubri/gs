@@ -7,7 +7,6 @@ database = Database(
     cursor_type=DictCursor
 )
 
-
 class User:
     @classmethod
     async def select_by_login_password(cls, login, password):
@@ -45,7 +44,6 @@ class User:
                 'access-user': await PermissionSchema.select_by_login(login),
                 'access-role': await PermissionSchema.select_by_login(login)
             }
-
 
 class PermissionSchema:
     @classmethod

@@ -1,10 +1,9 @@
 import {hasPermissionDirective, hasPermission} from '@security/directive/has-permission';
-
+import _ from 'lodash';
 
 export default class Security {
 
     constructor(table) {
-
         table['access-user'] = _.each(table['access-user'], accessRule => {
             accessRule.permission = _.chain(accessRule.permission)
                 .split(',')
