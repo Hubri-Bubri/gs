@@ -50,7 +50,7 @@ class Database:
     @aiocontextmanager
     async def cursor(self):
         async with create_pool(host=self._host, port=self._port, user=self._user,
-                               password=self._password, db=self._name) as pool:
+                               password=self._password, db=self._name, autocommit=True) as pool:
 
             async with pool.get() as connection:
                 async with connection.cursor(self._cursor_type) as cursor:

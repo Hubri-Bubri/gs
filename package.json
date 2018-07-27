@@ -10,6 +10,7 @@
     "axios": "^0.15.3",
     "bootstrap": "^4.0.0",
     "bootstrap-vue": "^2.0.0-rc.2",
+    "liquor-tree": "^0.2.30",
     "lodash": "^4.17.10",
     "tether": "^1.4.0",
     "vue": "^2.4.2",

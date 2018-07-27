@@ -3,6 +3,7 @@ import BootstrapVue from 'bootstrap-vue';
 import VueRouter from 'vue-router';
 import VueI18n from 'vue-i18n';
 import VueSelect from 'vue-select';
+import LiquorTree from 'liquor-tree';
 
 import Container from '@share/component/container/container';
 import Security from '@security/plugin/security/index';
@@ -32,6 +33,8 @@ Vue.component('Container', Container);
 Vue.component('ContainerHeader', ContainerHeader);
 Vue.component('ContainerBody', ContainerBody);
 Vue.component('ContainerFooter', ContainerFooter);
+Vue.component(LiquorTree.name, LiquorTree);
+
 
 Vue.component('TopMenu', TopMenu);
 

@@ -5,7 +5,7 @@ from aiohttp_session import get_session
 from uuid import uuid4
 from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
-from gs_api.dictionary import Application, User, Project
+from gs_api.dictionary import Application, User, Project, Projects, Offer, Invoice, Add_offer
 
 from .environment import APPLICATION_DIR
 
@@ -28,6 +28,22 @@ async def profile(request):
 async def method (request):
     return web.json_response(await Project.select_project(request.query['id']))
 
+@routes.get('/projects')
+async def method (request):
+    return web.json_response(await Projects.select_projects())
+
+@routes.get('/offer')
+async def method (request):
+    return web.json_response(await Offer.select_offer(request.query['id']))
+
+@routes.get('/invoice')
+async def method (request):
+    return web.json_response(await Invoice.select_invoice(request.query['id']))
+
+@routes.get('/add_offer')
+async def method (request):
+   # return web.json_response(await Add_offer.add_offer(request.query['add_work'], request.query['add_insurance_number'], request.query['add_place'], request.query['add_comment']))
+    return web.json_response(await Add_offer.add_offer())
 
 # register static routes
 routes.static('/static', f"{APPLICATION_DIR}/static")

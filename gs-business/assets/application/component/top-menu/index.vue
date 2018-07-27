@@ -68,18 +68,18 @@ export default {
     computed: {
 
         username() {
-            // return `${this.$security.account['first_name']} ${this.$security.account['second_name']}`;
+            return `${this.$security.account['first_name']} ${this.$security.account['second_name']}`;
             return `hello`;
         },
 
         company() {
-            // return this.$security.company['name'];
+            return this.$security.company['name'];
             return ``;
         }
     },
 
     created() {
-        console.log(this.$security.hasPermission('project@master@table-project', 'write'));
+   //     console.log(this.$security.hasPermission('project@master@table-project', 'write'));
     }
 }
 </script>

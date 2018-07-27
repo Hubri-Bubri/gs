@@ -99,3 +99,40 @@ class Project:
                     T.project.city, T.project.zip, T.user.first_name, T.user.second_name)
                 .where(T.project.id == id))
 
+class Projects:
+    @classmethod
+    async def select_projects(cls):
+        async with database.cursor() as cursor:
+            return await cursor.fetchall(Q()
+                .tables(T.project)
+                .fields(T.project.project_number, T.project.date, T.project.street,
+                    T.project.city, T.project.zip, T.project.status_set, T.project.id, T.project.other
+                    ))
+class Offer:
+    @classmethod
+    async def select_offer(cls, id):
+        async with database.cursor() as cursor:
+            return await cursor.fetchall(Q()
+                .tables(T.offer)
+                .fields(T.offer.offer_number, T.offer.status_set, T.offer.other)
+                .where(T.offer.project_id == id))
+class Invoice:
+    @classmethod
+    async def select_invoice(cls, id):
+        async with database.cursor() as cursor:
+            return await cursor.fetchall(Q()
+                .tables(T.invoice)
+                .fields(T.invoice.invoice_number, T.invoice.status_set, T.invoice.other)
+                .where(T.invoice.project_id == id))
+
+class Add_offer:
+    @classmethod
+    async def add_offer(cls):
+            async with database.cursor() as cursor:
+                return await cursor._cursor.execute("INSERT INTO offer (other) VALUES(%s)", [1])
+
+#return await cursor.Q(T.offer).insert()
+# print (add_work)
+# print (add_insurance_number)
+# print (add_place)
+# print (add_comment)
