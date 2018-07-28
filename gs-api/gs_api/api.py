@@ -3,12 +3,6 @@ from aiomysql import create_pool, SSCursor, DictCursor
 from collections import defaultdict, OrderedDict, Sequence
 from sqlbuilder.smartsql import Q, T, Result
 from sqlbuilder.smartsql.dialects import mysql
-import logging
-
-
-logger = logging.getLogger(__name__)
-
-
 from gs_share import aiocontextmanager
 
 
@@ -47,27 +41,21 @@ class Database:
                 async with connection.cursor(self._cursor_type) as cursor:
 
                     class _Query(Query):
-                        _cursor = cursor
-
                         def __init__(_self, tables=None, result=None):
                             super().__init__(tables=tables, result=result or Result(compile=self._compile))
+
+                        @property
+                        def _cursor(self):
+                            return cursor
 
                     yield _Query
 
 
-def fetchone(method):
-    
-    def decorator():
-        pass
-
-    return decorator
-
-
 class Query(Q):
 
-    @fetchone
     async def selectone(self):
-        return await self._cursor.execute(*super().select())
+        await self._cursor.execute(*super().select())
+        return await self._cursor.fetchone()
 
     async def selectall(self):
         await self._cursor.execute(*super().select())
@@ -81,19 +69,16 @@ class Query(Q):
         return await self._cursor.fetchone()
 
     async def insert(self, *args, **kwargs):
-        return await self._cursor.execute(*super().insert(*args, **kwargs))
+        await self._cursor.execute(*super().insert(*args, **kwargs))
+        return await self._cursor.fetchone()
 
     async def update(self):
-        return await self._cursor.execute(*super().update(*args, **kwargs))
+        await self._cursor.execute(*super().update(*args, **kwargs))
+        return await self._cursor.fetchone()
 
     async def delete(self):
-        pass
-    
-    async def as_table(self):
-        pass
-
-    async def as_set(self):
-        pass
+        await self._cursor.execute(*super().delete(*args, **kwargs))
+        return await self._cursor.fetchone()
 
     @property
     def _cursor(self):

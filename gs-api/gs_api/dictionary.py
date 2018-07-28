@@ -8,6 +8,7 @@ database = Database(
     compile=mysql.compile
 )
 
+
 class User:
     @classmethod
     async def select_by_login_password(cls, login, password):
