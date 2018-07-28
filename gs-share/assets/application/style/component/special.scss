@@ -1,0 +1,17 @@
+@import '../_mixin.scss';
+
+
+.gs-error {
+    @include container();
+    
+    align-items: center;
+    justify-content: center;
+
+    .big-icon {
+        font-size: 80vh;
+    }
+
+    a {
+        font-size: 7vh;
+    }
+}

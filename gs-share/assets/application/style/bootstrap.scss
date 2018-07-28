@@ -1,0 +1,48 @@
+.tableProject td, .tableProject th{
+    padding:0px;
+     font-size:12px;
+}
+
+.tableProject select.form-control:not([size]):not([multiple]) {
+    border: none;
+    padding: 2px;
+    margin: 0px;
+    width: 70%;
+    min-width:125px;
+    height: 20px;
+    font-size:12px;
+}
+.tableProject i{
+    font-size:20px;
+    width: 20%;
+    padding-left:10px;
+}
+.fa-circle{
+    padding:3px;
+}
+.tableProject .fas{
+    width:33px;
+}
+  .number{
+  white-space: nowrap;
+  }
+
+   .other {
+   display: block; /* or inline-block */
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow: hidden;
+  max-height: 1.6em;
+  line-height: 1.8em;
+  }
+
+  .status{
+width:182px;
+white-space: nowrap;
+
+  }
+.tableProject .status{
+min-width:200px;
+white-space: nowrap;
+
+  }

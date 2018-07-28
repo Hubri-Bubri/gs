@@ -10,11 +10,13 @@
         <link rel="stylesheet" type="text/css" href="/static/bundle/font-awesome/css/fa-brands.css"/>
         <link rel="stylesheet" type="text/css" href="/static/bundle/font-awesome/css/fa-solid.css"/>
 
-
-        <script type="text/javascript" src="/static/bundle/application.js?nocache={{nocache}}" defer></script>
+        <script type="text/javascript" src="/static/bundle/gs-business.js?nocache={{nocache}}" defer></script>
     </head>
+
     <body>
-        <layout class="gs-business"></layout>
+        <div id="application" class="gs-business gs-application">
+            <router-view></router-view>
+        </div>
     </body>
 </html>
 

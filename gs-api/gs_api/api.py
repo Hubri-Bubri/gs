@@ -1,8 +1,8 @@
 from asyncio import get_event_loop
 from aiomysql import create_pool, SSCursor, DictCursor
 from collections import defaultdict, OrderedDict, Sequence
-from sqlbuilder.smartsql import Q, T
-from sqlbuilder.smartsql.dialects.mysql import compile as mysql_compile
+from sqlbuilder.smartsql import Q, T, Result
+from sqlbuilder.smartsql.dialects import mysql
 import logging
 
 
@@ -13,24 +13,15 @@ from gs_share import aiocontextmanager
 
 
 class Database:
-    _host = None
-    _port = None
-    _name = None
-    _user = None
-    _password = None
 
-    _expression_type = None
-    _cursor_type = None
-
-    def __init__(self, *, host=None, port=None, name=None, user=None, password=None, expression_type=None, cursor_type=None):
+    def __init__(self, *, host=None, port=None, name=None, user=None, password=None, cursor_type=None, compile=None):
         self._host = host
         self._port = port
         self._name = name
         self._user = user
         self._password = password
-
-        self._expression_type = self.SqlbuilderCursor
         self._cursor_type = DictCursor
+        self._compile = compile
 
     def set_configuration(self, host, port, name, user, password):
         self._host = host
@@ -41,40 +32,48 @@ class Database:
 
     @aiocontextmanager
     def pool(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @aiocontextmanager
     def connection(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @aiocontextmanager
-    async def cursor(self):
+    async def query(self):
         async with create_pool(host=self._host, port=self._port, user=self._user,
-                               password=self._password, db=self._name) as pool:
+                               password=self._password, db=self._name, autocommit=True) as pool:
 
             async with pool.get() as connection:
                 async with connection.cursor(self._cursor_type) as cursor:
-                    yield self._expression_type(cursor)
 
-    class Cursor:
-        """ Shortcut facade for python db-api 2.0 cursor """
+                    class _Query(Query):
+                        _cursor = cursor
 
-        def __init__(self, cursor):
-            self._cursor = cursor
+                        def __init__(_self, tables=None, result=None):
+                            super().__init__(tables=tables, result=result or Result(compile=self._compile))
 
-        async def execute(self):
-            raise NotImplementedError()
+                    yield _Query
 
-        async def fetchall(self, *args, **kwargs):
-            await self.execute(*args, **kwargs)
-            return await self._cursor.fetchall()
 
-        async def fetchone(self, *args, **kwargs):
-            await self.execute(*args, **kwargs)
-            return await self._cursor.fetchone()
+class Query(Q):
 
-    class SqlbuilderCursor(Cursor):
-        """ sqlbuilder.smartsql aware api """
-        
-        async def execute(self, query):
-            return await self._cursor.execute(*mysql_compile(query))
+    def __init__(self, tables=None, result=None):
+        super().__init__(tables=tables, result=result)
+
+    async def selectone(self):
+        await self._cursor.execute(*super().select())
+        return await self._cursor.fetchone()
+
+    async def selectall(self):
+        await self._cursor.execute(*super().select())
+        return await self._cursor.fetchall()
+
+    async def select(self):
+        return await self.selectall()
+
+    async def insert(self, *args, **kwargs):
+        return await self._cursor.execute(*super().insert(*args, **kwargs))
+
+    @property
+    def _cursor(self):
+        raise NotImplementedError

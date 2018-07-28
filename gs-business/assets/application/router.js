@@ -1,4 +1,3 @@
-
 import VueRouter from 'vue-router';
 import ProjectMaster from '@business/component/project/master';
 import ProjectDetail from '@business/component/project/detail';

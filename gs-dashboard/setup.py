@@ -2,7 +2,7 @@ from setuptools import setup
 from distutils.cmd import Command
 from subprocess import Popen
 import subprocess
-from gs import __version__
+from gs_dashboard import __version__
 
 
 class Npm(Command):
