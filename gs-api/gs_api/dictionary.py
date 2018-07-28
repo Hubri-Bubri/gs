@@ -33,8 +33,9 @@ class User:
         async with database.query() as Q:
             return await (Q()
                 .tables((T.role & T.m2m_user_role & T.user).on(
-                        (T.role.id == T.m2m_user_role.role_id) &
-                        (T.user.id == T.m2m_user_role.user_id)))
+                    (T.role.id == T.m2m_user_role.role_id) &
+                    (T.user.id == T.m2m_user_role.user_id)
+                ))
                 .fields(T.role.name)
                 .where((T.user.login == login))
                 .selectall())
@@ -152,7 +153,7 @@ class Invoice:
                 .where(T.invoice.project_id == id)
                 .selectall())
 
-class Add_offer:
+class Offer:
     @classmethod
     async def add_offer(cls):
             async with database.query() as Q:
@@ -162,7 +163,7 @@ class Add_offer:
 
                 # return await cursor._cursor.execute("INSERT INTO offer (other) VALUES(%s)", [1])
 
-#return await cursor.Q(T.offer).insert()
+# return await cursor.Q(T.offer).insert()
 # print (add_work)
 # print (add_insurance_number)
 # print (add_place)
