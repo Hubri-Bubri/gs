@@ -55,14 +55,19 @@ class Database:
                     yield _Query
 
 
+def fetchone(method):
+    
+    def decorator():
+        pass
+
+    return decorator
+
+
 class Query(Q):
 
-    def __init__(self, tables=None, result=None):
-        super().__init__(tables=tables, result=result)
-
+    @fetchone
     async def selectone(self):
-        await self._cursor.execute(*super().select())
-        return await self._cursor.fetchone()
+        return await self._cursor.execute(*super().select())
 
     async def selectall(self):
         await self._cursor.execute(*super().select())
@@ -71,8 +76,24 @@ class Query(Q):
     async def select(self):
         return await self.selectall()
 
+    async def count(self):
+        await self._cursor.execute(*super().count())
+        return await self._cursor.fetchone()
+
     async def insert(self, *args, **kwargs):
         return await self._cursor.execute(*super().insert(*args, **kwargs))
+
+    async def update(self):
+        return await self._cursor.execute(*super().update(*args, **kwargs))
+
+    async def delete(self):
+        pass
+    
+    async def as_table(self):
+        pass
+
+    async def as_set(self):
+        pass
 
     @property
     def _cursor(self):

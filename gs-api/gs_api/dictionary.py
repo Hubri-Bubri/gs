@@ -157,9 +157,7 @@ class Add_offer:
             async with database.query() as Q:
                 return await (Q()
                     .tables(T.offer)
-                    .insert({
-                        T.offer.other: 1
-                    }))
+                    .insert({T.offer.other: 1}))
 
                 # return await cursor._cursor.execute("INSERT INTO offer (other) VALUES(%s)", [1])
 
