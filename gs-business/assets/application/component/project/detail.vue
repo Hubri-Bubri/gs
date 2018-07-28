@@ -506,7 +506,6 @@ const treeData = [
   count:'2', unit: 'Psch.', price: '120', summa:'240', without:'120*', discount:' 20%', status: 'Yes', 'checkbox':'true' }
   ],
   "subMenu": "Painting"
-
 }, {
   "name": "Painting works",
   "content": [{ 'position_number': '01.05.020', 'description_head':'Head Description' ,'description_work': "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.",
@@ -532,7 +531,6 @@ const treeData = [
   ],
   "subMenu": "Painting 3"
 },
-
 ////////////////////
  {"name": "tiling work",
   "content": [{ 'position_number': '01.05.010', 'description_head':'Head Description Head Description Head' ,'description_work': "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.",
@@ -540,7 +538,6 @@ const treeData = [
   { 'position_number': '01.05.010', 'description_head':'Head Description' ,'description_work': "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.",
   count:'2', unit: 'Psch.', price: '120', summa:'240', without:'120*', discount:' 20%', status: 'Yes', 'checkbox':'true' }],
   "subMenu": "tiling 1"
-
 }, {
   "name": "tiling work",
   "content": [{ 'position_number': '01.05.010', 'description_head':'Head Description' ,'description_work': "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.",
@@ -564,7 +561,6 @@ const treeData = [
   "subMenu": "tiling 4"
 }
 ];
-
 export default {
   props: {
     id: String

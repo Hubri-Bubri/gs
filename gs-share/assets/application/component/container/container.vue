@@ -1,4 +1,5 @@
 <template>
+
     <div class="gs-container">
         <slot></slot>
     </div>

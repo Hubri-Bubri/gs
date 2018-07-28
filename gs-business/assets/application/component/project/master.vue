@@ -101,7 +101,6 @@ export default {
                 class: 'number'
                 }
                 },
-
             fieldsOffer: {
                 offer_number: {
                 label: 'Offer No.',
@@ -119,7 +118,6 @@ export default {
                 class: 'status'
                 }
                 },
-
             fieldsInvoice: {
                 invoice_number: {
                 label: 'Invoice No.',
@@ -137,7 +135,6 @@ export default {
                 class: 'status'
                 }
                 },
-
                options: [
                          { value: 'Open', text: 'Open' },
                          { value: 'Done', text: 'Done'},
@@ -153,18 +150,17 @@ export default {
             invoices: null
         }
     },
-
     methods: {
         inItemClick(item, index, event) {
             this.$router.push({
                 path: `/project/detail/${item.id}`
             })
         },
-    //    inOfferClick(item, index, event) {
-    //        this.$router.push({
-    //            path: `/project/detail/${item.id}/offer/${offer.id}`
-    //        })
-    //    },
+        inOfferClick(item, index, event) {
+            this.$router.push({
+                path: `/project/detail/${item.id}/offer/${offer.id}`
+            })
+        },
     getOffer(project_id){
         axios.get('/offer', {params: {id: project_id}}).then(response => {
                this.offers = response.data
@@ -208,5 +204,4 @@ export default {
          })
         }
     }
-
 </script>
