@@ -173,7 +173,7 @@ export default {
         },
         computeStyle(value) {
             switch (value) {
-                case 'Open': return {'color': 'black'};
+                case 'Open': return {'color': '#F5DEB3'};
                 case 'Done': return {'color': 'green'};
                 case 'Invoice': return {'color':'orange'};
                 case 'Desiccation': return {'color':'grey'};

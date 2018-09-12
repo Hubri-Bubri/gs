@@ -71,6 +71,9 @@ class Query(Q):
     async def select(self):
         return await self.selectall()
 
+    async def delete(self, *args, **kwargs):
+        return await self._cursor.execute(*super().delete(*args, **kwargs))
+
     async def insert(self, *args, **kwargs):
         return await self._cursor.execute(*super().insert(*args, **kwargs))
 

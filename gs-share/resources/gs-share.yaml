@@ -1,9 +1,9 @@
 database:
-    host: "localhost"
+    host: "87.128.41.195"
     port: 3306
-    name: "gs"
+    name: "it-vision"
     user: "root"
-    password: "8888"
+    password: "toor"
 
 application:
     business:

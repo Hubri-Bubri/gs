@@ -2,6 +2,9 @@ from sqlbuilder.smartsql import Q, T
 from sqlbuilder.smartsql.dialects import mysql
 from .api import Database, DictCursor
 
+from datetime import datetime as dt
+import datetime
+
 
 database = Database(
     cursor_type=DictCursor,
@@ -25,7 +28,7 @@ class User:
                 .tables(T.user)
                 .fields(T.user.login, T.user.first_name, T.user.second_name)
                 .where((T.user.login == login))
-                .selectall())
+                .selectone())
 
     @classmethod
     async def select_roles_by_login(cls, login):
@@ -103,7 +106,7 @@ class Project:
             return await (Q()
                 .tables(T.project & T.user).on(T.project.user_id == T.user.id)
                 .fields(
-                    # T.project.project_number,
+                     T.project.project_number,
                     T.project.date,
                     T.project.street,
                     T.project.city,
@@ -115,20 +118,19 @@ class Project:
 
 
 class Projects:
-
     @classmethod
     async def select_projects(cls):
         async with database.query() as Q:
             return await (Q(T.project)
                 .fields(
-                    # T.project.project_number,
+                    T.project.project_number,
                     T.project.date,
                     T.project.street,
                     T.project.city,
                     T.project.zip,
-                    # T.project.status_set,
+                    T.project.status_set,
                     T.project.id,
-                    # T.project.other
+                    T.project.other
                 ).selectall())
 
 class Offer:
@@ -153,18 +155,55 @@ class Invoice:
 
 class Add_offer:
     @classmethod
-    async def add_offer(cls):
+    async def add_offer(cls, add_number, add_work, add_insurance_number, add_place, add_comment, add_project_id):
             async with database.query() as Q:
                 return await (Q()
                     .tables(T.offer)
                     .insert({
-                        T.offer.other: 1
+                        T.offer.work: add_work,
+                        T.offer.place: add_place,
+                        T.offer.insurance_number:add_insurance_number,
+                        T.offer.other: add_comment, 
+                        T.offer.offer_number: add_number,
+                        T.offer.date: datetime.datetime.now().strftime("%Y-%m-%d"),
+                        T.offer.status_set: 'Open',
+                        T.offer.project_id: add_project_id
                     }))
+class Del_offer:
+    @classmethod
+    async def del_offer(cls, id, del_id):
+        async with database.query() as Q:
+             await (Q(T.offer)
+                .where(T.offer.id == del_id)
+                .delete())
+             return await (Q(T.offer)
+                .fields(
+                    T.offer.offer_number,
+                    T.offer.date,
+                    T.offer.status_set,
+                    T.offer.place,
+                    T.offer.status_set,
+                    T.offer.insurance_number,
+                    T.offer.work,
+                    T.offer.other,
+                    T.offer.id)
+                .where(T.offer.project_id == id)
+                .selectall())
 
-                # return await cursor._cursor.execute("INSERT INTO offer (other) VALUES(%s)", [1])
 
-#return await cursor.Q(T.offer).insert()
-# print (add_work)
-# print (add_insurance_number)
-# print (add_place)
-# print (add_comment)
+class Offers:
+    @classmethod
+    async def select_offers(cls, id):
+        async with database.query() as Q:
+            return await (Q(T.offer)
+                .fields(
+                    T.offer.offer_number,
+                    T.offer.date,
+                    T.offer.status_set,
+                    T.offer.place,
+                    T.offer.status_set,
+                    T.offer.insurance_number,
+                    T.offer.other,
+                    T.offer.id)
+                .where(T.offer.project_id == id)
+                .selectall())

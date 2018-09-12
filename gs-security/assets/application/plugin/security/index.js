@@ -14,6 +14,7 @@ export default class Security {
         this.table = table;
         this.account = this.table['account'];
         this.company = this.table['selected-company'];
+        console.log(this.account);
     }
 
     static install(Vue, options) {
