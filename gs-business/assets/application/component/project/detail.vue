@@ -593,8 +593,8 @@ class="withoutPad"
 </b-collapse>                                 </div>
 </draggable>
 
-<calc-table-group :partx="partx"></calc-table-group>
 
+<calc-table-group :partx="partx"></calc-table-group>
 <hr />
     <vue-editor
     id="refCommentOfTable1"
@@ -1512,8 +1512,8 @@ altalltotal: function () {
    partx[part].parts.part_name=newVal.target.innerText
     },
    thousandSeparator(str) {
-return str
-        },
+    return str
+    },
 
     discOfPercent(){
   
