@@ -32,22 +32,22 @@
         </container-body>
           <b-modal id="offer"  size="lg" title="Offer List" ok-only  centered>
 
-             <b-table hover stacked="sm" :items="offers" :fields="fieldsOffer" @row-clicked="inOfferClick"  class="tableProject" small >
+          <!--   <b-table hover stacked="sm" :items="offers" :fields="fieldsOffer" @row-clicked="inOfferClick"  class="tableProject" small >
                     <template slot="status_set" slot-scope="offer">
                         <b-row>
                             <b-col cols="6">  {{ offer.item.status_set }}  </b-col>   <b-col cols="1"><i class="fas fa-circle fa-w-16 fa-2x " :style="computeStyleOffer(offer.item.status_set)"></i></b-col>
                    </b-row>
                     </template>
-            </b-table>
+            </b-table> -->
            </b-modal>
          <b-modal id="invoice" size="lg" title="Invoice List" ok-only  centered>
-            <b-table hover  stacked="sm" :items="invoices" :fields="fieldsInvoice" @row-clicked="inItemClick"  class="tableProject" small >
+         <!--   <b-table hover  stacked="sm" :items="invoices" :fields="fieldsInvoice" @row-clicked="inItemClick"  class="tableProject" small >
                     <template slot="status_set" slot-scope="invoice">
                         <b-row>
                             <b-col cols="6">  {{ invoice.item.status_set }}  </b-col>   <b-col cols="1"><i class="fas fa-circle fa-w-16 fa-2x" :style="computeStyleInvoice(invoice.item.status_set)"></i></b-col>
                    </b-row>
                     </template>
-            </b-table>
+            </b-table> -->
           </b-modal>
     </container>
 </template>
@@ -58,7 +58,7 @@ export default {
         return {
             fields: {
                 project_number: {
-                label: 'Project No.',
+                label: 'Project Number',
                 sortable: true,
                 class: 'number'
                 },
@@ -103,7 +103,7 @@ export default {
                 },
             fieldsOffer: {
                 offer_number: {
-                label: 'Offer No.',
+                label: 'Offer Number',
                 sortable: true,
                 class: 'number'
                 },
@@ -120,7 +120,7 @@ export default {
                 },
             fieldsInvoice: {
                 invoice_number: {
-                label: 'Invoice No.',
+                label: 'Invoice Number',
                 sortable: true,
                 class: 'number'
                 },

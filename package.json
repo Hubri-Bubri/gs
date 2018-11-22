@@ -12,11 +12,14 @@
     "bootstrap-vue": "^2.0.0-rc.2",
     "liquor-tree": "^0.2.30",
     "lodash": "^4.17.10",
+    "safe-eval": "^0.4.1",
     "tether": "^1.4.0",
     "vue": "^2.4.2",
     "vue-i18n": "^7.6.0",
     "vue-router": "^2.3.0",
-    "vue-select": "^2.4.0"
+    "vue-select": "^2.4.0",
+    "vue2-editor": "^2.6.6",
+    "vuedraggable": "^2.16.0"
   },
   "devDependencies": {
     "node-sass": "^4.9.0",

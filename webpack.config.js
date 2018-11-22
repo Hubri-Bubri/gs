@@ -6,6 +6,7 @@ let resolve = (dir) => {
 }
 
 module.exports = {
+    devtool: 'source-map',
     entry: {
         'gs-dashboard/gs_dashboard/static/bundle/gs-dashboard': resolve('./gs-dashboard/assets/application/application.js'),
         'gs-business/gs_business/static/bundle/gs-business': resolve('./gs-business/assets/application/application.js')

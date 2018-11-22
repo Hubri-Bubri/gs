@@ -11,6 +11,8 @@ import ContainerHeader from '@share/component/container/container-header';
 import ContainerBody from '@share/component/container/container-body';
 import ContainerFooter from '@share/component/container/container-footer';
 
+import CalcTableGroupe from '@share/component/calc-table/calc-table-group';
+
 import TopMenu from '@business/component/top-menu/index';
 
 import '@share/style/bootstrap.scss';
@@ -34,6 +36,8 @@ Vue.component('ContainerHeader', ContainerHeader);
 Vue.component('ContainerBody', ContainerBody);
 Vue.component('ContainerFooter', ContainerFooter);
 Vue.component(LiquorTree.name, LiquorTree);
+
+Vue.component('calc-table-group', CalcTableGroupe);
 
 
 Vue.component('TopMenu', TopMenu);
