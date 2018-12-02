@@ -10,10 +10,11 @@ import Security from '@security/plugin/security/index';
 import ContainerHeader from '@share/component/container/container-header';
 import ContainerBody from '@share/component/container/container-body';
 import ContainerFooter from '@share/component/container/container-footer';
-
-import CalcTableGroupe from '@share/component/calc-table/calc-table-group';
-
 import TopMenu from '@business/component/top-menu/index';
+
+import CalcTableGroup from '@share/component/calc-table/calc-table-group';
+import CalcTable from '@share/component/calc-table/calc-table';
+import calculation from '@share/component/calc-table/calculation';
 
 import '@share/style/bootstrap.scss';
 import '@share/style/override/card.scss';
@@ -26,6 +27,8 @@ import '@share/style/component/loader.scss';
 import axios from 'axios';
 import { router } from '@business/router';
 
+import thousandSeparator from '@share/filters';
+
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
 Vue.use(Security);
@@ -36,12 +39,11 @@ Vue.component('ContainerHeader', ContainerHeader);
 Vue.component('ContainerBody', ContainerBody);
 Vue.component('ContainerFooter', ContainerFooter);
 Vue.component(LiquorTree.name, LiquorTree);
-
-Vue.component('calc-table-group', CalcTableGroupe);
-
-
 Vue.component('TopMenu', TopMenu);
 
+Vue.component('calc-table-group', CalcTableGroup);
+Vue.component('calc-table', CalcTable);
+Vue.component('calculation', calculation);
 
 axios.get('/profile').then(response => {
     return new Vue({
@@ -63,3 +65,5 @@ axios.get('/profile').then(response => {
         }
     });
 });
+
+Vue.filter('thousandSeparator', thousandSeparator)
