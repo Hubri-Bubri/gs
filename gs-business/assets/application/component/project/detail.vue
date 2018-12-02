@@ -250,10 +250,10 @@
                                           placeholder="Enter other" class="cForm-input" />
                                     </b-form-group>
                                  </b-col>
-                                <calculation :partx='partx' :addtaxColapse="addtaxColapse"></calculation>
+                                <calculation :partx='partx' :alttax="alttax" v-model="addtaxColapse"></calculation>
                               </b-row>
                             <!-- ---------------------------------------------- ------------------------- -->
-                              <calc-table-group :partx="partx" :addtaxColapse="addtaxColapse" :workers="workers"></calc-table-group>
+                              <calc-table-group v-model="partx"  :alttax="alttax" :addtaxColapse="addtaxColapse" :workers="workers"></calc-table-group>
                            </b-container>
                         </container-body>
                         <container-footer>
@@ -275,7 +275,7 @@
                                   <b-form-input id="netto" 
                                    :state="null"  type="text" placeholder="Enter netto" disabled class="cForm-input text-right"
                                    :value="allSumms()" />
-                               <b-input-group-append ><div class="input-group-text lablelInInput">€</div></b-input-group-append>  
+                           <b-input-group-append ><div class="input-group-text lablelInInput">€</div></b-input-group-append>  
                               </b-input-group>
                               </b-form-group>
                            </b-container>
@@ -1113,7 +1113,7 @@ export default {
     data() {
         return {
             addtaxColapse: false,
-
+            alttax: [],
             workers:workers,
             partx: partx,
             items: items,
@@ -1514,11 +1514,7 @@ export default {
                 this.toggle.splice(i, 1)
             }
         },
-        partDel(part) {
-            // console.log(del_id);
-            if (confirm("Are you sure?")) this.partx.splice(this.partx.indexOf(part), 1);
-
-        },
+       
 
     },
 

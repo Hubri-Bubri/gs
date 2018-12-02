@@ -21,7 +21,7 @@
       </b-form>
       <b-modal size="sm" centered id="move" ref="move" title="Move">
          <b-form-select multiple class="" id="move" @change="moveToCopySelect($event, moveToCopyRadio)" v-model="moveToCopy" :select-size="4">
-            <option v-for="part in partx">{{part.parts.part_name}}</option>
+            <option v-for="part in value">{{part.parts.part_name}}</option>
          </b-form-select>
          <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="['Move', 'Copy']" />
          <template slot="modal-footer">
@@ -43,9 +43,10 @@
             </b-button>
         </b-col>
       </b-row>
-      <draggable v-model="partx" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
+      <draggable :value="value" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
          :no-transition-on-drag="true" @start="drag=true" @end="drag=false">
-         <calc-table :part="part" :addtaxColapse="addtaxColapse" :color="color" :selectedWorkers="selectedWorkers" v-for="part in partx" :key="part.id">
+         <calc-table :part="part" :addtaxColapse="addtaxColapse" :color="color" :selectedWorkers="selectedWorkers"
+          :alttax="alttax" v-for="part in value" :key="part.id">
             <b-link class="fas fa-trash  butMore" style="padding-left: 0px; font-size:12px;" @click="partDel(part)" slot="tableDel" />
          </calc-table>
       </draggable>
@@ -58,7 +59,7 @@ export default {
     components: {
         draggable,
     },
-    props: ['partx', 'addtaxColapse', 'workers'],
+    props: ['value', 'addtaxColapse', 'workers', 'alttax'],
     data() {
         return {
             counter: -1,
@@ -82,10 +83,13 @@ computed: {
     }
   },
     methods: {
+        onItems($event){
+          { this.$emit('input', $event) }
+        },
         nameOfPart() {
             this.shpart = true;
             this.$refs.shpart.hide(),
-                this.partx.unshift({
+                this.value.unshift({
                     parts: {
                         part_name: nameofpart.value,
 
@@ -116,12 +120,12 @@ computed: {
         moveToCopySelect(event, radio) {
             var tmpArr = this.tmpArr = []
             this.oldColor.push(JSON.parse(JSON.stringify(this.color)))
-            this.oldPartx.push(JSON.parse(JSON.stringify(this.partx)))
-            var tmpArrCp = JSON.parse(JSON.stringify(this.partx))
+            this.oldPartx.push(JSON.parse(JSON.stringify(this.value)))
+            var tmpArrCp = JSON.parse(JSON.stringify(this.value))
             var newColor = []
             this.color.forEach((clolorRow) => {
                 var partIndex = clolorRow.split('-')
-                this.partx.forEach(function(part, index) {
+                this.value.forEach(function(part, index) {
                     var temRow = ''
                     var other = ''
                     if (part.parts.part_name == partIndex[0]) {
@@ -136,7 +140,7 @@ computed: {
             })
 
             event.forEach((eve)=> {
-                this.partx.forEach((part)=>{
+                this.value.forEach((part)=>{
                     if (part.parts.part_name == eve) {
                         this.tmpArr.forEach(function(val, index) {
                             newColor.push(part.parts.part_name + '-' + index)
@@ -149,12 +153,17 @@ computed: {
             this.color = newColor.slice()
             this.counter = this.counter + 1
         },
+        partDel(part) {
+            // console.log(del_id);
+            if (confirm("Are you sure?")) this.value.splice(this.value.indexOf(part), 1);
+
+        },
         cancelPartx(indexButton) {
             this.color = []
             this.moveToCopy = []
-            this.partx.splice(0, this.partx.length)
+            this.value.splice(0, this.value.length)
             this.oldPartx[indexButton].forEach((val)=> {
-                this.partx.push(val)
+                this.value.push(val)
             })
             this.color = JSON.parse(JSON.stringify(this.oldColor[indexButton]))
             this.counter = this.counter - 1
@@ -162,7 +171,7 @@ computed: {
         okMoveToCopy() {
             this.$refs.move.hide()
         },
-          worker() {
+        worker() {
           this.$refs.worker.show()
         },
         okWorker() {

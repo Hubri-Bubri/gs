@@ -33,10 +33,10 @@
               </b-input-group>
            </b-form-group>
            <b-form-row>
-              <b-col cols="3"  class="cForm-input">
+              <b-col cols="3" class="cForm-input">
                  Added tax:
               </b-col>
-              <b-col cols="1"  class="cForm-input">
+              <b-col cols="1" class="cForm-input">
                  <b-link style="text-decoration: none;font-weight: normal;" v-b-toggle="'addtax'">
                     <span class="when-closed">+</span>
                  </b-link>
@@ -56,7 +56,7 @@
                  </b-input-group>
               </b-col>
            </b-form-row>
-           <b-collapse style="width:100%" id="addtax" v-model="addtaxColapse">
+           <b-collapse style="width:100%" id="addtax" :value="value" @input="onAddtaxCollapse">
               <b-form-row>
                  <b-col cols="3"  class="cForm-input calttax">
                     Added tax:
@@ -94,10 +94,9 @@
 
 <script type="text/javascript">
 export default {
-    props: ['addtaxColapse', 'partx'],
+    props: ['value', 'partx', 'alttax'],
     data() {
         return {
-            alttax: [],
             unit_type: ['Psch.', '%', 'Stück.', 'Sack.'],
             calc: ['yes', 'no', 'etc', 'alternative'],
             butDiscPerc: '%',
@@ -114,6 +113,9 @@ export default {
     },
  
     methods: {
+        onAddtaxCollapse($event){
+          { this.$emit('input', $event) }
+        },
         discOfPercent() {
             var tmpDisc, tmpNetto, tmpTax, tmpTax2
             var summa = 0

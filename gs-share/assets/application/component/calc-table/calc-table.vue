@@ -188,7 +188,7 @@ export default {
         draggable,
         VueEditor
     },
-    props: ['part', 'addtaxColapse', 'color', 'selectedWorkers'],
+    props: ['part', 'addtaxColapse', 'color', 'selectedWorkers', 'alttax'],
     data() {
         return {
             unit_type: ['Psch.', '%', 'Stück.', 'Sack.'],
@@ -196,7 +196,6 @@ export default {
             butDiscPerc: '%',
             disable: [],
             toggle: [],
-            alttax: [],
             tableId: null
         } //return
     }, //data
