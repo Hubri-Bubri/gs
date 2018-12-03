@@ -27,6 +27,9 @@ prod_requires = [
     'aiohttp_jinja2',
     'aiohttp_security',
     'aiohttp_session',
+    'gs_api',
+    'gs_security',
+    'gs_configurator'
 ]
 
 setup(

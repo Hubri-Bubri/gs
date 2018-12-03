@@ -1,4 +1,3 @@
-import aiohttp_debugger
 import aiohttp_session
 import aiohttp_security
 import aiohttp_jinja2
