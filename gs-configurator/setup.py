@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(
-    name='infomat-infoclinic-configurator',
+    name='gs-configurator',
     install_requires=['ruamel.yaml'],
-    packages=['infomat_infoclinic_configurator']
+    packages=['gs_configurator']
 )

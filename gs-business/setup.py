@@ -24,9 +24,9 @@ class Npm(Command):
 
 prod_requires = [
     'aiohttp',
-    'aiomysql',
     'aiohttp_jinja2',
-    'aiohttp_security'
+    'aiohttp_security',
+    'aiohttp_session',
 ]
 
 setup(
