@@ -30,12 +30,12 @@ prod_requires = [
 ]
 
 setup(
-    name='gs',
+    name='gs-dashboard',
     version=__version__,
     install_requires=prod_requires,
-    packages=['gs'],
+    packages=['gs_dashboard'],
     package_data={
-        'gs': [
+        'gs_dashboard': [
             'static/*',
             'static/bundle/*',
             'static/bundle/font-awesome/css/*',
