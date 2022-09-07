@@ -19,8 +19,8 @@ export default class Security {
 
     static install(Vue, options) {
         Vue.directive('has-permission', hasPermissionDirective);
-
         Vue.mixin({
+
             beforeCreate() {
                 if (this.$options.security) {
                     this._security = this.$options.security;
@@ -31,7 +31,7 @@ export default class Security {
         Object.defineProperty(Vue.prototype, '$security', {
             get() {
                 let component = this;
-
+                
                 while (true) {
                     if (component._security) {
                         return component._security;
@@ -46,6 +46,7 @@ export default class Security {
     }
 
     hasPermission(target, predicate) {
+ 
         return hasPermission(this.table['access-user'], target, predicate);
     }
 }

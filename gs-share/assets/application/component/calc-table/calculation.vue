@@ -68,14 +68,14 @@
                  </b-col>
                  <b-col cols="3">
                     <b-input-group   class="cForm-input">
-                       <b-input id="taxP" v-model="taxP2" :state="null"  type="number" @input="discOfPercent()"
+                       <b-input id="taxP" v-model="taxPDub" :state="null"  type="number" @input="discOfPercent()"
                           placeholder="Summa of Percent" class="cForm-input " />
                                    <b-input-group-append ><div class="input-group-text lablelInInput">%</div></b-input-group-append>  
                     </b-input-group>
                  </b-col>
                  <b-col cols="5">
                     <b-input-group  class="cForm-input">
-                       <b-input disabled id="tax" v-model="tax2" :state="null"  type="text"
+                       <b-input disabled id="tax" v-model="taxDub" :state="null"  type="text"
                           placeholder="Summa of Percent" class="cForm-input text-right" />
                           <b-input-group-append ><div class="input-group-text lablelInInput">€</div></b-input-group-append>  
                     </b-input-group>
@@ -94,18 +94,12 @@
 
 <script type="text/javascript">
 export default {
-    props: ['value', 'partx', 'alttax'],
+    props: ['value', 'partx', 'tax', 'taxDub', 'taxP', 'taxPDub', 'disc', 'discP'],
     data() {
         return {
             unit_type: ['Psch.', '%', 'Stück.', 'Sack.'],
             calc: ['yes', 'no', 'etc', 'alternative'],
             butDiscPerc: '%',
-            disc: 0,
-            discP: 10,
-            tax: 0,
-            tax2: 0,
-            taxP: 19,
-            taxP2: 0,
             netto: 0,
             brutto: 0,
             persentCounter: 0
@@ -152,7 +146,7 @@ export default {
             this.partx.forEach((val) => {
                 val.parts.part_content.forEach((sval, index) => {
                     if (sval.status == 'yes') {
-                        if (this.alttax[index] != true) {
+                        if (sval.alttax != true) {
                             addt = addt + (sval.count * sval.price)
                         } else {
                             addt2 = addt2 + (sval.count * sval.price)
@@ -163,8 +157,8 @@ export default {
 
             this.tax = this.$options.filters.thousandSeparator(addt * (this.taxP / 100))
             tmpTax = (addt * (this.taxP / 100))
-            this.tax2 = this.$options.filters.thousandSeparator(addt2 * (this.taxP2 / 100))
-            //   tmpTax2=  addt2*(this.taxP2/100)
+            this.taxDub = this.$options.filters.thousandSeparator(addt2 * (this.taxPDub / 100))
+            //   tmpTax2=  addt2*(this.taxPDub/100)
             tmpTax2 = 0
             this.brutto = this.$options.filters.thousandSeparator(tmpNetto + tmpTax + tmpTax2)
 

@@ -11,10 +11,10 @@ class DatabaseAuthorizationPolicy(AbstractAuthorizationPolicy):
         user_permission_schema = await PermissionSchema.select_by_login(identity)
         target, domen = context.split(':')
 
+
         return permission in self.parse_permission_schema(user_permission_schema, target)
 
     def parse_permission_schema(self, user_permission_schema, target):
-
         for user, target, tag in map(lambda _: _.values(), user_permission_schema):
             if target in target:
                 return [int(_.strip()) for _ in tag.split(',')]

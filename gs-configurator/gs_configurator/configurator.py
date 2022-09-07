@@ -30,6 +30,6 @@ class Configurator:
 
     def load(self):
         self._config, self._path = self._read_config_file(self._search_file, self._search_dirs)
-
+        
     def __getitem__(self, key):
         return self._config[key]

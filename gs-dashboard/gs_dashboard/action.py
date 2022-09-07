@@ -1,6 +1,8 @@
 import time
 from enum import Enum
 from aiohttp import hdrs, web
+import asyncio
+
 from aiohttp_jinja2 import template
 from aiohttp_session import get_session
 from uuid import uuid4
@@ -23,12 +25,12 @@ async def dashboard(request):
 
 @routes.post('/session')
 async def session(request):
+    
     session = await get_session(request)
     form = await request.json()
-
     session['COMPANY_ID'] = form.get('company-id')
 
-    return web.HTTPOk()
+    return web.StreamResponse()
 
 
 @routes.get('/application')
@@ -40,7 +42,6 @@ async def application(request):
 async def company(request):
     session = await get_session(request)
     login = session.get('AIOHTTP_SECURITY')
-
     return web.json_response(await Company.select_by_login(login))
 
 
@@ -50,10 +51,13 @@ async def authenticate(request):
 
     login = form.get('login')
     password = form.get('password')
+
     response = web.HTTPOk()
+
 
     if await check_credentials(login, password):
         await remember(request, response, login)
+
         return response
 
     return web.HTTPUnauthorized()

@@ -77,6 +77,9 @@ class Query(Q):
     async def insert(self, *args, **kwargs):
         return await self._cursor.execute(*super().insert(*args, **kwargs))
 
+    async def update(self, *args, **kwargs):
+        await self._cursor.execute(*super().update(*args, **kwargs))
+        
     @property
     def _cursor(self):
         raise NotImplementedError

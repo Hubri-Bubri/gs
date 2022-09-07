@@ -29,7 +29,6 @@
                                class="mb-3" size="lg"></b-form-select>
 
                 <div class="gs-dashboard__login-footer">
-                    
                     <b-button :disabled="applicationUri === null"
                               @click.prevent.stop="openApplication(companyId, applicationUri)"
                               v-if="applications.length > 0"
@@ -113,7 +112,7 @@
             },
 
             openApplication(companyId, applicationUri) {
-                window.open(this.applicationUri, "_blank");
+                window.open(this.applicationUri, "_self");
             },
 
             loadCompanies() {
