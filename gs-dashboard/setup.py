@@ -2,7 +2,6 @@ from setuptools import setup
 from distutils.cmd import Command
 from subprocess import Popen
 import subprocess
-from gs_dashboard import __version__
 
 
 class Npm(Command):
@@ -24,18 +23,21 @@ class Npm(Command):
 
 prod_requires = [
     'aiohttp',
+    'aiohttp_session',
     'aiomysql',
     'aiohttp_jinja2',
     'aiohttp_security',
     'gs_api',
     'gs_security',
-    'gs_configurator'
+    'gs_configurator',
+    'gs_share'
 ]
 
 setup(
     name='gs-dashboard',
-    version=__version__,
-    install_requires=prod_requires,
+    version="0.0.117"
+    ,
+    install_requires=prod_requires, 
     packages=['gs_dashboard'],
     package_data={
         'gs_dashboard': [

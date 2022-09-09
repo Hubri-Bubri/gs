@@ -1,85 +1,144 @@
 <template>
-    <div class="gs-business-top-menu gs-top-menu">
-        <div class="row no-gutters">
-            <div class="col-8">
-                <b-nav>
-                    <b-nav-item-dropdown text="Project">
-                        <b-dropdown-item to="/project" href="#">Projects</b-dropdown-item>
-                        <b-dropdown-item to="/deals" href="#">Deals</b-dropdown-item>
-                        <b-dropdown-item href="#">Assignments</b-dropdown-item>
-                        <b-dropdown-item href="#">Bills</b-dropdown-item>
-                        <b-dropdown-item href="#">OP-Balancing</b-dropdown-item>
-                    </b-nav-item-dropdown>
 
+<div>
+  <b-navbar toggleable="lg">
+
+    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+ <b-collapse id="nav-collapse" is-nav>
+                <b-navbar-nav>
+                    <b-nav-item-dropdown text="General">
+                        <b-dropdown-item to="/project" href="#">{{project.content}}</b-dropdown-item>
+   <!--                      <b-dropdown-item to="#" href="#">Deals</b-dropdown-item>
+                        <b-dropdown-item href="#">Assignments</b-dropdown-item>
+                        <b-dropdown-item href="#">Bills</b-dropdown-item> -->
+                        <b-dropdown-item to="/balance" href="#">OP-Balancing</b-dropdown-item>
+                    </b-nav-item-dropdown>
+<!-- 
                     <b-nav-item-dropdown text="Order Overview">
                         <b-dropdown-item href="#">T-Course</b-dropdown-item>
                         <b-dropdown-item href="#">Damage Reports</b-dropdown-item>
                         <b-dropdown-item href="#">Leakage Reports</b-dropdown-item>
                         <b-dropdown-item href="#">Device List</b-dropdown-item>
                         <b-dropdown-item href="#">Equipment Storage</b-dropdown-item>
-                    </b-nav-item-dropdown>
+                    </b-nav-item-dropdown> -->
 
                     <b-nav-item-dropdown text="SUB-Entrepreneur">
-                        <b-dropdown-item href="#">SUB-Data</b-dropdown-item>
-                        <b-dropdown-item href="#">SUB-Orders</b-dropdown-item>
-                        <b-dropdown-item href="#">E-Invoices</b-dropdown-item>
+                        <b-dropdown-item to="/sub" href="#">SUB-Data</b-dropdown-item>
+                        <!-- <b-dropdown-item to="/subData" href="#">SUB-Data</b-dropdown-item> -->
+                        <!-- <b-dropdown-item href="#">E-Invoices</b-dropdown-item> -->
                     </b-nav-item-dropdown>
                     
                     <b-nav-item-dropdown text="Base Data">
-                        <b-dropdown-item href="#">Customer Data</b-dropdown-item>
-                        <b-dropdown-item href="#">Contact Person</b-dropdown-item>
-                        <b-dropdown-item href="#">Insurance</b-dropdown-item>
-                        <b-dropdown-item href="#">Expert</b-dropdown-item>
+                        <b-dropdown-item to="/customer" href="#">Customer Data</b-dropdown-item>
+                        <b-dropdown-item to="/personals" href="#">Company Data</b-dropdown-item>
+              <!--           <b-dropdown-item href="#">Insurance</b-dropdown-item>
+                        <b-dropdown-item href="#">Expert</b-dropdown-item> -->
+                        <b-dropdown-item to="/prices" href="#">Price List</b-dropdown-item>
+                        <b-dropdown-item to="/devices" href="#">Devices List</b-dropdown-item>
                     </b-nav-item-dropdown>
-
+<!-- 
                     <b-nav-item-dropdown text="Statistics">
                         <b-dropdown-item href="#">Monthly Sales</b-dropdown-item>
                         <b-dropdown-item href="#">Customer Sales</b-dropdown-item>
                         <b-dropdown-item href="#">Partner Sales</b-dropdown-item>
-                    </b-nav-item-dropdown>
-
+                    </b-nav-item-dropdown> -->
+<!-- 
                     <b-nav-item-dropdown text="Settings" right v-has-permission.project@master@table-project.read>
                         <b-dropdown-item href="#">Employee</b-dropdown-item>
                         <b-dropdown-item href="#">Settings</b-dropdown-item>
                         <b-dropdown-item href="#">Units</b-dropdown-item>
                         <b-dropdown-item href="#" v-has-permission.project@master@table-project.write>Fleet</b-dropdown-item>
-                    </b-nav-item-dropdown>
-                </b-nav>
-            </div>
+                    </b-nav-item-dropdown> -->
+                </b-navbar-nav>
 
-            <div class="col-4">
-                <b-nav class="justify-content-end">
-                    <b-nav-item-dropdown right>
+                <b-navbar-nav  class="ml-auto">
+                    <b-nav-item-dropdown right> 
                         <template slot="button-content">
-                            <i class="fas fa-user"></i> {{username}} ({{company}})
+                       <i class="fas fa-user"/> {{username}} ({{leftTime}})
                         </template>
                         <b-dropdown-item href="#">Profile</b-dropdown-item>
-                        <b-dropdown-item href="#">Exit</b-dropdown-item>
+                        <b-dropdown-item href="#" @click="exit">Exit</b-dropdown-item>
                     </b-nav-item-dropdown>
-                </b-nav>
-            </div>
-        </div>
-    </div>
+                </b-navbar-nav>
+</b-collapse>
+
+<b-navbar-brand href="#">{{company}}</b-navbar-brand>
+
+</b-navbar>
+</div>
 </template>
 
 
 <script type="text/javascript">
+import axios from 'axios';
+import moment from 'moment';
 export default {
-    computed: {
+    data() {
+        return {
+          project:{content:'Project'},
+          username:'',
+          company:'',
+          time:'',
+          leftTime:'',
+          is_focus: 1
+      }},
 
-        username() {
-            return `${this.$security.account['first_name']} ${this.$security.account['second_name']}`;
-            return `hello`;
-        },
+    methods: {
+      displaytime() {
+          var self = this
+          var diffrent = moment(this.time,"YYYY-MM-DD HH:mm:ss")
+          .diff(moment().format("YYYY-MM-DD HH:mm:ss"), "seconds")
 
-        company() {
-            return this.$security.company['name'];
-            return ``;
-        }
+          var sec = diffrent;
+          var h = sec/3600 ^ 0;
+          var m = (sec-h*3600)/60 ^ 0;
+          var s = sec-h*3600-m*60;
+
+          this.leftTime =  ((m<10?"0"+m:m)+":"+(s<10?"0"+s:s)) // (h<10?"0"+h:h)+":"+
+
+          if(diffrent <=0){ // '00:00:00'
+              // this.exit()
+          }
+          setTimeout(self.displaytime, 1000)
+      },
+      exit(){
+        console.log('exit')
+        axios.get('/logout').then(response => {window.location.href = '//in.awe.do'});
+      },
+      variables(){
+      axios.get('/variables').then(response => {
+        this.project=response.data[0]
+        })
     },
+  },
 
-    created() {
-   //     console.log(this.$security.hasPermission('project@master@table-project', 'write'));
+    mounted(){
+
+   // setTimeout(() => {
+   this.username = this.$security.account['first_name']+' '+this.$security.account['second_name'],
+     console.log(this.$security.company)
+   // this.company = this.$security.company['name']
+   this.variables();
+        // },1);
+
+
+
+
+
+      var self = this
+      var time = 15 //add minutes
+      this.time =  moment().add(time, 'minutes').format("YYYY-MM-DD HH:mm:ss");
+      this.displaytime();
+      document.onmousemove = ()=> {
+      this.time =  moment().add(time, 'minutes').format("YYYY-MM-DD HH:mm:ss");
+        };
+      document.onkeypress = ()=> {
+      this.time =  moment().add(time, 'minutes').format("YYYY-MM-DD HH:mm:ss");
+      };
+      document.onclick= ()=> {
+      this.time =  moment().add(time, 'minutes').format("YYYY-MM-DD HH:mm:ss");
+      };
+
     }
 }
 </script>

@@ -19,5 +19,6 @@ export default function (value) {
     }else{
         output += ',00'
     }
+    output = output.replace('-.','-')
     return output;
 }

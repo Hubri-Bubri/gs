@@ -1,7 +1,9 @@
 .tableProject td, .tableProject th{
     padding:0px;
      font-size:12px;
+     vertical-align: middle !important;
 }
+
 
 .tableProject select.form-control:not([size]):not([multiple]) {
     border: none;
@@ -21,7 +23,7 @@
     padding:3px;
 }
 .tableProject .fas{
-    width:33px;
+  /*  width:33px; */
 }
   .number{
   white-space: nowrap;
@@ -34,6 +36,7 @@
   overflow: hidden;
   max-height: 1.6em;
   line-height: 1.8em;
+
   }
 
   .status{
@@ -42,7 +45,9 @@ white-space: nowrap;
 
   }
 .tableProject .status{
-min-width:200px;
+/*min-width:200px;*/
+min-width:100%;
 white-space: nowrap;
 
   }
+ 

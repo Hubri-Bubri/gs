@@ -1,0 +1,64 @@
+/home/alex/.virtualenv/development/bin/python: No module named gs_dushbard
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/asyncio/base_events.py", line 1062, in create_server
+    sock.bind(sa)
+OSError: [Errno 98] Address already in use
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/lib/python3.6/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/alex/projects/gs/gs-dashboard/gs_dashboard/__main__.py", line 5, in <module>
+    gs_dashboard.run()
+  File "/home/alex/projects/gs/gs-dashboard/gs_dashboard/__init__.py", line 39, in run
+    return run_app(application, host='0.0.0.0', port=configuration['application']['dashboard']['listen'])
+  File "/home/alex/.virtualenv/development/lib/python3.6/site-packages/aiohttp/web.py", line 111, in run_app
+    loop.run_until_complete(site.start())
+  File "/home/alex/.virtualenv/development/lib/python3.6/site-packages/nest_asyncio.py", line 98, in run_until_complete
+    return f.result()
+  File "/usr/lib/python3.6/asyncio/tasks.py", line 180, in _step
+    result = coro.send(None)
+  File "/home/alex/.virtualenv/development/lib/python3.6/site-packages/aiohttp/web_runner.py", line 89, in start
+    reuse_port=self._reuse_port)
+  File "/usr/lib/python3.6/asyncio/base_events.py", line 1066, in create_server
+    % (sa, err.strerror.lower()))
+OSError: [Errno 98] error while attempting to bind on address ('0.0.0.0', 8080): address already in use
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/runpy.py", line 163, in _run_module_as_main
+    mod_name, _Error)
+  File "/usr/lib/python2.7/runpy.py", line 111, in _get_module_details
+    __import__(mod_name)  # Do not catch exceptions initializing package
+  File "gs_dashboard/__init__.py", line 24
+    aiohttp_jinja2.setup(application, loader=FileSystemLoader(f"{APPLICATION_DIR}/static"))
+                                                                                        ^
+SyntaxError: invalid syntax
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/asyncio/base_events.py", line 1062, in create_server
+    sock.bind(sa)
+OSError: [Errno 98] Address already in use
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/lib/python3.6/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/alex/projects/gs/gs-dashboard/gs_dashboard/__main__.py", line 5, in <module>
+    gs_dashboard.run()
+  File "/home/alex/projects/gs/gs-dashboard/gs_dashboard/__init__.py", line 39, in run
+    return run_app(application, host='0.0.0.0', port=configuration['application']['dashboard']['listen'])
+  File "/home/alex/.virtualenv/development/lib/python3.6/site-packages/aiohttp/web.py", line 111, in run_app
+    loop.run_until_complete(site.start())
+  File "/home/alex/.virtualenv/development/lib/python3.6/site-packages/nest_asyncio.py", line 98, in run_until_complete
+    return f.result()
+  File "/usr/lib/python3.6/asyncio/tasks.py", line 180, in _step
+    result = coro.send(None)
+  File "/home/alex/.virtualenv/development/lib/python3.6/site-packages/aiohttp/web_runner.py", line 89, in start
+    reuse_port=self._reuse_port)
+  File "/usr/lib/python3.6/asyncio/base_events.py", line 1066, in create_server
+    % (sa, err.strerror.lower()))
+OSError: [Errno 98] error while attempting to bind on address ('0.0.0.0', 8080): address already in use

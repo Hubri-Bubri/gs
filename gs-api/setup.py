@@ -3,11 +3,12 @@ from setuptools import setup
 
 prod_requires = [
     'sqlbuilder',
-    'aiomysql'
+    'aiomysql',
+    'gs_share'
 ]
-
 setup(
     name='gs_api',
     install_requires=prod_requires,
-    packages=['gs_api']
+    packages=['gs_api'],
+    version="0.0.1942"
 )
