@@ -22,7 +22,7 @@ def run():
     application.router.add_routes(routes)
     
     aiohttp_jinja2.setup(application, loader=FileSystemLoader(f"{APPLICATION_DIR}/static"))
-    aiohttp_session.setup(application, SimpleCookieStorage())
+    aiohttp_session.setup(application, SimpleCookieStorage(domain='awe.do'))
     aiohttp_security.setup(application, SessionIdentityPolicy(), DatabaseAuthorizationPolicy())
 
     # do load file configuraion
@@ -36,4 +36,4 @@ def run():
         password=configuration['database']['password']
     )
 
-    return run_app(application, host='0.0.0.0', port=configuration['application']['dashboard']['listen'])
+    return run_app(application, host='127.0.0.1', port=configuration['application']['dashboard']['listen'])

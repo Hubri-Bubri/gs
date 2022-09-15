@@ -1,6 +1,7 @@
 var path = require('path')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 
+
 let resolve = (dir) => {
     return path.join(__dirname, dir)
 }
@@ -17,6 +18,8 @@ module.exports = {
         filename: '[name].js',
         publicPath: '/static'
     },
+// devtool: 'source-map',
+
 
     resolve: {
         extensions: ['.js', '.vue'],
@@ -51,11 +54,13 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: ["style-loader", "css-loader", "sass-loader"]
-            }
+            },
+            {test: /(png|jpg|svg)$/i, loader: "url-loader"},
         ]
     },
 
     plugins: [
+
         new CopyWebpackPlugin([
             // gs-dashboard
             { from: resolve('node_modules/bootstrap/dist/css/bootstrap.css'), to: './gs-dashboard/gs_dashboard/static/bundle' },

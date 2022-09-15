@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.1/vue.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://unpkg.com/semtonotes-client@0.2.3"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script src="dist/xrx-vue.js"></script>
+    <script>
+      Vue.use(XrxVue.default)
+
+      new Vue({
+        el: '#app',
+        data: {
+          thumbXrxStyle:{
+            strokeColor: 'green',
+            fillOpacity: 0.55,
+          }
+        },
+        template: `<xrx-vue
+        ref="zoneEditor"
+        class="panel panel-default"
+        :thumb-xrx-style="thumbXrxStyle"
+        :enable-thumb="true"
+        thumb-background='assets/1024px-Ghostscript_Tiger.svg.png'
+        initial-image='assets/1024px-Ghostscript_Tiger.svg.png'
+    />`,
+        methods: {
+        },
+      })
+    </script>
+
+  </body>
+</html>
