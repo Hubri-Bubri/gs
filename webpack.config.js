@@ -1,6 +1,7 @@
 var path = require('path')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 
+
 let resolve = (dir) => {
     return path.join(__dirname, dir)
 }
@@ -56,6 +57,7 @@ module.exports = {
     },
 
     plugins: [
+
         new CopyWebpackPlugin([
             // gs-dashboard
             { from: resolve('node_modules/bootstrap/dist/css/bootstrap.css'), to: './gs-dashboard/gs_dashboard/static/bundle' },

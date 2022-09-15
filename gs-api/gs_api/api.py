@@ -1,6 +1,7 @@
 from asyncio import get_event_loop
 from aiomysql import create_pool, SSCursor, DictCursor
-from collections import defaultdict, OrderedDict, Sequence
+from collections import defaultdict, OrderedDict
+from collections.abc import Sequence
 from sqlbuilder.smartsql import Q, T, Result
 from sqlbuilder.smartsql.dialects import mysql
 import logging
@@ -77,6 +78,9 @@ class Query(Q):
     async def insert(self, *args, **kwargs):
         return await self._cursor.execute(*super().insert(*args, **kwargs))
 
+    async def update(self, *args, **kwargs):
+        await self._cursor.execute(*super().update(*args, **kwargs))
+        
     @property
     def _cursor(self):
         raise NotImplementedError
