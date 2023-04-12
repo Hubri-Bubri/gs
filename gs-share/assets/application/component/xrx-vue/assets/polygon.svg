@@ -1,0 +1,19 @@
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 164 124">
+   <defs>
+    <linearGradient y2="1" x2="1" y1="0.28125" x1="0.33594" id="svg_4">
+     <stop stop-opacity="1" stop-color="#ffffff" offset="0"/>
+     <stop stop-opacity="1" stop-color="#33a533" offset="1"/>
+    </linearGradient>
+   </defs>
+    <polygon stroke-dasharray="null" stroke-width="9" stroke="#000000" fill="url(#svg_4)" id="svg_1"
+      points="
+      0,20
+      20,124
+      80,80
+      144,124
+      164,40
+      80,0
+      "/>
+   </svg>
+ </svg>
