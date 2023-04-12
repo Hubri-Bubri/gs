@@ -2,7 +2,7 @@ from setuptools import setup
 from distutils.cmd import Command
 from subprocess import Popen
 import subprocess
-from gs_business import __version__
+
 
 
 class Npm(Command):
@@ -25,16 +25,19 @@ class Npm(Command):
 prod_requires = [
     'aiohttp',
     'aiohttp_jinja2',
+    'weasyprint',
     'aiohttp_security',
     'aiohttp_session',
     'gs_api',
     'gs_security',
-    'gs_configurator'
+    'gs_configurator',
+    'gs_share'
 ]
 
 setup(
     name='gs-business',
-    version=__version__,
+    version="0.0.6583"
+    ,
     install_requires=prod_requires,
     packages=['gs_business'],
     package_data={
