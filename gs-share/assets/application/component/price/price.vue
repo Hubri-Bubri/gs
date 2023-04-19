@@ -72,7 +72,7 @@
           <template #row-details="row">
             <div contenteditable="true" :style="(row.item._rowVariant=='success')?rowColor:''" @blur="updateDate($event.target.innerText, 'desc', row.item.id)">{{row.item.desc}}</div>
           </template>
-        </b-table>                             
+        </b-table>  <span hidden>{{selectedPrice}}</span>                           
       </b-col>
       <b-col cols="4" v-show="hideColumn" class="block-2">
         <b-table:items="selectedPrice" :fields="getFields(fields1, newFields1)"  hover small  sticky-header  style="max-height:100%">

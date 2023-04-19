@@ -36,8 +36,8 @@
                   :thrId="idNode"
                   :parId="parId">
                   </vue-drag-tree> 
-</b-col>
-<b-col cols="9" class="block-2">
+              </b-col>
+              <b-col cols="9" class="block-2">
                   <b-table :items="items" :fields="fields"
                   show-empty
                   sticky-header 

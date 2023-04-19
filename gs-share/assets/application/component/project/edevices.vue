@@ -1,6 +1,5 @@
 <template>
   <devices-table-group 
-ref="ctg"
 :windowPrint="windowPrint"
 :works="works"
 
@@ -49,6 +48,7 @@ v-model="partx"
 
 @worker="worker"
 @hideWindowPrint="hideWindowPrint"
+ref="deviceGroup"
   ></devices-table-group>
 </template>
 

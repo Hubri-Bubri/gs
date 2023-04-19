@@ -951,21 +951,24 @@ this.checkbox_update('column', 0, 0)
         })
       },
     checkbox_update(event, key, indexSelect){
+      // console.log(event)
       if (event != 'column'){
         if (event == null){
- 
-             this.value.parts.checkbox_list.selected[key].splice(this.value.parts.checkbox_list.selected[key].indexOf('tepm'+(indexSelect+1)), 1)
+              this.value.parts.checkbox_list.selected[key].splice(this.value.parts.checkbox_list.selected[key].indexOf('tepm'+(indexSelect+1)), 1)
         }else{
-             this.value.parts.checkbox_list.selected[key].push(event)
+          this.value.parts.checkbox_list.selected[key]=event
+             // this.value.parts.checkbox_list.selected[key].push(event)
         }
       }
+
+      
         if(this.value.parts.checkbox_list.selected!=null){
-          axios.get('update_checkbox_table', {
-            params: {
+          axios.post('update_checkbox_table', {
+            
               id: this.value.parts.id,
               fild: 'selected',
               data: this.value.parts.checkbox_list.selected
-            }
+            
           })
         }
       

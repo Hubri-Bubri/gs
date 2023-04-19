@@ -3276,11 +3276,19 @@ class Projects:
             return partx
 
     @classmethod
-    async def update_checkbox_table(cls, id, fild, data):
+    async def update_checkbox_table(cls, uid, fild, data):
+
+        # print(id)
+        # print(fild)
+        # print(data)
+
         string = ''
-        objs = json.loads(data)
+        # objs = json.loads(str(data))
+        # print(objs)
+        objs = data
         counObj=0
         objstring=''
+
         for obj in objs:
             if counObj==0:
                 separator = ''
@@ -3291,7 +3299,6 @@ class Projects:
             counObj=counObj+1
             string=string+separator+obj+':'
             objstring=objstring+sepObj+obj
-
             count=0
             for item in objs[obj]:
                 count=count+1
@@ -3299,14 +3306,16 @@ class Projects:
                     separator = ''
                 else:
                     separator = ','
+                # print(item)
                 numberForItem = int(item.split('temp')[1])
+                # print(numberForItem)
                 item = 'temp'+str(numberForItem)
                 string = string+item+separator
 
         async with database.query() as Q:
             await (Q()
                      .tables(T.tables)
-                     .where(T.tables.id == id)
+                     .where(T.tables.id == uid)
                      .update({
                          T.tables[fild]: string,
                          T.tables.obj: objstring

@@ -1,25 +1,33 @@
 <template>
    <div>
     <hr />
-      <b-row align-h="between">
-        <slot></slot>
-        <b-col lg="6" md="12"><b-row align-h="between" class="leftType">
-          <slot name="Type"></slot>
-          <slot name="Work"></slot>
-          <b-button size="sm" @click="printOffer()" v-if="!((tmp.typeOfHead=='Invoices')&&(tmp.number.split(' ').length==5))">
-              <i class="fas fa-print"></i>
-          </b-button>
-        </b-row>
-        </b-col>
-      </b-row>
+          <b-row>
+          <b-col cols="6">
+            <slot></slot>
+          </b-col>
+          <b-col cols="5">
+    
+              <slot name="Type"></slot>
+        
+              
+              
+         
+          </b-col>
+          <b-col cols="1">
+            <b-button size="sm" @click="printOffer()" v-if="!((tmp.typeOfHead=='Invoices')&&(tmp.number.split(' ').length==5))">
+              <b-icon icon="printer" aria-hidden="true"></b-icon>
+            </b-button>
+          </b-col>
+          </b-row>
       <br/>
       <b-modal size="lg" centered ok-only no-close-on-esc no-close-on-backdrop hide-header-close  :visible="windowPrint" v-if="makemodalpdf">
          <div slot="modal-title" class="w-100">
             <div>Print</div>
          </div>
 
-         <iframe type="iframe" style="width:100%;height:617px;" name="myIframe" ></iframe>
-         <form target="myIframe" :action="'/pdf'" method="post" style="display:none" id="preForm" >
+         <iframe type="iframe" style="width:100%;height:550px;" name="myIframe" ></iframe>
+
+         <form target="myIframe" :action="'/pdf'" method="post" style="display:none" ref="preForm">
             <input type="text" name="dateInspect" :value="tmp.dateInspect" />
             <input type="text" name="dateEvent" :value="tmp.dateEvent" />
             <input type="text" name="worker" :value="tmp.worker" />
@@ -134,7 +142,8 @@
                </b-col>
                <b-col cols="6">
                    <b-form-select buttons text-field="name" value-field="id" button-variant="outline-primary" 
-                     :options="typeDocsList" @change="selectedDocs($event)" :value="selectedDocsList" multiple :select-size="(tmp.typeOfHead=='Damage')?7:(tmp.typeOfHead=='Devices')?3:5">
+                     :options="typeDocsList" @change="selectedDocs($event)" :value="selectedDocsList"
+                     multiple :select-size="(tmp.typeOfHead=='Damage')?7:(tmp.typeOfHead=='Devices')?3:5">
                   </b-form-select>
                </b-col>
             </b-row>
@@ -234,6 +243,12 @@ export default {
         }
     },
     methods: {
+        previewPDFForm(){
+          console.log('1')
+          setTimeout(() => {
+            this.$refs.preForm.submit()
+          }, 20);
+        },
         getCustomer() {
             if (this.customer) return this.selectCustomer.name
         },

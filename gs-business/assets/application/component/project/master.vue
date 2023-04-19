@@ -620,15 +620,15 @@ export default {
   },
   mounted(){
     this.totalRows = this.items.length
-    setTimeout(() => {
-      axios.get('/variables').then(response => {
+    axios.get('/variables').then(response => {
         this.project=response.data[0]
         this.fields[0].label=this.project.content
       })
       axios.get('/countries').then(response => {
         this.countries=response.data
       })
-      this.$socket.send('getProjects')
+    setTimeout(() => {
+       this.$socket.send('getProjects')
       this.$options.sockets.onmessage = (data) => (data.data=='getProjects') ? this.getProjects('01'): ''
     },1000);
   }

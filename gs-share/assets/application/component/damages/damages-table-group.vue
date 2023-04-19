@@ -36,6 +36,7 @@
       @preview="preview"
       @printOffer="printOffer"
       @hideWindowPrint="hideWindowPrint"
+      ref="print"
       >
       <b-col lg="6" md="12">
 

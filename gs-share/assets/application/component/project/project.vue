@@ -141,13 +141,20 @@
     </b-row>
     <br/>
     <!-- start tables -->
-    <div v-show="typesForTables.length==0">
+<!--     <div v-show="typesForTables.length==0">
       <Spinner size="large" ></Spinner>
-    </div>
+    </div> -->
+
+    <div class="text-center text-info" v-show="typesForTables.length==0">
+            <b-spinner class="align-middle" ></b-spinner>
+            <strong>Loading...</strong>
+          </div>
+
     <div v-for="name in typesForTables" v-if="getItems(name.type)!=''">
         {{name.type}}
       <b-table :items="getItems(name.type)" hover  small 
       :fields="fieldsTable" @row-clicked="inItemGetData">
+
         <template #cell(number)="it">
           <div v-if="name.type=='Invoices'" class="text-container">
             <span v-if="it.item.number.split(' ').length==5"  class="text-content">
@@ -180,6 +187,7 @@
             <span  class="text-content">{{ it.item.number.split(' ')[0] }}</span>
           </div>
         </template>
+
         <template #cell(delete)="it">
             <b-link @click.stop="offerDel(it.item.id)">
               <b-icon icon="trash" aria-hidden="true"></b-icon>
@@ -219,6 +227,9 @@
             <span  class="text-content"> {{data.item.other}}</span>
           </div>
         </template>
+
+
+
       </b-table>
     </div>
   </b-container>
@@ -352,24 +363,24 @@ export default {
       this.updateProject('zip1', val)
     },
     updateProject(fild, newData){
-      axios.get('/updateProject', {params: {
+      axios.post('/updateProject', {
         id: this.id,
         date: newData,
         fild: fild
-      }}).then(response => {
+      }).then(response => {
         if (fild == 'other'){
-          axios.get('/updateProject', {
-            params: {
+          axios.post('/updateProject', {
+            
               id: this.id,
               date:  this.$security.table.account.first_name+'_'+this.$security.table.account.second_name,
               fild: 'user'
-          }});
-          axios.get('/updateProject', {
-            params: {
+          });
+          axios.post('/updateProject', {
+            
               id: this.id,
               date: moment().format("DD.MM HH:mm"),
               fild: 'datacomment'
-          }});
+          });
         }
       })
     },
@@ -458,6 +469,7 @@ export default {
             orderandsub = JSON.parse(JSON.stringify(orderandsub.concat(segmer)));
           }
         })
+        // console.log(orderandsub)
         return orderandsub
       }
       if (type == 'Invoices'){
@@ -548,3 +560,8 @@ export default {
   }
 }
 </script>
+<style type="text/css">
+  .table-primaryHide{
+  display: none;
+}
+</style>

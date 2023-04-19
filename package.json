@@ -11,7 +11,7 @@
     "bootstrap": "^4.6.1",
     "bootstrap-vue": "^2.23.1",
     "css-loader": "^0.26.4",
-    "gs-paint": "git+https://github.com/Hubri-Bubri/gs-paint.git#v1.0.7",
+    "gs-paint": "git+https://github.com/Hubri-Bubri/gs-paint.git#v1.0.9",
     "install": "^0.12.2",
     "lodash": "^4.17.10",
     "moment": "^2.24.0",

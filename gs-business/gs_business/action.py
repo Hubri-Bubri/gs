@@ -392,9 +392,13 @@ async def method (request):
         await client.send_str('getProjectDetail')
     return result
 
-@routes.get('/update_checkbox_table')
+@routes.post('/update_checkbox_table')
 async def method (request):
-    result = web.json_response(await Projects.update_checkbox_table(request.query['id'], request.query['fild'], request.query['data']))
+    form = await request.json()
+    uid = form['id']
+    fild = form['fild']
+    data = form['data']
+    result = web.json_response(await Projects.update_checkbox_table(uid, fild, data))
     for client in ws_clients:
         await client.send_str('getProjectDetail')
     return result
@@ -542,11 +546,11 @@ async def method (request):
 @routes.post('/updateProject')
 async def method (request):
     form = await request.json()
-    id = form['id']
+    uid = form['id']
     date = form['date']
     fild = form['fild']
     try:
-        result = web.json_response(await Project.update(id, date, fild))
+        result = web.json_response(await Project.update(uid, date, fild))
     except KeyError:
         try:
             return web.json_response('')
@@ -1790,7 +1794,7 @@ async def method (request):
     result= web.json_response(await Docs.deldoc(request.query['id']))
     # print('deldoc')
     for client in ws_clients:
-        await client.send_str('getProjectDetail')
+        await client.send_str('getDocs')
     return result
 
 

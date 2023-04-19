@@ -10,5 +10,5 @@ setup(
             'resources/*',
         ]
     },
-    version="0.0.3483"
+    version="0.0.3494"
 )

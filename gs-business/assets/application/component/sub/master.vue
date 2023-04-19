@@ -39,7 +39,7 @@
         </template>
         <container>
           <container-body>
-            <b-table stacked="lg" hover :items="items" :fields="getFields()" @row-clicked="inItemClick"   hover :filter="filter" :filter-included-fields="filterOn"
+            <b-table stacked="lg" :items="items" :fields="getFields()" @row-clicked="inItemClick"   hover :filter="filter" :filter-included-fields="filterOn"
               show-empty @filtered="onFiltered" sticky-header no-border-collapse style="max-height:100%" :busy="(items.length==0)">
               <template #cell(in)="data">
                 <div class="text-center w-100">

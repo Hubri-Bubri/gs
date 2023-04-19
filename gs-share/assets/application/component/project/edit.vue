@@ -1,10 +1,7 @@
 <template>
 <div>
-
-  <b-icon icon='calculator' aria-hidden="true"  @click="checkInEditor('other')" v-if="(tmp.number==null)"  style="position:relative;left:24px;top: 16px;width:25px;z-index:2;"/>
-
+<b-icon icon='calculator' aria-hidden="true"  @click="checkInEditor('other')" v-if="(tmp.number==null)"  style="position:relative;left:24px;top: 16px;width:25px;z-index:2;"/>
 <span v-show="(disablefildUser('gencooment', id)!='you')" style="position:relative;left:30px;top: 16px;width:18px;z-index:2;" v-if="(tmp.number==null)">{{disablefildUser('gencooment', id)}}</span>
-
 <vue-editor :value="project.other" :editorToolbar="customToolbar"
 style="height:82vh;position:relative;top:-20px;z-index:1;" v-if="(tmp.number==null)"
 class="text-right"  ref="other"
@@ -272,6 +269,7 @@ class="text-right"  ref="other"
 @hideWindowPrint="hideWindowPrint"
 
 @changeSum="discOfPercent()"
+ref="calcGroup"
 ></calc-table-group>
 </b-container>
 

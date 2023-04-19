@@ -16,12 +16,13 @@
         </b-modal>  -->
 
     <b-modal size="sm" centered id="ids" ref="ids" title="Number of Invoice" body-class="workerHeight" >
-            <b-form-checkbox-group buttons  button-variant="light" style="width:100%" :checked="selectedId"  @change="selectedId=$event"
+            <b-form-checkbox-group buttons  button-variant="light" style="width:100%" :checked="[selectedId]"  @change="selectedId=$event"
             text-field="lastNumber" value-field="lastNumber" stacked :options="id_list" v-if="detectNewRound(id_list)" />
+
             <div v-else class="text-center">
              There will be a new account range.
 
-            <b-form-checkbox-group buttons  button-variant="light" style="width:100%" checked="1" @change="selectedId=$event"
+            <b-form-checkbox-group buttons  style="width:100%" checked="[1]" @change="selectedId=$event"
              stacked :options="[1]" />
             </div>
             <template slot="modal-footer">
@@ -104,8 +105,9 @@
       @preview="preview"
       @printOffer="printOffer"
       @hideWindowPrint="hideWindowPrint"
+      ref="print"
       >
-      <b-col lg="6" md="12">
+
         <!--             <b-button class="customButton" @click="move">
                        Move
                     </b-button> -->
@@ -138,22 +140,33 @@
 
 
 
-      </b-col>
-<b-col  slot="Type" v-if="((type=='Orders') || (type=='Offers'))">
-  Type:&nbsp;
-  <b-select  :value="type" @change="offerChangeType(id, $event)" :options="getOpt()"  size="sm" />
-</b-col>
+    
 
-<b-col  slot="Work">
-  Work:&nbsp;
-  <b-select   :value="tmp.work" :options="works" @change="updateItem($event, 'work', tmp.id)"  size="sm"/>
-</b-col>
+
+
+
+
+            <b-form inline align-h="between" slot="Type">
+              <label>Type:&nbsp;&nbsp;</label>
+                <b-select  :value="type" @change="offerChangeType(id, $event)" :options="getOpt()"  size="sm" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label>Work:&nbsp;&nbsp;</label>
+                <b-select :value="tmp.work" :options="works" @change="updateItem($event, 'work', tmp.id)"  size="sm"/>
+             
+            </b-form>
+
+
+
 
 
 </print>
-      <div v-show="value.length==0">
- <Spinner size="large" ></Spinner>
-</div>
+
+
+  <div class="text-center text-info" v-show="value.length==0">
+    <b-spinner class="align-middle" ></b-spinner>
+    <strong>Loading...</strong>
+  </div>
+
+
       <draggable :value="value" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
          :no-transition-on-drag="true" @start="drag=true" @end="checkMove($event)">
          <div v-for="(part, index) in value" :key="part.id">
@@ -172,7 +185,7 @@
                     <b-link v-b-toggle="'partx' + table.tableId" class="butMore" style="width:100%">
                      + {{total(value[index].parts.part_content) | thousandSeparator }} €
                     </b-link>
-                    
+
                     <i class="fas fa-dot-circle" style="font-size:12px"></i> 
                     <span :contenteditable="type!='Invoices'" @blur="toModel($event, value[index].parts.id, value[index].parts.part_name)" @click.prevent.self>
                         {{value[index].parts.part_name}}
@@ -415,6 +428,7 @@ inItemGetData(item, index) {
         }else{
 
           axios.get('/detect_invoice').then(response => {
+            console.log(response.data)
             this.id_list = response.data,
             this.selectedId = response.data[(response.data.length-1)].lastNumber,
             
@@ -423,7 +437,7 @@ inItemGetData(item, index) {
         }}
 
         if(val=="Damage Description"){
-          // console.log(this.id)
+        // console.log(this.color)
         axios.get('/add_invoice', {
             params: {
                 id: this.id,

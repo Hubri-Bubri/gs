@@ -1,6 +1,5 @@
-<template>
+<template> 
   <damages-table-group 
-ref="ctg"
 :windowPrint="windowPrint"
 :works="works"
 
@@ -49,6 +48,7 @@ v-model="partx"
 
 @worker="worker"
 @hideWindowPrint="hideWindowPrint"
+ref="damageGroup"
   ></damages-table-group>
 </template>
 

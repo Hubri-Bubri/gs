@@ -273,7 +273,7 @@ class language:
             added=strftime("%d-%m-%Y %H:%M:%S", localtime())
             web.json_response(await Docs.add_pdf(h, date, offerHead, number, added, number_of_pages, project_id, user))
             for client in ws_clients:
-                await client.send_str('getProjectDetail')
+                await client.send_str('getDocs')
 
         if data['addPdf'] == 'separator':
             date=data['date']
@@ -305,7 +305,7 @@ class language:
                     web.json_response(await Docs.add_pdf(part, date, offerHead, number, added, number_of_pages, project_id, user))
 
             for client in ws_clients:
-                await client.send_str('getProjectDetail')
+                await client.send_str('getDocs')
 
         if data['addPdf'] == 'false':
             pdf = HTML(string=h).write_pdf()
@@ -317,5 +317,7 @@ class language:
             await resp.write(pdf)
 
             # for client in ws_clients:
+            #     await client.send_str('getDocs')
             #     await client.send_str('getProjectDetail')
+
         return resp
