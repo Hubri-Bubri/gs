@@ -2961,72 +2961,8 @@ async def websocket_handler(request):
     ws_clients.append(ws)
     try:
         async for msg in ws:
-            if msg.data == 'getFiles':
-                for client in ws_clients:
-                    await client.send_str('getFiles')
-            if msg.data == 'get_type_works':
-                for client in ws_clients:
-                    await client.send_str('get_type_works')
-            if msg.data == 'getProjects':
-                for client in ws_clients:
-                    await client.send_str('getProjects')
-            if msg.data == 'getProjectDetail':
-                for client in ws_clients:
-                    await client.send_str('getProjectDetail')
-            if msg.data == 'getSub':
-                for client in ws_clients:
-                    await client.send_str('getSub')
-            if msg.data == 'getOffer':
-                for client in ws_clients:
-                    await client.send_str('getOffer')
-            if msg.data == 'getContracts':
-                for client in ws_clients:
-                    await client.send_str('getContracts')
-            if msg.data == 'getSubContracts':
-                for client in ws_clients:
-                    await client.send_str('getSubContracts')
-            if msg.data == 'getSubDetail':
-                for client in ws_clients:
-                    await client.send_str('getSubDetail')
-            if msg.data == 'getCustomers':
-                for client in ws_clients:
-                    await client.send_str('getCustomers')
-            if msg.data == 'getCustomerDetail':
-                for client in ws_clients:
-                    await client.send_str('getCustomerDetail')
-            if msg.data == 'getFilesCustomer':
-                for client in ws_clients:
-                    await client.send_str('getFilesCustomer')
-            if msg.data == 'getFilesPersonal':
-                for client in ws_clients:
-                    await client.send_str('getFilesPersonal')
-            if msg.data == 'getFilesPerson':
-                for client in ws_clients:
-                    await client.send_str('getFilesPerson')
-            if msg.data == 'getPrices':
-                for client in ws_clients:
-                    await client.send_str('getPrices')
-            if msg.data == 'getDevices':
-                for client in ws_clients:
-                    await client.send_str('getDevices')
-            if msg.data == 'getDocs':
-                for client in ws_clients:
-                    await client.send_str('getDocs')
-            if msg.data == 'getSubFiles':
-                for client in ws_clients:
-                    await client.send_str('getSubFiles')
-            if msg.data == 'getPersonal':
-                for client in ws_clients:
-                    await client.send_str('getPersonal')
-            if msg.data == 'getBalance':
-                for client in ws_clients:
-                    await client.send_str('getBalance')
-            if msg.data == 'getLoocks':
-                for client in ws_clients:
-                    await client.send_str('getLoocks')
-            if msg.data == 'getLoocksSub':
-                for client in ws_clients:
-                    await client.send_str('getLoocksSub')
+           for client in ws_clients:
+                await client.send_str(msg.data)
     except ConnectionResetError:
         print("ConnectionResetError, reconnecting...")
         os.system("killall -9 python");
