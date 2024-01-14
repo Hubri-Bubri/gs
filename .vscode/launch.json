@@ -4,7 +4,7 @@
             "name": "dashboard",
             "type": "python",
             "request": "launch",
-            "program": "~/Projects/anonimus/anonimus-server/.venv/bin/anonimus-server",
+            "program": "~/project/awe/gs-dashboard/gs_dashboard/__main__.py",
             "console": "integratedTerminal",
             "justMyCode": false
         },
