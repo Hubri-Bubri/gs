@@ -1,6 +1,6 @@
 <template>
- <b-container fluid>
-    <b-modal size="md" centered id="column" ref="column" title="Edit Column">
+ <b-container fluid ref="heightTableDevice">
+    <b-modal size="md" centered id="column" ref="column" :title="$t('price.editColumn')">
       <b-row>
         <b-col>
           <b-form-checkbox-group buttons  style="width:100%" v-model="newFields" stacked :options="opt(fields)"/>
@@ -8,7 +8,7 @@
         <b-col class="text-center">
           <b-form-checkbox-group buttons  style="width:100%" v-model="newFields1" stacked :options="opt(fields1)"/>
           <b-button class="btn btn-light" @click="hideColumnfunc()">
-            {{hideColumn?'hide':'show'}} this column
+           {{hideColumn?$t('price.hide'):$t('price.show')}} {{$t('price.column')}}
           </b-button>
         </b-col>
       </b-row>
@@ -17,7 +17,7 @@
       </template>
     </b-modal>
     <b-row>
-      <b-col cols="3" class="block-1">
+      <b-col cols="12" lg="3" class="block-1" >
         <vue-drag-tree
         :data='itemsMenuDev'
         :allowDrag='allowDrag'
@@ -34,8 +34,9 @@
         @drop="dropHandler">
         </vue-drag-tree>                              
       </b-col>
-      <b-col :cols="hideColumn?5:9" class="block-2">
-        <b-table :items="itemsDev" :fields="getFields(fields, newFields)"  hover small  sticky-header  style="max-height:100%">
+      <b-col cols="12" :lg="hideColumn?5:9" class="block-2 m-0 p-0">
+        <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+        <b-table :items="itemsDev" :fields="getFields(fields, newFields)"  hover small  show-empty stacked="lg" no-border-collapse>
           <template #cell(#)="data">
             <div @click="rowSelected(data.item)" class="text-center w-100">
               {{ data.index + 1 }}
@@ -80,9 +81,11 @@
             <div contenteditable="true" :style="(row.item._rowVariant=='success')?rowColor:''" @blur="updateDate($event.target.innerText, 'comment', row.item.id)">{{row.item.comment}}</div>
           </template>
         </b-table>
+      </div>
       </b-col>
       <b-col cols="4" v-show="hideColumn" class="block-2">
-        <b-table  class="tableProject" :items="selectedPriceDev" :fields="getFields(fields1, newFields1)"  hover small  sticky-header  style="max-height:100%">
+        <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+        <b-table  class="tableProject" :items="selectedPriceDev" :fields="getFields(fields1, newFields1)"  hover small  show-empty no-border-collapse>
           <template #cell(#)="data">
             <div @click="rowSelected(data.item)" class="text-center w-100">
               {{ data.index + 1 }}
@@ -124,6 +127,7 @@
             <div contenteditable="true" :style="(row.item._rowVariant=='success')?rowColor:''" @blur="updateDate($event.target.innerText, 'comment', row.item.id)">{{row.item.comment}}</div>
           </template>
         </b-table>
+      </div>
       </b-col>  
     </b-row>
   </b-container>
@@ -134,127 +138,129 @@ export default {
   props: ['howhight', 'idNodeDev', 'parIdDev', 'itemsDev', 'oldIdDev', 'itemsMenuDev', 'selectedPriceDev', 'menuDevicesTree'],
   data(){
     return{
-      newFields:['#', 'Position',  'Designation', 'i', 'Watt', 'Time', 'Manufacturer'],
-      newFields1:['#','Designation'],
+      newFields:['#', this.$t('lists.position'), this.$t('lists.designation'), 'i', this.$t('lists.kilowatt'), this.$t('lists.time'), this.$t('lists.manufacturer')],
+      newFields1:['#', this.$t('lists.designation')],
       rowColor:'background-color:#c3e6cb',
       hideColumn:false,
-      fields: [
-      {
-        key: '#',
-        label: '#',
-        sortable: true
-      },
-      {
-        key: 'pos_num',
-        label: 'Position',
-        sortable: true
-      },
-      {
-        key: 'designation',
-        label: 'Designation',
-        sortable: true
-      },
-      {
-        key: 'show_details',
-        label: 'i',
-      },
-      {
-        key: 'kilowatt',
-        label: 'Watt',
-        sortable: true
-      },
-      {
-        key: 'time',
-        label: 'Time',
-        sortable: true
-      },
-      {
-        key: 'manufacturer',
-        label: 'Manufacturer',
-        sortable: true
-      },
-      {
-        key: 'serial',
-        label: 'Serial',
-        sortable: true
-      },
-      {
-        key: 'order',
-        label: 'Order',
-        sortable: true
-      },
-      {
-        key: 'check_date',
-        label: 'Check',
-        sortable: true
-      },
-      {
-        key: 'next_check_date',
-        label: 'Next Check',
-        sortable: true
-      },
-      {   key: 'delete',
-          label: 'Del',
-      }],
-      fields1: [{
-        key: '#',
-        label: '#',
-        sortable: true
-      },
-      {
-        key: 'pos_num',
-        label: 'Position',
-        sortable: true
-      },
-      {
-        key: 'designation',
-        label: 'Designation',
-        sortable: true
-      },
-      {
-        key: 'show_details',
-        label: 'i',
-      },
-      {
-        key: 'kilowatt',
-        label: 'Watt',
-        sortable: true
-      },
-      {
-        key: 'time',
-        label: 'Time',
-        sortable: true
-      },
-      {
-        key: 'manufacturer',
-        label: 'Manufacturer',
-        sortable: true
-      },
-      {
-        key: 'serial',
-        label: 'Serial',
-        sortable: true
-      },
-      {
-        key: 'order',
-        label: 'Order',
-        sortable: true
-      },
-      {
-        key: 'check_date',
-        label: 'Check',
-        sortable: true
-      },
-      {
-        key: 'next_check_date',
-        label: 'Next Check',
-        sortable: true
-      }],
       fieldsForTable:[],
       fields1ForTable:[],
       drag1: null,
       drag2: null
     }
+  },
+  computed:{
+     fields() {return[
+           {
+             key: '#',
+             label: '#',
+             sortable: true
+           },
+           {
+             key: 'pos_num',
+             label: this.$t('lists.position'),
+             sortable: true
+           },
+           {
+             key: 'designation',
+             label: this.$t('lists.designation'),
+             sortable: true
+           },
+           {
+             key: 'show_details',
+             label: 'i',
+           },
+           {
+             key: 'kilowatt',
+             label: this.$t('lists.kilowatt'), 
+             sortable: true
+           },
+           {
+             key: 'time',
+             label: this.$t('lists.time'), 
+             sortable: true
+           },
+           {
+             key: 'manufacturer',
+             label: this.$t('lists.manufacturer'), 
+             sortable: true
+           },
+           {
+             key: 'serial',
+             label: this.$t('lists.serial'), 
+             sortable: true
+           },
+           {
+             key: 'order',
+             label: this.$t('lists.order'), 
+             sortable: true
+           },
+           {
+             key: 'check_date',
+             label: this.$t('lists.check_date'), 
+             sortable: true
+           },
+           {
+             key: 'next_check_date',
+             label: this.$t('lists.next_check_date'), 
+             sortable: true
+           },
+           {   key: 'delete',
+               label: this.$t('docs.delete')
+           }]},
+      fields1() {return[{
+              key: '#',
+              label: '#',
+              sortable: true
+            },
+            {
+              key: 'pos_num',
+              label: this.$t('lists.position'), 
+              sortable: true
+            },
+            {
+              key: 'designation',
+              label: this.$t('lists.designation'), 
+              sortable: true
+            },
+            {
+              key: 'show_details',
+              label: 'i',
+            },
+            {
+              key: 'kilowatt',
+              label: this.$t('lists.kilowatt'), 
+              sortable: true
+            },
+            {
+              key: 'time',
+              label: this.$t('lists.time'), 
+              sortable: true
+            },
+            {
+              key: 'manufacturer',
+              label: this.$t('lists.manufacturer'), 
+              sortable: true
+            },
+            {
+              key: 'serial',
+              label: this.$t('lists.serial'), 
+              sortable: true
+            },
+            {
+              key: 'order',
+              label: this.$t('lists.order'), 
+              sortable: true
+            },
+            {
+              key: 'check_date',
+              label: this.$t('lists.check_date'), 
+              sortable: true
+            },
+            {
+              key: 'next_check_date',
+              label: this.$t('lists.next_check_date'), 
+              sortable: true
+            }]}
   },
   methods: {
     rowSelected(items) {
@@ -291,8 +297,13 @@ export default {
     hidePosition(){
       this.$refs.column.show()    
     },
-    onClickOutside() {
-      this.$emit('onClickOutsideDev')
+    // onClickOutside() {
+    //   this.$emit('onClickOutsideDev')
+    // },
+    loded(){
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs.heightTableDevice.clientHeight, 200)
+      }, 1);     
     },
     allowDrag(model, component) {
       if (component.depth!=1){
@@ -370,6 +381,8 @@ export default {
     // console.log('dropHandler: ', model, component, e);
       this.drag2=model.id;
     }
+  },mounted(){
+    this.$emit('loded', 'component', this.$refs.heightTableDevice.clientHeight, 200)
   }
 }
 </script>

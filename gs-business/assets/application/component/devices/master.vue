@@ -4,18 +4,18 @@
       <top-menu></top-menu>
     </container-header>
     <container-body>
-      <b-modal size="md" centered id="move" ref="move" title="Move">
+      <b-modal size="md" centered id="move" ref="move" :title="$t('projectDetail.move')">
         <!-- @change="moveToCopySelect($event, moveToCopyRadio)" v-model="moveToCopy" -->
         <b-form-select class="" id="move" v-model="selectedItems" :select-size="detectRowSise(items_menu)">
           <option v-for="item in detectItem(items_menu)" @click="selectedModal(item)">{{item.name}}</option>
         </b-form-select>
-        <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="['move', 'copy']" />
+        <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[$t('company.copy'), $t('company.move')]" />
           <template slot="modal-footer">
        <!-- <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>-->
             <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button> 
           </template>
       </b-modal>
-      <b-card header="Devices" class="gs-container">
+      <b-card :header="$t('projectDetail.devices')"  class="gs-container">
         <container>
           <container-body  style="overflow: unset;">
             <b-row>
@@ -38,11 +38,12 @@
                   </vue-drag-tree> 
               </b-col>
               <b-col cols="9" class="block-2">
-                  <b-table :items="items" :fields="fields"
+                <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+                  <b-table :items="items" :fields="fields" stacked="lg"
                   show-empty
-                  sticky-header 
-                            hover
-                  style="max-height:100%"
+                  no-border-collapse
+                  hover
+                  
                   >
                     <template #cell(#)="data">
                       <div @click="rowSelected(data.item)" class="text-center w-100">
@@ -83,6 +84,7 @@
                       <b-link @click="delRow(row.item.id)" ><b-icon icon="trash" aria-hidden="true"></b-icon></b-link>
                     </template> 
                   </b-table>
+                </div>
                   <div hidden>{{ selected }}</div>
                 </b-col>
               </b-row>
@@ -93,12 +95,12 @@
           <b-col cols="12">
             <b-input-group>
               <b-input-group-append>
-                <b-button @click="add">Add Part</b-button>
-                <b-button @click="remove">Remove</b-button>
+                <b-button @click="add">{{$t('projectDetail.plusPart')}}</b-button>
+                <b-button @click="remove">{{$t('projectDetail.remove')}}</b-button>
               </b-input-group-append>
               <b-input-group-append>
-                <b-button @click="addRow">Add Row</b-button>
-                <b-button @click="mv_cp">Move/Copy</b-button>
+                <b-button @click="addRow">{{$t('projectDetail.plusRow')}}</b-button>
+                <b-button @click="mv_cp">{{$t('projectDetail.move')}}</b-button>
               </b-input-group-append>
               <b-form-input v-model="nameNode" :style="nodeDis?'background-color:grey':''"
               @click.native="nodeDis?nodeDisTurn():''" @change="nodeDis=true;toModel(nameNode)"></b-form-input>
@@ -125,70 +127,79 @@ export default {
       parId:null,
       oldId:0,
       selectedItems:[],
-      fields: [
-        {
-          key: '#',
-          label: '#'
-        },
-        {
-          key: 'pos_num',
-          label: 'Position',
-          sortable: true
-        },
-        {
-          key: 'designation',
-          label: 'Designation',
-          sortable: true
-        },
-        {
-          key: 'comment',
-          label: 'Comment',
-          sortable: true
-        },
-        {
-          key: 'kilowatt',
-          label: 'Watt',
-          sortable: true
-        },
-        {
-          key: 'time',
-          label: 'Time',
-          sortable: true
-        },
-        {
-          key: 'manufacturer',
-          label: 'Manufacturer',
-          sortable: true
-        },
-        {
-          key: 'serial',
-          label: 'Serial',
-          sortable: true
-        },
-        {
-          key: 'order',
-          label: 'Order',
-          sortable: true
-        },
-        {
-          key: 'check_date',
-          label: 'Check',
-          sortable: true
-        },
-        {
-          key: 'next_check_date',
-          label: 'Next Check',
-          sortable: true
-        },
-        {
-          key: 'delete',
-          label: 'Del',
-        }],
         items_menu:[],
         drag1: null,
         drag2: null
       }
     },
+
+   computed: {
+    fields(){
+      return[
+      {
+        key: 'index',
+        label: '#',
+        sortable: true
+      },
+      {
+        key: 'pos_num',
+        label: this.$t('lists.position'), 
+        sortable: true
+      },
+      {
+        key: 'designation',
+        label: this.$t('lists.designation'), 
+        sortable: true
+      },
+      {
+        key: 'comment',
+        label: this.$t('lists.comment'), 
+        sortable: true
+      },
+      {
+        key: 'kilowatt',
+        label: this.$t('lists.kilowatt'), 
+        sortable: true
+      },
+      {
+        key: 'time',
+        label: this.$t('lists.time'), 
+        sortable: true
+      },
+      {
+        key: 'manufacturer',
+        label: this.$t('lists.manufacturer'), 
+        sortable: true
+      },
+      {
+        key: 'serial',
+        label: this.$t('lists.serial'), 
+        sortable: true
+      },
+      {
+        key: 'order',
+        label: this.$t('lists.order'), 
+        sortable: true
+      },
+      {
+        key: 'check_date',
+        label: this.$t('lists.check_date'), 
+        sortable: true
+      },
+      {
+        key: 'next_check_date',
+        label: this.$t('lists.next_check_date'), 
+        sortable: true
+      },
+      {
+        key: 'delete',
+        label: this.$t('docs.delete'),
+        sortable: true
+      }
+    ]
+  }
+    },
+
     methods: {
       modshow(v){
         var items_menu = this.items_menu
@@ -196,7 +207,7 @@ export default {
         this.items_menu = items_menu
       },
       nodeDisTurn(){
-        if (confirm("Are you sure want to rename?")) {
+        if (confirm(this.$t('alert.rename'))) {
           this.nodeDis = false
         }
       },
@@ -317,7 +328,7 @@ export default {
           alert('No menu item is selected for deletion.')
         }
         else {
-          if (confirm("Are you sure want to remove?")) {
+          if (confirm(this.$t('alert.remove'))) {
             axios.get('/remove_devices_menu', {
               params: {
                 remove_id: this.idNode
@@ -364,7 +375,7 @@ export default {
       // location.href = "#finishList"
       },
       delRow(id){
-        if (confirm("Are you sure want to remove?")) {
+        if (confirm(this.$t('alert.remove'))) {
           axios.get('/remove_devices', {
             params: {
               id: id
@@ -443,7 +454,7 @@ export default {
       },
       selectedModal(val){
         var price_ids=[]
-        if (confirm("Are you sure to "+this.moveToCopyRadio+' '+this.selected.length+
+        if (confirm(this.$t('alert.to')+" "+this.moveToCopyRadio+' '+this.selected.length+
         ' rows in to '+val.name+"?")) {
           this.selected.forEach((val)=>{
             price_ids.push(val.id)

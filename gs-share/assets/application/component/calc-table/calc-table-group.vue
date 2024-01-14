@@ -1,9 +1,9 @@
 <template>
    <div>
-    <b-modal size="lg" centered id="reports" ref="reports" title="Reports" body-class="workerHeight">
+    <b-modal size="lg" centered id="reports" ref="reports" :title="$t('calcTableGroup.reports')" body-class="workerHeight">
       <b-table class="tableProject" striped hover :fields="fieldsTableD" :items="raports" @row-clicked="inItemGetData" />        
             <template slot="modal-footer">
-              <button type="button" left class="btn btn-secondary" @click="addInvoice('Damage Description')">Add</button>
+              <button type="button" left class="btn btn-secondary" @click="addInvoice('Damage Description')">{{$t('projectDetail.add')}}</button>
            </template>
         </b-modal>
 
@@ -15,44 +15,82 @@
            </template>
         </b-modal>  -->
 
-    <b-modal size="sm" centered id="ids" ref="ids" title="Number of Invoice" body-class="workerHeight" >
-            <b-form-checkbox-group buttons  button-variant="light" style="width:100%" :checked="[selectedId]"  @change="selectedId=$event"
+    <b-modal size="sm" centered id="ids" ref="ids" :title="$t('calcTableGroup.numberOfInvoice')" body-class="workerHeight" >
+            <b-form-checkbox-group buttons  button-variant="light" style="width:100%" :checked="[selectedId]"  @change.native="selectedId=$event;"
             text-field="lastNumber" value-field="lastNumber" stacked :options="id_list" v-if="detectNewRound(id_list)" />
 
             <div v-else class="text-center">
-             There will be a new account range.
+            {{$t('calcTableGroup.newRange')}}
 
-            <b-form-checkbox-group buttons  style="width:100%" checked="[1]" @change="selectedId=$event"
+            <b-form-checkbox-group buttons  style="width:100%" checked="[1]" @change.native="selectedId=$event"
              stacked :options="[1]" />
             </div>
             <template slot="modal-footer">
-              <button type="button" left class="btn btn-secondary" @click="okInvoice(!detectNewRound(id_list))">OK</button>
+              <button type="button" left class="btn btn-secondary" @click="addInvoiceLoad=true;okInvoice(!detectNewRound(id_list))">OK</button>
            </template>
          
            
         </b-modal>
 
-    <b-modal size="sm" centered id="ids_sub" ref="ids_sub" title="Number Of SUB Invoice" body-class="workerHeight"  >
+    <b-modal size="sm" centered id="ids_sub" ref="ids_sub" :title="$t('calcTableGroup.numberOfSUBInvoice')" body-class="workerHeight"  >
 
-            <b-input @change="selectedId=$event" />
+            <b-input @change.native="selectedId=$event" />
             <template slot="modal-footer">
-              <button type="button" left class="btn btn-secondary" @click="okInvoiceSub">OK</button>
+              <button type="button" left class="btn btn-secondary" @click="addSInvoiceLoad=true;okInvoiceSub();">OK</button>
            </template>
         </b-modal>
       <!-- <b-form @submit.prevent="nameOfPart(nameofpart)"> -->
-         <b-modal size="md" centered id="addPart" ref="shpart" title="Add Part">
-            <b-form-group horizontal :label-cols="4" label="Name of part:"
-               label-for="nameofpart" style="padding: 5px;">
-               <b-form-input v-model="nameofpart" required class="cForm-input" id="nameofpart"
-                  :state="null" type="text" placeholder="Enter name of part" />
-            </b-form-group>
+         <b-modal size="md" centered ref="shpart" :title="$t('calcTableGroup.addPart')">
+          <b-container>
+            <b-col cols="12" v-for="(nameofpart, index) in nameofparts"  :key="nameofpart.id">
+            <b-row align-v="center">
+              <b-col cols="1" align-self="center">
+                <b-checkbox plain checked="true" disabled></b-checkbox>
+              </b-col>
+              <b-col cols="4" align-self="center">
+                {{$t('calcTableGroup.nameOfPart')}}
+              </b-col>
+              <b-col cols="7" align-self="center">
+                <b-form-input :value="nameofpart.nameofpart" @input="nameofpart.folderInImages=nameofpart.folderInDocuments=nameofpart.nameofpart=$event" required :state="null" type="text" placeholder="Enter name of table" />
+              </b-col>
+            </b-row>
+            <b-row align-v="center">
+              <b-col cols="1" align-self="center">
+                <b-checkbox plain v-model="nameofpart.folderInDocumentsCheck" :id="'folderInDocuments-'+index"></b-checkbox>
+              </b-col>
+              <b-col cols="4" align-self="center">
+                <label :for="'folderInDocuments-'+index">{{$t('calcTableGroup.folderInDocuments')}}</label>
+              </b-col>
+              <b-col cols="7" align-self="center">
+                <b-form-input :disabled="!nameofpart.folderInDocumentsCheck" :value="nameofpart.folderInDocumentsCheck?nameofpart.folderInDocuments:''" @change="nameofpart.folderInDocuments=$event" required :state="null" type="text" placeholder="Enter name of folder in documents" />
+              </b-col>
+            </b-row>
+            <b-row align-v="center">
+              <b-col cols="1" align-self="center">
+                <b-checkbox plain v-model="nameofpart.folderInImagesCheck" :id="'folderInImages-'+index"></b-checkbox>
+              </b-col>
+              <b-col cols="4" align-self="center">
+                <label :for="'folderInImages-'+index">{{$t('calcTableGroup.folderInImages')}}</label>
+              </b-col>
+              <b-col cols="7" align-self="center">
+                <b-form-input :disabled="!nameofpart.folderInImagesCheck" :value="nameofpart.folderInImagesCheck?nameofpart.folderInImages:''" @change="nameofpart.folderInImages=$event" required :state="null" type="text" placeholder="Enter name of folder in images" />
+              </b-col>
+            </b-row>
+            <b-row align-h="between" class="pt-2">
+              <b-col cols="1"><b-button size="sm" :disabled="(nameofparts.length==1)" variant="danger" @click="nameofparts.splice((index), 1)">-</b-button></b-col>
+              <b-col cols="1"><b-button size="sm" variant="outline-primary" @click="nameofparts.push({'nameofpart':null, 'folderInDocumentsCheck':true, 'folderInDocuments':null, 'folderInImagesCheck':true, 'folderInImages':null})">+</b-button></b-col>
+            </b-row>
+            </b-col>
+
+          </b-container>
+
             <template slot="modal-footer">
-               <b-button type="submit" variant="primary" data-toggle="addPart" @click="nameOfPart(nameofpart)">OK</b-button>
+               <b-button type="submit" variant="primary" data-toggle="addPart" @click="nameOfPart(nameofparts)">OK</b-button>
             </template>
          </b-modal>
       <!-- </b-form> -->
-      <b-modal size="md" centered id="addSub" ref="addSub" title="SUB">
-        <b-form-group horizontal :label-cols="4" label="SUB:" style="padding: 5px;">
+      <b-modal size="md" centered id="addSub" ref="addSub" :title="$t('calcTableGroup.sub')">
+        <b-form-group horizontal :label-cols="4" :label="$t('calcTableGroup.sub')+':'" style="padding: 5px;">
           <!-- <b-form-input class="cForm-input" v-model="numberforsub"
               type="text" placeholder="Enter name for SUB:" />
           </b-form-group> -->
@@ -62,19 +100,8 @@
             <b-button type="submit" variant="primary"  @click="okcontractsub">OK</b-button>
           </template>
       </b-modal>
-      <b-modal size="sm" centered id="move" ref="move" title="Move">
-         <b-form-select multiple class="" id="move" @change="moveToCopySelect($event, moveToCopyRadio)" v-model="moveToCopy" :select-size="4">
-            <option v-for="part in value">{{part.parts.part_name}}</option>
-         </b-form-select>
-         <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="['Move', 'Copy']" />
-         <template slot="modal-footer">
-            <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>
-            <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button>
-         </template>
-      </b-modal>
 
-
-      <print v-if="tmp.typeOfHead != 'Devices' & tmp.typeOfHead != 'Damage'"
+      <print v-if="tmp.typeOfHead != 'Devices' & tmp.typeOfHead != 'Damage'" 
       :windowPrint="windowPrint"
       :selectedCornty="selectedCornty"
       :project="project" :tmp="tmp"
@@ -93,7 +120,6 @@
       :selectCustomer="selectCustomer"
       :selectPerson="selectPerson"
   
-
       :selectedDocsList="selectedDocsList"
       :addPdfs="addPdfs"
       :makemodalpdf="makemodalpdf"
@@ -111,83 +137,93 @@
         <!--             <b-button class="customButton" @click="move">
                        Move
                     </b-button> -->
-          <b-button   v-b-modal.addPart size="sm" >
-              Add Part
+          <b-col>
+          <b-button size="sm" @click="(nameofparts=[{nameofpart:null, folderInDocumentsCheck:true, folderInDocuments:null, folderInImagesCheck:true, folderInImages:null}]);($refs['shpart'].show());">
+              {{$t('calcTableGroup.addPart')}}
           </b-button>
-          <b-button  size="sm"  @click="getSubCustomers()"  v-if="type=='Orders'">
-              Add SUB
+          <b-button  size="sm"  @click="getSubCustomers()"  v-if="(type=='Orders')">
+              {{$t('calcTableGroup.addSub')}}
           </b-button>
 <!--           <b-button  class="customButton col-12 col-lg-1" @click="addInvoice('Damage Description')"  style="min-width:55px;" v-if="(type=='Orders')"> 
               To Damage
           </b-button> -->
-          <b-button  size="sm"  @click="reports" >
-              Reports
-          </b-button>
-          <b-button  size="sm" @click="worker" >
-            Workers
-          </b-button>
-
-          <b-button  size="sm"  @click="addInvoice('SInvoices')"  v-if="(type=='SUB')">
-              SUB Invoice
+<!--           <b-button  size="sm"  @click="reports" >
+              {{$t('calcTableGroup.reports')}}
+          </b-button> -->
+          <b-button  size="sm" @click="worker" v-if="(type!='StandingOrder')">
+            {{$t('calcTableGroup.workers')}}
           </b-button>
 
-          <b-button @click="addInvoice('Invoices')"  size="sm"  v-if="(type=='Orders')">
-              To Invoice
+          <b-button  size="sm" @click="$emit('sendMail', availableMails)"
+          v-if="(type=='StandingOrder')">
+            {{$t('calcTableGroup.timetableInvoice')}}
+          </b-button>
+
+          <b-button size="sm" @click="exec(plan.id)" :variant="lastButton?'':detectExec(plan)"
+          v-if="((plan!=null) && (plan.autosend==0))">
+            {{$t('calcTableGroup.timetableExec')}}
           </b-button>
 
 
-    
+          <b-button size="sm"  @click="addInvoice('SInvoices')" v-if="(type=='SUB')" :disabled="addSInvoiceLoad">
+            {{addSInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.subInvoice')}}
+            <b-iconstack font-scale="1" v-if="addSInvoiceLoad">
+              <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
+            </b-iconstack>
+          </b-button>
 
+          <b-button @click="addInvoice('Invoices')"  size="sm"  v-if="((type=='Orders') || (type=='StandingOrder'))" :disabled="addInvoiceLoad">
+            {{addInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.toInovice')}}
+            <b-iconstack font-scale="1" v-if="addInvoiceLoad">
+              <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
+            </b-iconstack>
+          </b-button>
+          <b-button @click="addInvoice('removeInvoices')"  size="sm"  v-if="(type=='Invoices')" :disabled="addInvoiceLoad" variant="danger">
+            {{addInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.removeInovice')}}
+            <b-iconstack font-scale="1" v-if="addInvoiceLoad">
+              <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
+            </b-iconstack>
+          </b-button>
+          </b-col>
+<!--           <label v-if="(type!='SUB'&&type!='Invoices')">{{$t('calcTableGroup.type')}}:&nbsp;&nbsp;</label>
+          <b-select v-if="(type!='SUB'&&type!='Invoices')" :value="$t('oneCountAlret.'+type)" @change="offerChangeType(id, $event)"
+          :options="getOpt()"  size="sm" />&nbsp;&nbsp;&nbsp; -->
+          
+          <!-- <label>{{$t('calcTableGroup.work')}}:&nbsp;&nbsp;</label> -->
+          <!-- <b-select :value="tmp.work" :options="works" @change="updateItem($event, 'work', tmp.id)"  size="sm"/> -->
+        <b-col cols="12" lg="2">
+        <b-select v-if="(type!='SUB'&&type!='Invoices')" :value="$t('oneCountAlret.'+type)" size="sm"
+        @change="offerChangeType(id, $event)" :options="getOpt()" />
+      </b-col>
+      <b-col cols="12" lg="2">
+        <b-select :value="detectOfWork()"
+        :options="works" size="sm" @change="updateItem($event, 'work', tmp.id)" />
+      </b-col>
 
-
-    
-
-
-
-
-
-            <b-form inline align-h="between" slot="Type">
-              <label>Type:&nbsp;&nbsp;</label>
-                <b-select  :value="type" @change="offerChangeType(id, $event)" :options="getOpt()"  size="sm" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label>Work:&nbsp;&nbsp;</label>
-                <b-select :value="tmp.work" :options="works" @change="updateItem($event, 'work', tmp.id)"  size="sm"/>
-             
-            </b-form>
-
-
-
-
-
+<!-- this.$t('calcTableGroup.work') -->
 </print>
-
-
   <div class="text-center text-info" v-show="value.length==0">
     <b-spinner class="align-middle" ></b-spinner>
-    <strong>Loading...</strong>
+    <strong>{{$t('projects.loading')}}...</strong>
   </div>
-
-
-      <draggable :value="value" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
+  <draggable :value="value" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
          :no-transition-on-drag="true" @start="drag=true" @end="checkMove($event)">
          <div v-for="(part, index) in value" :key="part.id">
-
-
-
-
           <calc-table :nowTableId="value" :value="sort(value[index])" :addtaxColapse="addtaxColapse" :tableId="index" :butDiscPerc="butDiscPerc" :unitType="unitType" :looks="looks"
-            :color="color" :selectedWorkers="selectedWorkers" :toggle="value[index].parts.toggle" :type="type" :funcStop="funcStop"  v-on:changeSum="discOfPercent()"  >
-
+            :color="color" :selectedWorkers="selectedWorkers" :toggle="value[index].parts.toggle" :type="type" :funcStop="funcStop"  v-on:changeSum="discOfPercent()"  :discP="discP">
                <b-checkbox plain name="partx" slot-scope="table" class="withoutbox"
-                    :class="{ 'table-dark' : value[index].parts.toggle,' handleTitle':type!='Invoices'}"
-                    v-model="value[index].parts.toggle" 
-                    slot="tableHead"> 
+                :class="{ 'table-dark' : value[index].parts.toggle,' handleTitle':type!='Invoices'}"
+                v-model="value[index].parts.toggle" slot="tableHead" @change="$emit('seltable')"> 
 
-                    <b-link v-b-toggle="'partx' + table.tableId" class="butMore" style="width:100%">
-                     + {{total(value[index].parts.part_content) | thousandSeparator }} €
+                    <b-link style="width:100%" @click="toog(value[index].parts.id)">
+                     <span :id="'p'+value[index].parts.id" style="display:none">+ {{total(value[index].parts.part_content) | thousandSeparator }} € </span>
+                     <span :id="'m'+value[index].parts.id">-</span>
                     </b-link>
-
-                    <i class="fas fa-dot-circle" style="font-size:12px"></i> 
-                    <span :contenteditable="type!='Invoices'" @blur="toModel($event, value[index].parts.id, value[index].parts.part_name)" @click.prevent.self>
+                    <span class="forFinger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <b-icon icon="circle-fill" aria-hidden="true"></b-icon>
+                    <span class="forFinger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <!-- <i class="fas fa-dot-circle" style="font-size:12px"></i>  -->
+                    <span :contenteditable="type!='Invoices'" class="diveditable" @blur="toModel($event, value[index].parts.id, value[index].parts.part_name)" @click.prevent.self>
                         {{value[index].parts.part_name}}
                     </span>
                        <span v-for="file in responseFiles" v-if="file.id==value[index].parts.id">
@@ -200,8 +236,9 @@
                         <b-link class="butMore" style="padding-left:0px;" @click="showImages('im'+value[index].parts.id)">Images</b-link> 
                       </span>
                       
+                      <b-icon icon="trash" aria-hidden="true"  @click="partDel(value[index].parts.id)"></b-icon>
 
-                    <b-link class="fas fa-trash  butMore" style="padding-left: 0px; font-size:12px;" @click="partDel(value[index].parts.id)"/>
+                    <!-- <b-link class="fas fa-trash  butMore" style="padding-left: 0px; font-size:12px;" @click="partDel(value[index].parts.id)"/> -->
                 </b-checkbox>
             </calc-table>
 
@@ -218,11 +255,14 @@ export default {
     components: {
         draggable,
     },
-    props: ['value', 'tmp', 'addtaxColapse', 'workers', 'toggle', 'responseFiles', 'type', 'id', 'funcStop', 'opt', 'butDiscPerc', 'looks',
+    props: ['value', 'tmp', 'addtaxColapse', 'workers', 'toggle', 'responseFiles', 'type', 'id', 'funcStop', 'opt', 'butDiscPerc', 'looks', 'availableMails', 'plan',
     'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList','selectedCornty', 'project',  'account', 'pid', 'person', 'customer', 'selectCustomer', 'selectPerson', 'windowPrint',
     'disc', 'discP', 'tax', 'taxDub', 'taxP', 'taxPDub', 'netto', 'brutto', 'comments', 'loadDamages', 'works', 'selectedWorkers'],
     data() {
         return {
+            lastButton: false,
+            addInvoiceLoad:false,
+            addSInvoiceLoad:false,
             customer_sub:[],
             raports:[],
             counter: -1,
@@ -231,7 +271,10 @@ export default {
             tmpArr: [],
             color: [],
             oldColor: [],
-            nameofpart: null,
+            nameofparts:null,
+            // nameofpart: null,
+            // folderInDocuments:null,
+            // folderInImages:null,
             shpart: null,
             oldPartx: [],
             // selectedWorkers: [],
@@ -293,6 +336,7 @@ computed: {
                 return summa; //количество разрядов
             };
         },
+
   },
 mounted(){
 this.head = this.tmp.typeOfHead
@@ -300,11 +344,72 @@ this.id = this.tmp.id
 this.type = this.tmp.type
   setTimeout(() => {
     axios.get('/get_units').then(response => {
-    this.unitType = response.data;
-    })
+    this.unitType = response.data.sort();
+    });
   },1000);
+
+
+
 },
 methods: {
+exec(id){
+  if (confirm(this.$t('alert.sure'))){
+    axios.get('/plan_exec', {
+      params: {
+        id: id
+      }
+    });
+    this.lastButton = true;
+  }
+},
+detectExec(val){
+  var now = new Date()
+  var endOfMonth = false
+  if (val.period=='mstart'){
+    val.period = 1
+  }
+  if (val.period=='mmidle'){
+    val.period = Math.floor((new Date(now.getFullYear(), (now.getMonth()+1), 0).getDate()) / 2)
+  }
+  if (val.period=='mend'){
+    endOfMonth = true
+    val.period = new Date(now.getFullYear(), (now.getMonth()+1), 0).getDate()
+  }
+  var period = new Date(now.getFullYear()+'-'+(now.getMonth()+1)+'-'+val.period)
+  if(val.pushToWorkDays==1){
+    var weekDay = [7, 1, 2, 3, 4, 5, 6][period.getDay()]
+    if (weekDay>5){
+      if(endOfMonth){
+        val.period = val.period-(weekDay-5)
+      }
+      else {
+        val.period = val.period+(8-weekDay)
+      }
+    }
+  }
+
+  var lastsend = this.$options.filters.dateInverse(val.lastsend).split(' ')[0].split('.')
+  var last = new Date(lastsend[2]+'-'+lastsend[1]+'-'+lastsend[0])
+
+  if (period < now){
+    if(last < period){
+      return ('danger')
+    }
+  }         
+},
+detectOfWork(){
+  if(this.tmp.work=='{"isTrusted":true}'){
+    return this.$t('calcTableGroup.work');
+  } else{
+    return this.tmp.work;
+  }
+},
+toog(val){
+  document.getElementById('m'+val).style.display = document.getElementById('partx'+val).style.display = (document.getElementById('partx'+val).style.display=='none') ? '' : 'none'
+  document.getElementById('p'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
+
+},
+
 detectNewRound(id_list){
 var year = 2020
 var nowYear = (new Date().getFullYear())
@@ -355,12 +460,12 @@ axios.get('/customer_sub').then(response => {
     updateItem(val, type, id){
       // alert()
       // if (this.updatePojectFunc==0){
-        axios.get('/update_item_from_project', {
-              params: {
+        axios.post('/update_item_from_project', {
+              
                    val: val,
                    type: type,
                    id: id
-                 }
+                 
         }).then(response => {
           // this.updatePojectFunc=1
         })
@@ -416,22 +521,19 @@ inItemGetData(item, index) {
       getOpt(){
        var opts = []
        this.opt.forEach((v)=>{
-          if (v.type!='Damage Description')if(v.type!='Invoices')if(v.type!='SUB')if(v.type!='Sub Invoices'){opts.push(v.type)}
+          if (v.type!='Damage Description')if(v.type!='Invoices')if(v.type!='SUB')if(v.type!='Sub Invoices'){opts.push(this.$t('oneCountAlret.'+v.type))}
         })
        return opts
       },
         addInvoice(val){
-        if(val=="Invoices" || val=="SInvoices"){
+        if(val=="Invoices" || val=="SInvoices"  || val=="removeInvoices"){
         if(val=='SInvoices'){
-
           this.$refs.ids_sub.show();
         }else{
-
           axios.get('/detect_invoice').then(response => {
-            console.log(response.data)
+            // console.log(response.data)
             this.id_list = response.data,
             this.selectedId = response.data[(response.data.length-1)].lastNumber,
-            
             this.$refs.ids.show()
           });
         }}
@@ -442,7 +544,8 @@ inItemGetData(item, index) {
             params: {
                 id: this.id,
                 type: val,
-                number:this.color.join()
+                number:this.color.join(),
+                labelForDelete:''
 
             }
             })
@@ -453,15 +556,19 @@ inItemGetData(item, index) {
         },
         okInvoice(newRange){
         this.$refs.ids.hide(),
-
         axios.get('/add_invoice', {
             params: {
                 id: this.id,
-                type: 'Invoices',
-                number: this.selectedId,
-                newRange: newRange
+                type: (this.tmp.type!="Invoices")?'Invoices':'removeInvoices',
+                number: ((typeof(this.selectedId)=='object')?this.selectedId.target.value:this.selectedId),
+                newRange: newRange,
+                labelForDelete:this.$t('oneCountAlret.labelForDelete')
             }
+            }).then(response => {
+              this.addInvoiceLoad = false
             })
+
+        
         },
         okInvoiceSub(){
         this.$refs.ids_sub.hide(),
@@ -469,9 +576,12 @@ inItemGetData(item, index) {
             params: {
                 id: this.id,
                 type: 'Sub Invoices',
-                number: this.selectedId.split(' ').join('_'),
-                newRange: false
+                number: ((typeof(this.selectedId)=='object')?this.selectedId.target.value:this.selectedId).split(' ').join('_'),
+                newRange: false,
+                labelForDelete:''
             }
+            }).then(response => {
+              this.addSInvoiceLoad = false
             })
         },
         okcontractsub(){
@@ -481,20 +591,24 @@ inItemGetData(item, index) {
                 id: this.id,
                 type: 'SUB',
                 number: this.numberforsub.split(' ').join('_'),
-                newRange: false
+                newRange: false,
+                labelForDelete:''
             }
             })
         },
         offerChangeType(id, type){
-     if (confirm("Are you sure?")){
-         axios.get((document.URL.split('/')[4]=='sub')?'/change_type_sub':'/change_type', {
-            params: {
-                id: id,
-                type: type
-            }
+          if (confirm(this.$t('alert.sure'))){
+            if (type==this.$t('oneCountAlret.Offers')) {type = 'Offers'}
+            if (type==this.$t('oneCountAlret.Orders')) {type = 'Orders'}
+            if (type==this.$t('oneCountAlret.StandingOrder')) {type = 'StandingOrder'}
+              axios.get('/change_type', {
+                params: {
+                    id: id,
+                    type: type
+                }
             })
-        // this.type = type
-    }
+          // this.type = type
+          }
         },
         showImages(classId){
           const viewer = this.$el.querySelector('.'+classId).$viewer
@@ -514,30 +628,30 @@ inItemGetData(item, index) {
         onItems($event){
           { this.$emit('input', $event) }
         },
-        nameOfPart(nameofpart) {
+        nameOfPart(nameofparts) {
             var tmpArrValue = []
             this.shpart = true,
             this.$refs.shpart.hide(),
-            tmpArrValue.push({
-                     parts: {
-                         checkbox_list: {
-                             flavours: {},
-                             selected: {},
-                             allSelected: {},
-                             indeterminate: {}
-                         },
-                         part_content: []
-                     }
-                 })
+            // tmpArrValue.push({
+            //          parts: {
+            //              checkbox_list: {
+            //                  flavours: {},
+            //                  selected: {},
+            //                  allSelected: {},
+            //                  indeterminate: {}
+            //              },
+            //              part_content: []
+            //          }
+            //      })
 
-
-             axios.get((document.URL.split('/')[4]=='sub')?'/add_part_sub':'/add_part', {
+             axios.get('/add_part', {
                           params: {
-                              part_name: nameofpart,
-                              item_id: this.id
+                              parts_names:  JSON.stringify(nameofparts), 
+                              item_id: this.id,
+                              pid:this.pid
                            }
                       })
-            this.$emit('input', tmpArrValue.concat(this.value))
+            // this.$emit('input', tmpArrValue.concat(this.value))
         },
         okMoveToCopy() {
             this.$refs.move.hide()
@@ -592,7 +706,7 @@ inItemGetData(item, index) {
         },
         partDel(part) {
             // console.log(del_id);
-            if (confirm("Are you sure?")){
+            if (confirm(this.$t('alert.sure'))){
             // var deltable=this.value.filter(function(val){return (val!=part)})
             // this.$emit('input', deltable)
 

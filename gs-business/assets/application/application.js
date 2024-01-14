@@ -2,7 +2,12 @@ import Vue from 'vue';
 // import BootstrapVue from 'bootstrap-vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import VueRouter from 'vue-router';
+// import VueI18n from 'vue-i18n';
+
 import VueI18n from 'vue-i18n';
+
+
+
 // import VueSelect from 'vue-select';
 // import LiquorTree from 'liquor-tree';
 // import InfiniteScroll from 'v-infinite-scroll';
@@ -16,9 +21,10 @@ import Clipboard from 'v-clipboard';
 // Vue.use(IconsPlugin);
 
 
-
-import GsPaint from 'gs-paint/src/Editor.vue';
+// import GsPaint from 'gs-paint/src/Editor.vue';
 // import GsPaint from 'gs-paint/src/demo/Demo.vue';
+import { GsEditorPlugin } from 'gs-paint/src/';
+
 
 import Container from '@share/component/container/container';
 import Security from '@security/plugin/security/index';
@@ -52,7 +58,7 @@ import edevices from '@share/component/project/edevices';
 import price from '@share/component/price/price';
 import devices from '@share/component/devices/devices';
 
-import balance from '@share/component/balance/balance';
+// import balance from '@share/component/balance/balance';
 
 
 
@@ -81,11 +87,28 @@ import reThousandSeparator from '@share/reThousandSeparator';
 
 import dateInverse from '@share/date';
 
-import Viewer from 'v-viewer'
-import 'viewerjs/dist/viewer.css'
+import Viewer from 'v-viewer';
+import 'viewerjs/dist/viewer.css';
 
+import gb from './gb.json';
+import de from './de.json';
+import ru from './ru.json';
 
+Vue.use(VueI18n);
 
+const messages = {
+    gb,
+    de,
+    ru
+};
+
+const i18n = new VueI18n({
+  locale: window.navigator.language.slice(0, 2), 
+  fallbackLocale: 'gb',
+  messages, // set locale messages
+});
+
+new Vue({ i18n: i18n});
 import VueNativeSock from 'vue-native-websocket'
 // console.log(window.location.host)
 //Vue.use(VueNativeSock, 'ws://'+window.location.host+'/ws', {
@@ -114,11 +137,9 @@ Vue.use(Security);
 Vue.use(Clipboard);
 Vue.use(IconsPlugin);
 // Vue.use( CKEditor );
+Vue.use(GsEditorPlugin);
 
-Vue.component('gs-paint', GsPaint);
-
-
-
+// Vue.component('gs-paint', GsPaint);
 // Vue.component('VSelect', VueSelect);
 Vue.component('Container', Container);
 Vue.component('ContainerHeader', ContainerHeader);
@@ -152,7 +173,7 @@ Vue.component('price', price);
 Vue.component('devices', devices);
 
 Vue.component('print', print);
-Vue.component('balance', balance);
+// Vue.component('balance', balance);
 Vue.component('LineChart', LineChart);
 
 Vue.component('Spinner', Spinner);
@@ -160,14 +181,21 @@ Vue.component('Spinner', Spinner);
 
 // Vue.use(VueColumnsResizable);
 
-axios.get('/profile').then(response => {
-    if(window.location.href.indexOf('/project/user/')==-1){ 
+
+
+ axios.get('/profile', {
+        params: {
+          'subDomain': window.location.href.split('//')[1].split('.awe.do')[0]
+        }
+      }).then(response => {
+    if(window.location.href.indexOf('/I/')==-1){ 
         if(response.data.account == null) {
             window.location.href = '//in.awe.do';
         }
     } 
     // console.log(response.data)
     return new Vue({
+        i18n,
         security: new Security(response.data),
         // security: new Security({
             // account ...
@@ -178,6 +206,7 @@ axios.get('/profile').then(response => {
             return {
                 profile: {
                     'account': {},
+                    'available-companies': {},
                     'selected-company': {},
                     'access': [],
                     'roles': []
@@ -185,6 +214,7 @@ axios.get('/profile').then(response => {
             }
         }
     });
+
 });
 
 Vue.filter('thousandSeparator', thousandSeparator);

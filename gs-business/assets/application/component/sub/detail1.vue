@@ -1077,7 +1077,8 @@ axios<template>
 
                                         <template slot="delete" slot-scope="it">
                                             <b-col>
-                                                <b-link @click.stop="offerDel(it.item.id)" class="fas fa-trash fa-w-16" style="padding-top:7px;" />
+                                                <b-icon icon="trash" aria-hidden="true" @click.stop="offerDel(it.item.id)"></b-icon>
+                                                <!-- <b-link @click.stop="offerDel(it.item.id)" class="fas fa-trash fa-w-16" style="padding-top:7px;" /> -->
                                             </b-col>
                                         </template>
 
@@ -1289,8 +1290,8 @@ axios<template>
                                         <b-container>
                                             <b-col cols="auto" class="cuestomRow">
                                                 <b-button size="sm" class="cForm-inputG" variant="outline-secondary" @click="addPdfs=false, printOffer()">
-                                                    <i class="fas fa-print">
-                                                    </i>
+                                                  <b-icon icon="printer" aria-hidden="true"></b-icon>
+                                                    <!-- <i class="fas fa-print"></i> -->
                                                 </b-button>
                                             </b-col>
                                         </b-container>

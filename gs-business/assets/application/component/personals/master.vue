@@ -1,6 +1,6 @@
 <template>
   <container>
-    <b-modal size="md" centered  ref="movedoc" title="Move">
+    <b-modal size="md" centered  ref="movedoc" :title="$t('projectDetail.move')">
       <b-form-select class="" v-model="selectedPersonalDoc" :select-size="detectRowSise(itemsMenuDoc)">
         <option v-for="(item, i) in detectItem(itemsMenuDoc)" @click="selectedModal(item)" :key="i">{{item.name}}</option>
       </b-form-select>
@@ -8,7 +8,7 @@
         <button type="button" class="btn btn-primary" @click="okMoveDoc">OK</button> 
       </template>
     </b-modal>
-    <b-modal size="lg" centered id="attr" ref="attr" title="Select Type">
+    <b-modal size="lg" centered id="attr" ref="attr" :title="$t('company.selectType')">
       <b-row>
         <b-col cols="6">
           <b-form-select :select-size="optionsForFactory.length">
@@ -25,7 +25,7 @@
                   </b-col>
                   <b-col>
                     <b-form-select class="select" :disabled="(index==0)"
-                    :value="(index!=0)?item.type:'text'" @change="updateRowInTemplate(item.id, $event, 'type')" :options="['text', 'color', 'date', 'datetime', 'datetime-local', 'email', 'number', 'range', 'search', 'tel', 'time', 'url', 'month', 'week']"></b-form-select>
+                    :value="(index!=0)?item.type:'text'" @change="updateRowInTemplate(item.id, $event, 'type')" :options="['text', 'color', 'date', 'datetime', 'datetime-local', 'email', 'number', 'range', 'search', 'tel', 'time', 'url', 'month', 'week', 'switch']"></b-form-select>
                   </b-col>
                   <b-col cols="1">
                     <b-link class="butMore" style="padding-left:0px;" @click="removeRowInTemplate(item.id)">-</b-link>
@@ -40,10 +40,10 @@
       <template slot="modal-footer" v-if="(selectedOptFactory)">
         <b-input-group-append>
           <button type="button" class="btn btn-secondary"  @click="addItemInTemplate">
-            Add item         
+            {{$t('company.addItem')}}    
           </button>
           <button type="button" class="btn btn-secondary"  @click="removeItemInTemplate(selectedOptFactory)">
-            Remove item         
+            {{$t('company.removeItem')}} 
           </button>
         </b-input-group-append>
         <b-form-input :value="optionsForFactory[optionsForFactory.findIndex(x => x.id == selectedOptFactory)].name"
@@ -54,11 +54,11 @@
         </b-input-group-append>
       </template>
     </b-modal>
-    <b-modal size="md" centered id="move" ref="move" title="Move">
+    <b-modal size="md" centered id="move" ref="movePersonal" :title="$t('projectDetail.move')">
       <b-form-select class="" id="move" v-model="selectedItems" :select-size="detectRowSise(items_menu)">
-        <option v-for="item in detectItem(items_menu)" :disabled="addFactoryButton?item.type=='factory':item.type=='part'" @click="selectedModal(item)">{{item.name}}</option>
+        <option v-for="item in detectItem(items_menu)" :disabled="addFactoryButton?item.type=='factory':item.type=='part'" @click="selectedModalPersonal(item)">{{item.name}}</option>
       </b-form-select>
-      <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="['move', 'copy']" />
+      <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[$t('company.copy'), $t('company.move')]" />
       <template slot="modal-footer">
 <!--             <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>-->
         <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button> 
@@ -71,109 +71,66 @@
       <b-card-group deck>
         <b-card no-body class="gs-container">
           <b-tabs card>
-              <b-tab title="Company Data">
-                <container>
-                  <container-body>
-                    <b-container>
-                      <b-row>
-                        <b-col cols="4" > 
-<!--                           <vue-drag-tree :data='items_menu'
-                          :allowDrag='allowDrag'
-                          :allowDrop='allowDrop' disableDBClick
-                          @drag="dragHandler" @drag-enter="dragEnterHandler"
-                          @current-node-clicked="curNodeClicked"
-                          @drag-leave="dragLeaveHandler" @drag-over="dragOverHandler"
-                          @drag-end="dragEndHandler" @drop="dropHandler" :thrId="idNode" :parId="parId">
-                          </vue-drag-tree>
- -->
-       <vue-drag-tree
-        :data='items_menu'
-        :allowDrag='allowDrag'
-        :allowDrop='allowDrop'
-        :idNode="idNode"
-        :parId="parId"
-        disableDBClick
-        @drag="dragHandler"
-        @drag-enter="dragEnterHandler"
-        @current-node-clicked="curNodeClicked"
-        @drag-leave="dragLeaveHandler"
-        @drag-over="dragOverHandler"
-        @drag-end="dragEndHandler"
-        @drop="dropHandler">
-        </vue-drag-tree>  
+            <b-tab :title="$t('topMenu.companyData')">
+              <container>
+                <container-body>
+                  <b-container>
+                    <b-row>
+                      <b-col cols="4" > 
+                        <vue-drag-tree
+                        :data='items_menu'
+                        :allowDrag='allowDrag'
+                        :allowDrop='allowDrop'
+                        :idNode="idNode"
+                        :parId="parId"
+                        disableDBClick
+                        @drag="dragHandler"
+                        @drag-enter="dragEnterHandler"
+                        @current-node-clicked="curNodeClicked"
+                        @drag-leave="dragLeaveHandler"
+                        @drag-over="dragOverHandler"
+                        @drag-end="dragEndHandler"
+                        @drop="dropHandler">
+                        </vue-drag-tree>  
+                      </b-col> 
+                      <b-col cols="8">
 
-
-
-                        </b-col> 
-                        <b-col cols="8">
-                          <b-table :items="items" :fields="this.addFactoryButton?fields_workers:fields_factory"
-                          hover
-                          sticky-header 
-                          no-border-collapse
-                          style="max-height:100%"
-                                 
-                                        @row-clicked="inItemGetData"
-                                        @row-dblclicked="rowSelected" >
-                                             <template #cell(index)="data">
-                                                {{ data.index + 1 }}
-                                              </template>
-<!--                                             <template slot="name" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" v-model="row.item.name" @input="updateDate($event, 'name', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="short_name" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" v-model="row.item.short_name" @input="updateDate($event, 'short_name', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="start_work" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" v-model="row.item.start_work" @input="updateDate($event, 'start_work', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="end_work" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" v-model="row.item.end_work" @input="updateDate($event, 'end_work', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="position" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" v-model="row.item.position" @input="updateDate($event, 'position', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="salary" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" v-model="row.item.salary" @input="updateDate($event, 'salary', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="desc" slot-scope="row">
-                                                <div contenteditable="true" @input="updateDate($event.target.innerText, 'desc', row.item.id)">{{row.item.desc}}</div>
-                                            </template>--> 
-                                            <template #cell(delete)="row">
-                                              <b-link @click="delRow(row.item.id)"><b-icon icon="trash" aria-hidden="true"></b-icon></b-link>
-                                            </template>
-                                    </b-table>
-                                    <div hidden>{{ selected }}</div>
-                                </b-col>
-                            </b-row>
-                        </b-container>
-                    </container-body>
-                </container>
-                <b-card-footer>
-
-
-                        <b-input-group>
-                            <b-input-group-append>
-                                <b-button :disabled="addFactoryButton" @click="add('factory')">Add Factory</b-button>
-                                <b-button :disabled="idNode==129" @click="add('part')">Add Part</b-button>
-                                <b-button :disabled="idNode==129" @click="remove">Remove</b-button>
-                            </b-input-group-append>
-                            <b-form-input v-model="nameNode" @input="toModel"></b-form-input>
-                            <b-input-group-append>
-                                <b-button @click="addRow">Add Row</b-button>
-                                <b-button @click="mv_cp">Move/Copy</b-button>
-                            </b-input-group-append>
-                        </b-input-group>
-           
-
-            </b-card-footer>
- </b-container>
-                      </b-tab>
-
-                  </b-tabs>
-              </b-card>
-              <b-card no-body class="gs-container">
+                        <b-table :items="items" :fields="addFactoryButton?fieldsWorkers:fieldsFactory"
+                        hover sticky-header no-border-collapse style="max-height:100%" stacked="lg"
+                        @row-clicked="inItemGetData" @row-dblclicked="rowSelected" >
+                          <template #cell(index)="data">
+                            {{ data.index + 1 }}
+                          </template>
+                          <template #cell(delete)="row">
+                            <b-link @click="delRow(row.item.id)"><b-icon icon="trash" aria-hidden="true"></b-icon></b-link>
+                          </template>
+                        </b-table>
+                        <div hidden>{{ selected }}</div>
+                      </b-col>
+                    </b-row>
+                  </b-container>
+                </container-body>
+              </container>
+              <b-card-footer>
+                <b-input-group>
+                  <b-input-group-append>
+                    <b-button :disabled="addFactoryButton" @click="add('factory')">{{$t('company.addFactory')}}</b-button>
+                    <b-button :disabled="idNode==129" @click="add('part')">{{$t('projectDetail.plusPart')}}</b-button>
+                    <b-button :disabled="idNode==129" @click="remove">{{$t('projectDetail.remove')}}</b-button>
+                  </b-input-group-append>
+                  <b-form-input v-model="nameNode" @input="toModel"></b-form-input>
+                  <b-input-group-append>
+                    <b-button @click="addRow">{{$t('projectDetail.plusRow')}}</b-button>
+                      <b-button @click="mv_cp">{{$t('company.mv_cp')}}</b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-card-footer>
+          </b-tab>
+        </b-tabs>
+      </b-card>
+      <b-card no-body class="gs-container">
                     <b-tabs card>
-                        <b-tab title="Details">
+                        <b-tab :title="$t('company.details')">
                             <container>
                                 <container-body>
 
@@ -184,22 +141,22 @@
 <b-form-group horizontal :label-cols="4" class="cForm" label="ID:">
 <b-form-input :state="null" disabled type="text" :value="details.id" class="cForm-input" />
 </b-form-group>
-<b-form-group horizontal :label-cols="4" class="cForm" label="Start Date:">
+<b-form-group horizontal :label-cols="4" class="cForm" :label="$t('project.startDate')+':'">
 <b-form-input :state="null" type="date"  :value="details.start_work" placeholder="Enter date" class="cForm-input" @change="updateDate($event, 'start_work', details.id)" />
 </b-form-group>
-<b-form-group horizontal :label-cols="4" class="cForm" label="End Date:">
+<b-form-group horizontal :label-cols="4" class="cForm" :label="$t('project.endDate')+':'">
 <b-form-input :state="null" type="date"  :value="details.end_work" placeholder="Enter date" class="cForm-input" @change="updateDate($event, 'end_work', details.id)" />
 </b-form-group>
 </b-col>
 
 <b-col sm="6" class="cuestomRow">
-<b-form-group horizontal :label-cols="4" class="cForm" label="Name:">
+<b-form-group horizontal :label-cols="4" class="cForm" :label="$t('customerDetail.name')+':'">
 <b-form-input :state="null" type="text" :value="details.name" placeholder="Enter name" class="cForm-input" @change="updateDate($event, 'name', details.id)" />
 </b-form-group>
-<b-form-group horizontal :label-cols="4" class="cForm" label="Short Name:">
+<b-form-group horizontal :label-cols="4" class="cForm" :label="$t('company.shortName')+':'">
 <b-form-input :state="null" type="text" :value="details.short_name" placeholder="Enter Short Name" class="cForm-input" @change="updateDate($event, 'short_name', details.id)"  />
 </b-form-group>
-<b-form-group horizontal :label-cols="4" class="cForm" label="Position:">
+<b-form-group horizontal :label-cols="4" class="cForm" :label="$t('customerDetail.position')+':'">
 <b-form-input :state="null" type="text" :value="details.position" placeholder="Enter position" class="cForm-input"  @change="updateDate($event, 'position', details.id)" />
 </b-form-group>
 </b-col>
@@ -225,7 +182,7 @@
                                                 </b-form-group>
                                             </b-col>
                                           <b-col sm="4" class="cuestomRow">
-                                                <b-form-group horizontal :label-cols="4" class="cForm" :label="'Phone: '+(index+1)" v-for="(p, index) in details.phone" :key="p.id">
+                                                <b-form-group horizontal :label-cols="4" class="cForm" :label="$t('customerDetail.phone')+': '+(index+1)" v-for="(p, index) in details.phone" :key="p.id">
                                                     <b-input-group>
 <b-form-input :value="p.phone"  @change="p.phone=$event;editContactInPerson('phone', details.phone)"
                                                     type="text" placeholder="Enter phone" class="cForm-input" />
@@ -258,7 +215,7 @@
                                             </b-col>
                                             <b-col cols="12"><br></b-col>
                                            <b-col sm="12" class="cuestomRow">
-                                                <b-form-group horizontal :label-cols="1" class="cForm" :label="'Adress: '+(index+1)" v-for="(a, index) in details.adress" :key="a.id">
+                                                <b-form-group horizontal :label-cols="1" class="cForm"  :label="$t('customerDetail.adress')+': '+(index+1)" v-for="(a, index) in details.adress" :key="a.id">
                                                     <b-input-group>
                                                         <b-form-input :value="a.adress.split(';')[0]" @input="a.adress=$event+';'+a.adress.split(';')[1]+';'+a.adress.split(';')[2];a.adress=a.adress.replace(undefined, '')"  @change="editContactInPerson('adress', details.adress)" 
                                                         type="text" placeholder="Enter Adress" class="cForm-input" />
@@ -314,9 +271,32 @@ class="cForm">
     </template>
 <b-row>
 <b-col :cols="((index==0)&&(dataForRows.content.length > 0))?9:12">
-<b-input  :type="getDataTamplate(optionsForFactory[optionsForFactory
+
+
+<b-form-checkbox v-if="getDataTamplate(optionsForFactory[optionsForFactory
+.findIndex(x => x.id == details.option)].filds, 'type', index)=='switch'"
+:checked="dataForRows.content==1?true:false" name="check-button" switch class="cForm-input"
+@change="updateContent(
+$event,
+optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds.length,
+inc,
+index,
+details.id
+)" />
+
+
+<vue-editor  v-if="getDataTamplate(optionsForFactory[optionsForFactory
+.findIndex(x => x.id == details.option)].filds, 'type', index)=='textarea'"
+:value="dataForRows.content" :editorToolbar="customToolbar"
+@blur="writecomet(optionsForFactory, details, index, inc)" :ref="'editorId'+getDataTamplate(optionsForFactory[optionsForFactory
+.findIndex(x => x.id == details.option)].filds, 'id', index)"
+/>
+
+<b-input v-if="getDataTamplate(optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds, 'type', index)!='textarea' && getDataTamplate(optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds, 'type', index)!='switch'" :type="getDataTamplate(optionsForFactory[optionsForFactory
 .findIndex(x => x.id == details.option)].filds, 'type', index)"
-:value="dataForRows.content"  class="cForm-input" @change="updateContent(
+:value="dataForRows.content"
+class="cForm-input"
+@change="updateContent(
 $event,
 optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds.length,
 inc,
@@ -331,7 +311,7 @@ optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].fild
 inc,
 details.id
         )">
-            Remove
+        {{$t('projectDetail.remove')}}
         </b-link>
     </b-col>
 </b-row>
@@ -357,7 +337,7 @@ details.id
 <b-form-input v-model="details.name" ></b-form-input>
 
  <b-button  @click="addBlock(optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds.length)">
-    Add
+    {{$t('projectDetail.add')}}
 </b-button>
 </b-input-group>
 
@@ -368,7 +348,7 @@ details.id
 
                         <b-tab>
                           <template #title>
-                             Docs
+                          {{$t('projectDetail.docs')}}
                           </template>
                             <container>
                                <container-body  style="overflow-x: hidden;">
@@ -416,9 +396,9 @@ details.id
                     <b-button @click="dropDoc=dropDoc?false:true">
                       <b-icon :icon="dropDoc?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
                     </b-button>
-                    <b-button @click="addDoc">+Part</b-button>
-                    <b-button @click="removeDoc" :disabled="(nameNodeDoc=='General Folder')?true:false">Remove</b-button>
-                    <b-button @click="moveDoc">Move</b-button>
+                    <b-button @click="addDoc">{{$t('projectDetail.plusPart')}}</b-button>
+                    <b-button @click="removeDoc" :disabled="(nameNodeDoc=='General Folder')?true:false">{{$t('projectDetail.remove')}}</b-button>
+                    <b-button @click="moveDoc">{{$t('projectDetail.move')}}</b-button>
                   </template>
                   <b-form-input v-model="nameNodeDoc" :style="nodeDisDoc?'background-color:grey':''" :disabled="(nameNodeDoc=='General Folder')?true:false"
                   @click.native="nodeDisDoc?nodeDisTurnDoc():''" @change="nodeDisDoc=true;toModelDoc(nameNodeDoc)"></b-form-input>
@@ -429,10 +409,10 @@ details.id
                         </b-tab>
 
 
-                        <b-tab>
+                        <b-tab v-if="false">
 
                             <template #title>
-                             Images
+                             {{$t('projectDetail.images')}}
                           </template>
 
                           <container>
@@ -509,7 +489,7 @@ details.id
 </template>
 
 <script>
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import axios from 'axios';
 import {
     VueEditor,
@@ -524,6 +504,23 @@ export default {
     },
   data(){
     return{    
+
+                      customToolbar: [
+                      [{ list: "check" }],
+                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                // ['blockquote', 'code-block'],
+                // [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                // [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                // [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+                // [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+                // [{ 'direction': 'rtl' }],                         // text direction
+                // [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+                // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                // [{ 'font': [] }],
+                [{ 'align': [] }],
+                // ['clean']                                         // remove formatting button
+              ], 
 
                 idNodeFile:-1,
                 docs_menu_ids:[],
@@ -547,74 +544,6 @@ export default {
                     // {name:'type1', test2:'test2'},
                     // {name:'type3', test3:'test3'}
                 ],
-                   fieldsDocs: [
-                {   
-                    key: 'type',
-                    label: 'File',
-                    sortable: true
-                },
-                {
-                    key: 'name',
-                    label: 'Name',
-                    sortable: true
-                },
-                {
-                    key: 'number',
-                    label: '#',
-                    sortable: true
-                },
-                {
-                    key: 'added',
-                    label: 'Date / Time',
-                    sortable: true
-                },
-                {
-                    key: 'user',
-                    label: 'User',
-                    sortable: true
-                },
-                {
-                  key: 'delete',
-                  label: 'Delete'
-                }
-            ],
-            fieldsImages: [
-                {   
-                    key: 'id',
-                    label: 'Image',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                    key: 'file_name',
-                    label: 'Name',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                    key: 'date',
-                    label: 'Date / Time',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                    key: 'user',
-                    label: 'User',
-                    sortable: true,
-                    thClass:''
-                },
-                // {
-                //     key: 'group',
-                //     label: 'Table',
-                //     sortable: true,
-                //     thClass:''
-                // },
-                {
-                  key: 'delete',
-                  label: 'Delete',
-                  thClass:''
-                }
-            ],
 
                 files:[],
 
@@ -628,7 +557,7 @@ export default {
         url: '/loadFilesToCompany',
         thumbnailWidth: 50,
         parallelUploads: 20,
-        dictDefaultMessage: "Click or Drop",
+        dictDefaultMessage: this.$t('alert.clickOrDrop'),
         acceptedFiles: 'application/pdf'
       },
 
@@ -636,7 +565,7 @@ export default {
         url: '/loadFilesToCompany',
         thumbnailWidth: 50,
         parallelUploads: 20,
-        dictDefaultMessage: "Click or Drop",
+        dictDefaultMessage: this.$t('alert.clickOrDrop'),
         acceptedFiles: 'image/*'
       },
 
@@ -684,62 +613,119 @@ export default {
       parId:null,
       oldId:0,
       selectedItems:[],
-      fields_workers: [{
-                    key: 'index',
-                    label: 'index'
-           
-                },
-                {
-                    key: 'name',
-                    label: 'Name',
-                    // tdClass: 't_pos_num',
-                    sortable: true
-                },
-                {
-                    key: 'position',
-                    label: 'Position',
-                    // tdClass: 't_price',
-                    sortable: true
-                },
-
-                // {
-                //     key: 'percent',
-                //     tdClass: 't_percent',
-                //     label: '%',
-                //     sortable: true
-                // },
-                {   key: 'delete',
-                    label: 'Del'
-                }
-            ],
-        fields_factory: [{
-                    key: 'index',
-                    label: 'index'
-                },
-                {
-                    key: 'name',
-                    label: 'Props Name',
-                    // tdClass: 't_pos_num',
-                    sortable: true
-                },
-  
-                // {
-                //     key: 'percent',
-                //     tdClass: 't_percent',
-                //     label: '%',
-                //     sortable: true
-                // },
-                {   key: 'delete',
-                    label: 'Del'
-                }
-            ],
           items_menu:[],
           drag1: null,
           drag2: null
     }
 
   },
+   computed: {
+    fieldsDocs(){
+      return[
+      {
+        key: 'type',
+        label: this.$t('docs.file'),
+        sortable: true
+      },
+      {
+        key: 'name',
+        label: this.$t('docs.name'),
+        sortable: true
+      },
+      {
+        key: 'number',
+        label: '#',
+        sortable: true
+      },
+      {
+        key: 'added',
+        label: this.$t('docs.added'),
+        sortable: true
+      },
+      {
+        key: 'user',
+        label: this.$t('docs.user'),
+        sortable: true
+      },
+      {
+        key: 'delete',
+        label: this.$t('docs.delete')
+      }]},
+
+      fieldsImages(){
+      return[{   
+        key: 'id',
+        label: this.$t('docs.images'),
+        sortable: true
+      },
+      {
+        key: 'file_name',
+        label: this.$t('docs.name'),
+        sortable: true
+      },
+      {
+        key: 'date',
+        label: this.$t('docs.added'),
+        sortable: true
+      },
+      {
+        key: 'user',
+        label: this.$t('docs.user'),
+        sortable: true
+      },
+      {
+        key: 'delete',
+        label: this.$t('docs.delete')
+      }]},
+
+    fieldsWorkers(){
+      return[{
+          key: 'index',
+          label: '#'
+        },
+        {
+          key: 'name',
+          label: this.$t('customerDetail.name'),
+          sortable: true
+        },
+        {
+          key: 'position',
+          label: this.$t('customerDetail.position'),
+          sortable: true
+        },
+        {
+          key: 'delete',
+          label: this.$t('docs.delete')
+        }]},
+    fieldsFactory(){
+      return[{
+          key: 'index',
+          label: '#'
+        },
+        {
+          key: 'name',
+          label: this.$t('company.propsName'),
+          sortable: true
+        },
+        {
+          key: 'delete',
+          label: this.$t('docs.delete')
+        }]}
+  },
     methods: {
+      writecomet(optionsForFactory, details, index, inc){
+      var newContent =  this.$refs['editorId'+this.getDataTamplate(optionsForFactory[optionsForFactory
+.findIndex(x => x.id == details.option)].filds, 'id', index)][0].quill.getHTML()
+        if (newContent != '<p><br></p>') {
+          this.updateContent(
+          newContent,
+          optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds.length,
+          inc,
+          index,
+          details.id
+          )
+        }
+      },
     pcurNodeClickedDoc(model, component) {
       this.nameNodeDoc = model.name
       this.idNodeFile=model.id
@@ -787,10 +773,10 @@ export default {
     },  
     removeDoc(){
       if (this.idNodeFile==null){
-        alert('No menu item is selected for deletion.')
+        alert(this.$t('alert.noItemSelectForDel'))
       }
       else {
-        if (confirm("Are you sure want to remove?")) {
+        if (confirm(this.$t('alert.remove'))) {
           axios.get('/remove_docs_personal_menu', {
             params: {
               remove_id: this.idNodeFile
@@ -810,7 +796,7 @@ export default {
       this.$refs.movedoc.hide()
     },
     nodeDisTurnDoc(){
-      if (confirm("Are you sure want to rename?")) {
+      if (confirm(this.$t('alert.rename'))) {
         this.nodeDisDoc = false
       }
     },
@@ -834,6 +820,7 @@ export default {
       findLevel(this.itemsMenuDoc, this.idNodeFile)
     },
     selectedModal(val){
+      console.log(1)
       var docs_ids=[]
       var files_ids=[]
       this.selectedPriceDoc.forEach((val)=>{
@@ -999,7 +986,7 @@ getFilesPersonal(id){
             id: id
           }
         }).then(response => {
-          console.log(id, response.data)
+          // console.log(id, response.data)
           this.responseFiles = response.data.filter(function (v){
             if(v.name != undefined){
               if((v.name.split('.')[v.name.split('.').length-1]) == 'pdf'){ return v}
@@ -1074,21 +1061,21 @@ pimageInTableSelected(item){
       pchvalueimages(val){
   this.selectedDamageImages=val
 },
-// pselectimagesarr(group){
-// var imagesarr = []
-// if (this.selectedDamageImages=='Image'){
-//   this.domageImages.forEach((si)=>{
-//     if(si._rowVariant=='secondary'){
-//        imagesarr.push(si.id.split('=')[1])
-//     }
-//   })
-//   this.updatefilenames(group, 'group',imagesarr.join())
-// }
-// console.log(this.groupByFild(this.selectedDamageImages))
-  // if (op=='-'){
-  //   this.selectedImages.splice(this.selectedImages.indexOf(it), 1)
-  // }
-// },  
+pselectimagesarr(group){
+var imagesarr = []
+if (this.selectedDamageImages=='Image'){
+  this.domageImages.forEach((si)=>{
+    if(si._rowVariant=='secondary'){
+       imagesarr.push(si.id.split('=')[1])
+    }
+  })
+  this.updatefilenames(group, 'group',imagesarr.join())
+}
+console.log(this.groupByFild(this.selectedDamageImages))
+  if (op=='-'){
+    this.selectedImages.splice(this.selectedImages.indexOf(it), 1)
+  }
+},  
 
         fsadd2() {
                 this.$refs.myVueDropzone2.removeAllFiles()
@@ -1115,7 +1102,7 @@ pimageInTableSelected(item){
         },
 
         filedel(val) {
-            if (confirm("Are you sure?")) {
+            if (confirm(this.$t('alert.sure'))) {
                 axios.get('/delfile_company', {
                     params: {
                         id: val
@@ -1514,10 +1501,10 @@ curNodeClicked(model, component) {
     },
     remove(){
        if (this.idNode==null){
-            alert('No menu item is selected for deletion.')
+            alert(this.$t('alert.noItemSelectForDel'))
        }
        else {
-            if (confirm("Are you sure want to remove?")) {
+            if (confirm(this.$t('alert.remove'))) {
                 axios.get('/remove_personal_menu', {
                     params: {
                         remove_id: this.idNode
@@ -1578,7 +1565,7 @@ curNodeClicked(model, component) {
     },
     addRow(){
         if (this.idNode==null){
-            alert('No menu item is selected for add.')
+            alert(this.$t('alert.noSelectedForAdd'))
         } else {
             if (this.addFactoryButton){
                 axios.get('/add_personal', {
@@ -1606,7 +1593,7 @@ curNodeClicked(model, component) {
         this.$refs.attr.hide()
     },
     delRow(id){
-        if (confirm("Are you sure want to remove?")) {
+        if (confirm(this.$t('alert.remove'))) {
             axios.get('/remove_personal', {
                 params: {
                     id: id,
@@ -1637,19 +1624,19 @@ curNodeClicked(model, component) {
     },
     mv_cp(){
         if (this.idNode==null){
-            alert('No menu item is selected.')
+            alert(this.$t('alert.noItemSelect'))
         } else{
             if (this.selected.length==0){
-                alert('No rows selected.')
+                alert(this.$t('alert.noRowsSelected'))
             }
         }
         if ((this.idNode!=null)&&(this.selected.length!=0)){
-            this.$refs.move.show()           
+            this.$refs.movePersonal.show()           
         }
     },
     okMoveToCopy(){
         this.selected=[],
-        this.$refs.move.hide()
+        this.$refs.movePersonal.hide()
     },
     detectItem(items){
       var returnArr=[]
@@ -1683,23 +1670,23 @@ curNodeClicked(model, component) {
         findLevel(items)  
         return returnArr.length
     },
-    // selectedModal(val){
-    //     var price_ids=[]
-    //     if (confirm("Are you sure to "+this.moveToCopyRadio+' '+this.selected.length+
-    //         ' rows in to '+val.name+"?")) {
-    //         this.selected.forEach((val)=>{
-    //             price_ids.push(val.id)
-    //         })
-    //          axios.get('/cp_mv_to_personal', {
-    //              params: {
-    //                  price_ids: price_ids.join(),
-    //                  new_menu: val.id,
-    //                  operation: this.moveToCopyRadio,
-    //                  type: this.addFactoryButton?'part':'factory'
-    //              }
-    //          })
-    //     }
-    // },
+    selectedModalPersonal(val){
+        var price_ids=[]
+        if (confirm(this.$t('alert.to')+" "+this.moveToCopyRadio+' '+this.selected.length+
+            ' rows in to '+val.name+"?")) {
+            this.selected.forEach((val)=>{
+                price_ids.push(val.id)
+            })
+             axios.get('/cp_mv_to_personal', {
+                 params: {
+                     price_ids: price_ids.join(),
+                     new_menu: val.id,
+                     operation: this.moveToCopyRadio,
+                     type: this.addFactoryButton?'part':'factory'
+                 }
+             })
+        }
+    },
      dragHandler(model, component, e) {
     
     //    // console.log('dragHandler: ', model, component, e);
@@ -1750,7 +1737,7 @@ curNodeClicked(model, component) {
             this.drag2=null;          
         })
         } else{
-            alert('You can not subordinate the enterprise department')
+            alert(this.$t('alert.youCanNotSubordinateTheEnterpriseDepartment'))
         }
     },
     

@@ -14,7 +14,7 @@
          </template>
       </b-modal> -->
 
-    <b-modal size="md" centered  ref="movedoc" title="Move">
+    <b-modal size="md" centered  ref="movedoc" :title="$t('projectDetail.move')">
          <b-form-select class="" v-model="selectedItems" :select-size="detectRowSise(itemsMenuDoc)">
             <option v-for="(item, i) in detectItem(itemsMenuDoc)" @click="selectedModalDoc(item)" :key="i">{{item.name}}</option>
          </b-form-select>
@@ -24,14 +24,24 @@
          </template>
       </b-modal>
 
-<b-modal size="sm" centered  title="Select Workers" body-class="workerHeight" v-model="workerModal"  no-close-on-esc no-close-on-backdrop hide-header-close>
-        <b-form-input type="text" v-model="searchWorker" style="margin-bottom: 4px !important;"/>
-            <b-form-checkbox-group buttons  button-variant="light" style="width:100%" v-model="selectedWorkers" stacked :options="workers"/>
+    <b-modal size="md" centered  ref="moveImag" :title="$t('projectDetail.move')">
+         <b-form-select class="" v-model="selectedItems" :select-size="detectRowSise(itemsMenuImag)">
+            <option v-for="(item, i) in detectItem(itemsMenuImag)" @click="selectedModalImag(item)" :key="i">{{item.name}}</option>
+         </b-form-select>
+
+         <template slot="modal-footer">
+            <button type="button" class="btn btn-primary" @click="okMoveImg">OK</button> 
+         </template>
+      </b-modal>
+
+<b-modal size="sm" centered  :title="$t('projectDetail.selectWorkers')" body-class="workerHeight" v-model="workerModal"  no-close-on-esc no-close-on-backdrop hide-header-close>
+    <b-form-input type="text" v-model="searchWorker" style="margin-bottom: 4px !important;" />
+    <b-form-checkbox-group buttons  button-variant="light" style="width:100%" v-model="selectedWorkers" stacked :options="availableWorkers" />
             <template slot="modal-footer">
                   <b-container fluid>
                     <b-row  align-h="between">
                       <b-col class="text-left">
-                        <b-button type="button" variant="primary" @click="selectedWorkers=[]">Clear</b-button>
+                        <b-button type="button" variant="primary" @click="selectedWorkers=[]">{{$t('projectDetail.clear')}}</b-button>
                       </b-col>
                       <b-col class="text-right">
                         <b-button type="button" variant="primary" @click="closeWorkerModal">OK</b-button>
@@ -41,22 +51,24 @@
            </template>
         </b-modal>
 
-<b-modal size="lg" centered ok-only id="map" title="Track"  v-model="mapmodal" no-close-on-esc no-close-on-backdrop hide-header-close>
+<b-modal size="lg" centered ok-only id="map" :title="$t('projectDetail.track')"  v-model="mapmodal" no-close-on-esc no-close-on-backdrop hide-header-close>
   <b-embed type="iframe" aspect="16by9"
     :src="'https://www.google.com/maps/embed/v1/directions?key=AIzaSyBFTr5-GCSd0rT-euE1Uarf64eF6mZVK9k&'+
-    'origin=In+den+Leppsteinswiesen+8,+64380+Roßdorf&'+'destination='+project.street1">
+    'origin='+addressfild+'&'+
+    'destination='+(project.street1+', '+project.zip1+' '+project.city1).replace('undefined', '')"
+    >
   </b-embed>
 <template slot="modal-footer">
-<b-button type="button" variant="outline-secondary"  @click="mapmodalhide">Close</b-button>
+<b-button type="button" variant="outline-secondary"  @click="mapmodalhide">{{$t('projectDetail.close')}}</b-button>
 </template>
 </b-modal>
 
           <!-- <b-form @submit.prevent="addOk"> -->
-            <b-modal size="md" centered  v-model="addSameModalWindow" :title="'Add Offers'"  no-close-on-esc no-close-on-backdrop hide-header-close>
-                <b-form-group horizontal :label-cols="4" label="Order #:" label-for="OrderNumber" style="padding: 5px;">
+            <b-modal size="md" centered  v-model="addSameModalWindow" :title="$t('projectDetail.addOffers')"  no-close-on-esc no-close-on-backdrop hide-header-close>
+<!--                 <b-form-group horizontal :label-cols="4" label="Order #:" label-for="OrderNumber" style="padding: 5px;">
                     <b-form-input v-model="project.number" class="cForm-input" id="OrderNumber" disabled :state="null" type="text" placeholder="Enter number" />
-                </b-form-group>
-                <b-form-group horizontal :label-cols="4" label="Type Of Work:" label-for="work" style="padding: 5px;">
+                </b-form-group> -->
+                <b-form-group horizontal :label-cols="4" :label="$t('projectDetail.typeOfWork')+':'" label-for="work" style="padding: 5px;">
                     <b-form-select class="select" id="work" :options="works" v-model="add_offer.work" required />
                 </b-form-group>
                 <template slot="modal-footer">
@@ -64,12 +76,12 @@
                     <b-row  align-h="between">
                       <b-col class="text-left">
                         <b-button @click="closeaddok" variant="primary">
-                            Close
+                            {{$t('projectDetail.close')}}
                         </b-button>
                       </b-col>
                       <b-col class="text-right">
                         <b-button type="submit" variant="primary" @click="addOk">
-                            Add
+                            {{$t('projectDetail.add')}}
                         </b-button>
                       </b-col>
                     </b-row>
@@ -82,15 +94,14 @@
             <b-col cols="12" md="4">
               <b-form-checkbox-group buttons text-field="name" value-field="item"  v-model="mailSelect"
               stacked style="width:100%" class="cheboxscorl" :options="filtered(((abook==false)?modalMail:abooklist),searchmail)" />
-       
               <b-input-group>
-              <b-form-input type='text' placeholder="Search mail adress" v-model="searchmail" />
+              <b-form-input type='text' :placeholder="$t('projectDetail.esearchMailAdress')" v-model="searchmail" />
                 <b-input-group-append>
                    <b-form-checkbox button
                       stacked
                       @change="cheabook"
                       v-model="abook" 
-                      >Address Book
+                      >{{$t('projectDetail.addressBook')}}
                     </b-form-checkbox>
                   </b-input-group-append>
               </b-input-group>
@@ -101,25 +112,151 @@
               stacked style="width:100%"
               :options="filtered(modalFiles, searchfile)" />
                 </div>
-              <b-form-input type='text' placeholder="Search name of file" v-model="searchfile" />
+              <b-form-input type='text' :placeholder="$t('projectDetail.searchNameOfFile')" v-model="searchfile" />
             </b-col>
           </b-row>
           <br>
-            <b-form-input type='text' placeholder="Subject" v-model="subject" />
+            <b-form-input type='text' :placeholder="$t('projectDetail.subject')" v-model="subject" />
 <vue-editor id="content" ref="content" class="mail" v-model="content" :editorToolbar="customToolbar" />
   <template slot="modal-footer">
     <b-form inline>
-    <b-button type="button" @click="mailmodalhide">Close</b-button>
+    <b-button type="button" @click="mailmodalhide">{{$t('projectDetail.close')}}</b-button>
     <b-form-checkbox button v-if="(selectedFiles && selectedFiles.length ? selectedFiles.length : 0)>=2"
-    stacked @change="checkattach('chek')" v-model="split">Split
+    stacked @change="checkattach('chek')" v-model="split">{{$t('projectDetail.split')}}
     </b-form-checkbox>
     <b-form-input type="text" v-model="filename" @input="checkattach('inp')"
-    placeholder="Name of single attachment" v-if="(selectedFiles && selectedFiles.length ? selectedFiles.length : 0)>=2"></b-form-input>
-    <b-button  @click="sendmail()" >Send</b-button>
+    :placeholder="$t('projectDetail.nameOfSingleAttachment')" v-if="(selectedFiles && selectedFiles.length ? selectedFiles.length : 0)>=2"></b-form-input>
+    <b-button :disabled="(mailSelect.length==0)"  @click="sendmail()" >{{$t('projectDetail.send')}}</b-button>
   </b-form>
   </template>
 </b-modal>
 
+
+  <b-modal size="lg" v-model="timetableMailModal" no-close-on-esc no-close-on-backdrop hide-header-close>
+          <b-row>
+            <b-col cols="12" md="6">
+              <b-form-checkbox-group buttons text-field="name" value-field="item"  v-model="mailSelectPlan"
+              stacked style="width:100%" class="cheboxscorl" :options="filtered(((abook==false)?modalMail:abooklist),searchmail)" />
+              <b-input-group>
+              <b-form-input type='text' :placeholder="$t('projectDetail.esearchMailAdress')" v-model="searchmail" />
+                <b-input-group-append>
+                   <b-form-checkbox button
+                      stacked
+                      @change="cheabook"
+                      v-model="abook" 
+                      >{{$t('projectDetail.addressBook')}}
+                    </b-form-checkbox>
+                  </b-input-group-append>
+              </b-input-group>
+            </b-col>
+
+            <b-col cols="12" md="6" class="text-center">
+              <b-col class="text-center">{{$t('projectDetail.delivery')}}:</b-col>
+              <br>
+              <div v-if="(cheatypedate==null)?(!Number.isNaN(Number(selectedDateForSend))):cheatypedate">
+              <b-form-radio-group buttons 
+              button-variant="light" v-model="selectedDateForSend"
+               style="width:100%"
+              :options="[1,2,3,4,5,6,7]" />
+
+              <b-form-radio-group buttons 
+              button-variant="light" v-model="selectedDateForSend"
+               style="width:100%"
+              :options="[8,9,10,11,12,13,14]" />
+
+              <b-form-radio-group buttons 
+              button-variant="light" v-model="selectedDateForSend"
+               style="width:100%"
+              :options="[15,16,17,18,19,20,21]" />
+
+              <b-form-radio-group buttons 
+              button-variant="light" v-model="selectedDateForSend"
+               style="width:100%"
+              :options="[22,23,24,25,26,27,28]" />
+              </div>
+              <div v-if="(cheatypedate==null)?(Number.isNaN(Number(selectedDateForSend))):!cheatypedate">
+              <b-form-radio-group buttons 
+              button-variant="light" v-model="selectedDateForSend"
+              stacked style="width:100%"
+              :options="monthpart" />
+              </div>
+              <br>
+            <b-row  align-v="center" align-h="around">
+            <b-form-checkbox button
+            stacked :checked="(cheatypedate==null)?(!Number.isNaN(Number(selectedDateForSend))):cheatypedate"
+              @change="(cheatypedate=$event);pushToWorkDays=($event==true)?false:pushToWorkDays"
+
+            >{{$t('projectDetail.mothToDays')}}
+            </b-form-checkbox>
+
+            <b-form-checkbox button
+            stacked 
+            v-model="pushToWorkDays" v-if="(cheatypedate==null)?(Number.isNaN(Number(selectedDateForSend))):!cheatypedate"
+            >{{$t('projectDetail.pushToWorkDays')}}
+            </b-form-checkbox>
+            </b-row>
+            </b-col>
+
+          </b-row>
+          <br>
+            <b-form-input type='text' :placeholder="$t('projectDetail.subject')" v-model="subjectPlan" />
+<vue-editor id="contentPlan" ref="contentPlan" class="mail" v-model="contentPlan" :editorToolbar="customToolbar" />
+  <template slot="modal-footer">
+<b-container>
+  <b-row align-v="center" align-h="between">
+    <b-col cols="4">
+      <b-form-checkbox switch v-model="autoSend">
+        {{autoSend?$t('projectDetail.autoSend'):$t('projectDetail.notAutoSend')}}
+      </b-form-checkbox>
+    </b-col>
+    <b-col cols="4">
+      <b-form-checkbox switch @change="selperiodFinishWork=!autoDate?null:selperiodFinishWork" v-model="autoDate">
+        {{autoDate?$t('projectDetail.autoDate'):$t('projectDetail.notAutoDate')}}
+      </b-form-checkbox>
+    </b-col>
+    <b-col cols="4">
+      <b-form-radio-group
+        :disabled="!autoDate"
+        v-model="selperiodFinishWork"
+        :options="periodFinishWork"
+      ></b-form-radio-group>
+    </b-col>
+  </b-row>
+
+  <b-row align-v="center" align-h="between">
+    <b-col cols="2">
+      <b-button type="button" @click="timetableMailModalHide">
+        {{$t('projectDetail.close')}}
+      </b-button>
+    </b-col>
+    <b-col cols="2">
+      {{$t('projectDetail.nameOfInvoice')+':'}}
+    </b-col>
+    <b-col cols="3">
+      <b-form-input type="text" v-model="filename"></b-form-input>
+    </b-col>
+    <b-col cols="2" v-if="(detectPeriod!=null)">
+      <b-button :disabled="(selectedDateForSend==null)||(mailSelectPlan.length==0)"
+      @click="sendtimetablemail('remove_mail')" variant="danger" >
+        {{$t('projectDetail.removeplaning')}}
+      </b-button>
+    </b-col>
+    <b-col cols="3" v-if="(detectPeriod!=null)">
+      <b-button :disabled="(selectedDateForSend==null)||(mailSelectPlan.length==0)"
+      @click="sendtimetablemail('replan_mail')" variant="primary" >
+        {{$t('projectDetail.replaning')}}
+      </b-button>
+    </b-col>
+    <b-col cols="3" v-if="(detectPeriod==null)">
+      <b-button :disabled="(selectedDateForSend==null)||(mailSelectPlan.length==0)"
+      @click="sendtimetablemail('plan_mail')" variant="success" >
+        {{$t('projectDetail.planing')}}
+      </b-button>
+    </b-col>
+  </b-row>
+</b-container>
+  </template>
+</b-modal>
 
 
 
@@ -129,16 +266,20 @@
         </container-header>
         <container-body class="container-fluid" >
             <b-card-group deck>
-                <b-card no-body class="gs-container">
-                    <b-tabs card v-model="tabIndex" >
+                <b-card no-body class="gs-container" :style="heightComponentforSm">
+                    <b-tabs card v-model="tabIndex"  class="tabs">
                         <b-tab>
                         <template #title>
-                            {{projectfild.content}}
+                            
+                            <span v-if="project.number==undefined">{{projectfild.content}}</span>
+                            <span v-else :title="projectfild.content+' '+project.number">{{project.number}}</span>
+          
                         </template>
                         <container>
-                            <container-body  style="overflow-x: hidden;" ref="project">
-                              <b-container>
+                          <container-body  ref="project">
+                              <b-container ref="hproject">
                                <project
+                                :dislink="!(selectedTables.length<=1)"
                                 :projectfild="projectfild"
                                 :project="project"
                                 :id="id"
@@ -160,7 +301,8 @@
                                 :responseFiles="responseFiles"
                                 :selrow="selrow"
                                 :showsubarr="showsubarr"
-
+                                ref="calProject"
+                                @linkForWorkers="linkForWorkers"
                                 @addSameModal="addSameModal"
                                 @sendMail="sendMail"
                                 @openmap="mapmodalshow"
@@ -176,35 +318,37 @@
                         </b-tab>
                         <b-tab style="padding:0px;"  >
                         <template #title>
-                            Price List
+                            {{$t('projectDetail.priceList')}}
                             <!-- <b-link @click="menuPriceTree=menuPriceTree?false:true">Price List</b-link> -->
                           </div>
                         </template>
                         <container>
-                          <container-body  style="overflow: unset;">
-                            <price v-if="(tabIndex==1) && (comtomodal!='pricelist')"
-                            ref="priceChild1"
-                            :menuPriceTree="menuPriceTree"
-                            :idNode="idNode"
-                            :items="itemsPrice"
-                            :itemsMenu="itemsMenu"
-                            :oldId="oldId"
-                            :selectedPrice="selectedPrice"
-                            @onClickOutside="menuPriceTree=false"
-                            @curNodeClicked="pcurNodeClicked"
-                            @rowSelected="prowSelected"
-                            ></price>
-                    
+                          <container-body>
+                              <price v-if="(tabIndex==1) && (comtomodal!='pricelist')"
+                              @loded="loded"
+                              ref="priceChild1"
+                              :menuPriceTree="menuPriceTree"
+                              :idNode="idNode"
+                              :items="itemsPrice"
+                              :itemsMenu="itemsMenu"
+                              :oldId="oldId"
+                              :selectedPrice="selectedPrice"
+                              @curNodeClicked="pcurNodeClicked"
+                              @rowSelected="prowSelected"
+                              ></price>
                           </container-body>
-
                 <container-footer style="overflow: hidden;">
                         <b-input-group>
-                            <b-button @click="addPrice">+Part</b-button>
-                            <b-button @click="removePrice">Remove</b-button>
-                            <b-button @click="addRowPrice">+Row</b-button>
+                            <b-button @click="addPrice">{{$t('projectDetail.plusPart')}}</b-button>
+                            <b-button @click="removePrice">{{$t('projectDetail.remove')}}</b-button>
+                            <b-button @click="addRowPrice">{{$t('projectDetail.plusRow')}}</b-button>
                             <!-- <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpPrice">mv/cp</b-button></b-col> -->
-                            <b-button  @click="sendPrice">Send</b-button>
-                              <b-button  @click="$refs.priceChild1.hidePosition()" ><i class="fas fa-columns"></i></b-button>
+
+                            <b-button  @click="sendPrice" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
+                              <b-button  @click="$refs.priceChild1.hidePosition()" >
+                                <b-icon icon="layout-three-columns" aria-hidden="true"></b-icon>
+                                <!-- <i class="fas fa-columns"></i> -->
+                              </b-button>
                            <b-form-input  v-model="nameNode" :style="nodeDis?'background-color:grey':''"
                                 @click.native="nodeDis?nodeDisTurn():''" @change="nodeDis=true;toModel(nameNode)"></b-form-input>
                             
@@ -217,13 +361,14 @@
                         </b-tab>
 <b-tab style="padding:0px;"  >
                         <template #title>
-                            Devices List
+                            {{$t('projectDetail.devicesList')}}
                             <!-- <b-link @click="menuDevicesTree=menuDevicesTree?false:true">Devices List</b-link> -->
                             </div>
                         </template>
                         <container>
-                          <container-body  style="overflow: unset;">
+                          <container-body>
                             <devices v-if="(tabIndex==2) && (comtomodal!='deviceslist')"
+                            @loded="loded"
                             ref="devChild1"
 
                             :idNodeDev="idNodeDev"
@@ -234,21 +379,25 @@
                             :selectedPriceDev="selectedPriceDev"
                             :menuDevicesTree="menuDevicesTree"
 
-                            @onClickOutsideDev="menuDevicesTree=false"
+                       
                             @curNodeClickedDev="pcurNodeClickedDev"
                             @rowSelectedDev="prowSelectedDev"
 
                             ></devices>
+                                 <!-- @onClickOutsideDev="menuDevicesTree=false" -->
                           </container-body>
                         <container-footer>
                           <b-input-group>
-                             <b-button @click="addDevice">+Part</b-button>
-                             <b-button @click="removeDevice">Remove</b-button>
-                             <b-button @click="addRowDevice">+Row</b-button>
+                             <b-button @click="addDevice">{{$t('projectDetail.plusPart')}}</b-button>
+                             <b-button @click="removeDevice">{{$t('projectDetail.remove')}}</b-button>
+                             <b-button @click="addRowDevice">{{$t('projectDetail.plusRow')}}</b-button>
                              <!--  <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpDevice">mv/cp</b-button></b-col> -->
-                              <b-button @click="sendDevice">Send</b-button>
+                              <b-button @click="sendDevice">{{$t('projectDetail.send')}}</b-button>
                               
-                              <b-button @click="$refs.devChild1.hidePosition()" ><i class="fas fa-columns"></i></b-button>
+                              <b-button @click="$refs.devChild1.hidePosition()" >
+                                <b-icon icon="layout-three-columns" aria-hidden="true"></b-icon>
+                                <!-- <i class="fas fa-columns"></i> -->
+                              </b-button>
                                                
                               <b-form-input v-model="nameNodeDev" :style="nodeDisDev?'background-color:grey':''"
                                   @click.native="nodeDisDev?nodeDisTurnDev():''" @change="nodeDisDev=true;toModelDev(nameNodeDev)"></b-form-input>
@@ -265,11 +414,12 @@
                         <b-tab>
                           <template #title>
                               <!-- <b-link @click="menuDocsTree=menuDocsTree?false:true">Docs</b-link> -->
-                              Docs
+                              {{$t('projectDetail.docs')}}
                           </template>
                             <container>
-                               <container-body  style="overflow: unset;">                    
+                               <container-body style="overflow: hidden;">                    
                                     <docs v-if="detect('docs')"
+                                    @loded="loded"
                                     ref="docs2"
                                     :responseFiles="responseFiles"
                                     :fieldsDocs="fieldsDocs"
@@ -288,15 +438,14 @@
                                     :oldIdDoc="oldIdDoc"
                                     :selectedPriceDoc="selectedPriceDoc"
                                     :menuDocsTree="menuDocsTree"
-
-                                    @onClickOutsideDoc="menuDocsTree=false"
+                                   
                                     @curNodeClickedDoc="pcurNodeClickedDoc"
                                     @rowSelectedDoc="prowSelectedDoc"
                             
 
                                     >
                                     </docs>
-
+ <!-- @onClickOutsideDoc="menuDocsTree=false" -->
                                 </container-body>
                                 
 
@@ -314,9 +463,9 @@
                                    <b-icon :icon="dropDoc?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
                                 </b-button>
                             
-                              <b-button @click="addDoc">+Part</b-button>
-                             <b-button @click="removeDoc" :disabled="(nameNodeDoc=='General Folder')?true:false">Remove</b-button>
-                              <b-button @click="moveDoc">Move</b-button>
+                              <b-button @click="addDoc">{{$t('projectDetail.plusPart')}}</b-button>
+                             <b-button @click="removeDoc" :disabled="(nameNodeDoc=='General Folder')?true:false">{{$t('projectDetail.remove')}}</b-button>
+                              <b-button @click="moveDoc">{{$t('projectDetail.move')}}</b-button>
                         </template>
                               <b-form-input  v-model="nameNodeDoc" :style="nodeDisDoc?'background-color:grey':''"
                               :disabled="(nameNodeDoc=='General Folder')?true:false"
@@ -331,59 +480,68 @@
                         <b-tab>
 
                             <template #title>
-                              Images
+                              {{$t('projectDetail.images')}}
                             </template>
 
                           <container>
-                            <container-body  style="overflow-x: hidden;" ref="images">
+                            <container-body style="overflow: hidden;">
 
                              <images
-                             :domageImages="domageImages"
-                             :fieldsImages="fieldsImages"
-                             :selectedDamageImages="selectedDamageImages"
-                             :optImages="optImages"
-                             @resetFilds="presetFilds"
-                             @chvalueimages="pchvalueimages"
-                             @selectimagesarr="pselectimagesarr"
-                             @updatefilename="updatefilename"
-                             @allselrow="pallselrow"
-                             @allselrowin="pallselrowin"
-                             @showx="showx"
-                             @filedel="filedel"
-                             @imageInTableSelected="pimageInTableSelected"
+                              v-if="detect('images')"
+                              :domageImages="domageImages"
+                              ref="images1"
+                              :wwidth="wwidth"
+                              :idNodeImg="idNodeImg"
+                              :itemsMenuImag="itemsMenuImag"
+                              :selectedPriceImg="selectedPriceImg"
+                              @imageInTableSelected="prowSelectedImg"
+                              @pcurNodeClickedImg="pcurNodeClickedImg"
+                              @filedel="filedel"
+                              @showx="showx"
+                              @loded="loded"
                              ></images>
+                             <!-- @updatefilename="updatefilename" -->
+
                             </container-body>
                             <container-footer style="z-index:2">
-                  <b-collapse v-model="dropImage" id="dropImage2">
-                    <vue-dropzone ref="myVueDropzone2" id="dz2"
-                    :options="dropzoneOptions2" v-on:vdropzone-sending="sendingEvent"
-                    v-on:vdropzone-success="fsadd2" :forceFallback="true">
-                    </vue-dropzone>
-                  </b-collapse>
-                  <b-button @click="dropImage=dropImage?false:true">
-                    <b-icon :icon="dropImage?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
-                  </b-button>
-                  <b-button v-show="butifsel()" @click="sendtodamage()">Send</b-button>
-                </container-footer>
-
+                              <b-collapse v-model="dropImage" id="dropImage2">
+                                <vue-dropzone ref="myVueDropzone2" id="dz2"
+                                :options="dropzoneOptions2" v-on:vdropzone-sending="sendingEventImage"
+                                v-on:vdropzone-success="fsadd2" :forceFallback="true" />
+                              </b-collapse>
+                              <b-input-group>
+                                <template #prepend>
+                                  <b-button @click="dropImage=dropImage?false:true">
+                                    <b-icon :icon="dropImage?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
+                                  </b-button>
+                                  <b-button @click="addImag">{{$t('projectDetail.plusPart')}}</b-button>
+                                  <b-button @click="removeImag" :disabled="(nameNodeDoc=='General Folder')?true:false">{{$t('projectDetail.remove')}}</b-button>
+                                  <b-button @click="moveImag">{{$t('projectDetail.move')}}</b-button>
+                                </template>
+                                <b-form-input  v-model="nameNodeImag" :style="nodeDisImag?'background-color:grey':''"
+                                :disabled="(nameNodeImag=='General Folder')?true:false"
+                                @click.native="nodeDisImag?nodeDisTurnImag():''" @change="nodeDisImag=true;toModelImag(nameNodeImag)" />
+                                <b-button v-show="butifsel()" @click="sendtodamage()">{{$t('projectDetail.send')}}</b-button>
+                              </b-input-group>
+                            </container-footer>
                           </container>
                         </b-tab>
                     </b-tabs>
                 </b-card>
-                <b-card no-body class="gs-container">
+                <b-card no-body class="gs-container" :style="heightEditforSm">
                     <b-tabs card v-model="dubTabIndex">
                         <b-tab ref="Edit">
                           <template #title>
-                            Edit
+                            {{tmp.typeOfHead?$t('oneCountAlret.'+tmp.typeOfHead):$t('fields.other')}}
                           </template>
                             <container>
-                                <container-body >
+                                <container-body>
                                   <edit ref="editList"
                                   :tmp="tmp"
                                   :project="project"
                                   :looks="looks"
                                   :works="works"
-                                  
+                                  @loded="loded"
                                   :selectedCornty="selectedCornty"
                                   :id="id"
                                   :comments="comments"
@@ -392,7 +550,7 @@
                                   :workers="workers"
                                   :funcStop="funcStop"
 
-
+                                  :plan="plan"
                                   :partx="partx"
                                   :customer="customer"
                                   :person="person"
@@ -406,6 +564,9 @@
                                   :makemodalpdf="makemodalpdf"
                                   :typeDocsList="typeDocsList"
 
+                                  :availableMails="availableMails"
+                                  @sendMail="sendTimeTableMail"
+                                  @seltable="seltable"
                                   @projectOther="projectOther"
                                   @selectedDocs="selectedDocs"
                                   @addPdf="addPdf"
@@ -427,27 +588,65 @@
 
 
 
+<!-- 
+
+<b-iconstack font-scale="3" style="position:relative;left:24px;top:25px;z-index:2;"
+@mouseover="cloudHover = true" @mouseleave="cloudHover = false"
+@click="writecomet();changeDisable('b', 'gencooment', id);cloudChange=false;cloudLoad=true;" v-if="(tmp.number==null)">
+  <b-icon stacked icon="circle-fill" :animation="cloudLoad?'throb':null" variant="primary" v-show="cloudLoad||cloudHover"></b-icon>
+  <b-icon stacked icon="cloud-upload" scale="0.5" :variant="cloudHover?'light':'dark'" v-show="!cloudLoad"></b-icon>
+  <b-icon stacked icon="circle" variant="info" v-show="cloudChange"></b-icon>
+</b-iconstack>
+
+<b-iconstack font-scale="3" style="position:relative;left:24px;top:25px;z-index:2;"
+@click="checkInEditor('other')" v-if="(tmp.number==null)" @mouseover="calcHover = true" @mouseleave="calcHover = false">
+  <b-icon stacked icon="circle-fill" variant="primary" v-show="calcHover"></b-icon>
+  <b-icon stacked icon="calculator" scale="0.5" :variant="calcHover?'light':'dark'"></b-icon>
+</b-iconstack>
+
+<span v-show="(disablefildUser('gencooment', id)!='you')" style="position:relative;left:30px;top: 16px;width:18px;z-index:2;" v-if="(tmp.number==null)">{{disablefildUser('gencooment', id)}}</span>
+<vue-editor :value="project.other" :editorToolbar="customToolbar"
+style="height:82vh;position:relative;top:-20px;z-index:1;" v-if="(tmp.number==null)"
+class="text-right"  ref="other"
+
+@focus="changeDisable('f', 'gencooment', id);cloudChange=true;"
+:id="'gencooment'+id" 
+:disabled="disablefild('gencooment', id)?'disabled':false"
+/> -->
+
+
                                  
 <!-- <b-button class="customButton btn-outline-secondary" @click="checkInEditor('refCommentOfTable', tmp.id)" v-if="(openEditor==true)"
 style="position:relative;left:24px;top: 26px;width:18px;z-index:2;"><i class="fas fa-calculator"></i></b-button> -->
 
-
+<!-- 
 <b-icon icon='calculator' aria-hidden="true"  @click="checkInEditor('refCommentOfTable', tmp.id)" v-if="(openEditor==true)"
-style="position:relative;left:24px;top: 36px;width:25px;z-index:2;"/>
+style="position:relative;left:24px;top: 36px;width:25px;z-index:2;"/> -->
+
+
+<b-iconstack font-scale="3" style="position:relative;left:24px;top:44px;z-index:2;"
+@mouseover="cloudHover=true" @mouseleave="cloudHover=false"
+@click="updateItem($refs['refCommentOfTable'].quill.getHTML(), 'comment', tmp.id);tmp.comment=$refs['refCommentOfTable'].quill.getHTML();
+changeDisable('b', 'refCommentOfTable', tmp.id);cloudChange=false;cloudLoad=true;" v-if="(openEditor==true)">
+  <b-icon stacked icon="circle-fill" :animation="cloudLoad?'throb':null" variant="primary" v-show="cloudLoad||cloudHover"></b-icon>
+  <b-icon stacked icon="cloud-upload" scale="0.5" :variant="cloudHover?'light':'dark'" v-show="!cloudLoad"></b-icon>
+  <b-icon stacked icon="circle" variant="info" v-show="cloudChange"></b-icon>
+</b-iconstack>
+
+<b-iconstack font-scale="3" style="position:relative;left:24px;top:44px;z-index:2;"
+@click="checkInEditor('refCommentOfTable', tmp.id)" v-if="(openEditor==true)" @mouseover="calcHover = true" @mouseleave="calcHover = false">
+  <b-icon stacked icon="circle-fill" variant="primary" v-show="calcHover"></b-icon>
+  <b-icon stacked icon="calculator" scale="0.5" :variant="calcHover?'light':'dark'"></b-icon>
+</b-iconstack>
 
 <span v-show="(disablefildUser('refCommentOfTable', tmp.id)!='you')" style="position:relative;left:30px;top: 36px;width:18px;z-index:2;"
 v-if="(openEditor==true)">{{disablefildUser('refCommentOfTable', tmp.id)}}</span>
 
 <vue-editor :value="tmp.comment" :editorToolbar="customToolbar"  v-if="(openEditor==true)"
-@focus="changeDisable('f', 'refCommentOfTable', tmp.id)"
-@blur="updateItem($refs['refCommentOfTable'].quill.getHTML(), 'comment', tmp.id);tmp.comment=$refs['refCommentOfTable'].quill.getHTML();
-changeDisable('b', 'refCommentOfTable', tmp.id);"
+@focus="changeDisable('f', 'refCommentOfTable', tmp.id);cloudChange=true;"
 :disabled="disablefild('refCommentOfTable', tmp.id)?'disabled':false"
-
 style="position:relative;top:0px;z-index:1;" 
 class="text-right"  ref="refCommentOfTable" id="refCommentOfTable"
-
-
 
  />
 
@@ -474,7 +673,7 @@ class="text-right"  ref="refCommentOfTable" id="refCommentOfTable"
                         </b-tab>
                           <b-tab v-if="devicesTab()" ref="devices">
                           <template #title>
-                            Devices
+                            {{$t('projectDetail.devices')}}
   </template>
                             <container>
                                 <container-body >
@@ -491,13 +690,10 @@ class="text-right"  ref="refCommentOfTable" id="refCommentOfTable"
                                   :selectPerson="selectPerson"
                                   :selectedWorkers="selectedWorkers"
                                   :selectedDocsList="selectedDocsList"
-
                                   :windowPrint="windowPrint"
                                   :addPdfs="addPdfs"
                                   :makemodalpdf="makemodalpdf"
                                   :typeDocsList="typeDocsList"
-
-
                                   @selectedDocs="selectedDocs"
                                   @addPdf="addPdf"
                                   @addPdfSep="addPdfSep"
@@ -512,7 +708,7 @@ class="text-right"  ref="refCommentOfTable" id="refCommentOfTable"
                         </b-tab>
                         <b-tab v-if="damageTab()" ref="damage">
                           <template #title>
-                            Damage
+                            {{$t('projectDetail.damage')}}
                           </template>
                             <container>
                                 <container-body >
@@ -554,10 +750,10 @@ class="text-right"  ref="refCommentOfTable" id="refCommentOfTable"
 </template>
 <script type="text/javascript">
 
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import draggable from 'vuedraggable';
 import axios from 'axios';
-import moment from 'moment';
+// import moment from 'moment';
 // import { Multipane, MultipaneResizer } from 'vue-multipane';
 import {
     VueEditor
@@ -596,10 +792,36 @@ export default {
     },
     data() {
         return {
+        hideNumberOfYear:null,
+        selectedTables:[],
+        dislink:false,
+        wcval:null,
+        wcadd:null,
+        weval:null,
+        weadd:null,
+        heightEditforSm:'',
+        heightComponentforSm:'min-height:934px',
+        wwidth:null,
+        beforeSubject:null,
+        beforeMail:null,
+        pushToWorkDays:true,
+        selperiodFinishWork:null,
+        autoSend:false,
+        autoDate:false,
+        cheatypedate:null,
+        plan:null,
+        planid:null,
+        selectedDateForSend:null,
+        detectPeriod:null,
+        cloudHover:false,
+        cloudLoad:false,
+        cloudChange:false,
+        calcHover:false,
         openEditor:false,
         menuPriceTree: false,
         menuDevicesTree: false,
         menuDocsTree: false,
+        // menuImgsTree: false,
         beforeTab: null,
         tabIndex: null,
         dubTabIndex: null, 
@@ -610,6 +832,7 @@ export default {
         selectedDocsList:[],
         typeDocsList:[],
         docs_menu_ids:[],
+        images_menu_ids:[],
 
         workerModal:false,
         addSameModalWindow:false,
@@ -626,10 +849,13 @@ export default {
         searchmail:'',
         subject:null,
         content:null, //component
+        subjectPlan:null,
+        contentPlan:null, //component
         modalMail:[],
         modalFiles:[],
         selectedFiles:null,
-        mailSelect:null,
+        mailSelect:[],
+        mailSelectPlan:[],
 
         dropImage:true,
         dropDoc:true,
@@ -637,34 +863,43 @@ export default {
         nodeDis:true,
         nodeDisDev:true,
         nodeDisDoc:true,
+        nodeDisImag:true,
         nameNode:null,
         nameNodeDev:null,
         nameNodeDoc:null,
+        nameNodeImag:null,
         idNode:null,
         idNodeDev:null,
         idNodeDoc:-1,
+        idNodeImg:-1,
         itemsPrice:[],
         itemsPriceDev:[],
         itemsPriceDoc:[],
+        // itemsPriceImg:[],
         oldId:0,
         oldIdDev:0,
         oldIdDoc:0,
+        oldIdImg:0,
         itemsMenu:[],
         itemsMenuDev:[],
         itemsMenuDoc:[],
+        itemsMenuImag:[],
         selectedItems:[],
 
         moveToCopyRadio:'move',
         selectedPrice:[],
         selectedPriceDev:[],
         selectedPriceDoc:[],
+        selectedPriceImg:[],
 
         tabxmodal:false,
         mailmodal:false,
+        timetableMailModal:false,
         titlex:null,
         comtomodal:null,
         projectfild:{content:'Project'},
-        optImages:[],
+        addressfild:'Earth',
+        // optImages:[],
         selrow:null,
         customToolbar: [
         [{ list: "check" }],
@@ -699,7 +934,7 @@ export default {
 
           countCall:0,
           project_id:null,
-          selectedDamageImages:'Image',
+          // selectedDamageImages:'Image',
           domageImages:[],
           selectedLenght: 0,
           dateForInvoice:null,
@@ -707,7 +942,7 @@ export default {
           q:'baer-gs',
           generalCommentContet:null,
           generalComments:true,
-          searchWorker:[],
+          searchWorker:null,
           selectedWorkers:[],
           startTask:null,
           endTask:null,
@@ -728,86 +963,18 @@ export default {
 
             persentCounter: 0,
             damages:[],
-
-            fieldsDocs: [
-                {   
-                    key: 'type',
-                    label: 'File',
-                    sortable: true
-                },
-                {
-                    key: 'name',
-                    label: 'Name',
-                    sortable: true
-                },
-                {
-                    key: 'number',
-                    label: '#'
-                },
-                {
-                    key: 'added',
-                    label: 'Date / Time',
-                    sortable: true
-                },
-                {
-                    key: 'user',
-                    label: 'User',
-                    sortable: true
-                },
-                {
-                  key: 'delete',
-                  label: 'Delete'
-                }
-            ],
-            fieldsImages: [
-                {   
-                    key: 'id',
-                    label: 'Image',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                    key: 'file_name',
-                    label: 'Name',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                    key: 'date',
-                    label: 'Date / Time',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                    key: 'user',
-                    label: 'User',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                    key: 'group',
-                    label: 'Table',
-                    sortable: true,
-                    thClass:''
-                },
-                {
-                  key: 'delete',
-                  label: 'Delete',
-                  thClass:''
-                }
-            ],
 dropzoneOptions1: {
             url: 'loadFiles',
             thumbnailWidth: 50,
             parallelUploads: 20,
-            dictDefaultMessage: "Click or Drop",
+            dictDefaultMessage: this.$t('alert.clickOrDrop'),
             acceptedFiles: 'application/pdf'
         },
 dropzoneOptions2: {
             url: 'loadFiles',
             thumbnailWidth: 50,
             parallelUploads: 20,
-            dictDefaultMessage: "Click or Drop",
+            dictDefaultMessage: this.$t('alert.clickOrDrop'),
             acceptedFiles: 'image/*'
         },
             // dropzoneOptions1: {
@@ -816,21 +983,11 @@ dropzoneOptions2: {
             //     parallelUploads: 20
             // },
 
-            sendToGroupForDamages: {
-                url: '/load_img_in_group',
-                thumbnailWidth: 50,
-                parallelUploads: 20
-            },
+
             docs: [],
             files: [],
             responseFiles: [],
             addPdfs: false,
-            secondText: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. \r\n Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-            firstText: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. \r\n Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-            threText: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. \r\n Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-            fourText: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. \r\n Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-            fiveText: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. \r\n Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-            sixText: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. \r\n Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
             resp: null,
             viewPrint: true,
             comments: true,
@@ -1104,18 +1261,73 @@ dropzoneOptions2: {
             looks: []
         } //return
     }, //data
-    // computed: {
-    //     availablePersons() {
-    //         if(this.customer){
-    //             var persons = this.customer.persons.filter(function(elem, index, self) {
-    //                 return index === self.indexOf(elem);
-    //             })
-    //           return  persons.sort((a, b) => (a > b ? 1 : -1));
-    //         }else{
-    //             return  false
-    //         }
-    //     }
-    // },
+    computed: {
+      periodFinishWork(){
+        return[{
+          text: this.$t('projectDetail.prevperiod'),
+          value: 'previous'
+        },
+        {
+          text: this.$t('projectDetail.curperiod'),
+          value: 'current' }]
+        },
+      monthpart(){
+        return[{   
+        value: 'mstart',
+        text: this.$t('projectDetail.mstart')
+          },
+          {
+        value: 'mmidle',
+        text: this.$t('projectDetail.mmidle')
+          },
+          {
+        value: 'mend',
+        text: this.$t('projectDetail.mend')
+          }]
+      },
+      fieldsDocs() {
+        return[
+      {   
+        key: 'type',
+        label: '§',
+        sortable: true
+      },
+      {
+        key: 'name',
+        label: this.$t('docs.name'),
+        class:'w-100',
+        sortable: true
+      },
+      {
+        key: 'number',
+        label: '#'
+      },
+      {
+        key: 'added',
+        label: this.$t('docs.added'),
+        sortable: true
+      },
+      {
+        key: 'user',
+        label: '👤',
+        sortable: true
+      },
+      {
+        key: 'delete',
+        label: 'X'
+      }
+      ]},
+      availableWorkers() {
+        if (this.searchWorker) {
+            return this.workers.filter(item => {
+                return item.toLowerCase().includes(this.searchWorker.toLowerCase());
+            });
+          }
+          return this.workers
+        }
+      
+    
+    },
     sockets:{
     connect: function(){
       console.log('socket connected')
@@ -1125,26 +1337,102 @@ dropzoneOptions2: {
     }
   },
     methods: {
-      detect(type){
-        if (type == 'docs'){
-          if ((this.tabIndex==3) && (this.comtomodal!='docs')){
-            // this.idNodeDoc=-1;
-            return true;
-          } else{
-            this.idNodeDoc=-1;
-            this.responseFiles.forEach((item)=>{
-              if (item._showDetails==true){
-                item._showDetails = false
+    linkForWorkers(user){
+      var host=window.location.host
+      if (this.selectedTables.length > 0){
+        this.partx.forEach((valuePart)=> {
+          if (valuePart.parts.id == this.selectedTables[0]){
+            var notHaveFoolder = 1
+            this.itemsMenuImag[0].children.forEach((folder)=>{
+              if ((folder.name == valuePart.parts.part_name)&(notHaveFoolder==1)){
+                notHaveFoolder = 0
+                this.$clipboard('https://'+host+'/#/I/'+user+'/'+this.project.number+'/'+folder.name.replace(' ', '_'))
               }
-              // (item._showDetails==true)?false:item._showDetails
             })
+            if (notHaveFoolder == 1){
+              if (confirm('"'+valuePart.parts.part_name+'" '+this.$t('projectDetail.notExist'))) {
+                axios.get('/add_images_menu', {
+                  params: {
+                    parent_id: '-1',
+                    project: this.id,
+                    newName: valuePart.parts.part_name
+                  }
+                }).then(response=>{
+                  this.$clipboard('https://'+host+'/#/I/'+user+'/'+this.project.number+'/'+response.data.name.replace(' ', '_'))
+                })
+              } else{
+                this.$clipboard('https://'+host+'/#/I/'+user+'/'+this.project.number+'/'+'General+Folder')
+              }
+            }
+          }
+        })
+      } else {
+        this.$clipboard('https://'+host+'/#/I/'+user+'/'+this.project.number+'/'+'General+Folder')
+      } 
+    },
+      seltable(){
+        this.selectedTables = []
+        this.partx.forEach((valuePart)=> {
+          if (valuePart.parts.toggle) {
+            this.selectedTables.push(valuePart.parts.id)
+          }
+        })
+      },
+      loded(dir, elheight, add){
+        this.sm2lg(dir, elheight, add)
+      },
+      sm2lg(dir, val, add){
+        // console.log(dir, val, add)
+        var result 
+        function changeSm2Lg(wwidth, height, add){
+          if(wwidth<=768){
+            if(height!=undefined){
+              return 'min-height:'+(height+add)+'px;'
+            }
           }
         }
+        result =  (changeSm2Lg(this.wwidth, val, add))
+        if (dir == 'component'){
+          this.wcval = val
+          this.wcadd = add
+          this.heightComponentforSm=result
+        }
+        if (dir == 'edit'){
+          this.weval = val
+          this.weadd = add
+          this.heightEditforSm=result
+        }
+      },
+      detect(type){
+          if (type == 'docs'){
+            if ((this.tabIndex==3) && (this.comtomodal!='docs')){
+              // this.idNodeDoc=-1;
+              return true;
+            }
+          }
+          if (type == 'images'){
+            if ((this.tabIndex==4) && (this.comtomodal!='images')){
+              // this.idNodeDoc=-1;
+              return true;
+            }
+          }
+          //  else{
+          //   this.idNodeDoc=-1;
+          //   this.responseFiles.forEach((item)=>{
+          //     if (item._showDetails==true){
+          //       item._showDetails = false
+          //     }
+          //     // (item._showDetails==true)?false:item._showDetails
+          //   })
+          // }
+        
       },
 moveDoc(){
   this.$refs.movedoc.show()
 },
-
+moveImag(){
+  this.$refs.moveImag.show()
+},
 projectOther(val){
 this.project.other = val
 }, 
@@ -1210,16 +1498,16 @@ this.project.other = val
 
     sendtodamage(){
         var ids=[]
-        var names=[]
-        // console.log(this.selectedTransfer)
-        this.partx.forEach((valuePart)=> {
-                if (valuePart.parts.toggle) {
-                    // valuePart.parts.part_content.forEach((v)=>{
-                        // item_id = v.item_id
-                        names.push(valuePart.parts.id)
-                    // })
-                }
-        })
+        // var names=[]
+        // // console.log(this.selectedTransfer)
+        // this.partx.forEach((valuePart)=> {
+        //         if (valuePart.parts.toggle) {
+        //             // valuePart.parts.part_content.forEach((v)=>{
+        //                 // item_id = v.item_id
+        //                 names.push(valuePart.parts.id)
+        //             // })
+        //         }
+        // })
         this.domageImages.forEach((v, i)=>{
             if (v._rowVariant!='') ids.push(v.id.split('image?id=')[1])
         })
@@ -1233,7 +1521,7 @@ this.project.other = val
         axios.get('/send_damage', {
                   params: {
                         ids: ids.join(),
-                        names: names.join()
+                        names: this.selectedTables.join()
                   }
         }).then(response=>{
             this.domageImages.forEach(v=>{
@@ -1274,7 +1562,7 @@ this.project.other = val
             this.addPdfs=true;
             // console.log(this.addPdfs)
             // this.$refs.printOffer.hide()
-            this.hideWindowPrint()
+            // this.hideWindowPrint()
             // setTimeout(() => {
             
             // setTimeout(() => {
@@ -1332,7 +1620,7 @@ this.project.other = val
           this.typeDocsList = response.data
           if (this.tmp.typeOfHead ==  'Offers') {this.selectedDocsList=['31']}
           if (this.tmp.typeOfHead == 'Invoices') {this.selectedDocsList=['14']}
-          if (this.tmp.typeOfHead == 'Orders') {this.selectedDocsList=['40']}
+          if (this.tmp.typeOfHead == 'Orders') {this.selectedDocsList=['38']}
           if (this.tmp.typeOfHead == 'SUB') {this.selectedDocsList=['41']}
           if (this.tmp.typeOfHead == 'Devices') {this.selectedDocsList=['45']}
             if (this.tmp.typeOfHead == 'Damage') {this.selectedDocsList=['48']}
@@ -1364,6 +1652,7 @@ addSameModal(){
         })
     }
   },
+
   checkattach(val){  //component
   if (val =='chek' ) this.filename=''
   if (val== 'inp'){
@@ -1387,57 +1676,349 @@ addSameModal(){
       this.modalFiles=[]
       this.selectedFiles=[]
       this.mailSelect=[]
-      var subject=(this.tmp.place?(this.tmp.place+' - '):'')+(this.tmp.insurance?(this.tmp.insurance+' - '):'')+(this.tmp.other?(this.tmp.other+' - '):'')+(this.tmp.number?(this.tmp.number+' '):'')
-      this.subject=(subject!='')?(subject+'intern'):''
-      var content=(this.tmp.type!='SUB' ? 'Sehr geehrte'+(('Herr' == name.split(' ')[0])?'r':'')+' '+name : 'Sehr geehrte '+this.tmp.number.split(' ')[0]) +',<br/>'+
-      (this.tmp.type=='Invoices'?'anbei erhalten Sie unsere Rechnung, mit der Bitte, um Prüfung sowie zeitnahen Ausgleich.':'')+
-      (this.tmp.type=='Offers'?'anbei unser KV mit bitte zum beauftragen.':'')+
-      (this.tmp.type=='SUB'?'anbei erhalten Sie Auftrag für o.g. Projekt':'')
-      +'<br/><p sytle="padding-bottom:4px;">Mit freundlichen Gr&uuml;&szlig;en</p><p>&nbsp;</p><b>'+
-      this.$security.table.account.first_name +' '+ this.$security.table.account.second_name
-      +'</b><hr color="black" style="width: 345px; padding: 0px; margin: 0px;" align="left" sytle="padding-bottom:4px;"/><p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/phone-icon-2x.png" alt="" width="13" />&nbsp;&nbsp;'
-      +this.$security.table.account.tel+
-      '</p><p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/email-icon-2x.png" alt="" width="13" />&nbsp;&nbsp;'
-      +this.$security.table.account.mail+
-      '<p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/link-icon-2x.png" alt="" width="13" />&nbsp;&nbsp;'+this.mail_date+'</p><p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/address-icon-2x.png" alt="" width="13"  sytle="padding-bottom:4px;" />&nbsp;&nbsp;'+this.mail_address+'</p><p style="width:345px;height:106px;padding-top:2px;"><img src="'+this.mail_logo+'" style="max-height:100px;max-width:345px;"/></p>'
+
+      var subject = this.beforeSubject
+      var number=(this.tmp.typeOfHead=='Invoices')?(this.tmp.number.split(' ').length==5)?this.tmp.number.split(' ')[3]:
+      this.countDigitals(this.tmp.number.split(' ')[1])+'-'+this.tmp.number.split(' ')[0].split('-')[1]:(this.tmp.typeOfHead=='SUB')?
+      this.tmp.number.split(' ')[0]:(this.tmp.typeOfHead=='Sub Invoices')?this.tmp.number.split(' ')[3]:this.tmp.number
+
+      subject = subject.split('@Number').join(number?number:'')
+      subject = subject.split('@Document').join(this.tmp.date?this.tmp.date:'')
+      subject = subject.split('@Place').join(this.tmp.place?this.tmp.place:'')
+      subject = subject.split('@Order').join(this.tmp.other?this.tmp.other:'')
+      subject = subject.split('@Insurance').join(this.tmp.insurance?this.tmp.insurance:'')
+      subject = subject.split('@InsName').join(this.tmp.insurname?this.tmp.insurname:'')
+
+      this.subject = subject 
+
+      var content = this.beforeMail
+      content = content.split('@Respect').join('geehrte'+(('Herr' == name.split(' ')[0])?'r':''))
+      content = content.split('@Person').join(name)
+
+      content = content.split('@EditorName').join(this.$security.table.account.first_name)
+      content = content.split('@EditorSurname').join(this.$security.table.account.second_name)
+      content = content.split('@EditorPhone').join(this.$security.table.account.tel)
+      content = content.split('@EditorEmail').join(this.$security.table.account.mail)
+      content = content.split('@CompanyWebSite').join(this.mail_date)
+      content = content.split('@CompanyAddress').join(this.mail_address)
+
+      var invPress = content.split('<p>@InvPress?')[1]
+      invPress = invPress.split('</p>')[0]
+      var offerPress = content.split('<p>@OfferPress?')[1]
+      offerPress = offerPress.split('</p>')[0]
+      var subPress = content.split('<p>@SUBPress?')[1]
+      subPress = subPress.split('</p>')[0]
+
+      if (this.tmp.type=='Invoices'){
+        content = content.split('<p>@InvPress?'+invPress+'</p>').join(invPress)
+      } 
+      if (this.tmp.type!='Invoices'){
+        content = content.split('<p>@InvPress?'+invPress+'</p>').join('')
+      }
+      if (this.tmp.type=='Offers'){
+        content = content.split('<p>@OfferPress?'+offerPress+'</p>').join(offerPress)
+      }
+      if (this.tmp.type!='Offers'){
+        content = content.split('<p>@OfferPress?'+offerPress+'</p>').join('')
+      }
+      if (this.tmp.type=='SUB'){
+        content = content.split('<p>@SUBPress?'+subPress+'</p>').join(subPress)
+      }
+      if (this.tmp.type!='SUB'){
+        content = content.split('<p>@SUBPress?'+subPress+'</p>').join('')
+      }
+
       this.content = content
       this.filename=''
-}
-this.modalMail=[]
-            val.forEach((val)=>{
-            this.modalMail.push({item:val.mail, name:val.mail})    
-            })
+      }
+            this.modalMail=[]
+
+            var subIvoice = false
+            if(this.tmp.typeOfHead=='Invoices') {
+              if(this.tmp.number.split(' ')[3]!=undefined){
+                subIvoice = true
+              }
+            }
+            if(this.tmp.typeOfHead=='Sub Invoices') {
+              if(this.tmp.number.split(' ')[3]!=undefined){
+                subIvoice = true
+              }
+            }
+
+            if((this.tmp.type == 'SUB') || subIvoice) {
+              axios.get('/get_sub_emails', {
+              params: {
+                factory:this.tmp.number.split(' ')[0]
+              }
+              }).then(response => {
+                  this.modalMail = response.data
+              })
+            }
+            else{
+              this.modalMail.push({item:this.selectCustomer.customerMail, name:this.selectCustomer.customerMail})  
+              val.forEach((val)=>{
+                this.modalMail.push({item:val.mail, name:val.mail})
+              })
+            }
+
             this.modalFiles=[]
             this.responseFiles.forEach((val)=>{
             var t = (val.html=='file')?'f':'d'
             this.modalFiles.push({item:t+'-'+val.id, name:val.name.split('.pdf')[0]})    
             })
 
-
             this.mailmodalshow()
           
         },
+
+  sendTimeTableMail(val){ //component
+    var subjectFromPlan = null
+    var contentFromPlan = null
+    var filenameFromPlan = null
+    
+       axios.get('/get_plan', {
+              params: {
+                   id: this.tmp.id
+                 }
+        }).then(response => {
+          if (response.data != null){
+          this.mailSelectPlan = response.data.to.split(',')
+          this.selectedDateForSend = response.data.period
+          this.detectPeriod = response.data.period
+          subjectFromPlan = response.data.subject
+          contentFromPlan = response.data.content
+          filenameFromPlan  = response.data.name
+          this.planid = response.data.id
+          this.selperiodFinishWork = response.data.autoPeriodWorks
+          if(response.data.autoDate==1) this.autoDate = true
+          if((response.data.autoDate==0)&&(response.data.autoDate==null)) {
+            this.autoDate = false
+            this.selperiodFinishWork = null
+          }
+          if(response.data.autosend==1) this.autoSend = true
+          if(response.data.autosend==0) this.autoSend = false
+
+          if(response.data.pushToWorkDays==1) this.pushToWorkDays = true
+          if(response.data.pushToWorkDays==0) this.pushToWorkDays = false
+       }
+
+
+    var namePerson = this.selectPerson.name.split(' ')
+    var name = (namePerson.length==3)?namePerson[0]+' '+namePerson[2]:this.selectPerson.name
+    if ((this.contentPlan==null) || (this.contentPlan =='')) {
+      this.modalMail=[]
+      this.mailSelect=[]
+      
+      
+
+
+      // var number=(this.tmp.typeOfHead=='Invoices')?(this.tmp.number.split(' ').length==5)?this.tmp.number.split(' ')[3]:
+      // this.countDigitals(this.tmp.number.split(' ')[1])+'-'+this.tmp.number.split(' ')[0].split('-')[1]:
+      // (this.tmp.typeOfHead=='SUB')?this.tmp.number.split(' ')[0]:
+      // (this.tmp.typeOfHead=='Sub Invoices')?this.tmp.number.split(' ')[3]:this.tmp.number
+
+      // var subject=(this.tmp.place?(this.tmp.place+' - '):'')+
+      // (this.tmp.insurance?(this.tmp.insurance+' - '):'')+(this.tmp.other?(this.tmp.other+' - '):'')
+      // subject = subject + number
+      // this.subjectPlan=(subject!='')?(subject+' intern'):''
+
+      // if (subjectFromPlan!=null){
+      //   this.subjectPlan = subjectFromPlan
+      // }
+
+      // var content=(this.tmp.type!='SUB' ? 'Sehr geehrte'+(('Herr' == name.split(' ')[0])?'r':'')+' '+name : 'Sehr geehrte Damen und Herren') +',<br/>'+
+      // (this.tmp.type=='Invoices'?'anbei erhalten Sie unsere Rechnung, mit der Bitte, um Prüfung sowie zeitnahen Ausgleich.':'')+
+      // (this.tmp.type=='Offers'?'anbei unser KV mit bitte zum beauftragen.':'')+
+      // (this.tmp.type=='SUB'?'anbei erhalten Sie Auftrag für o.g. Projekt':'')
+      // +'<br/><p sytle="padding-bottom:4px;">Mit freundlichen Gr&uuml;&szlig;en</p><p>&nbsp;</p><b>'+
+      // this.$security.table.account.first_name +' '+ this.$security.table.account.second_name
+      // +'</b><hr color="black" style="width: 345px; padding: 0px; margin: 0px;" align="left" sytle="padding-bottom:4px;"/><p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/phone-icon-2x.png" alt="" width="13" />&nbsp;&nbsp;'
+      // +this.$security.table.account.tel+
+      // '</p><p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/email-icon-2x.png" alt="" width="13" />&nbsp;&nbsp;'
+      // +this.$security.table.account.mail+
+      // '<p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/link-icon-2x.png" alt="" width="13" />&nbsp;&nbsp;'+this.mail_date+'</p><p><img style="float: left; background-color: #f2547d;" src="https://cdn2.hubspot.net/hubfs/53/tools/email-signature-generator/icons/address-icon-2x.png" alt="" width="13"  sytle="padding-bottom:4px;" />&nbsp;&nbsp;'+this.mail_address+'</p><p style="width:345px;height:106px;padding-top:2px;"><img src="'+this.mail_logo+'" style="max-height:100px;max-width:345px;"/></p>'
+      // this.contentPlan = content
+
+
+      var subject = this.beforeSubject
+
+      var number=(this.tmp.typeOfHead=='Invoices')?(this.tmp.number.split(' ').length==5)?this.tmp.number.split(' ')[3]:
+      this.countDigitals(this.tmp.number.split(' ')[1])+'-'+this.tmp.number.split(' ')[0].split('-')[1]:(this.tmp.typeOfHead=='SUB')?
+      this.tmp.number.split(' ')[0]:(this.tmp.typeOfHead=='Sub Invoices')?this.tmp.number.split(' ')[3]:this.tmp.number
+
+      subject = subject.split('@Number').join(number?number:'')
+      subject = subject.split('@Document').join(this.tmp.date?this.tmp.date:'')
+      subject = subject.split('@Place').join(this.tmp.place?this.tmp.place:'')
+      subject = subject.split('@Order').join(this.tmp.other?this.tmp.other:'')
+      subject = subject.split('@Insurance').join(this.tmp.insurance?this.tmp.insurance:'')
+      subject = subject.split('@InsName').join(this.tmp.insurname?this.tmp.insurname:'')
+
+      if (subjectFromPlan!=null){
+        this.subjectPlan = subjectFromPlan
+      } else{
+        this.subjectPlan = subject 
+      }
+
+      var content = this.beforeMail
+      content = content.split('@Respect').join('geehrte'+(('Herr' == name.split(' ')[0])?'r':''))
+      content = content.split('@Person').join(name)
+
+      content = content.split('@EditorName').join(this.$security.table.account.first_name)
+      content = content.split('@EditorSurname').join(this.$security.table.account.second_name)
+      content = content.split('@EditorPhone').join(this.$security.table.account.tel)
+      content = content.split('@EditorEmail').join(this.$security.table.account.mail)
+      content = content.split('@CompanyWebSite').join(this.mail_date)
+      content = content.split('@CompanyAddress').join(this.mail_address)
+
+      var invPress = content.split('<p>@InvPress?')[1]
+      invPress = invPress.split('</p>')[0]
+      var offerPress = content.split('<p>@OfferPress?')[1]
+      offerPress = offerPress.split('</p>')[0]
+      var subPress = content.split('<p>@SUBPress?')[1]
+      subPress = subPress.split('</p>')[0]
+
+      if (this.tmp.type=='Invoices'){
+        content = content.split('<p>@InvPress?'+invPress+'</p>').join(invPress)
+      } 
+      if (this.tmp.type!='Invoices'){
+        content = content.split('<p>@InvPress?'+invPress+'</p>').join('')
+      }
+      if (this.tmp.type=='Offers'){
+        content = content.split('<p>@OfferPress?'+offerPress+'</p>').join(offerPress)
+      }
+      if (this.tmp.type!='Offers'){
+        content = content.split('<p>@OfferPress?'+offerPress+'</p>').join('')
+      }
+      if (this.tmp.type=='SUB'){
+        content = content.split('<p>@SUBPress?'+subPress+'</p>').join(subPress)
+      }
+      if (this.tmp.type!='SUB'){
+        content = content.split('<p>@SUBPress?'+subPress+'</p>').join('')
+      }
+
+      this.contentPlan = content
+
+
+
+      this.filename=this.$t('oneCountAlret.Invoices')+' @InvNo'
+      }
+
+      if (contentFromPlan!=null){
+        this.contentPlan = contentFromPlan
+      }
+
+      if (filenameFromPlan!=null){
+        this.filename = filenameFromPlan
+      }
+      
+            this.modalMail=[]
+
+            var subIvoice = false
+            if(this.tmp.typeOfHead=='Invoices') {
+              if(this.tmp.number.split(' ')[3]!=undefined){
+                subIvoice = true
+              }
+            }
+            if(this.tmp.typeOfHead=='Sub Invoices') {
+              if(this.tmp.number.split(' ')[3]!=undefined){
+                subIvoice = true
+              }
+            }
+
+            if((this.tmp.type == 'SUB') || subIvoice) {
+              axios.get('/get_sub_emails', {
+              params: {
+                factory:this.tmp.number.split(' ')[0]
+              }
+              }).then(response => {
+                  this.modalMail = response.data
+              })
+            }
+            else{
+              this.modalMail.push({item:this.selectCustomer.customerMail, name:this.selectCustomer.customerMail})  
+              val.forEach((val)=>{
+                this.modalMail.push({item:val.mail, name:val.mail})
+              })
+            }
+
+            this.timeTableMailModalShow()
+           })
+        },
+
     sendmail(){  //component
-    if (this.mailSelect.length<1) alert('No recipients')
-    if (this.subject==null) alert('No subject')
+    if (this.mailSelect.length<1) alert(this.$t('alert.noRecipients'))
+    if (this.subject==null) alert(this.$t('alert.noSubject'))
     if ((this.subject!=null) && (this.mailSelect.length>=1)){
       if (this.selectedFiles!=null) {
         var files=this.selectedFiles.join()
       } else {var files='_'}
       var from=this.$security.table.account.mail;
       var to=this.mailSelect.join();
-      axios.get('/send_mail', {
-          params: {
+      axios.post('/send_mail', {
+
             from:from,
             to:to,
             subject: this.subject,
             content: (this.content==null)?'':this.content,
             filename: this.filename,
             files:files
-          }
+
+        }).then(response => {
+          this.mailmodalhide()
+          this.$refs.calProject.showAlert(this.mailSelect.join())
+          this.content = null
         })
-      this.mailmodalhide()
-      this.content = null
+      
+    }
+    },
+
+sendtimetablemail(type){
+var from=this.$security.table.account.mail;
+var to=this.mailSelectPlan.join();
+var params = null 
+if (type =='plan_mail') {
+  params = {
+  'item': this.tmp.id,
+  'period': this.selectedDateForSend,
+  'from': from,
+  'to': to,
+  'subject': this.subjectPlan,
+  'name': this.filename,
+  'autosend' : this.autoSend,
+  'autodate' : this.autoDate?1:0,
+  'autoperiodworks' : this.selperiodFinishWork,
+  'pushToWorkDays':this.pushToWorkDays?1:0,
+  'content': (this.contentPlan==null)?'':this.contentPlan
+  
+  }
+}
+if (type =='replan_mail') {
+  // console.log(this.autoSend)
+  params = {
+    'item': this.tmp.id,
+    'period': this.selectedDateForSend,
+    'from': from,
+    'to': to,
+    'subject': this.subjectPlan,
+    'name': this.filename,
+    'autosend' : this.autoSend,
+    'autodate' : this.autoDate?1:0,
+    'autoperiodworks' : this.selperiodFinishWork,
+    'pushToWorkDays':this.pushToWorkDays?1:0,
+    'content': (this.contentPlan==null)?'':this.contentPlan,
+    'id': this.planid
+  }
+}
+if(type =='remove_mail'){params={id:this.planid}}
+
+    if (this.mailSelectPlan.length<1) alert(this.$t('alert.noRecipients'))
+    if (this.subjectPlan==null) alert(this.$t('alert.noSubject'))
+    if ((this.subjectPlan!=null) && (this.mailSelectPlan.length>=1)){
+
+
+      axios.post('/'+type, params)
+      this.timetableMailModalHide()
+      this.contentPlan = null
     }
     },
 
@@ -1453,8 +2034,22 @@ mailmodalhide(){
     this.mailmodal=false;
     if (this.comtomodal!=null) this.tabxmodal=true;
 },
+
+timetableMailModalHide(){
+    this.contentPlan=null;
+    this.planid=null;
+    this.timetableMailModal=false;
+    this.detectPeriod=null;
+    this.selectedDateForSend=null;
+    this.mailSelectPlan=[];
+    if (this.comtomodal!=null) this.tabxmodal=true;
+},
+
 mailmodalshow(){
     this.mailmodal=true;
+},
+timeTableMailModalShow(){
+    this.timetableMailModal=true;
 },
 closeaddok(){
     this.addSameModalWindow=false;
@@ -1478,7 +2073,7 @@ tabletopartx(tables){
               this.dropDoc=false
                 setTimeout(() => {
 
-                  this.$refs.docs1?this.$refs.docs1.$refs['ifrForm' + index].submit():''
+                  // this.$refs.docs1?this.$refs.docs1.$refs['ifrForm' + index].submit():''
                   this.$refs.docs2?this.$refs.docs2.$refs['ifrForm' + index].submit():''
 
                 }, 50);
@@ -1530,7 +2125,21 @@ tabletopartx(tables){
             items._rowVariant=''
          }
     },
-
+    prowSelectedImg(items) {
+        // console.log(items)
+         if(this.selectedPriceImg.indexOf(items)==-1){
+            this.selectedPriceImg = this.selectedPriceImg.filter((v)=>{
+                if (v.id != items.id){
+                    return v
+                }
+            });
+            this.selectedPriceImg.push(items);
+            items._rowVariant='success';
+         } else{
+            this.selectedPriceImg.splice(this.selectedPriceImg.indexOf(items), 1)
+            items._rowVariant=''
+         }
+    },
 
     // selectedModal(val){
     //     var price_ids=[]
@@ -1582,6 +2191,40 @@ tabletopartx(tables){
         })                      
         // }
     },
+
+    selectedModalImag(val){
+
+        var files_ids=[]
+        // if (confirm("Are you sure to "+this.moveToCopyRadio+' '+this.selectedPriceDoc.length+
+        //     ' rows in to '+val.name+"?")) {
+            this.selectedPriceImg.forEach((val)=>{
+                  var id = val.id.split('=')
+                  // console.log(id[1])
+                  files_ids.push(id[1])
+
+                
+            })
+              // console.log(docs_ids)
+             axios.get('/mv_images', {
+                 params: {
+                     files_ids: files_ids.join(),
+                     new_menu: val.id
+                 }
+             }).then(response=>{
+              // this.$socket.send('getProjectDetail')
+              // alert();
+     
+                setTimeout(() => {
+                   
+                   this.getDocs();
+                //   }, 100);     
+            }, 20);
+                      // this.getdomageImages()
+             // this.getDocs();
+        })                      
+        // }
+    },
+
     //   okMoveToCopy(){
     //     this.selectedPrice=[],
     //     this.$refs.move.hide()
@@ -1590,6 +2233,12 @@ tabletopartx(tables){
         this.selectedPriceDoc=[],
         this.$refs.movedoc.hide()
     },
+
+      okMoveImg(){
+        this.selectedPriceImg=[],
+        this.$refs.moveImag.hide()
+    },
+
 
     detectRowSise(items){
       var returnArr=[]
@@ -1625,16 +2274,16 @@ tabletopartx(tables){
     },
     sendPrice(){
         var ids=[]
-        var names=[]
+        // var names=[]
         // console.log(this.selectedTransfer)
-        this.partx.forEach((valuePart)=> {
-                if (valuePart.parts.toggle) {
-                    // valuePart.parts.part_content.forEach((v)=>{
-                        // item_id = v.item_id
-                        names.push(valuePart.parts.id)
-                    // })
-                }
-        })
+        // this.partx.forEach((valuePart)=> {
+        //         if (valuePart.parts.toggle) {
+        //             // valuePart.parts.part_content.forEach((v)=>{
+        //                 // item_id = v.item_id
+        //                 names.push(valuePart.parts.id)
+        //             // })
+        //         }
+        // })
         this.selectedPrice.forEach((v, i)=>{
             ids.push(v.id)
         })
@@ -1644,14 +2293,15 @@ tabletopartx(tables){
         // }
 
         // var unique = names.filter(onlyUnique)
-
+        console.log(this.selectedTables)
         axios.get('/send_price', {
                   params: {
                         ids: ids.join(),
-                        names: names.join()
+                        names: this.selectedTables.join()
                   }
         }).then(response=>{
             this.selectedPrice=[]
+            this.selectedTables=[]
             this.itemsPrice.forEach(v=>{
                v._rowVariant=''  
             })
@@ -1659,16 +2309,16 @@ tabletopartx(tables){
     },
     sendDevice(){
         var ids=[]
-        var names=[]
+        // var names=[]
         // console.log(this.selectedTransfer)
-        this.partx.forEach((valuePart)=> {
-                if (valuePart.parts.toggle) {
-                    // valuePart.parts.part_content.forEach((v)=>{
-                        // item_id = v.item_id
-                        names.push(valuePart.parts.id)
-                    // })
-                }
-        })
+        // this.partx.forEach((valuePart)=> {
+        //         if (valuePart.parts.toggle) {
+        //             // valuePart.parts.part_content.forEach((v)=>{
+        //                 // item_id = v.item_id
+        //                 names.push(valuePart.parts.id)
+        //             // })
+        //         }
+        // })
         this.selectedPriceDev.forEach((v, i)=>{
             ids.push(v.id)
         })
@@ -1682,7 +2332,7 @@ tabletopartx(tables){
         axios.get('/send_devices', {
                   params: {
                         ids: ids.join(),
-                        names: names.join()
+                        names: this.selectedTables.join()
                   }
         }).then(response=>{
             this.selectedPriceDev=[]
@@ -1693,10 +2343,10 @@ tabletopartx(tables){
     },
       mv_cpPrice(){
         if (this.idNode==null){
-            alert('No menu item is selected.')
+            alert(this.$t('alert.noItemSelect'))
         } else{
             if (this.selectedPrice.length==0){
-                alert('No rows selected.')
+                alert(this.$t('alert.noRowsSelected'))
             }
         }
         if ((this.idNode!=null)&&(this.selectedPrice.length!=0)){
@@ -1705,10 +2355,10 @@ tabletopartx(tables){
     },
       mv_cpDevice(){
         if (this.idNodeDev==null){
-            alert('No menu item is selected.')
+            alert(this.$t('alert.noItemSelect'))
         } else{
             if (this.selectedPriceDev.length==0){
-                alert('No rows selected.')
+                alert(this.$t('alert.noRowsSelected'))
             }
         }
         if ((this.idNodeDev!=null)&&(this.selectedPriceDev.length!=0)){
@@ -1717,7 +2367,7 @@ tabletopartx(tables){
     },
     addRowPrice(){
         if (this.idNode==null){
-            alert('No menu item is selected for add.')
+            alert(this.$t('alert.noSelectedForAdd'))
         } else {
             axios.get('/add_price', {
                 params: {
@@ -1729,7 +2379,7 @@ tabletopartx(tables){
     },
     addRowDevice(){
         if (this.idNodeDev==null){
-            alert('No menu item is selected for add.')
+            alert(this.$t('alert.noSelectedForAdd'))
         } else {
             axios.get('/add_devices', {
                 params: {
@@ -1742,10 +2392,10 @@ tabletopartx(tables){
 
     removePrice(){
        if (this.idNode==null){
-            alert('No menu item is selected for deletion.')
+            alert(this.$t('alert.noItemSelectForDel'))
        }
        else {
-            if (confirm("Are you sure want to remove?")) {
+            if (confirm(this.$t('alert.remove'))) {
                 axios.get('/remove_price_menu', {
                     params: {
                         remove_id: this.idNode
@@ -1759,10 +2409,10 @@ tabletopartx(tables){
     },
     removeDevice(){
        if (this.idNodeDev==null){
-            alert('No menu item is selected for deletion.')
+            alert(this.$t('alert.noItemSelectForDel'))
        }
        else {
-            if (confirm("Are you sure want to remove?")) {
+            if (confirm(this.$t('alert.remove'))) {
                 axios.get('/remove_devices_menu', {
                     params: {
                         remove_id: this.idNodeDev
@@ -1776,10 +2426,10 @@ tabletopartx(tables){
     },
     removeDoc(){
        if (this.idNodeDoc==null){
-            alert('No menu item is selected for deletion.')
+            alert(this.$t('alert.noItemSelectForDel'))
        }
        else {
-            if (confirm("Are you sure want to remove?")) {
+            if (confirm(this.$t('alert.remove'))) {
                 axios.get('/remove_docs_menu', {
                     params: {
                         remove_id: this.idNodeDoc
@@ -1787,6 +2437,23 @@ tabletopartx(tables){
                 }).then(response=>{
                     this.idNodeDoc=null,
                     this.nameNodeDoc=null
+                })
+            }
+        } 
+    },
+    removeImag(){
+       if (this.idNodeImg==null){
+            alert(this.$t('alert.noItemSelectForDel'))
+       }
+       else {
+            if (confirm(this.$t('alert.remove'))) {
+                axios.get('/remove_image_menu', {
+                    params: {
+                        remove_id: this.idNodeImg
+                    }
+                }).then(response=>{
+                    this.idNodeImg=null,
+                    this.nameNodeImag=null
                 })
             }
         } 
@@ -1838,6 +2505,7 @@ tabletopartx(tables){
         findLevel(this.itemsMenuDev, this.idNodeDev)  
     },
     addDoc(){
+      var newName = this.$t('projectDetail.plusPart');
       function findLevel(obj, id, project) {
         if (id==null){
             id=0,
@@ -1845,21 +2513,49 @@ tabletopartx(tables){
         }
             obj.forEach((val)=>{
                 if (val.id==id){
+
                     axios.get('/add_docs_menu', {
                         params: {
                             parent_id: val.id,
-                            project: project
+                            project: project,
+                            newName: newName
                         }
                     })
                 } else {
                     if(val.children.length!=0) {
-                        findLevel(val.children, id, project)
+                        findLevel(val.children, id, project, newName)
                     }
                 }
             })
         }
 
         findLevel(this.itemsMenuDoc, this.idNodeDoc, this.id)
+    },
+    addImag(){
+      var newName = this.$t('projectDetail.plusPart')
+      function findLevel(obj, id, project) {
+        if (id==null){
+            id=0,
+            obj.push({id:0, children:[]})
+        }
+            obj.forEach((val)=>{
+                if (val.id==id){
+                    axios.get('/add_images_menu', {
+                        params: {
+                            parent_id: val.id,
+                            project: project,
+                            newName: newName
+                        }
+                    })
+                } else {
+                    if(val.children.length!=0) {
+                        findLevel(val.children, id, project, newName)
+                    }
+                }
+            })
+        }
+
+        findLevel(this.itemsMenuImag, this.idNodeImg, this.id)
     },
        getPrices(){
 
@@ -1979,10 +2675,9 @@ tabletopartx(tables){
             this.itemsMenuDoc.push({id: -1, name: 'General Folder', parrent: 0, children:[]});
             this.docs_menu_ids.push(-1);
                response.data.forEach((val)=>{
-                         if (val.parrent==0){
+                        if (val.parrent==0){
                             val['children']=[]
                             this.itemsMenuDoc.push(val);
-                           
                         }
                });
 
@@ -2004,8 +2699,46 @@ tabletopartx(tables){
                });
                 this.responseFiles=[];
                 this.docs2files();
-                 this.getdomageImages();
+
+
+
+        axios.get('/images_menu', {
+                params: {
+                    project:this.id
+                }
+            }).then(response => {
+            this.itemsMenuImag=[];
+            this.itemsMenuImag.push({id: -1, name: 'General Folder', parrent: 0, children:[]});
+            this.images_menu_ids.push(-1);
+               response.data.forEach((val)=>{
+                        if (val.parrent==0){
+                            val['children']=[]
+                            // console.log(val)
+                            this.itemsMenuImag.push(val);
+                        }
+               });
+
+                response.data.forEach((valResp)=>{
+                  function findLevel(obj, id)  {
+                        obj.forEach((val)=>{
+                            if (val.id==id){
+                                valResp['children']=[]
+                                // console.log(valResp)
+                                val.children.push(valResp);
+                            } else{
+                                if (val.children.length!=0){
+                                    findLevel(val.children, id)
+                                }
+                            }
+                        })
+                    }
+                this.images_menu_ids.push(valResp.id)
+                findLevel(this.itemsMenuImag, valResp.parrent)  
+               })
             })
+             // console.log(this.itemsMenuImag)
+            this.getdomageImages()     
+          })
         },
     toModel(enterVal){
         function findLevel(obj, id) {
@@ -2070,21 +2803,48 @@ tabletopartx(tables){
 
         findLevel(this.itemsMenuDoc, this.idNodeDoc)
     },
+    toModelImag(enterVal){
+        function findLevel(obj, id) {
+            obj.forEach((val)=>{
+                if (val.id==id){
+                    //val.name=enterVal
+                    axios.get('/update_name_images_menu', {
+                        params: {
+                            name: enterVal,
+                            id: id
+                        }
+                    })
+                } else {
+                    if (val.children.length!=0){
+                        findLevel(val.children, id)
+                    }
+                }
+            })
+        }
+
+        findLevel(this.itemsMenuImag, this.idNodeImg)
+    },
     nodeDisTurn(){
-          if (confirm("Are you sure want to rename?")) {
+          if (confirm(this.$t('alert.rename'))) {
                this.nodeDis = false
             }
        },
     nodeDisTurnDev(){
-          if (confirm("Are you sure want to rename?")) {
+          if (confirm(this.$t('alert.rename'))) {
                this.nodeDisDev = false
             }
        },
     nodeDisTurnDoc(){
-          if (confirm("Are you sure want to rename?")) {
+          if (confirm(this.$t('alert.rename'))) {
                this.nodeDisDoc = false
             }
        },
+    nodeDisTurnImag(){
+          if (confirm(this.$t('alert.rename'))) {
+               this.nodeDisImag = false
+            }
+       },
+
     pcurNodeClicked(model, component) {
         this.nameNode = model.name,
         this.idNode=model.id
@@ -2097,7 +2857,8 @@ tabletopartx(tables){
                      id: model.id
                  }
              }).then(response => {
-                 this.itemsPrice = response.data
+                 this.itemsPrice = response.data;
+                 this.$refs.priceChild1.loded();
              })
             }
         }else{
@@ -2106,7 +2867,8 @@ tabletopartx(tables){
                      id: model.id
                  }
              }).then(response => {
-                 this.itemsPrice = response.data
+                 this.itemsPrice = response.data;
+                 this.$refs.priceChild1.loded();
              })
         }
         this.oldId = this.idNode
@@ -2128,7 +2890,8 @@ tabletopartx(tables){
                      id: model.id
                  }
              }).then(response => {
-                 this.itemsPriceDev = response.data
+                 this.itemsPriceDev = response.data;
+                 this.$refs.devChild1.loded();
              })
             }
         }else{
@@ -2137,7 +2900,8 @@ tabletopartx(tables){
                      id: model.id
                  }
              }).then(response => {
-                 this.itemsPriceDev = response.data
+                 this.itemsPriceDev = response.data;
+                 this.$refs.devChild1.loded();
              })
         }
         this.oldIdDev = this.idNodeDev
@@ -2153,30 +2917,68 @@ tabletopartx(tables){
         if(this.idNodeDoc == this.oldIdDoc){
              if (this.itemsPriceDoc.length>0){
                 this.itemsPriceDoc=[]
-            } else{
-            axios.get('/show_docs', {
-                 params: {
-                     id: model.id
-                 }
-             }).then(response => {
-                 this.itemsPriceDoc = response.data
-             })
-            }
-        }else{
-            axios.get('/show_docs', {
-                 params: {
-                     id: model.id
-                 }
-             }).then(response => {
-                 this.itemsPriceDoc = response.data
-             })
+            } 
+            this.$refs.docs2.loded()
+        //     else{
+        //     axios.get('/show_docs', {
+        //          params: {
+        //              id: model.id
+        //          }
+        //      }).then(response => {
+        //          this.itemsPriceDoc = response.data;
+        //          this.$refs.docs2.loded();
+        //      })
+        //     }
+        // }else{
+        //     axios.get('/show_docs', {
+        //          params: {
+        //              id: model.id
+        //          }
+        //      }).then(response => {
+        //          this.itemsPriceDoc = response.data;
+        //          this.$refs.docs2.loded();
+        //      })
         }
         this.oldIdDoc = this.idNodeDoc
         if ((model.parrent == 0) && component.folder == false){
             this.idNodeDoc = null
         }
     },
+    pcurNodeClickedImg(model, component) {
+        this.nameNodeImag = model.name,
+        this.idNodeImg=model.id
 
+        if(this.idNodeImg == this.oldIdImg){
+            //  if (this.itemsPriceImg.length>0){
+            //     this.itemsPriceImg=[]
+            // } 
+            this.$refs.images1.loded()
+        }
+        //     else{
+        //     // axios.get('/show_imgs', {
+        //     //      params: {
+        //     //          id: model.id
+        //     //      }
+        //     //  }).then(response => {
+        //          // this.itemsPriceImg = response.data;
+        //          this.$refs.images1.loded();
+        //      // })
+        //     }
+        // }else{
+            // axios.get('/show_imgs', {
+            //      params: {
+            //          id: model.id
+            //      }
+            //  }).then(response => {
+                 // this.itemsPriceImg = response.data;
+                 // this.$refs.images1.loded();
+             // })
+        // }
+        this.oldIdImg = this.idNodeImg
+        if ((model.parrent == 0) && component.folder == false){
+            this.idNodeImg = null
+        }
+    },
 
     fschange(title, name){
     this.titlex = title
@@ -2188,6 +2990,7 @@ tabletopartx(tables){
       const viewer = this.$el.querySelector('.'+classId).$viewer
       viewer.index = index
       viewer.show()
+
     },
     subcontract(id){
       var subcont = false
@@ -2245,50 +3048,53 @@ tabletopartx(tables){
         }
 },
 
-    presetFilds(){
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].thClass=''
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].thClass=''
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].thClass=''
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'group')].thClass=''
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].tdClass=''
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].tdClass=''
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].tdClass=''
-        this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'group')].tdClass=''
-        this.domageImages.forEach((v)=>{
-          v._rowVariant=''
-        })
-    },
-    pallselrow(){
-      this.domageImages.forEach((v)=>{
-          v._rowVariant='success'
-      })
-    },
-    pallselrowin(table){
-      table.forEach((v)=>{
-          v._rowVariant='success'
-      })
-    },
+    // presetFilds(){
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].thClass=''
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].thClass=''
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].thClass=''
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'group')].thClass=''
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].tdClass=''
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].tdClass=''
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].tdClass=''
+    //     this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'group')].tdClass=''
+    //     this.domageImages.forEach((v)=>{
+    //       v._rowVariant=''
+    //     })
+    // },
+    // pallselrow(){
+    //   this.domageImages.forEach((v)=>{
+    //       v._rowVariant='success'
+    //   })
+    // },
+    // pallselrowin(table){
+    //   table.forEach((v)=>{
+    //       v._rowVariant='success'
+    //   })
+    // },
 
 
       getdomageImages(){
+        // console.log(this.project.number)
        axios.get('/domage_images', {
           params: {
             id: this.id,
-            project: this.project.number
+            project: (this.project.number==null)?'0001':this.project.number
           }
         }).then(response => {
 
         this.domageImages = response.data.filter(function (v){
           if((v.file_name.split('.')[v.file_name.split('.').length-1]) != 'pdf'){ return v}
         })
-
+         console.log(this.domageImages)
         })
+
+        // console.log((this.project.number==null)?'0001':this.project.number, this.domageImages )
       },
-      countWorker(val){
-        if (val != null) {
-          return '* '+val.split(',').length
-        }
-      },
+      // countWorker(val){
+      //   if (val != null) {
+      //     return '* '+val.split(',').length
+      //   }
+      // },
       countDigitals(val){
         // console.log(val)
         var nuls=3-val.toString().length
@@ -2297,22 +3103,24 @@ tabletopartx(tables){
                     }
         return val
       },
-    workersToTask(id, event){
-      axios.get('/workers_task', {
-        params: {
-          workers: event?this.selectedWorkers.join():'Null',
-          id: id
-        }
-      })
-    },
+    // workersToTask(id, event){
+    //   axios.get('/workers_task', {
+    //     params: {
+    //       workers: event?this.selectedWorkers.join():'Null',
+    //       id: id
+    //     }
+    //   })
+    // },
     updateItem(val, type, id){
-        axios.get('/update_item_from_project', {
-              params: {
+        axios.post('/update_item_from_project', {
+               
                    val: val,
                    type: type,
                    id: id
-                 }
-        })
+                 
+        }).then(response => {
+                  this.cloudLoad = false;
+                 });
     },
     updatefilename(val, type, id){
         axios.get('/updatefilename', {
@@ -2346,76 +3154,81 @@ tabletopartx(tables){
     this.tmp.typeOfHead=null,
     this.tmp.id=null,
     this.generalComments=true
+    if(this.dubTabIndex==0){
+      setTimeout(() => {
+        this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 56)
+      }, 300)
+    }
     },
 
 
-    displaytime() {
-    var self = this
-    this.tasktime = moment().format("YYYY-MM-DD HH:mm:ss");
-    setTimeout(self.displaytime, 1000)
-    },
-    difTime(val, t){
-    var start = moment(val, "YYYY-MM-DD HH:mm:ss.SSS");
-    var diffrent = moment(this.tasktime,"YYYY-MM-DD HH:mm:ss")
-    .diff(moment(start,"YYYY-MM-DD HH:mm:ss"), "seconds")
-    var sec = diffrent;
-    var h = sec/3600 ^ 0;
-    var m = (sec-h*3600)/60 ^ 0;
-    var s = sec-h*3600-m*60;
-    if((t=='s') | (t=='l')){
-    return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m)+((t=='l')?":"+(s<10?"0"+s:s):''))
-    }
-    if((t=='x')){
-    return diffrent
-    }
-    },
-    difTimeFinish(start, end, t){
-    var diffrent = moment(end,"YYYY-MM-DD HH:mm:ss")
-    .diff(moment(start,"YYYY-MM-DD HH:mm:ss"), "seconds")
-    var sec = diffrent;
-    var h = sec/3600 ^ 0;
-    var m = (sec-h*3600)/60 ^ 0;
-    var s = sec-h*3600-m*60;
-    if((t=='s') | (t=='l')){
-    return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m)+((t=='l')?":"+(s<10?"0"+s:s):''))
-    }
-    if((t=='x')){
-    return diffrent
-    }
-    },
-    summHour(tasks, t){
-    var totallHours=0
-    var totallHoursS=0
-      tasks.forEach((v)=>{
-        if(v.data_time_start!=null & v.data_time_end!=null){
-          totallHours = totallHours + parseInt(this.difTimeFinish(v.data_time_start, v.data_time_end, 'x'))
-          var temp = parseInt(this.difTimeFinish(v.data_time_start, v.data_time_end, 'x'))
-          temp = temp*((v.workers==null)?1:v.workers.split.length)
-          totallHoursS = totallHoursS + temp
-        } else{
-          totallHours = totallHours + parseInt(this.difTime(v.data_time_start, 'x'))
-          var temp = parseInt(this.difTime(v.data_time_start, 'x'))
-          temp = temp*((v.workers==null)?1:v.workers.split.length)
-          totallHoursS = totallHoursS + temp
-        }
-      })
-    var sec = (t=='(s)')?totallHoursS:totallHours;
-    var h = sec/3600 ^ 0;
-    var m = (sec-h*3600)/60 ^ 0;
-    var s = sec-h*3600-m*60;
-    if(t=='s'){
-    return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m))
-    }
-    if(t=='(s)'){
-    return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m))
-    }
-    if(t=='x'){
-    return totallHours
-    }
-    if(t=='xs'){
-    return totallHoursS
-    }
-    },
+    // displaytime() {
+    // var self = this
+    // this.tasktime = moment().format("YYYY-MM-DD HH:mm:ss");
+    // setTimeout(self.displaytime, 1000)
+    // },
+    // difTime(val, t){
+    // var start = moment(val, "YYYY-MM-DD HH:mm:ss.SSS");
+    // var diffrent = moment(this.tasktime,"YYYY-MM-DD HH:mm:ss")
+    // .diff(moment(start,"YYYY-MM-DD HH:mm:ss"), "seconds")
+    // var sec = diffrent;
+    // var h = sec/3600 ^ 0;
+    // var m = (sec-h*3600)/60 ^ 0;
+    // var s = sec-h*3600-m*60;
+    // if((t=='s') | (t=='l')){
+    // return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m)+((t=='l')?":"+(s<10?"0"+s:s):''))
+    // }
+    // if((t=='x')){
+    // return diffrent
+    // }
+    // },
+    // difTimeFinish(start, end, t){
+    // var diffrent = moment(end,"YYYY-MM-DD HH:mm:ss")
+    // .diff(moment(start,"YYYY-MM-DD HH:mm:ss"), "seconds")
+    // var sec = diffrent;
+    // var h = sec/3600 ^ 0;
+    // var m = (sec-h*3600)/60 ^ 0;
+    // var s = sec-h*3600-m*60;
+    // if((t=='s') | (t=='l')){
+    // return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m)+((t=='l')?":"+(s<10?"0"+s:s):''))
+    // }
+    // if((t=='x')){
+    // return diffrent
+    // }
+    // },
+    // summHour(tasks, t){
+    // var totallHours=0
+    // var totallHoursS=0
+    //   tasks.forEach((v)=>{
+    //     if(v.data_time_start!=null & v.data_time_end!=null){
+    //       totallHours = totallHours + parseInt(this.difTimeFinish(v.data_time_start, v.data_time_end, 'x'))
+    //       var temp = parseInt(this.difTimeFinish(v.data_time_start, v.data_time_end, 'x'))
+    //       temp = temp*((v.workers==null)?1:v.workers.split.length)
+    //       totallHoursS = totallHoursS + temp
+    //     } else{
+    //       totallHours = totallHours + parseInt(this.difTime(v.data_time_start, 'x'))
+    //       var temp = parseInt(this.difTime(v.data_time_start, 'x'))
+    //       temp = temp*((v.workers==null)?1:v.workers.split.length)
+    //       totallHoursS = totallHoursS + temp
+    //     }
+    //   })
+    // var sec = (t=='(s)')?totallHoursS:totallHours;
+    // var h = sec/3600 ^ 0;
+    // var m = (sec-h*3600)/60 ^ 0;
+    // var s = sec-h*3600-m*60;
+    // if(t=='s'){
+    // return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m))
+    // }
+    // if(t=='(s)'){
+    // return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m))
+    // }
+    // if(t=='x'){
+    // return totallHours
+    // }
+    // if(t=='xs'){
+    // return totallHoursS
+    // }
+    // },
     // allhours(val){
     // var hours = 0
     //   this.loadDamages.forEach((v)=>{
@@ -2433,13 +3246,13 @@ tabletopartx(tables){
     // var s = sec - h * 3600 - m * 60;
     // return ((h<10?"0"+h:h)+":"+(m<10?"0"+m:m))
     // },
-    taskStop(id){
-      axios.get('/task_time_damage', {
-            params: {
-                 id: id
-               }
-      })
-    },
+    // taskStop(id){
+    //   axios.get('/task_time_damage', {
+    //         params: {
+    //              id: id
+    //            }
+    //   })
+    // },
       // addImage(treeDamage){
 
       //   treeDamage.forEach((v)=>{
@@ -2551,7 +3364,7 @@ tabletopartx(tables){
                     this.docs = (this.docs != response.data)?response.data:this.docs
                     axios.get('/files', {
                     params: {
-                        id: this.project.number
+                        id: (this.project.number==null)?'0001':this.project.number
                     }
                 }).then(response => {
 
@@ -2730,6 +3543,18 @@ axios.get('/get_tables', {
             xhr.setRequestHeader('X-Group', selectTables);
             xhr.setRequestHeader('X-User',  this.$security.account['first_name']+'_'+this.$security.account['second_name']);
         },
+        sendingEventImage(file, xhr, formData) {
+            var selectTables = []
+            this.partx.forEach(function(val, index) {
+                if (val.parts.toggle) {
+                    selectTables.push(val.parts.id)
+                }
+            })
+            xhr.setRequestHeader('X-Number', this.project.number);
+            xhr.setRequestHeader('X-Folder', this.idNodeImg);
+            xhr.setRequestHeader('X-Group', selectTables);
+            xhr.setRequestHeader('X-User',  this.$security.account['first_name']+'_'+this.$security.account['second_name']);
+        },
         // sendingImageInGroupForDamages(file, xhr, formData) {
         //   var groups=[]
         //   this.loadDamages.forEach((v)=>{
@@ -2762,10 +3587,17 @@ axios.get('/get_tables', {
         },
 
         allSumms() {
-            var allSumms = 'General: ' + this.$options.filters.thousandSeparator(this.alltotal(this.partx)) + ' ' +
-                'I' +
-                ' Alternative: ' + this.$options.filters.thousandSeparator(this.altalltotal(this.partx));
-            return allSumms;
+          var allSumms = this.$t('projectDetail.general')+': ' + this.$options.filters.thousandSeparator(this.alltotal(this.partx));
+          var altSumms = this.$t('projectDetail.alternative')+': ' + this.$options.filters.thousandSeparator(this.altalltotal(this.partx));
+          var returnSumms = (this.altalltotal(this.partx)==0)?(allSumms):(allSumms + ' I ' + altSumms);
+          if(this.dubTabIndex==0){
+            setTimeout(() => {
+              if(this.weval!=this.$refs.editList.$refs.editcomponet.clientHeight){
+                this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 82)
+              }
+            }, 300);
+          }
+          return returnSumms;
         },
         alltotal: function() {
             var summa = 0
@@ -2794,104 +3626,104 @@ axios.get('/get_tables', {
             })
             return summa;
         },
-inItemClickCotract(val){
- var item = this.offers.filter(function(v){
-    if(v.id==val){
-      return v
-    }
- })
-this.inItemClick(item[0], 0)
-}, 
-        inItemClick(item, index) {
-        this.tmp.typeOfHead = 'Offer',
-        this.tmp.number = item.offer_number,
-        this.tmp.date = item.date,
-        this.tmp.place = item.place,
-        this.tmp.insurname = item.insurname,
-        this.tmp.insurance = item.insurance_number,
-        this.tmp.work = item.work,
-        this.tmp.other = item.other,
-        this.tmp.type=item.type,
-        this.tmp.id=item.id,
-        this.tmp.comment=item.comment
-        axios.get('/table_data', {
-            params: {
-              id: item.id
-            }
-        }).then(response => {
-            this.partx=[],
-            response.data.forEach((val)=>{
-            var addofnew=0
-            this.partx.forEach((px)=>{
-              if(px.parts.part_name==val.part_name){
-                addofnew=1
-              }
-            })
-            if(addofnew==0){
-            this.partx.push(
-                {
-                        parts: {
-                            part_name: val.part_name,
-                            part_name_device: val.part_name_device,
-                            toggle: false,
-                            checkbox_list: {
-                                flavours: {},
-                                selected: {},
-                                allSelected:  {},
-                                indeterminate: {}
-                            },
-                            part_content: [{
-                                    upHere: false,
-                                    сheckbox: 'true',
-                                    count: val.count,
-                                    description_head: val.description_head,
-                                    description_work: val.description_work,
-                                    description_from_price: val.description_from_price,
-                                    discount: val.discount,
-                                    position_number: val.position_number,
-                                    price: val.price,
-                                    status: val.status,
-                                    alttax: val.alttax,
-                                    summa: val.summa,
-                                    unit: val.unit,
-                                    without: val.without,
-                                    done: val.done,
-                                    id_row: val.id,
-                                    item_id: val.item_id,
-                                    part_name: val.part_name
-                            }]
-                        }
-                  }
-            )
-          } else{
-            var indexOfPart=(this.partx.findIndex(x => x.parts.part_name == val.part_name))
-this.partx[indexOfPart].parts.part_content.push(
-                             {
-                                     upHere: false,
-                                     сheckbox: 'true',
-                                     count: val.count,
-                                     description_head: val.description_head,
-                                     description_work: val.description_work,
-                                     description_from_price: val.description_from_price,
-                                     discount: val.discount,
-                                     position_number: val.position_number,
-                                     price: val.price,
-                                     status: val.status,
-                                     alttax: val.alttax,
-                                     summa: val.summa,
-                                     unit: val.unit,
-                                     without: val.without,
-                                     done: val.done,
-                                     id_row: val.id,
-                                     item_id: val.item_id,
-                                     part_name: val.part_name
-                                 }
-                             )
+// inItemClickCotract(val){
+//  var item = this.offers.filter(function(v){
+//     if(v.id==val){
+//       return v
+//     }
+//  })
+// this.inItemClick(item[0], 0)
+// }, 
+//         inItemClick(item, index) {
+//         this.tmp.typeOfHead = 'Offer',
+//         this.tmp.number = item.offer_number,
+//         this.tmp.date = item.date,
+//         this.tmp.place = item.place,
+//         this.tmp.insurname = item.insurname,
+//         this.tmp.insurance = item.insurance_number,
+//         this.tmp.work = item.work,
+//         this.tmp.other = item.other,
+//         this.tmp.type=item.type,
+//         this.tmp.id=item.id,
+//         this.tmp.comment=item.comment
+//         axios.get('/table_data', {
+//             params: {
+//               id: item.id
+//             }
+//         }).then(response => {
+//             this.partx=[],
+//             response.data.forEach((val)=>{
+//             var addofnew=0
+//             this.partx.forEach((px)=>{
+//               if(px.parts.part_name==val.part_name){
+//                 addofnew=1
+//               }
+//             })
+//             if(addofnew==0){
+//             this.partx.push(
+//                 {
+//                         parts: {
+//                             part_name: val.part_name,
+//                             part_name_device: val.part_name_device,
+//                             toggle: false,
+//                             checkbox_list: {
+//                                 flavours: {},
+//                                 selected: {},
+//                                 allSelected:  {},
+//                                 indeterminate: {}
+//                             },
+//                             part_content: [{
+//                                     upHere: false,
+//                                     сheckbox: 'true',
+//                                     count: val.count,
+//                                     description_head: val.description_head,
+//                                     description_work: val.description_work,
+//                                     description_from_price: val.description_from_price,
+//                                     discount: val.discount,
+//                                     position_number: val.position_number,
+//                                     price: val.price,
+//                                     status: val.status,
+//                                     alttax: val.alttax,
+//                                     summa: val.summa,
+//                                     unit: val.unit,
+//                                     without: val.without,
+//                                     done: val.done,
+//                                     id_row: val.id,
+//                                     item_id: val.item_id,
+//                                     part_name: val.part_name
+//                             }]
+//                         }
+//                   }
+//             )
+//           } else{
+//             var indexOfPart=(this.partx.findIndex(x => x.parts.part_name == val.part_name))
+// this.partx[indexOfPart].parts.part_content.push(
+//                              {
+//                                      upHere: false,
+//                                      сheckbox: 'true',
+//                                      count: val.count,
+//                                      description_head: val.description_head,
+//                                      description_work: val.description_work,
+//                                      description_from_price: val.description_from_price,
+//                                      discount: val.discount,
+//                                      position_number: val.position_number,
+//                                      price: val.price,
+//                                      status: val.status,
+//                                      alttax: val.alttax,
+//                                      summa: val.summa,
+//                                      unit: val.unit,
+//                                      without: val.without,
+//                                      done: val.done,
+//                                      id_row: val.id,
+//                                      item_id: val.item_id,
+//                                      part_name: val.part_name
+//                                  }
+//                              )
 
-                  }
-        })
-})
-        },
+//                   }
+//         })
+// })
+//         },
 //         inItemClickInvoice(item, index) {
 //         this.tmp.typeOfHead = 'Invoice',
 //         this.tmp.number = item.inoice_number,
@@ -3064,29 +3896,29 @@ damageToBase(fild, event, id){
         }
     })
 },
-        keyupMethod(event) {
-            if (event.keyCode === 113) {
-                this.tmouseOver()
-            }
-            if (event.keyCode === 27) {
-                this.mouseOut()
-            }
-        },
-        tmouseOver: function() {
-            this.show = true;
-        },
-        mouseOut: function() {
-            this.show = false;
-        },
-        newTab() {
-            this.tabs.push(this.tabCounter++)
-        },
+        // keyupMethod(event) {
+        //     if (event.keyCode === 113) {
+        //         this.tmouseOver()
+        //     }
+        //     if (event.keyCode === 27) {
+        //         this.mouseOut()
+        //     }
+        // },
+        // tmouseOver: function() {
+        //     this.show = true;
+        // },
+        // mouseOut: function() {
+        //     this.show = false;
+        // },
+        // newTab() {
+        //     this.tabs.push(this.tabCounter++)
+        // },
         addOk(work) {
             this.addSameModalWindow=false
             if (this.comtomodal!=null) this.tabxmodal=true
                axios.get('/add_same', {
                     params: {
-                        add_number: this.project.number,
+                        add_number: (this.project.number==null)?'0001':this.project.number,
                         add_insurance_number: '', // this.add_offer.insurance_number
                         add_place: '', // this.add_offer.place
                         add_work: work, // this.add_offer.work
@@ -3100,12 +3932,13 @@ damageToBase(fild, event, id){
                         id: this.id
                       }
                     }).then(response => {
+
                         this.itemsTable = response.data;
                     })
                 })
         },
         offerDel(del_id) {
-            if (confirm("Are you sure?")) {
+            if (confirm(this.$t('alert.sure'))) {
                 axios.get('/del_item', {
                     params: {
                         id: del_id
@@ -3116,7 +3949,7 @@ damageToBase(fild, event, id){
             }
         },
         docDel(id, number) {
-            if (confirm("Are you sure?")) {
+            if (confirm(this.$t('alert.sure'))) {
                 axios.get('/del_doc', {
                     params: {
                         id: id,
@@ -3128,7 +3961,7 @@ damageToBase(fild, event, id){
             }
         },
         fileDel(id, number) {
-            if (confirm("Are you sure?")) {
+            if (confirm(this.$t('alert.sure'))) {
                 axios.get('/del_file', {
                     params: {
                         id: id,
@@ -3140,7 +3973,7 @@ damageToBase(fild, event, id){
             }
         },
         filedel(val) {
-            if (confirm("Are you sure?")) {
+            if (confirm(this.$t('alert.sure'))) {
                 axios.get('/delfile', {
                     params: {
                         id: val
@@ -3214,6 +4047,8 @@ if (type == 'Orders')  {
 ///////////////////////////////////////component
 pinItemGetData(item, index) {
   this.inItemGetData(item, index)
+
+
 },
 pgetcontact(id){
 this.get_contact(id)
@@ -3229,12 +4064,19 @@ this.addOk(work)
 },
 
 inItemGetData(item, index) {
-    // if (this.tmp.id!=item.id){
       if (item!=undefined) {
+  axios.get('/get_plan', {
+    params: {
+      id: item.id
+    }
+  }).then(response => {
+      this.plan = response.data
+ 
       this.selrow = item.id,
       item._rowVariant = (item.id==this.selrow)?'secondary':'',
       this.generalComments=false,
       this.tmp.typeOfHead = item.type,
+      // console.log(item.type),
       this.beforeTab = item.type,
       this.tmp.number = item.number,
       this.tmp.date = item.date,
@@ -3249,22 +4091,28 @@ inItemGetData(item, index) {
       this.tmp.dateInspect = item.dateInspect,
       this.tmp.worker = item.ExamWorker,
       this.tmp.comment=item.comment
+       })
       }
 
     setTimeout(() => {
       // console.log(this.tabxmodal)
 
           if (this.$refs.editList != undefined) {
-            this.$refs.editList.remoteTax(item.id)
+            if (item != undefined) {
+              this.$refs.editList.remoteTax(item.id)
+            }
           }
       
       // this.$refs.edit1.remoteTax(item.id)
+
+     
     }, 300)
   // }
 },
 
 //////////////////////////////////////////////////
 get_person(id, mnew){
+  // console.log(2)
     axios.get('/get_persons', {
       params: {
       id: id
@@ -3298,6 +4146,7 @@ get_contact(id){
       this.availableMails=[]
       this.availablePhons=[]
       this.availableMails = response.data.mail
+      // console.log(response.data.mail)
       this.availablePhons = response.data.phone
       this.selectMail=this.availableMails[0]?this.availableMails[0].mail:null
       this.selectPhone=this.availablePhons[0]?this.availablePhons[0].phone:null
@@ -3330,34 +4179,36 @@ get_workers_f(){
 get_type_works(){
   axios.get('/get_type_works', {
   }).then(response => {
-    this.works = response.data
+    this.works = response.data;
+    this.works.unshift(this.$t('calcTableGroup.work'))
   })
 },
 
-pimageInTableSelected(item){
-  item._rowVariant=(item._rowVariant=='success')?'':'success';
-},
-pchvalueimages(val){
-  this.selectedDamageImages=val
-},
-pselectimagesarr(group){
-var imagesarr = []
-if (this.selectedDamageImages=='Image'){
-  this.domageImages.forEach((si)=>{
-    if(si._rowVariant=='success'){
-       imagesarr.push(si.id.split('=')[1])
-    }
-  })
-  this.updatefilenames(group, 'group',imagesarr.join())
-}
-// console.log(this.groupByFild(this.selectedDamageImages))
-  // if (op=='-'){
-  //   this.selectedImages.splice(this.selectedImages.indexOf(it), 1)
-  // }
-},
+// pimageInTableSelected(item){
+//   item._rowVariant=(item._rowVariant=='success')?'':'success';
+// },
+
+// pchvalueimages(val){
+//   this.selectedDamageImages=val
+// },
+// pselectimagesarr(group){
+// var imagesarr = []
+// if (this.selectedDamageImages=='Image'){
+//   this.domageImages.forEach((si)=>{
+//     if(si._rowVariant=='success'){
+//        imagesarr.push(si.id.split('=')[1])
+//     }
+//   })
+//   this.updatefilenames(group, 'group',imagesarr.join())
+// }
+// // console.log(this.groupByFild(this.selectedDamageImages))
+//   // if (op=='-'){
+//   //   this.selectedImages.splice(this.selectedImages.indexOf(it), 1)
+//   // }
+// },
 project_detail_new_f(){
 
-  var optImages = [{id:0, value:'Undefined'}]
+  // var optImages = [{id:0, value:'Undefined'}]
   axios.get('/project_detail_new', {
     params: {
       id: this.id
@@ -3365,30 +4216,35 @@ project_detail_new_f(){
   }).then(response => {
     response.data.filter((v)=>{
 
-    axios.get('/get_tables', {
-      params: {
-        id: v.id
-      }
-    }).then(response => {
-      if ((v.type!='Invoices') && (v.type!='Sub Invoices')) {
-        for (let i = 0; i < (response.data.length-1); i++) {
-            optImages.push({id:response.data[i].parts.id, value:response.data[i].parts.part_name})
-        }
-      }
-      if(optImages!=this.optImages){
-        this.optImages = optImages
-      }
-    })
+    // axios.get('/get_tables', {
+    //   params: {
+    //     id: v.id
+    //   }
+    // }).then(response => {
+      // if ((v.type!='Invoices') && (v.type!='Sub Invoices')) {
+      //   for (let i = 0; i < (response.data.length-1); i++) {
+      //       optImages.push({id:response.data[i].parts.id, value:response.data[i].parts.part_name})
+      //   }
+      // }
+      // if(optImages!=this.optImages){
+      //   this.optImages = optImages
+      // }
+    // })
        if(v.number.split(' ').length!=5){
         v.netto = this.$options.filters.thousandSeparator(parseFloat(v.netto));
         v.brutto = this.$options.filters.thousandSeparator(parseFloat(v.brutto));
       } else{
-        v.netto = this.$options.filters.thousandSeparator(-parseFloat(v.netto));
-        v.brutto = this.$options.filters.thousandSeparator(-parseFloat(v.brutto));
+        v.netto = '-'+this.$options.filters.thousandSeparator(parseFloat(v.netto));
+        v.brutto = '-'+this.$options.filters.thousandSeparator(parseFloat(v.brutto));
       }
       return v;
     })
     this.itemsTable = response.data;
+    setTimeout(() => {
+        this.sm2lg('component', this.$refs['hproject'].clientHeight, 110)
+        this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 56)
+        
+    }, 10);
     if (this.tmp.id!=undefined){
       var item_list = this.itemsTable.filter((v)=>{
         if (v.type == 'Orders' || v.type == 'Offers'){
@@ -3414,14 +4270,15 @@ project_detail_f(old){
               id: this.id
         }
   }).then(response => {
-      if (response.data!=null){
+     // console.log(response.data)
+                      if (response.data!=null){
                       var num = response.data.project_number
                       var nuls=3-num.toString().length
                       for (var i = 0; i <= nuls; i++) {
                           num='0'+num
                       }
                       this.project.work=response.data.work,
-                      this.project.number=num+'-'+response.data.project_number_year,
+                      this.project.number= num+((this.hideNumberOfYear!=1)?('-' + response.data.project_number_year):''),
                       this.project.date=response.data.date,
                       this.project.edate=response.data.edate,
                       this.project.street1=response.data.street1,
@@ -3431,25 +4288,27 @@ project_detail_f(old){
                       this.project.zip1=response.data.zip1,
                       this.project.other=response.data.other,
                       this.project.editor=response.data.first_name + ' ' + response.data.second_name,
-                      this.selectCustomer={id:response.data.customer_id, name:response.data.name, adress:response.data.street, adress1:response.data.zip+' '+response.data.city},
+                      this.selectCustomer={id:response.data.customer_id, name:response.data.name, adress:response.data.street, adress1:response.data.zip+' '+response.data.city,  customerMail:response.data.customerMail},
                       this.area=[{id:response.data.customer_id, name:response.data.name, adress:response.data.street, adress1:response.data.zip+' '+response.data.city}],
                       this.selectPerson={id:response.data.person_id, name:response.data.appeal+' '+response.data.names},
                       this.get_contact(this.selectPerson.id),
                       this.availablePersons=[{id:response.data.person_id, name:response.data.appeal+' '+response.data.names}],
                       // this.selectMail={id:response.data.mail, name:response.data.names}
-                      // this.availableMails=[{id:response.data.mail, name:response.data.names}]
+                      // this.availableMails.push(response.data.customerMail)
                       // this.selectPhone={id:response.data.phone, name:response.data.names}
                       // this.availablePhons=[{id:response.data.phone, name:response.data.names}]
                       
                       // this.docs2files()
-                      this.getdomageImages()
+                      // this.getdomageImages()
 
                 
-
+                      
                       axios.get('/customer').then(response => {
+
                         response.data.forEach((it)=>{
-                            if(this.selectCustomer.id!=it.id) this.area.push({id:it.id, name:it.name})
+                          if(this.selectCustomer.id!=it.id) this.area.push({id:it.id, name:it.name})
                         })
+                        // console.log(this.selectCustomer.customerMail)
                         this.area.sort(function(a, b){
                           var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
                           if (nameA<nameB) return -1
@@ -3458,9 +4317,9 @@ project_detail_f(old){
                         })
                       })
                      this.get_person(this.selectCustomer.id, false)
-                     
                     }
         })
+
 },
 getProjectDetail(old){
   // alert()
@@ -3490,11 +4349,30 @@ getProjectDetail(old){
     this.countCall = this.countCall + 1
     this.inItemGetData(cliked[0], 0)
   }
+  // console.log(0)
     this.project_detail_f(old)
     this.project_id=this.id
 }
 },
   watch: {
+    tabIndex: function(newv, oldv){
+      if (oldv!=null){
+        if (newv==0){
+          setTimeout(() => {
+              this.sm2lg('component', this.$refs['hproject'].clientHeight, 110)
+          }, 10);
+        }
+      }
+
+    },
+    wwidth: function() {
+      if ((this.wcval!=null)&&(this.wcadd!=null)){
+        this.sm2lg('component', this.wcval, this.wcadd)
+      }
+      if ((this.weval!=null)&&(this.weadd!=null)){
+        this.sm2lg('edit', this.weval, this.weadd)
+      }
+    },
     mapmodal: function(value) {
       if (value == false){
         this.mapmodalhide()
@@ -3537,15 +4415,27 @@ getProjectDetail(old){
       mounted(){
       axios.get('/countries').then(response => {
         this.countries=response.data
-      })
+      });
+      axios.get('/variables').then(response => {
+        this.addressfild=response.data[1].content.split(' ').join('+')
+        this.beforeSubject=response.data[2].content
+        this.beforeMail=response.data[3].content
+        this.hideNumberOfYear = response.data[4].content
+      });
+      this.getProjectDetail(1);
+      this.get_type_works();
      setTimeout(() => {
+        this.getPrices();
+        this.getDevices();
+        this.getDocs();
+        // this.$socket.send('getProjectDetail')
+        // this.$socket.send('get_type_works')
+        // this.$socket.send('getPrices')
+        // this.$socket.send('getDevices')
+        // this.$socket.send('getDocs')
 
-        this.$socket.send('getProjectDetail')
-        this.$socket.send('get_type_works')
-        this.$socket.send('getPrices')
-        this.$socket.send('getDevices')
-        this.$socket.send('getDocs')
-        
+       
+
         this.$options.sockets.onmessage = (data) => (data.data=='getProjectDetail') ? (this.getProjectDetail(1)): ''
         this.$options.sockets.onmessage = (data) => (data.data=='get_types_for_tables_f') ? (this.get_types_for_tables_f('socket')): ''
         this.$options.sockets.onmessage = (data) => (data.data=='project_detail_new_f') ? (this.project_detail_new_f()): ''
@@ -3555,11 +4445,14 @@ getProjectDetail(old){
         this.$options.sockets.onmessage = (data) => (data.data=='getPrices') ? this.getPrices(): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getDevices') ? this.getDevices(): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getDocs') ? this.getDocs(): ''
-        this.displaytime()
+        // this.displaytime()
         },1000);
         },
     created: function() {
-        document.addEventListener('keyup', this.keyupMethod)
+      const onResize = () => this.wwidth = window.innerWidth; //После определения ширина окна и  мобильного режима, должна примениться рассчитаная длина списка
+      onResize();
+      window.addEventListener('resize', onResize);
+      this.$once('hook:beforeDestroy', () => window.removeEventListener('resize', onResize));
     }
 }
 </script>
@@ -3569,4 +4462,67 @@ getProjectDetail(old){
     height: 200px;
     overflow-y: auto;
 }
+
+.raz { 
+  -moz-appearance: textfield;
+}
+.raz::-webkit-inner-spin-button { 
+  display: none;
+}
+
+@media only screen and (min-width : 992px) {
+  .b-table-sticky-header {
+    overflow-y: auto;
+    max-height: 100%
+  }
+  .b-table-sticky-header > .table.b-table > thead > tr > th {
+    position: sticky !important;
+    background-color: #fff;
+  }
+  .block-1 {
+    height: calc(87vh - 7rem);overflow-y: auto;
+  }
+  .block-2 {
+    height: calc(87vh - 7rem);overflow-x: hidden; overflow-y: hidden;
+  }
+  .editorsm2lg{
+    height: calc(85vh - 5rem);position:relative;top:-20px;z-index:1;
+  }
+  .forFinger{
+    display: none;
+  }
+/*  .cardimg img{
+    max-height:250px;
+    max-width:250px; //нужна пропорция при изминении размера
+  }*/
+  .cardimg .card-body{
+    height: 100% !important;
+  }
+}
+@media only screen and (max-width : 992px) { 
+  .cardimg .card-body{
+/*    height: 27px !important;
+    overflow-y: hidden !important;*/
+    display: none !important;
+  }
+  .tabs{
+    min-height: 100vh;
+  }
+  .b-table-sticky-header {
+    max-height: unset;
+  }
+  .sticky-header-lg{
+    overflow-x:hidden;
+  }
+  .printForMobile{
+    display: none;
+  }
+}
+.dropzone .dz-preview .dz-image {
+  width: 250px !important;
+  height: 250px !important;
+}
+
+
+
 </style>

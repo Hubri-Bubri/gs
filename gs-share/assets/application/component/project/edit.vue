@@ -1,28 +1,43 @@
 <template>
-<div>
-<b-icon icon='calculator' aria-hidden="true"  @click="checkInEditor('other')" v-if="(tmp.number==null)"  style="position:relative;left:24px;top: 16px;width:25px;z-index:2;"/>
-<span v-show="(disablefildUser('gencooment', id)!='you')" style="position:relative;left:30px;top: 16px;width:18px;z-index:2;" v-if="(tmp.number==null)">{{disablefildUser('gencooment', id)}}</span>
-<vue-editor :value="project.other" :editorToolbar="customToolbar"
-style="height:82vh;position:relative;top:-20px;z-index:1;" v-if="(tmp.number==null)"
-class="text-right"  ref="other"
 
-@focus="changeDisable('f', 'gencooment', id)"
-@blur="writecomet();changeDisable('b', 'gencooment', id);"
+<div ref="editcomponet">
+<b-iconstack font-scale="3" style="position:relative;left:24px;top:25px;z-index:2;"
+@mouseover="cloudHover = true" @mouseleave="cloudHover = false"
+@click="writecomet();changeDisable('b', 'gencooment', id);cloudChange=false;cloudLoad=true;" v-if="(tmp.number==null)">
+  <b-icon stacked icon="circle-fill" :animation="cloudLoad?'throb':null" variant="primary" v-show="cloudLoad||cloudHover"></b-icon>
+  <b-icon stacked icon="cloud-upload" scale="0.5" :variant="cloudHover?'light':'dark'" v-show="!cloudLoad"></b-icon>
+  <b-icon stacked icon="circle" variant="info" v-show="cloudChange"></b-icon>
+</b-iconstack>
+<span v-if="(tmp.number==null)" style="position:relative;left:24px;top:15px;z-index:2;">{{(timeSave!=null)?$t('alert.LastSaveIn')+': '+timeSave:''}}</span>
+
+<b-iconstack font-scale="3" style="position:relative;left:24px;top:25px;z-index:2;"
+@click="checkInEditor('other')" v-if="(tmp.number==null)" @mouseover="calcHover = true" @mouseleave="calcHover = false">
+  <b-icon stacked icon="circle-fill" variant="primary" v-show="calcHover"></b-icon>
+  <b-icon stacked icon="calculator" scale="0.5" :variant="calcHover?'light':'dark'"></b-icon>
+</b-iconstack>
+
+<span v-show="(disablefildUser('gencooment', id)!='you')" style="position:relative;left:30px;top: 16px;width:18px;z-index:2;"
+v-if="(tmp.number==null)">{{disablefildUser('gencooment', id)}}</span>
+
+<vue-editor :value="project.other" :editorToolbar="customToolbar"
+style="position:relative;top:-20px;z-index:1;" v-if="(tmp.number==null)"
+class="text-right"  ref="other"
+@blur="save()"
+@focus="changeDisable('f', 'gencooment', id);cloudChange=true;"
 :id="'gencooment'+id" 
 :disabled="disablefild('gencooment', id)?'disabled':false"
 />
-
 
 
                                    <b-container v-show="tmp.number != null">
                                       <b-input type="text" hidden v-model="tmp.typeOfHead" />
                                         <b-row>
                                              <b-col cols="12"><br></b-col>
-                                            <b-col :lg="(tmp.type!='Damage Description')?8:12" md="12">
+                                            <b-col lg="8" md="12">
                                               <b-row>
-                                              <b-col :lg="(tmp.type!='Damage Description')?6:12" md="12" >
-
-                                              <b-form-group :label="tmp.typeOfHead+':'" label-cols="4" label-size="sm">
+                                              <b-col lg="6" md="12" >
+                                              <!-- <b-form-group :label="tmp.typeOfHead+':'" label-cols="4" label-size="sm"> -->
+                                              <b-form-group :label="$t('fields.number')+':'" label-cols="4" label-size="sm">
                                                 {{(tmp.typeOfHead=='Invoices')?(tmp.number.split(' ').length==5)?tmp.number.split(' ')[3]:
                                                 countDigitals(tmp.number.split(' ')[1])+'-'+tmp.number.split(' ')[0].split('-')[1]:(tmp.typeOfHead=='SUB')
                                                 ?tmp.number.split(' ')[0]:(tmp.typeOfHead=='Sub Invoices')?tmp.number.split(' ')[3]:tmp.number}}
@@ -31,7 +46,7 @@ class="text-right"  ref="other"
                                                {{disablefildUser('ofnumber', tmp.id)}}
                                               </b-tooltip>
 
-                                              <b-form-group label="Document:" label-cols="4" label-size="sm">
+                                              <b-form-group :label="$t('edit.document')+':'" label-cols="4" label-size="sm">
                                                 <b-form-input disabled :disabled="disablefild('ofdate', tmp.id)"
                                                 type="date" @change="updateItem($event, 'date', tmp.id)"
                                                 :value="tmp.date" placeholder="Enter date"  
@@ -39,7 +54,7 @@ class="text-right"  ref="other"
                                                 @blur.native="changeDisable('b', 'ofdate', tmp.id)" :id="'ofdate'+tmp.id" size="sm"/>
                                               </b-form-group>
 
-                                              <b-form-group label="Place:" label-cols="4" label-size="sm">
+                                              <b-form-group :label="$t('edit.place')+':'" label-cols="4" label-size="sm">
                                                 <b-form-input disabled type="text"  :disabled="disablefild('ofplace', tmp.id)" 
                                                 @change="updateItem($event, 'place', tmp.id)"
                                                 :value="tmp.place" placeholder="Enter place" 
@@ -51,25 +66,25 @@ class="text-right"  ref="other"
                                                {{disablefildUser('ofdate', tmp.id)}}
                                                  </b-tooltip>
 
-                                              <b-form-group label="Event:" label-cols="4" label-size="sm" v-if="tmp.type=='Damage Description'">
+                                       <!--        <b-form-group label="Event:" label-cols="4" label-size="sm" v-if="tmp.type=='Damage Description'">
                                                 <b-form-input disabled :state="null" type="date" :disabled="disablefild('evdate', tmp.id)"
                                                 :value="tmp.dateEvent" @change="updateItem($event, 'dateEvent', tmp.id)"
                                                 @focus.native="changeDisable('f', 'evdate', tmp.id)" size="sm"
                                                 @blur.native="changeDisable('b', 'evdate', tmp.id)" :id="'evdate'+tmp.id"/>
-                                              </b-form-group>
+                                              </b-form-group> -->
 
-                                                <b-tooltip triggers="none" :show="disablefild('evdate', tmp.id)" :target="'evdate'+tmp.id">
+                                  <!--               <b-tooltip triggers="none" :show="disablefild('evdate', tmp.id)" :target="'evdate'+tmp.id">
                                                {{disablefildUser('evdate', tmp.id)}}
-                                                 </b-tooltip>
+                                                 </b-tooltip> -->
 
                                               </b-col>
-                                              <b-col :lg="(tmp.type!='Damage Description')?6:12" md="12" >
+                                              <b-col lg="6" md="12" >
                                                  <b-tooltip triggers="none" :show="disablefild('ofplace', tmp.id)" :target="'ofplace'+tmp.id">
                                                {{disablefildUser('ofplace', tmp.id)}}
                                                  </b-tooltip>
 
 
-                                              <b-form-group label="Order:" label-cols="4" label-size="sm">
+                                              <b-form-group :label="$t('edit.order')+':'" label-cols="4" label-size="sm">
                                                 <b-form-input disabled :disabled="disablefild('ofother', tmp.id)" :state="null" type="text"
                                                 @change="updateItem($event, 'other', tmp.id)"
                                                 :value="tmp.other" placeholder="Enter number" size="sm"
@@ -78,7 +93,7 @@ class="text-right"  ref="other"
                                               </b-form-group>
 
 
-                                              <b-form-group label="Insurance:" label-cols="4" label-size="sm" v-if="(tmp.type!='Damage Description')">
+                                              <b-form-group :label="$t('edit.insurance')+':'" label-cols="4" label-size="sm" >
                                                 <b-form-input disabled  :state="null" type="text" @change="updateItem($event, 'insurance_number', tmp.id)"
                                                 :disabled="disablefild('ofinsurance2', tmp.id)"
                                                 :value="tmp.insurance" placeholder="Enter insurance number" size="sm"
@@ -86,7 +101,7 @@ class="text-right"  ref="other"
                                                 :id="'ofinsurance2'+tmp.id"  />
                                               </b-form-group>
 
-                                               <b-form-group label="Ins.Name:" label-cols="4" label-size="sm">
+                                               <b-form-group :label="$t('edit.insName')+':'" label-cols="4" label-size="sm">
                                                 <b-form-input disabled :state="null" type="text"  placeholder="Enter insurance name"
                                                 @change="updateItem($event, 'insurname', tmp.id)"
                                                 :disabled="disablefild('ofinsurance3', tmp.id)" :value="tmp.insurname"
@@ -98,21 +113,21 @@ class="text-right"  ref="other"
                                                {{disablefildUser('ofother', tmp.id)}}
                                                  </b-tooltip>
 
-
+<!-- 
                                                <b-form-group label="Insurance:" label-cols="4" label-size="sm" v-if="(tmp.type=='Damage Description')">
                                                 <b-form-input disabled  :disabled="disablefild('ofinsurance', tmp.id)" :state="null" type="text"
                                                 @change="updateItem($event, 'insurance_number', tmp.id)" size="sm"
                                                 :value="tmp.insurance" placeholder="Enter insurance number" 
                                                 @focus.native="changeDisable('f', 'ofinsurance', tmp.id)"
                                                 @blur.native="changeDisable('b', 'ofinsurance', tmp.id)" :id="'ofinsurance'+tmp.id"   />
-                                               </b-form-group>
-
+                                               </b-form-group> -->
+<!-- 
                                                  <b-tooltip triggers="none" :show="disablefild('ofinsurance', tmp.id)" :target="'ofinsurance'+tmp.id">
                                                {{disablefildUser('ofinsurance', tmp.id)}}
-                                                 </b-tooltip>
+                                                 </b-tooltip> -->
 
                                               </b-col>
-                                               <b-col :lg="(tmp.type!='Damage Description')?6:12" md="12"  v-if="(tmp.type=='Damage Description')">
+      <!--                                          <b-col :lg="(tmp.type!='Damage Description')?6:12" md="12"  v-if="(tmp.type=='Damage Description')">
 
                                                 <b-form-group label="Exam.worker:" label-cols="4" label-size="sm">
                                                   <b-form-select type="text" @change="updateItem($event, 'ExamWorker', tmp.id)"
@@ -120,93 +135,93 @@ class="text-right"  ref="other"
                                                   />
                                                </b-form-group>
 
-                                              </b-col>
-                                               <b-col :lg="(tmp.type!='Damage Description')?6:12" md="12" >
+                                              </b-col> -->
+                                               <b-col lg="6" md="12" >
 
-                                                <b-form-group label="Ins.date:" label-cols="4" label-size="sm" v-if="tmp.type=='Damage Description'">
+      <!--                                           <b-form-group label="Ins.date:" label-cols="4" label-size="sm" v-if="tmp.type=='Damage Description'">
                                                   <b-form-input disabled :state="null" type="date"
                                                   :value="tmp.dateInspect" @change="updateItem($event, 'dateInspect', tmp.id)"
                                                   :disabled="disablefild('ofdateInspect', tmp.id)"
                                                   @focus.native="changeDisable('f', 'ofdateInspect', tmp.id)" @blur.native="changeDisable('b', 'ofdateInspect', tmp.id)"
                                                   :id="'ofdateInspect'+tmp.id" 
                                                   />
-                                               </b-form-group>
+                                               </b-form-group> -->
                                                  
-                                                 <b-tooltip triggers="none" :show="disablefild('ofdateInspect', tmp.id)" :target="'ofdateInspect'+tmp.id">
+              <!--                                    <b-tooltip triggers="none" :show="disablefild('ofdateInspect', tmp.id)" :target="'ofdateInspect'+tmp.id">
                                                {{disablefildUser('ofdateInspect', tmp.id)}}
-                                                 </b-tooltip>
+                                                 </b-tooltip> -->
                                                 <b-tooltip triggers="none" :show="disablefild('ofinsurance2', tmp.id)" :target="'ofinsurance2'+tmp.id">
                                                {{disablefildUser('ofinsurance2', tmp.id)}}
                                                  </b-tooltip>
 
-<b-button  @click="addGropuDamage" v-if="(tmp.type=='Damage Description')" size="sm">
+<!-- <b-button  @click="addGropuDamage" v-if="(tmp.type=='Damage Description')" size="sm">
                                         Add Group
 </b-button>
 <b-button  @click="worker" v-if="(tmp.type=='Damage Description')" size="sm">
                                         Workers
-</b-button>
+</b-button> -->
                                               </b-col>
                                               </b-row>
                                             </b-col>
                                             <!-- </b-form-row> -->
-<b-col lg="4" md="12" v-if="tmp.type!='Damage Description'">
+<b-col lg="4" md="12" >
  
                                             
-                                                <b-form-group label="Discont:" label-cols="4" label-size="sm">
+                                                <b-form-group :label="$t('edit.discont')+':'" label-cols="4" label-size="sm">
                                                   <b-input-group>
                                                     
-                                                      <b-input id="disc" type="number"  v-model="discP"
-                                                      size="sm" @change="discOfPercent();updateProjectTaxs();"/>
+                                                      <b-input id="disc" type="number"  v-model="discP" class="raz"
+                                                      size="sm" @change="updateProjectTaxs();discOfPercent();"/>
                                                     
                                                     
-                                                      <span @click="butDiscPerc = (butDiscPerc == '%' ? 'P' : '%');discOfPercent();updateProjectTaxs();">
+                                                      <span @click="butDiscPerc = (butDiscPerc == '%' ? 'P' : '%');discOfPercent();updateProjectTaxs();" style="white-space: nowrap;">
                                                         {{butDiscPerc}}
                                                       </span>
                                                     
-                                                    <b-col class="text-right">
+                                                    <b-col class="text-right" style="white-space: nowrap;">
                                                       {{disc}} €
                                                     </b-col>
                                                   </b-input-group>
                                                </b-form-group>
 
 
-                                                <b-form-group label="Netto:" label-cols="4" label-size="sm">
-                                                  <b-col class="text-right">{{netto}} €</b-col>
+                                                <b-form-group :label="$t('edit.netto')+':'" label-cols="4" label-size="sm">
+                                                  <b-col class="text-right" style="white-space: nowrap;">{{netto}} €</b-col>
                                                </b-form-group>
 
-                                              <b-form-group label="Tax:" label-cols="4" label-size="sm">
+                                              <b-form-group :label="$t('edit.tax')+':'" label-cols="4" label-size="sm">
                                                   <b-input-group>
                                                     
                                                       <b-link v-b-toggle="'addtax'" @click="saveCol($event)" >
                                                         <span class="when-closed">+</span>
                                                       </b-link>
-                                                      <b-input id="taxP" v-model="taxP" :state="null" size="sm"
+                                                      <b-input id="taxP" v-model="taxP" :state="null" size="sm" class="raz"
                                                       type="number" @change="discOfPercent();updateProjectTaxs();"/>%
                                                      
-                                                    <b-col class="text-right">
+                                                    <b-col class="text-right" style="white-space: nowrap;">
                                                       {{tax}} €
                                                     </b-col>
                                                   </b-input-group>
                                                </b-form-group>
                                                <b-collapse style="width:100%" id="addtax" v-model="addtaxColapse">
-                                                <b-form-group label="Tax:" label-cols="4" label-size="sm">
+                                                <b-form-group :label="$t('edit.tax')+':'" label-cols="4" label-size="sm">
                                                   <b-input-group>
 
                                                     <b-link v-b-toggle="'addtax'" @click="saveCol" >
                                                       <span class="when-opened">-</span>
                                                     </b-link>
 
-                                                    <b-input id="taxP" v-model="taxPDub" :state="null" size="sm"
+                                                    <b-input id="taxP" v-model="taxPDub" :state="null" size="sm" class="raz"
                                                     type="number" @change="discOfPercent();updateProjectTaxs();"/>%
-                                                    <b-col class="text-right">
+                                                    <b-col class="text-right"  style="white-space: nowrap;">
                                                       {{taxDub}} €
                                                     </b-col>
                                                   </b-input-group>
                                                </b-form-group>
                                                </b-collapse>  
 
- <b-form-group label="Brutto:" label-cols="4" label-size="sm">
-                           <b-col class="text-right">
+ <b-form-group :label="$t('edit.brutto')+':'" label-cols="4" label-size="sm">
+                           <b-col class="text-right"  style="white-space: nowrap;">
                                                    {{brutto}} €
                                          </b-col>
                                                </b-form-group>
@@ -259,6 +274,11 @@ class="text-right"  ref="other"
 :makemodalpdf="makemodalpdf"
 :typeDocsList="typeDocsList"
 
+:availableMails="availableMails"
+:plan="plan"
+@seltable="$emit('seltable')"
+@sendMail="$emit('sendMail', availableMails)"
+
 @selectedDocs="selectedDocs"
 @addPdf="addPdf"
 @printPdf="printPdf"
@@ -284,9 +304,9 @@ export default {
     VueEditor,
   },
   props: [
-  'tmp', 'project', 'looks',  'works', 'windowPrint',
+  'tmp', 'project', 'looks',  'works', 'windowPrint', 'availableMails',
   'selectedCornty', 'id', 'comments', 'responseFiles', 'selectedWorkers',
-  'typesForTables', 'workers', 'funcStop', 'loadDamages',
+  'typesForTables', 'workers', 'funcStop', 'loadDamages', 'plan',
   'partx', 'person', 'customer', 'selectCustomer', 'selectPerson',
   'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList'
   ],
@@ -295,6 +315,11 @@ export default {
 
   data(){
       return{
+            timeSave: null,
+            calcHover: false,
+            cloudHover: false,
+            cloudChange: false,
+            cloudLoad: false,
             addtaxColapse: null,
             tax: 0,
             taxDub: 0,
@@ -326,6 +351,15 @@ export default {
             }
     },
 methods: {
+
+save(){
+  this.writecomet();
+  this.changeDisable('b', 'gencooment', this.id);
+  this.cloudChange=false;
+  this.cloudLoad=true;
+  this.timeSave = moment().format("DD.MM HH:mm")
+  // console.log(this.timeSave)
+},
 writecomet(){
 var newContent =  this.$refs['other'].quill.getHTML()
   if (newContent != '<p><br></p>') {
@@ -464,24 +498,33 @@ axios.get('/get_tables', {
                 })
             if (this.butDiscPerc == '%') {
                 var add = 0
+                var add2 = 0
                 this.partx.forEach((val) => {
                     val.parts.part_content.forEach((sval) => {
                         if (sval.without == true) {
-                            add = add + ((sval.count * sval.price / 100) * this.discP)
+                          if(sval.alttax==true) add2 = add2 + ((sval.count * sval.price / 100) * this.discP)
+                          if(sval.alttax!=true) add = add + ((sval.count * sval.price / 100) * this.discP)
                         }
                     })
                 })
-                this.disc = this.$options.filters.thousandSeparator((summa / 100) * this.discP - add)
-                tmpDisc = (summa / 100) * this.discP - add
+
+                this.disc = this.$options.filters.thousandSeparator((summa / 100) * this.discP - (add+add2))
+                tmpDisc = (summa / 100) * this.discP - (add+add2)
+                // console.log(tmpDisc)
             } else {
                 this.disc = this.$options.filters.thousandSeparator(this.discP)
                 tmpDisc = this.discP
             }
+            // console.log(this.discP)
+
             this.netto = this.$options.filters.thousandSeparator(summa - tmpDisc)
             tmpNetto = summa - tmpDisc
+
+
             var addt = 0
             var addt2 = 0
             this.partx.forEach((val) => {
+
                 val.parts.part_content.forEach((sval, index) => {
                     if (sval.status == 'yes') {
                         if (sval.alttax != true) {
@@ -492,14 +535,17 @@ axios.get('/get_tables', {
                     }
                 })
             })
+            // console.log(add, add2)
             if (this.butDiscPerc == '%') {
-              addt=addt-(addt/100)*(this.discP)
-              addt2=addt2-(addt2/100)*(this.discP)
+              addt=(addt-((addt/100)*(this.discP)))+add //плюс потери с without
+              addt2=(addt2-((addt2/100)*(this.discP)))+add2
+              // console.log(addt)
             }
             if (this.butDiscPerc == 'P') {
               addt=addt-(addt/100)*(this.discP*100/summa)
               addt2=addt2-(addt2/100)*(this.discP*100/summa)
             }
+            // console.log(this.$options.filters.thousandSeparator(addt * (this.taxP / 100)), addt, this.taxP)
             this.tax = this.$options.filters.thousandSeparator(addt * (this.taxP / 100))
             tmpTax = (addt * (this.taxP / 100))
             this.taxDub = this.$options.filters.thousandSeparator(addt2 * (this.taxPDub / 100))
@@ -532,13 +578,13 @@ this.$emit('getCustomerAdressOne')
       },
 
     updateItem(val, type, id){
-        axios.get('/update_item_from_project', {
-              params: {
+        axios.post('/update_item_from_project', {
+              
                    val: val,
                    type: type,
                    id: id
-                 }
-        }).then(response => {})
+              
+        })
     },
       changeDisable(type_operation, fild, id){
         this.stopDis=(type_operation=='f')
@@ -567,6 +613,8 @@ this.$emit('getCustomerAdressOne')
                   id: this.id,
                   date:  this.$security.table.account.first_name+'_'+this.$security.table.account.second_name,
                   fild: 'user'
+                 }).then(response => {
+                  this.cloudLoad = false;
                  });
              axios.post('/updateProject', {
               
@@ -630,6 +678,133 @@ this.$emit('getCustomerAdressOne')
 
   },
 
+  // mounted(){
+  //   setTimeout(() => {
+  //       this.$emit('loded', 'edit', this.$refs.other.$el.clientHeight, 0)
+  //   }, 100);     
+  // }
+
   }
 
 </script>
+<style type="text/css">
+  .ql-editor{
+      font-size: 12px !important;
+      min-height: 0px !important;
+  }
+  .ql-editor ul[data-checked=true] > li::before {
+    content: '✓' !important;
+  }
+  .ql-editor ul[data-checked=false] > li::before {
+    content: '☐' !important;
+  }
+
+/*.withoutBorderInInput input[type=text]{
+  box-shadow: none;
+}
+.withoutBorderInInput input[type=text]:focus:not([readonly]) {
+  box-shadow: none;
+}
+.withoutBorderInInput textarea{
+  overflow-y: auto;
+}*/
+/*.short {
+  overflow-y: hidden !important;
+  max-height: 17px !important;
+}
+.notshort {
+  overflow-y: auto !important;
+}
+
+*/
+
+
+
+.ccbox label {
+  white-space: nowrap;
+    display: inline;
+    margin-top: -3px;
+    width: 15px;
+    text-align: left;
+}
+.ccbox input[type=checkbox] {
+    display: none;
+}
+
+
+.ccbox input[type=checkbox]+label:before {
+  white-space: nowrap;
+  display: inline;
+    content: "☐";
+    font-size: 14px;
+    font-weight: 100;
+}
+.ccbox input[type=checkbox]:checked+label:before {
+  white-space: nowrap;
+  display: inline;
+    content: "✓";
+    font-size: 14px;
+    font-weight: 100;
+}
+
+
+
+.howerRow {
+    background: #e9ecef;
+}
+.upHereColumn {
+    background-color: #007bff !important;
+}
+.upHereColumn input {
+    background-color: #007bff !important;
+}
+.greenrow .form-row {
+    background-color: #c8e6c9;
+}
+.ainput {
+    text-align: center !important;
+}
+.rinput {
+    text-align: right !important;
+}
+.cinput {
+    text-align: center !important;
+}
+.diveditable {
+  padding-left:4px;
+  padding-right:4px;
+  display: inline;
+  white-space: nowrap;
+}
+.diveditable br {
+  display: none;
+}
+.calttax{
+  text-decoration: underline;
+}
+/*.flag a{
+  padding: 5px !important;
+}*/
+/*@import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
+
+.tx {
+  width: 100%;
+  min-height: 17px;
+  height: 17px;
+  padding: 2px;
+  resize: none;
+  overflow: hidden;
+  background-color: transparent;
+  border: 2px solid #000;
+  border-radius: 4px;
+  font-family: "Inconsolata", monospace;
+  font-size: 0.710938rem;
+  color: #000;
+  box-shadow: none;
+}
+
+.tx:focus {
+  box-shadow: none;
+  outline: none;
+}*/
+</style>

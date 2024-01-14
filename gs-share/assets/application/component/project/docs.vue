@@ -1,8 +1,7 @@
 <template>
-  <b-container fluid style="overflow: unset;">
+  <b-container fluid ref="heightTableDocs">
     <b-row>
-      <b-col lg="3" class="block-1">
-
+      <b-col cols="12" lg="3" class="block-1">
         <vue-drag-tree
         :data='itemsMenuDoc'
         :allowDrag='allowDrag'
@@ -17,13 +16,16 @@
         @drag-end="dragEndHandler"
         @drop="dropHandler">
         </vue-drag-tree>
-
         <div hidden>{{selectedPriceDoc}}</div>
       </b-col>
-      <b-col cols="9" class="block-2">
-        <b-table :items="foldershowfiles(responseFiles)" :fields="fieldsDocs" hover sticky-header  style="max-height:100%" small>
+      <b-col cols="12" lg="9" class="block-2 m-0 p-0">
+        <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+        <b-table :items="foldershowfiles(responseFiles)" :fields="fieldsDocs"
+        hover small stacked="lg"
+        show-empty no-border-collapse
+        >
           <template #cell(type)="row">
-            <b-col @click="rowSelected(row.item)">
+         <!--    <b-col @click="rowSelected(row.item)" class="text-left"> -->
 
               <b-icon :icon="row.detailsShowing ?'file-earmark':'file-pdf'" aria-hidden="true" @click.stop="loadDocToFrame(row)"
               v-if="((row.item.name=='Orders') || (row.item.name=='Offers') || (row.item.name=='Invoices') || (row.item.name=='Damage Description'))"></b-icon>
@@ -36,7 +38,7 @@
                 <i style="font-size:14px" :class="row.detailsShowing ? 'far fa-file' : 'fa fa-file-pdf'" v-else-if="row.item.name.includes('.pdf')"></i>
                 <i style="font-size:14px" :class="row.detailsShowing ? 'far fa-file' : 'fa fa-file-pdf'" v-else></i>
               </b-link> -->
-            </b-col>
+            <!-- </b-col> -->
           </template>
           <template #cell(name)="row">
             <b-form-input  type="text" size="sm"
@@ -60,15 +62,19 @@
             </b-col> -->
           </template>
           <template #cell(added)="data">
-            <div @click="rowSelected(data.item)" style="white-space: nowrap;"> {{data.item.added | dateInverse}} </div>
+            <div @click="rowSelected(data.item)" style="white-space: nowrap;"
+            :title="data.item.added.split(' ')[0].split('-')[0]+'.'+data.item.added.split(' ')[0].split('-')[1]+'.'+data.item.added.split(' ')[0].split('-')[2]+' '+data.item.added.split(' ')[1]">
+              {{data.item.added.split(' ')[0].split('-')[0]+'.'+data.item.added.split(' ')[0].split('-')[1]+'.'+data.item.added.split(' ')[0].split('-')[2]}}
+            </div>
           </template>
           <template #cell(user)="data">
-            <div @click="rowSelected(data.item)"> {{data.item.user}} </div>
+            <div @click="rowSelected(data.item)" :title="data.item.user"> {{data.item.user.replace(/[^A-Z]/g, '')}} </div>
           </template>
           <template #cell(number)="data">
-            <div @click="rowSelected(data.item)"> {{data.item.number}} </div>
+            <div @click="rowSelected(data.item)" style="width:85px;"> {{data.item.number}} </div>
           </template>
         </b-table>
+      </div>
       </b-col>
     </b-row>
   </b-container>
@@ -94,13 +100,17 @@ export default {
         })
       }
     },
-    onClickOutside() {
-      this.$emit('onClickOutsideDoc')
-    },
+    // onClickOutside() {
+    //   this.$emit('onClickOutsideDoc')
+    // },
     rowSelected(items) {
       this.$emit('rowSelectedDoc', items)  
     },
-    
+    loded(){
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs.heightTableDocs.clientHeight, 220)
+      }, 1);     
+    },
     allowDrag(model, component) {
       if (component.depth!=1){
       // if (model.name === 'Node 0-1') {
@@ -193,6 +203,8 @@ export default {
     changeDisable(type_operation, fild, id){
       this.$emit('changeDisable', type_operation, fild, id)
     }
+  },mounted(){
+     this.$emit('loded', 'component', this.$refs.heightTableDocs.clientHeight, 220)
   }
 }
 </script>

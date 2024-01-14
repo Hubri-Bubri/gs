@@ -35,7 +35,7 @@ prod_requires = [
 
 setup(
     name='gs-dashboard',
-    version="0.0.117"
+    version="0.1.4"
     ,
     install_requires=prod_requires, 
     packages=['gs_dashboard'],

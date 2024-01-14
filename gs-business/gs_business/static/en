@@ -1,0 +1,15 @@
+{
+        "topMenu": {
+          "general": "General",
+          "bills": "Bills",
+          "subContractor": "Sub Contractor",
+          "subData": "SUB-Data",
+          "baseData": "Base Data",
+          "customerData": "Customer Data",
+          "companyData": "Company Data",
+          "priceList": "Price List",
+          "devicesList": "Devices List",
+          "profile": "Profile",
+          "singOut": "Sing Out"
+        }
+    }

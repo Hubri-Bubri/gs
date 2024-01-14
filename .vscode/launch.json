@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "dashboard",
+            "type": "python",
+            "request": "launch",
+            "program": "~/Projects/anonimus/anonimus-server/.venv/bin/anonimus-server",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "business",
+            "type": "python",
+            "request": "launch",
+            "program": "~/project/awe/gs-business/gs_business/__main__.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}

@@ -6,7 +6,7 @@
         <b-form-group :label="projectfild.content+':'" label-cols="3" label-size="sm">
           {{project.number}}
         </b-form-group>
-        <b-form-group label="Start date:" label-cols="3" label-size="sm">
+        <b-form-group  :label="$t('project.startDate')+':'" label-cols="3" label-size="sm">
           <b-form-input size="sm" type="date"
           @change="updateProject('date', $event)" :value="project.date" placeholder="Enter date" 
           :disabled="disablefild('project-start-date', id)"
@@ -16,18 +16,13 @@
         <b-tooltip triggers="none" :show="disablefild('pdata', id)" :target="'pdata'+id">
           {{disablefildUser('pdata', id)}}
         </b-tooltip>
-
-
-
-
-
       </b-col>
       <b-col lg="6" sm="12">
 
-        <b-form-group label="Editor:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('project.editor')+':'" label-cols="3" label-size="sm">
           {{project.editor}}
         </b-form-group>
-        <b-form-group label="End date:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('project.endDate')+':'" label-cols="3" label-size="sm">
           <b-form-input size="sm"
           :min="project.date"
           type="date"
@@ -39,20 +34,14 @@
           @blur.native="changeDisable('b', 'project-end-date', id)"
           :id="'project-end-date'+id" />
         </b-form-group>
-
-
-
       </b-col>
     </b-row>
     <hr />
     <b-row>
 
       <b-col lg="6" sm="12" >
-
-
-        <b-form-group label="Customer:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('project.customer')+':'" label-cols="3" label-size="sm">
           <b-form-select
-          label="name"
           text-field="name"
           value-field="id"
           :value="selectCustomer.id"
@@ -61,16 +50,16 @@
           :options="area"
           :disabled="area==[]" />
         </b-form-group>
-        <b-form-group label="Contact:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('project.contact')+':'" label-cols="3" label-size="sm">
           <b-form-select text-field="name" value-field="id" size="sm"
           :value="selectPerson.id" :options="availablePersons"
           @change="get_contact($event);updateProject('person_id', $event);" />
         </b-form-group>
-        <b-form-group label="Phone:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('customerDetail.phone')+':'" label-cols="3" label-size="sm">
           <b-form-select text-field="phone" value-field="phone" 
           :value="selectPhone" :options="availablePhons" size="sm" />
         </b-form-group>
-        <b-form-group label="E-mail:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('customerDetail.mail')+':'" label-cols="3" label-size="sm">
           <b-input-group>
             <b-form-select size="sm" text-field="mail" value-field="mail"  :value="selectMail" :options="availableMails" />
               <template #prepend><b-icon icon="inboxes" aria-hidden="true" @click="$emit('sendMail', availableMails)" class="m-1" /></template>
@@ -79,12 +68,12 @@
 
       </b-col>
       <b-col lg="6" sm="12">
-        <b-form-group label="ZIP:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('customerDetail.zip')+':'" label-cols="3" label-size="sm">
           <b-input-group>
-            <b-form-input type="text" @change="searchZip($event)" :value="project.zip1" placeholder="Enter zip code" size="sm"
+            <b-form-input type="text" @change="searchZip($event)" :value="project.zip1" :placeholder="$t('projects.ezip')" size="sm" :name="nohash"
               :disabled="disablefild('pzip1', id)" @focus.native="changeDisable('f', 'pzip1', id)" @blur.native="changeDisable('b', 'pzip1', id)" :id="'pzip1'+id"  />
              
-                <b-form-select value-field="code" text-field="name" size="sm"
+                <b-form-select value-field="code" text-field="name" size="sm" :name="nohash"
               :value="selectedCornty.code" :options="countries" @change="updateProject('country', $event)"/>
        
           </b-input-group>
@@ -95,25 +84,25 @@
         <b-tooltip triggers="none" :show="disablefild('pzip', id)" :target="'pzip'+id">
           {{disablefildUser('pzip', id)}}
         </b-tooltip>
-        <b-form-group label="Area:" label-cols="3" label-size="sm">
-          <b-form-input type="text" @change="updateProject('area', $event)" :value="project.area" placeholder="Enter area" size="sm"
+        <b-form-group :label="$t('projects.area')+':'" label-cols="3" label-size="sm">
+          <b-form-input type="text" @change="updateProject('area', $event)" :value="project.area" :placeholder="$t('projects.earea')" size="sm" :name="nohash"
           :disabled="disablefild('parea', id)" @focus.native="changeDisable('f', 'parea', id)" @blur.native="changeDisable('b', 'parea', id)" :id="'parea'+id"  />
         </b-form-group>
         <b-tooltip triggers="none" :show="disablefild('parea', id)" :target="'parea'+id">
           {{disablefildUser('parea', id)}}
         </b-tooltip>
-        <b-form-group label="City:" label-cols="3" label-size="sm">
-          <b-form-input  type="text" @change="updateProject('city1', $event)" :value="project.city1" size="sm"
-          placeholder="Enter city" :disabled="disablefild('pcity1', id)" @focus.native="changeDisable('f', 'pcity', id)"
+        <b-form-group :label="$t('customerDetail.city')+':'" label-cols="3" label-size="sm">
+          <b-form-input  type="text" @change="updateProject('city1', $event)" :value="project.city1" size="sm" :name="nohash"
+          :placeholder="$t('projects.ecity')" :disabled="disablefild('pcity1', id)" @focus.native="changeDisable('f', 'pcity', id)"
           @blur.native="changeDisable('b', 'pcity1', id)" :id="'pcity1'+id"  />
         </b-form-group>
         <b-tooltip triggers="none" :show="disablefild('pcity', id)" :target="'pcity'+id">
           {{disablefildUser('pcity', id)}}
         </b-tooltip>
-        <b-form-group label="Street:" label-cols="3" label-size="sm">
+        <b-form-group :label="$t('customerDetail.street')+':'" label-cols="3" label-size="sm">
           <b-input-group>
             <b-form-input type="text" @change="updateProject('street1', $event)" :value="project.street1"
-            placeholder="Enter street" :disabled="disablefild('pstreet1', id)" size="sm"
+            :placeholder="$t('projects.estreet')" :disabled="disablefild('pstreet1', id)" size="sm" :name="nohash"
             @focus.native="changeDisable('f', 'pstreet1', id)" @blur.native="changeDisable('b', 'pstreet1', id)" :id="'pstreet1'+id" />
               <template #append><b-icon icon="pin-map" aria-hidden="true" @click="$emit('openmap')" class="m-1" /></template>
           </b-input-group>
@@ -123,17 +112,34 @@
         </b-tooltip>
       </b-col>
     </b-row>
+    <b-alert
+      :show="dismissCountDown"
+      dismissible
+      variant="success"
+      @dismissed="dismissCountDown=0"
+      @dismiss-count-down="countDownChanged"
+    >
+      <p>{{$t('projectDetail.wasSendFor')}} {{textOfSend}}</p>
+      <b-progress
+      variant="warning"
+      :max="dismissSecs"
+      :value="dismissCountDown"
+      height="4px"
+      ></b-progress>
+    </b-alert>
     <hr />
     <b-row>
       <b-col>
         <b-button class="customButton" @click="addSameModal()" size="sm">
-          Add Offer
+         {{$t('project.addOffer')}}
         </b-button>
         <b-button class="customButton" @click="showCommetnts" :disabled="!tmp.id"  size="sm">
-          Show comments
+          {{$t('project.showComments')}}
         </b-button>
-        <b-dropdown  text="Link For Workers" class="customDrop"  size="sm">
-          <b-dropdown-item  v-for="item in workersForSend" :key="item.id" v-clipboard="'https://'+detecthost()+'/#/project/user/'+id+'/'+item.value" >
+        <b-dropdown  :text="$t('project.linkForWorkers')" class="customDrop"  size="sm" :disabled="dislink">
+          <!-- <b-dropdown-item :disabled="dislink" v-for="item in workersForSend" :key="item.id" @click="$emit('linkForWorkers', item.value)" > -->
+            <b-dropdown-item :disabled="dislink" v-for="item in workersForSend" :key="item.id" @click="$emit('linkForWorkers', item.value)" >
+            <!-- v-clipboard="'https://'+detecthost()+'/#/project/user/'+id+'/'+item.value+'/'+"  -->
             {{item.text}}
           </b-dropdown-item>
         </b-dropdown>
@@ -147,12 +153,12 @@
 
     <div class="text-center text-info" v-show="typesForTables.length==0">
             <b-spinner class="align-middle" ></b-spinner>
-            <strong>Loading...</strong>
+            <strong>{{$t('projects.loading')}}...</strong>
           </div>
 
     <div v-for="name in typesForTables" v-if="getItems(name.type)!=''">
-        {{name.type}}
-      <b-table :items="getItems(name.type)" hover  small 
+        {{$t('alert.'+name.type)}}
+      <b-table :items="getItems(name.type)" hover  small :tbody-tr-class="rowClass" stacked="lg"
       :fields="fieldsTable" @row-clicked="inItemGetData">
 
         <template #cell(number)="it">
@@ -161,7 +167,7 @@
               <b-link @click.stop="findRow(' | '+it.item.number.split(' ')[4], name.type)" class="fa fa-clone fa-w-16"  />
               {{it.item.number.split(' ')[0]}} - {{it.item.number.split(' ')[3]}}
             </span>
-            <span v-else  class="text-content">
+            <span v-else class="text-content">
               <b-link @click.stop="findRow(it.item.number, name.type)" class="fa fa-clone fa-w-16"  />
                 {{
                   countDigitals(it.item.number.split(' ')[1])
@@ -170,15 +176,15 @@
                 }}
             </span>
           </div>
-          <div v-if="((name.type=='Orders') && (it.item.number.split(' ').length==1))"  class="text-container">
-            <b-link v-if="(it.item.id==((getItems('Orders')[it.index+1])?getItems('Orders')[it.index+1].number.split(' ')[1]:''))"
+          <div v-if="((name.type=='Orders' || name.type=='StandingOrder') && (it.item.number.split(' ').length==1))"  class="text-container">
+            <b-link v-if="(it.item.id==((getItems(name.type)[it.index+1])?getItems(name.type)[it.index+1].number.split(' ')[1]:''))"
             class="hidenotlg" style="text-decoration:none;font-size:14px;vertical-align:top;" @click="showsub(it.item.id, (showsubarr.indexOf(it.item.id)==-1)?'+':'-')">
               {{(showsubarr.indexOf(it.item.id)==-1)?'+':'-'}} 
             </b-link>
-            {{it.item.number.split(' ')[0]+'' }} 
+          {{it.item.number.split(' ')[0]+'' }} 
           </div>
-          <div v-if="((name.type=='Orders') && (it.item.number.split(' ').length==3))"  class="text-container">
-            <span class="text-content"> &nbsp;  &nbsp;  &nbsp; {{it.item.number.split(' ')[0]}}</span>
+          <div v-if="((name.type=='Orders' || name.type=='StandingOrder') && (it.item.number.split(' ').length==3))"  class="text-container">
+           <span class="text-content"> &nbsp;  &nbsp;  &nbsp;  {{it.item.number.split(' ')[0]}}</span>
           </div>
           <div v-if="name.type=='Damage Description'"  class="text-container">
             <span  class="text-content">{{ it.item.number.split(' ')[0] }}</span>
@@ -194,7 +200,6 @@
             </b-link>
         </template>
         <template #cell(status_set)="it">
-
             <line-chart :datas="dataCharts(it.item)" :height="50" style="max-width:200px;" v-if="name.type=='Invoices'"/>
             <b-form-select v-else  size="sm" v-model="it.item.status_set" @change="updateItem($event, 'status_set', it.item.id)"
             :style="computeStyleOffer(it.item.status_set)">
@@ -227,9 +232,6 @@
             <span  class="text-content"> {{data.item.other}}</span>
           </div>
         </template>
-
-
-
       </b-table>
     </div>
   </b-container>
@@ -242,64 +244,77 @@ export default {
   components: {
     VueEditor,
   },
-  props: ['projectfild', 'project',
+  props: ['projectfild', 'project', 'dislink',
   'id', 'tmp', 'itemsTable', 'showsubarr',
    'availablePersons', 'responseFiles', 'selrow',
   'area', 'typesForTables', 'availablePhons', 
   'availableMails', 'countries', 'selectedCornty', 
   'looks', 'workersForSend', 'selectCustomer', 
   'selectPerson', 'selectMail', 'selectPhone'],
-  data(){
-    return{
-      fieldsTable: [
+    data() {
+      return {
+        textOfSend:'',
+        dismissSecs: 10,
+        dismissCountDown: 0,
+        showDismissibleAlert: false
+      }
+    },
+    computed: {
+    nohash(){
+      return Math.random().toString(36).slice(2)
+    },
+    fieldsTable() {
+      return [
         {
           key: 'number',
-          label: 'Number',
+          label: this.$t('fields.number'),
           sortable: true
           // class: 'pn'
         },
         {
           key: 'date',
-          label: 'Date',
+          label: this.$t('customerDetail.date'),
           sortable: true
           // class: 'st'
         },
         {
           key: 'insurance_number',
-          label: 'Insurance',
+          label: this.$t('edit.insurance'),
           sortable: true
         },
         {
           key: 'other',
-          label: "Order",
+          label: this.$t('lists.order'),
           sortable: true
         },
         {
           key: 'netto',
-          label: 'Netto',
+          label: this.$t('edit.netto'),
           sortable: true
           // class: 'text-lg-right'
         },
         {
           key: 'brutto',
-          label: 'Brutto',
+          label: this.$t('edit.brutto'),
           sortable: true
           // class: 'text-lg-right'
         },
         {
           key: 'status_set',
-          label: 'Status',
+          label: this.$t('fields.status'),
           sortable: true
           // class: 'status text-left'
         },
         {
           key: 'delete',
-          label: 'Delete'
+          label: 'X'
           // class: 'delete'
           // class: 'text-center'
         }
-      ],
-      options: [{
+      ]},
+
+      options(){ 
+        return [{
         value: 'Open',
         text: 'Open'
         },
@@ -307,13 +322,21 @@ export default {
           value: 'Done',
           text: 'Done'
         }
-      ],
+      ]
     }
   },
   methods: {
-    detecthost(){
-      return window.location.host
+    countDownChanged(dismissCountDown) {
+        this.dismissCountDown = dismissCountDown
     },
+    showAlert(mail) {
+        this.textOfSend = mail
+        this.dismissCountDown = this.dismissSecs
+    },
+    rowClass(item, type) {
+        if (!item || type !== 'row') return
+        if (item._rowVariant == 'secondary') return 'table-success'
+       },
     get_contact(id){
       this.$emit('getcontact', id)
     },
@@ -327,13 +350,13 @@ export default {
       this.$emit('addSameModal')
     },
     updateItem(val, type, id){
-      axios.get('/update_item_from_project', {
-        params: {
+      axios.post('/update_item_from_project', 
+        {
           val: val,
           type: type,
           id: id
         }
-      }).then(response => {})
+      ).then(response => {})
     },
     searchZip(val){
       axios.get('https://maps.google.com/maps/api/geocode/json', {
@@ -368,6 +391,7 @@ export default {
         date: newData,
         fild: fild
       }).then(response => {
+        // console.log(this.id, newData, fild)
         if (fild == 'other'){
           axios.post('/updateProject', {
             
@@ -547,7 +571,7 @@ export default {
     summFromRow(row, brutto){ 
       var result = 0
       row.op.forEach((v)=>{
-        result = parseInt(result) + parseInt(v.value)
+        result = parseFloat(result) + parseFloat(v.value)
       })
       if (result>brutto){
         result = brutto

@@ -2,12 +2,16 @@ from sqlbuilder.smartsql import Q, T
 from sqlbuilder.smartsql.dialects import mysql
 from .api import Database, DictCursor
 import json
+import requests
 from os import path
+
+from calendar import monthrange
 
 from datetime import datetime as dt
 import datetime
 from base64 import b64encode
-
+import re
+###
 import asyncio
 import nest_asyncio
 nest_asyncio.apply()
@@ -49,11 +53,12 @@ class User:
                 .selectall())
 
     @classmethod
-    async def select_profile(cls, login, company_id):
+    async def select_profile(cls, login, subDomain):
         return {
             'account': await cls.select_by_login(login),
             'roles': await cls.select_roles_by_login(login),
-            'selected-company': await Company.select_by_id(company_id),
+            'available-companies': await Company.select_by_login(login),
+            'selected-company': await Company.select_by_subDomain(subDomain),
             'access-user': await PermissionSchema.select_by_login(login),
             'access-role': await PermissionSchema.select_by_login(login)
         }
@@ -89,22 +94,29 @@ class Company:
     async def select_by_login(cls, login):
         async with database.query() as Q:
             return await (Q()
-                .tables((T.company & T.user & T.m2m_user_company).on(
+                .tables((T.company & T.user & T.m2m_user_company & T.application & T.m2m_company_application).on(
                     (T.company.id == T.m2m_user_company.company_id) &
-                    (T.user.id == T.m2m_user_company.user_id)
+                    (T.user.id == T.m2m_user_company.user_id) &
+                    (T.application.id == T.m2m_company_application.application_id) &
+                    (T.m2m_company_application.company_id == T.company.id)
                 ))
-                .fields(T.company.id, T.company.name)
+                .fields(T.company.id, T.company.name, T.application.link)
                 .where(T.user.login == login)
                 .selectall())
 
     @classmethod
-    async def select_by_id(cls, id):
+    async def select_by_subDomain(cls, subDomain):
         async with database.query() as Q:
-            return await (Q()
-                .tables(T.company)
-                .fields(T.company.name)
-                .where(T.company.id == id)
-                .selectone())
+             return (await (Q(T.application & T.m2m_company_application & T.company).on(
+                (T.application.id == T.m2m_company_application.application_id) &
+                (T.m2m_company_application.company_id == T.company.id))
+                .fields(
+                    T.company.name
+                )
+                .where(T.application.link == 'https://'+subDomain+'.awe.do')
+                .selectone()))
+
+
 
 #####start Sub
 class Sub:
@@ -314,212 +326,212 @@ class Sub:
                      }))
         return ''
 
-    @classmethod
-    async def select_project_new(cls, id):
-        async with database.query() as Q:
-            result = (await (Q()
-                .tables(T.sub_items & T.type_for_table).on(T.sub_items.type == T.type_for_table.id)
-                .fields(
-                    T.sub_items.id,
-                    T.sub_items.number,
-                    T.sub_items.date,
-                    T.sub_items.other,
-                    T.sub_items.place,
-                    T.sub_items.insurance_number,
-                    T.sub_items.work,
-                    T.sub_items.status_set,
-                    T.type_for_table.type,
-                    T.sub_items.tax,
-                    T.sub_items.taxDub,
-                    T.sub_items.taxP,
-                    T.sub_items.taxPDub,
-                    T.sub_items.disc,
-                    T.sub_items.discP,
-                    T.sub_items.butDiscPerc,
-                    T.sub_items.addtaxColapse,
-                    T.sub_items.dateEvent,
-                    T.sub_items.dateInspect,
-                    T.sub_items.ExamWorker
-                )
-                .where(T.sub_items.project_id == id)
-                .selectall()))
+    # @classmethod
+    # async def select_project_new(cls, id):
+    #     async with database.query() as Q:
+    #         result = (await (Q()
+    #             .tables(T.sub_items & T.type_for_table).on(T.sub_items.type == T.type_for_table.id)
+    #             .fields(
+    #                 T.sub_items.id,
+    #                 T.sub_items.number,
+    #                 T.sub_items.date,
+    #                 T.sub_items.other,
+    #                 T.sub_items.place,
+    #                 T.sub_items.insurance_number,
+    #                 T.sub_items.work,
+    #                 T.sub_items.status_set,
+    #                 T.type_for_table.type,
+    #                 T.sub_items.tax,
+    #                 T.sub_items.taxDub,
+    #                 T.sub_items.taxP,
+    #                 T.sub_items.taxPDub,
+    #                 T.sub_items.disc,
+    #                 T.sub_items.discP,
+    #                 T.sub_items.butDiscPerc,
+    #                 T.sub_items.addtaxColapse,
+    #                 T.sub_items.dateEvent,
+    #                 T.sub_items.dateInspect,
+    #                 T.sub_items.ExamWorker
+    #             )
+    #             .where(T.sub_items.project_id == id)
+    #             .selectall()))
 
-            result1 = ( await (Q()
-                .tables(T.sub_items )
-                .fields(
-                    T.sub_items.id,
-                    T.sub_items.number
-                )
-                .selectall()))
+    #         result1 = ( await (Q()
+    #             .tables(T.sub_items )
+    #             .fields(
+    #                 T.sub_items.id,
+    #                 T.sub_items.number
+    #             )
+    #             .selectall()))
 
-            balance = ( await (Q()
-                .tables(T.rows_for_balance)
-                .fields(
-                    T.rows_for_balance.id,
-                    T.rows_for_balance.type,
-                    T.rows_for_balance.value,
-                    T.rows_for_balance.date,
-                    T.rows_for_balance.invoice_id
-                )
-                .selectall()))
-            for item in result:
+    #         balance = ( await (Q()
+    #             .tables(T.rows_for_balance)
+    #             .fields(
+    #                 T.rows_for_balance.id,
+    #                 T.rows_for_balance.type,
+    #                 T.rows_for_balance.value,
+    #                 T.rows_for_balance.date,
+    #                 T.rows_for_balance.invoice_id
+    #             )
+    #             .selectall()))
+    #         for item in result:
                 
-                if (item['type'] == 'Damage Description'):
-                   # print(item['type'])
-                   result.remove(item)
+    #             if (item['type'] == 'Damage Description'):
+    #                # print(item['type'])
+    #                result.remove(item)
 
-            for item in result:
-                id =  item['number'].split(' ')
-                if len(id)==2:
-                    for number in result1:
-                        if int(id[1]) == number['id']: 
-                            item['contract_number']=number['number']
+    #         for item in result:
+    #             id =  item['number'].split(' ')
+    #             if len(id)==2:
+    #                 for number in result1:
+    #                     if int(id[1]) == number['id']: 
+    #                         item['contract_number']=number['number']
 
-            for item in result:
-                ops=[]
-                for bal in balance:
-                    if item['id']==bal['invoice_id']: 
-                        ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
-                item['op'] = ops
+    #         for item in result:
+    #             ops=[]
+    #             for bal in balance:
+    #                 if item['id']==bal['invoice_id']: 
+    #                     ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
+    #             item['op'] = ops
  
-            cOffer=0
-            cCounract=0
-            cDamage=0
+    #         cOffer=0
+    #         cCounract=0
+    #         cDamage=0
 
-            for item in result:    
-                if item['tax']==None:
-                    item['tax']='0,0'
-                if item['taxDub']==None:
-                    item['taxDub']='0,0'
-                if item['taxP']==None:
-                    item['taxP']='0,0'
-                if item['taxPDub']==None:
-                    item['taxPDub']='0,0'
-                if item['disc']==None:
-                    item['disc']='0,0'
-                if item['discP']==None:
-                    item['discP']='0,0'
-                if item['butDiscPerc']==None:
-                    item['butDiscPerc']='%'
-                if item['addtaxColapse']==None:
-                    item['addtaxColapse']='false'
+    #         for item in result:    
+    #             if item['tax']==None:
+    #                 item['tax']='0,0'
+    #             if item['taxDub']==None:
+    #                 item['taxDub']='0,0'
+    #             if item['taxP']==None:
+    #                 item['taxP']='0,0'
+    #             if item['taxPDub']==None:
+    #                 item['taxPDub']='0,0'
+    #             if item['disc']==None:
+    #                 item['disc']='0,0'
+    #             if item['discP']==None:
+    #                 item['discP']='0,0'
+    #             if item['butDiscPerc']==None:
+    #                 item['butDiscPerc']='%'
+    #             if item['addtaxColapse']==None:
+    #                 item['addtaxColapse']='false'
 
-                tax=(item['tax'].replace(',', '.'))
-                taxDub=(item['taxDub'].replace(',', '.'))
-                taxP=(item['taxP'].replace(',', '.'))
-                taxPDub=(item['taxPDub'].replace(',', '.'))
-                disc=(item['disc'].replace(',', '.'))
-                discP=(item['discP'].replace(',', '.'))
-                butDiscPerc=item['butDiscPerc']
-                addtaxColapse=item['addtaxColapse']
+    #             tax=(item['tax'].replace(',', '.'))
+    #             taxDub=(item['taxDub'].replace(',', '.'))
+    #             taxP=(item['taxP'].replace(',', '.'))
+    #             taxPDub=(item['taxPDub'].replace(',', '.'))
+    #             disc=(item['disc'].replace(',', '.'))
+    #             discP=(item['discP'].replace(',', '.'))
+    #             butDiscPerc=item['butDiscPerc']
+    #             addtaxColapse=item['addtaxColapse']
 
-                netto = 0
-                addt = 0
-                addt2 = 0
-                tables =(await (Q()
-                        .tables(T.sub_tables)
-                        .fields(
-                            T.sub_tables.id,
-                            T.sub_tables.name
-                        )
-                        .where(T.sub_tables.item_id == item['id'])
-                        .selectall()))
-                add = 0
-                for val in tables:
-                    rows =(await (Q()
-                                .tables(T.sub_rows_for_table)
-                                .fields(
-                                    T.sub_rows_for_table.count,
-                                    T.sub_rows_for_table.price,
-                                    T.sub_rows_for_table.summa,
-                                    T.sub_rows_for_table.status,
-                                    T.sub_rows_for_table.alttax,
-                                    T.sub_rows_for_table.without,
-                                    T.sub_rows_for_table.unit
-                                )
-                                .where(T.sub_rows_for_table.table_id == val['id'])
-                                .selectall()))
+    #             netto = 0
+    #             addt = 0
+    #             addt2 = 0
+    #             tables =(await (Q()
+    #                     .tables(T.sub_tables)
+    #                     .fields(
+    #                         T.sub_tables.id,
+    #                         T.sub_tables.name
+    #                     )
+    #                     .where(T.sub_tables.item_id == item['id'])
+    #                     .selectall()))
+    #             add = 0
+    #             for val in tables:
+    #                 rows =(await (Q()
+    #                             .tables(T.sub_rows_for_table)
+    #                             .fields(
+    #                                 T.sub_rows_for_table.count,
+    #                                 T.sub_rows_for_table.price,
+    #                                 T.sub_rows_for_table.summa,
+    #                                 T.sub_rows_for_table.status,
+    #                                 T.sub_rows_for_table.alttax,
+    #                                 T.sub_rows_for_table.without,
+    #                                 T.sub_rows_for_table.unit
+    #                             )
+    #                             .where(T.sub_rows_for_table.table_id == val['id'])
+    #                             .selectall()))
                     
-                    for row in rows:
-                        if row['count']==None:
-                            row['count'] = '0'
-                        if row['price']==None:
-                            row['price'] = '0'
+    #                 for row in rows:
+    #                     if row['count']==None:
+    #                         row['count'] = '0'
+    #                     if row['price']==None:
+    #                         row['price'] = '0'
 
-                        if row['unit']=='%':
-                                row['count']=1
-                        if row['status']=='yes':
+    #                     if row['unit']=='%':
+    #                             row['count']=1
+    #                     if row['status']=='yes':
                             
-                            try:
-                               a = float(row['price'])
-                            except ValueError:
-                               row['price'] = 0
-                            netto += (float(row['count'])*float(row['price']))
-                            if row['without']=='true':
-                                add += (float(row['count'])*float(row['price']) / 100) * float(discP)
+    #                         try:
+    #                            a = float(row['price'])
+    #                         except ValueError:
+    #                            row['price'] = 0
+    #                         netto += (float(row['count'])*float(row['price']))
+    #                         if row['without']=='true':
+    #                             add += (float(row['count'])*float(row['price']) / 100) * float(discP)
 
-                            # print(row['alttax'])
-                            if row['alttax']!='true':
-                                addt += (float(row['count'])*float(row['price']))
-                            else:
-                                addt2 += (float(row['count'])*float(row['price']))
+    #                         # print(row['alttax'])
+    #                         if row['alttax']!='true':
+    #                             addt += (float(row['count'])*float(row['price']))
+    #                         else:
+    #                             addt2 += (float(row['count'])*float(row['price']))
                             
 
 
            
-                if netto==0:
-                    netto=1
-                if butDiscPerc=='%':
-                    # print(netto, add)
-                    # netto = netto + add
-                    item['netto']=str(netto-(netto/100*float(discP)))
-                    # print(item['netto'])
-                    item['netto']=float(item['netto'])+add
-                    # print(item['netto'], add)
+    #             if netto==0:
+    #                 netto=1
+    #             if butDiscPerc=='%':
+    #                 # print(netto, add)
+    #                 # netto = netto + add
+    #                 item['netto']=str(netto-(netto/100*float(discP)))
+    #                 # print(item['netto'])
+    #                 item['netto']=float(item['netto'])+add
+    #                 # print(item['netto'], add)
 
-                    addt = addt-(addt/100)*float(discP)
-                    addt2 = addt2-(addt2/100)*float(discP)
+    #                 addt = addt-(addt/100)*float(discP)
+    #                 addt2 = addt2-(addt2/100)*float(discP)
                 
-                else:
+    #             else:
 
-                    item['netto']=str(netto-float(discP))
+    #                 item['netto']=str(netto-float(discP))
                     
-                    addt = addt-(addt/100)*float(discP)*100/netto
-                    addt2 = addt2-(addt2/100)*float(discP)*100/netto
+    #                 addt = addt-(addt/100)*float(discP)*100/netto
+    #                 addt2 = addt2-(addt2/100)*float(discP)*100/netto
                 
-                #addt = addt2 = 0
-                # item['netto']=0
+    #             #addt = addt2 = 0
+    #             # item['netto']=0
 
-                #tmpTax = (addt * (float(taxP) / 100))
-                #tmpTax2= (addt2 * (float(taxPDub) / 100))
+    #             #tmpTax = (addt * (float(taxP) / 100))
+    #             #tmpTax2= (addt2 * (float(taxPDub) / 100))
     
-                item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
+    #             item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
                 
-                if (item['type'] == 'Offers'):
-                    cOffer=cOffer+1
-                    if(len(str(cOffer))<2):
-                        nOffer = '0'+str(cOffer)
-                    item['number'] = item['number'] + '-' + nOffer
+    #             if (item['type'] == 'Offers'):
+    #                 cOffer=cOffer+1
+    #                 if(len(str(cOffer))<2):
+    #                     nOffer = '0'+str(cOffer)
+    #                 item['number'] = item['number'] + '-' + nOffer
                 
-                if (item['type'] == 'Contracts'):
-                    cCounract=cCounract+1
-                    if(len(str(cCounract))<2):
-                        nCounract = '0'+str(cCounract)
-                    item['number'] = item['number'] + '-' + nCounract
+    #             if (item['type'] == 'Contracts'):
+    #                 cCounract=cCounract+1
+    #                 if(len(str(cCounract))<2):
+    #                     nCounract = '0'+str(cCounract)
+    #                 item['number'] = item['number'] + '-' + nCounract
 
                         
-                if (item['type'] == 'Damage Description'):
-                    cDamage=cDamage+1
-                    item['number']=item['number'].split(' ')[0]
-                    if(len(str(cDamage))<2):
-                        nDamage = '0'+str(cDamage)
-                    item['number'] = item['number'] + '-' + nDamage
+    #             if (item['type'] == 'Damage Description'):
+    #                 cDamage=cDamage+1
+    #                 item['number']=item['number'].split(' ')[0]
+    #                 if(len(str(cDamage))<2):
+    #                     nDamage = '0'+str(cDamage)
+    #                 item['number'] = item['number'] + '-' + nDamage
 
 
-                # item['brutto']=str(item['brutto']).replace('.',',')
-                # item['netto']=str(item['netto']).replace('.',',')
-            # print(result)
-            return result
+    #             # item['brutto']=str(item['brutto']).replace('.',',')
+    #             # item['netto']=str(item['netto']).replace('.',',')
+    #         # print(result)
+    #         return result
 
 
     @classmethod
@@ -1270,29 +1282,29 @@ class Sub:
                 .fields(T.changeDisableTableSub.id, T.changeDisableTableSub.fild, T.changeDisableTableSub.rows_id, T.changeDisableTableSub.user)
                 .selectall())
 
-    @classmethod
-    async def change_type(cls, id, type):
-        async with database.query() as Q:
-            number=(await (Q()
-                    .tables(T.sub_items)
-                    .fields(
-                        T.sub_items.number
-                    )
-                    .where(T.sub_items.id == id)
-                    .selectone()))
-            type_id =(await (Q()
-                    .tables(T.type_for_table)
-                    .fields(
-                        T.type_for_table.id
-                    )
-                    .where(T.type_for_table.type == type)
-                    .selectone()))
-            return await (Q()
-                .tables(T.sub_items)
-                .where(T.sub_items.id == id)
-                .update({
-                    T.sub_items.type: type_id['id']
-                }))
+    # @classmethod
+    # async def change_type(cls, id, type):
+    #     async with database.query() as Q:
+    #         number=(await (Q()
+    #                 .tables(T.sub_items)
+    #                 .fields(
+    #                     T.sub_items.number
+    #                 )
+    #                 .where(T.sub_items.id == id)
+    #                 .selectone()))
+    #         type_id =(await (Q()
+    #                 .tables(T.type_for_table)
+    #                 .fields(
+    #                     T.type_for_table.id
+    #                 )
+    #                 .where(T.type_for_table.type == type)
+    #                 .selectone()))
+    #         return await (Q()
+    #             .tables(T.sub_items)
+    #             .where(T.sub_items.id == id)
+    #             .update({
+    #                 T.sub_items.type: type_id['id']
+    #             }))
 
 
     @classmethod
@@ -1833,9 +1845,46 @@ class Project:
     @classmethod
     async def select_project(cls, id):
         async with database.query() as Q:
-            result= (await (Q()
-                .tables((T.project & T.user & T.customer & T.person))
-                .on((T.project.user_id == T.user.id) & (T.project.customer_id == T.customer.id) & (T.project.person_id == T.person.person))
+            # print(id)
+            # result= (await (Q()
+            #     .tables((T.project & T.user & T.customer  & T.mail & T.person))
+            #     .on(
+            #     (T.project.user_id == T.user.id)&
+            #     (T.project.customer_id == T.customer.id)&
+            #     (T.project.person_id == T.person.person)&
+            #     (T.customer.id == T.mail.customer)
+            #     )
+            #     .fields(
+            #         T.project.project_number_year,
+            #         T.project.id,
+            #         T.project.project_number,
+            #         T.project.date,
+            #         T.project.edate,
+            #         T.project.street1,
+            #         T.project.city1,
+            #         T.project.zip1,
+            #         T.customer.street,
+            #         T.customer.city,
+            #         T.customer.zip,
+            #         T.project.area,
+            #         T.project.country,
+            #         T.project.customer_id,
+            #         T.project.person_id,
+            #         T.project.mail,
+            #         T.project.phone,
+            #         T.project.other,
+            #         T.user.first_name,
+            #         T.user.second_name,
+            #         T.user.mail.as_('userMail'),
+            #         T.customer.name,
+            #         T.person.appeal,
+            #         T.person.names,
+            #         T.mail.mail.as_('customerMail')
+            #     ).where(T.project.id == id)
+            #     .selectone()))
+
+            project= (await (Q()
+                .tables(T.project)
                 .fields(
                     T.project.project_number_year,
                     T.project.id,
@@ -1845,9 +1894,6 @@ class Project:
                     T.project.street1,
                     T.project.city1,
                     T.project.zip1,
-                    T.customer.street,
-                    T.customer.city,
-                    T.customer.zip,
                     T.project.area,
                     T.project.country,
                     T.project.customer_id,
@@ -1855,12 +1901,100 @@ class Project:
                     T.project.mail,
                     T.project.phone,
                     T.project.other,
+                    T.project.user_id,
+                    T.project.customer_id,
+                    T.project.person_id,
+                ).where(T.project.id == id)
+                .selectone()))
+
+            user= (await (Q()
+                .tables(T.user)
+                .fields(
                     T.user.first_name,
                     T.user.second_name,
-                    T.customer.name,
+                    T.user.mail
+                ).where(T.user.id == project['user_id'])
+                .selectone()))
+
+            customer= (await (Q()
+                .tables(T.customer)
+                .fields(
+                    T.customer.id,
+                    T.customer.street,
+                    T.customer.city,
+                    T.customer.zip,
+                    T.customer.name
+                ).where(T.customer.id == project['customer_id'])
+                .selectone()))
+
+            person= (await (Q()
+                .tables(T.person)
+                .fields(
                     T.person.appeal,
                     T.person.names
-                ).where(T.project.id == id)
+                ).where(T.person.person == project['person_id'])
+                .selectone()))
+
+            if person == None:
+                person = {'appeal':'', 'names':''}
+
+
+            mail= (await (Q()
+                .tables(T.mail)
+                .fields(
+                    T.mail.mail
+                ).where(T.mail.customer == customer['id'])
+                .selectone()))
+
+            if mail == None:
+                mail = {'mail':''}
+            result = {
+                'project_number_year': project['project_number_year'],
+                'id': project['id'],
+                'project_number': project['project_number'],
+                'date': project['date'],
+                'edate': project['edate'],
+                'street1': project['street1'],
+                'city1': project['city1'],
+                'zip1': project['zip1'],
+                'area': project['area'],
+                'country': project['country'],
+                'customer_id': project['customer_id'],
+                'person_id': project['person_id'],
+                'mail': project['mail'],
+                'phone': project['phone'],
+                'other': project['other'],
+                'first_name':user['first_name'],
+                'second_name':user['second_name'],
+                'userMail': user['mail'],
+                'street': customer['street'],
+                'city': customer['city'],
+                'zip': customer['zip'],
+                'name': customer['name'],
+                'appeal': person['appeal'],
+                'names': person['names'],
+                'customerMail': mail['mail']
+                }
+
+            # print(result)
+
+            return result
+
+    @classmethod
+    async def project_user(cls, id):
+        async with database.query() as Q:
+            year = int(id.split('-')[1])
+            number = int(id.split('-')[0])
+            result= (await (Q()
+                .tables(T.project & T.user)
+                .on(T.project.user_id == T.user.id)
+                .fields(
+                    T.project.project_number_year,
+                    T.project.id,
+                    T.project.project_number,
+                    T.user.first_name,
+                    T.user.second_name,
+                ).where((T.project.project_number == number)&(T.project.project_number_year == year))
                 .selectone()))
             # print (result)
             return (result)
@@ -2172,6 +2306,8 @@ class Project:
                     if much['name'] == customer['name']:
                         coutn_much=idx
                 if coutn_much==-1:
+                    if customer['city']==None:
+                        customer['city'] = ''
                     result.append({'id': customer['id'], 'name': customer['name'], 'adress':customer['street'],
                         'adress1':customer['zip']+' '+customer['city'], 'persons': [{'label': customer['names'],
                         'mail': mail, 'tel' : phone, 'fax': fax, 'id' : customer['person']}]})
@@ -2211,16 +2347,47 @@ class Project:
                 .selectall())
 
     @classmethod
-    async def add_part(cls, part_name, item_id):
+    async def add_part(cls, parts_names, item_id, pid, ws_clients):
         async with database.query() as Q:
+            parse_parts_names = json.loads(parts_names)
+            # print(parse_parts_names)
+            for index, part_names in enumerate(parse_parts_names):
+
+                nameofpart = part_names['nameofpart']
+                if (nameofpart=='' or nameofpart==' ' or nameofpart==None):
+                    nameofpart = 'nameless'
+                if part_names['folderInDocumentsCheck']==True:
+                    folderInDocuments = part_names['folderInDocuments']
+                    if (folderInDocuments=='' or folderInDocuments==' ' or folderInDocuments==None):
+                        folderInDocuments = 'nameless'
+                else:
+                    folderInDocuments = False
+
+                if part_names['folderInImagesCheck']==True:
+                    folderInImages = part_names['folderInImages']
+                    if (folderInImages=='' or folderInImages==' ' or folderInImages==None):
+                        folderInImages = 'nameless'
+                else:
+                    folderInImages = False
+# add_docs_menu?parent_id=-1&project=142
                 await (Q()
                     .tables(T.tables)
                     .insert({
-                        T.tables.name: part_name,
+                        T.tables.name: nameofpart,
                         T.tables.item_id: item_id,
                         T.tables.obj: '',
                         T.tables.selected: ''
                     }))
+                if folderInDocuments != False:
+                    await Docs.add_docs_menu(-1, pid, folderInDocuments)
+                if folderInImages != False:
+                    await Docs.add_images_menu(-1, pid, folderInImages)
+
+
+
+            for client in ws_clients:
+                await client.send_str('getProjectDetail')
+                await client.send_str('getDocs')
         return ''
 
     @classmethod
@@ -2415,7 +2582,7 @@ class Projects:
             return await (Q()
                         .tables(T.content_for_factory)
                         .fields(T.content_for_factory.content)
-                        .where((T.content_for_factory.id == 2))
+                        .where((T.content_for_factory.id == 2) | (T.content_for_factory.id == 10) | (T.content_for_factory.id == 12) | (T.content_for_factory.id == 13) | (T.content_for_factory.id == 14))
                         .selectall())
 
     @classmethod
@@ -2425,6 +2592,7 @@ class Projects:
         async with database.query() as Q:
             done = param[0]
             notdone = param[1]
+            auto = param[2]
             # print(done+' '+notdone)
 
             n_result = []
@@ -2445,12 +2613,15 @@ class Projects:
                             ).order_by(T.project.id.desc()).selectall()))
                             # ).order_by(T.project.id.desc()).selectall()))
                             # ).order_by(T.project.id.desc())[:int(page) * 30].selectall()))
-            
+            # result['StandingOrder']='0'
+            # plans = []
             for index, item in enumerate(result):
+                plans = []
                 # print(str(index)+' - '+str(item['id']))
 
                 subItem = (await (Q(T.items)
                             .fields(
+                                 T.items.id,
                                  T.items.status_set,
                                  T.items.type,
                                  T.items.project_id, #del
@@ -2458,6 +2629,7 @@ class Projects:
                             )
                             .where(T.items.project_id==item['id'])
                             .selectall()))
+
 
                 count = 0
                 lencount = len(subItem)
@@ -2467,30 +2639,107 @@ class Projects:
                     item['place'] = subItem[0]['place']
                 
                 # print(item)
+                plans = []
+
                 for status in subItem:
+                        # result['StandingOrder']='1'
                     if(len(subItem)>0):
                         if (item['place'] != status['place']):
                             item['place'] = 'Different places'
                     # if (status['type']==1):
                         # lencount = lencount + 1
-                    if (status['type']==3):
+                    if (status['type']==30):
                         lencount = lencount - 1
 
-                    if (status['type']==6):
+                    if (status['type']==60):
                         lencount = lencount - 1
 
-                    if (status['type']==4):
+                    if (status['type']==40):
                         lencount = lencount - 1
 
                     if status['status_set']=='Done':
-                        if (status['type']!=3):
-                            if (status['type']!=6):
-                                if (status['type']!=4):
+                        if (status['type']!=30):
+                            if (status['type']!=60):
+                                if (status['type']!=40):
                                     count = count + 1
                                 
-
+                # if(subItem == ()):
+                #     status = {'type':15, 'id': 0}
                 # print('('+str(count)+'/'+str(lencount)+') '+str(item['id']))
+                    if (status['type']==15):
+                        subPlan = (await (Q(T.plansend)
+                            .fields(
+                                T.plansend.id,
+                                T.plansend.period,
+                                T.plansend.lastsend,
+                                T.plansend.lastSendShown,
+                                T.plansend.autosend,
+                                T.plansend.pushToWorkDays,
+                                T.plansend.to
+                            )
+                            .where(T.plansend.itemid==status['id'])
+                            .selectone()))
 
+                        if(subPlan!=None):
+                            # subPlan = {'lastsend':'2023-01-01 00:00:00', 'autosend':'0', 'period' : '01', 'pushToWorkDays': '0'}
+
+                            lastsend = datetime.datetime.strptime(subPlan['lastsend'], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
+                            fulllastsend = datetime.datetime.strptime(subPlan['lastsend'], "%Y-%m-%d %H:%M:%S")
+                            
+                            if subPlan['lastSendShown']==None:
+                                lastSendShown = datetime.datetime.strptime('2023-01-01 00:00:00', "%Y-%m-%d %H:%M:%S")
+                            else:
+                                lastSendShown = datetime.datetime.strptime(subPlan['lastSendShown'], "%Y-%m-%d %H:%M:%S")
+                            
+                            dataforperiod = datetime.datetime.now().strftime("%Y-%m-%d")
+
+                            current_year = datetime.datetime.now().year
+                            month = int(datetime.datetime.now().strftime("%m"))
+
+                            days = monthrange(current_year, month)[1]
+                            dataOfSend = subPlan['period']
+                            if subPlan['period'] == 'mstart':
+                                dataOfSend = '01'
+                            if subPlan['period'] == 'mmidle':
+                                dataOfSend = days // 2
+                            if subPlan['period'] == 'mend':
+                                dataOfSend = days
+
+                            if subPlan['pushToWorkDays']=='1':
+                                weekDay = int(datetime.datetime.isoweekday(datetime.datetime.strptime(str(dataforperiod.split('-')[0])+'-'+str(dataforperiod.split('-')[1])+'-'+str(dataOfSend), "%Y-%m-%d")))
+                                if (weekDay>5):
+                                    if subPlan['period'] == 'mend':
+                                        dataOfSend = int(dataOfSend)-(weekDay-5)
+                                    else:    
+                                        dataOfSend = int(dataOfSend)+(8-weekDay)
+                                    # print(dataOfSend)
+
+                            if len(str(dataOfSend))==1:
+                                dataOfSend = '0'+dataOfSend
+                           
+                            period = str(dataforperiod.split('-')[0])+'-'+str(dataforperiod.split('-')[1])+'-'+str(dataOfSend)
+                            nowData = datetime.datetime.now().strftime("%Y-%m-%d")
+                            # print('###########')
+                            if (period < nowData): # дата отправки прошла
+                                # print('дата отправки прошла')
+                                if(lastsend < period): #пропущено
+                                    # print('пропущено')
+                                    subPlan['datasent'] = (fulllastsend>lastSendShown)
+                                    subPlan['lastSendShown'] = datetime.datetime.strptime(subPlan['lastsend'], "%Y-%m-%d %H:%M:%S").strftime("%d.%m.%Y")
+                                    subPlan['lastsend'] = 'missed'
+                            if (period > nowData): # дата отправки еще не наступила
+                                # print('дата отправки еще не наступила')
+                                subPlan['datasent'] = (fulllastsend>lastSendShown)
+                                subPlan['lastSendShown'] = datetime.datetime.strptime(subPlan['lastsend'], "%Y-%m-%d %H:%M:%S").strftime("%d.%m.%Y")
+                                subPlan['lastsend'] = 'not missed'
+                            if(lastsend == '2023-01-02'):
+                                subPlan['datasent'] = (fulllastsend>lastSendShown)
+                                subPlan['lastSendShown'] = datetime.datetime.strptime(subPlan['lastsend'], "%Y-%m-%d %H:%M:%S").strftime("%d.%m.%Y")
+                                subPlan['lastsend'] = 'not set'
+                            # print(subPlan['id'])
+                            # print('###########')   
+                            plans.append(subPlan)
+                        
                 if (lencount!=0):
                     if (count>=lencount):
                         if (done==str(1)):
@@ -2498,16 +2747,31 @@ class Projects:
                             n_result.append(item)
                     else:
                         if (notdone==str(1)):
-                            item['_rowVariant']=''
-                            n_result.append(item)
+                            if (status['type']==15):
+                                if (auto==str(1)):
+                                    # item['_rowVariant']='warning'
+                                    item['subPlan']=plans
+                                    n_result.append(item)
+                            else:
+                                item['_rowVariant']=''
+                                item['subPlan']=plans
+                                n_result.append(item)
                 else:
                     if (notdone==str(1)):
-                        item['_rowVariant']=''
-                        n_result.append(item)
+                        # if (status['type']==15):
+                            # if (auto==str(1)):
+                                # item['subPlan']=plans
+                                # item['_rowVariant']='warning'
+                                # n_result.append(item)
+                        # else:
+                            item['_rowVariant']=''
+                            n_result.append(item)
+                # print(plans)
             # page= int(page) * 30
             # print(page)
 # [:int(page)]
         # print(result)
+        # print(n_result)
         return n_result
 
     @classmethod
@@ -2537,7 +2801,8 @@ class Projects:
                     T.items.dateEvent,
                     T.items.dateInspect,
                     T.items.ExamWorker,
-                    T.items.comment
+                    T.items.comment,
+                    T.items.add_number
                 )
                 .where(T.items.project_id == id)
                 .selectall()))
@@ -2560,6 +2825,7 @@ class Projects:
                     T.rows_for_balance.invoice_id
                 )
                 .selectall()))
+
             for item in result:
                 
                 if (item['type'] == 'Damage Description'):
@@ -2688,6 +2954,7 @@ class Projects:
                                a = float(row['price'])
                             except ValueError:
                                row['price'] = 0
+
                             netto += (float(row['count'])*float(row['price']))
 
 
@@ -2695,7 +2962,7 @@ class Projects:
 
 
 
-                                # print(str(row['count'])+'*'+str(row['price'])+'='+str(float(row['count'])*float(row['price'])))
+                            # print(str(row['count'])+'*'+str(row['unit'])+'*'+str(row['price'])+'='+str(float(row['count'])+'*'+str(row['unit'])+'*'+float(row['price'])))
 
 
                             if row['without']=='true':
@@ -2739,17 +3006,33 @@ class Projects:
     
                 item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
                 
+
+
+ 
+
+
                 if (item['type'] == 'Offers'):
-                    cOffer=cOffer+1
-                    if(len(str(cOffer))<2):
-                        nOffer = '0'+str(cOffer)
-                    item['number'] = item['number'] + '-' + nOffer
+                    if item['add_number']!=None:
+                        item['number'] = item['number'] + '-' +str(item['add_number'])
+                    else:
+                        item['number'] = item['number']
                 
-                if (item['type'] == 'Contracts'):
-                    cCounract=cCounract+1
-                    if(len(str(cCounract))<2):
-                        nCounract = '0'+str(cCounract)
-                    item['number'] = item['number'] + '-' + nCounract
+                if (item['type'] == 'Orders'):
+                    if item['add_number']!=None:
+                        item['number'] = item['number'] + '-' +str(item['add_number'])
+                    else:
+                        item['number'] = item['number']
+
+                if (item['type'] == 'StandingOrder'):
+                    if item['add_number']!=None:
+                        item['number'] = item['number'] + '-' +str(item['add_number'])
+                    else:
+                        item['number'] = item['number']
+                # if (item['type'] == 'Contracts'):
+                #     cCounract=cCounract+1
+                #     if(len(str(cCounract))<2):
+                #         nCounract = '0'+str(cCounract)
+                #     item['number'] = item['number'] + '-' + nCounract
 
                         
                 if (item['type'] == 'Damage Description'):
@@ -2759,7 +3042,7 @@ class Projects:
                         nDamage = '0'+str(cDamage)
                     item['number'] = item['number'] + '-' + nDamage
 
-
+                # print(item['type'])
                 # item['brutto']=str(item['brutto']).replace('.',',')
                 # item['netto']=str(item['netto']).replace('.',',')
             # print(result)
@@ -3173,14 +3456,11 @@ class Projects:
                             .fields(
                                 T.measure_protocol.id,
                                 T.measure_protocol.table_id,
-                                T.measure_protocol.sminsurface,
-                                T.measure_protocol.smaxsurface,
-                                T.measure_protocol.smindepth,
-                                T.measure_protocol.smaxdepth,
-                                T.measure_protocol.fminsurface,
-                                T.measure_protocol.fmaxsurface,
-                                T.measure_protocol.fmindepth,
-                                T.measure_protocol.fmaxdepth
+                                T.measure_protocol.room,
+                                T.measure_protocol.install_surface,
+                                T.measure_protocol.install_deep,
+                                T.measure_protocol.uninstall_surface,
+                                T.measure_protocol.uninstall_deep
                             )
                             .where(T.measure_protocol.table_id == val['id'])
                             .selectall()))
@@ -3376,7 +3656,6 @@ class Projects:
                     )
                     .where(T.items.project_id == id)
                     .selectall()))
-
                 result = list()              
                 files=(await (Q()
                     .tables(T.files)
@@ -3389,7 +3668,8 @@ class Projects:
                         # T.files.pages,
                         T.files.group,
                         T.files.added,
-                        T.files.user
+                        T.files.user,
+                        T.files.folder_id
                     )
                     .where(T.files.number == project)
                     .selectall()))
@@ -3405,7 +3685,7 @@ class Projects:
                             user = 'Undefind'
                         else:
                             user =  val['user']
-                        img={'id':'/image?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':user, 'group':group, '_rowVariant':''}
+                        img={'id':'/image?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':user, 'group':group, '_rowVariant':'', 'folder_id':val['folder_id']}
                         result.append(img)
                 # print(files, project)
 
@@ -3531,7 +3811,9 @@ class Projects:
                     #         user = 'Undefind'
                     #     else:
                     #         user =  val['user']
-                        content={'id':'/image_customer?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
+                        content={'id':'/image_customer?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':val['user'], 'group':val['group'], '_rowVariant':'', 'folder_id':val['folder_id']}
+                        # content={'id':'/image_customer?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':user, 'group':group, '_rowVariant':'', 'folder_id':val['folder_id']}
+                        # content={'id':'/image_customer?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
                         result.append(content)
                     else:
                         content={'id':str(val['id']), 'name':val['name'], 'added':val['added'], 'user':val['user'],
@@ -3575,7 +3857,8 @@ class Projects:
                     #         user = 'Undefind'
                     #     else:
                     #         user =  val['user']
-                        content={'id':'/image_person?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
+                        content={'id':'/image_person?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':val['user'], 'group':val['group'], '_rowVariant':'', 'folder_id':val['folder_id']}
+                        # content={'id':'/image_person?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
                         result.append(content)
                     else:
                         content={'id':str(val['id']), 'name':val['name'], 'added':val['added'], 'user':val['user'], 'group':'',
@@ -3618,7 +3901,8 @@ class Projects:
                     #         user = 'Undefind'
                     #     else:
                     #         user =  val['user']
-                        content={'id':'/image_sub?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
+                        # content={'id':'/image_sub?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
+                        content={'id':'/image_sub?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':val['user'], 'group':val['group'], '_rowVariant':'', 'folder_id':val['folder_id']}
                         result.append(content)
                     else:
                         content={'id':str(val['id']), 'name':val['name'], 'added':val['added'], 'user':val['user'], 'group':'',
@@ -3660,7 +3944,8 @@ class Projects:
                     #         user = 'Undefind'
                     #     else:
                     #         user =  val['user']
-                        content={'id':'/image_sperson?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
+                        content={'id':'/image_sperson?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':val['user'], 'group':val['group'], '_rowVariant':'', 'folder_id':val['folder_id']}
+                        # content={'id':'/image_sperson?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'user':val['user']}
                         result.append(content)
                     else:
                         content={'id':str(val['id']), 'name':val['name'], 'added':val['added'], 'user':val['user'], 'group':'',
@@ -3684,23 +3969,301 @@ class Projects:
                     .where(T.images_for_group_damages.group_id == id)
                     .selectall())
               
+    # @classmethod
+    # async def change_type(cls, id, type):
+    #     async with database.query() as Q:
+    #         type_id =(await (Q()
+    #                 .tables(T.type_for_table)
+    #                 .fields(
+    #                     T.type_for_table.id
+    #                 )
+    #                 .where(T.type_for_table.type == type)
+    #                 .selectone()))
+    #         return await (Q()
+    #             .tables(T.items)
+    #             .where(T.items.id == id)
+    #             .update({
+    #                 T.items.type: type_id['id']
+    #             }))
+
+
     @classmethod
     async def change_type(cls, id, type):
         async with database.query() as Q:
             type_id =(await (Q()
-                    .tables(T.type_for_table)
-                    .fields(
-                        T.type_for_table.id
-                    )
-                    .where(T.type_for_table.type == type)
-                    .selectone()))
-            return await (Q()
+                .tables(T.type_for_table)
+                .fields(
+                    T.type_for_table.id
+                )
+                .where(T.type_for_table.type == type)
+                .selectone()))
+
+            selected_for_item_copy = (await (Q()
                 .tables(T.items)
+                .fields(
+                    T.items.project_id,
+                    T.items.status_set,
+                    T.items.number,
+                    T.items.date,
+                    T.items.other,
+                    T.items.place,
+                    T.items.insurance_number,
+                    T.items.work,
+                    T.items.tax,
+                    T.items.taxDub,
+                    T.items.taxP,
+                    T.items.taxPDub,
+                    T.items.disc,
+                    T.items.discP,
+                    T.items.butDiscPerc,
+                    T.items.addtaxColapse,
+                    T.items.dateEvent,
+                    T.items.dateInspect,
+                    T.items.ExamWorker,
+                    T.items.comment,
+                    T.items.insurname
+                )
                 .where(T.items.id == id)
-                .update({
-                    T.items.type: type_id['id']
-                }))
+                .selectone()))
             
+            new_item_id = None
+            max_item_id = (await (Q(T.items)
+                .fields(
+                    T.items.id
+                ).order_by(T.items.id.desc())
+                .selectone()))
+
+            for id_from_item in range(1, max_item_id['id']):
+                check_id = (await (Q()
+                .tables(T.items)
+                .fields(
+                    T.items.id
+                )
+                .where(T.items.id == id_from_item)
+                .selectone()))
+                if check_id==None:
+                    new_item_id = id_from_item
+                    break
+            if new_item_id == None:
+                new_item_id = max_item_id['id'] + 1
+            
+            new_offer_number = None
+
+            if type == 'Offers':
+                itmes_numbers = (await (Q(T.items)
+                    .fields(
+                        T.items.add_number
+                    ).where((T.items.project_id == selected_for_item_copy['project_id']) & (T.items.type == 10))
+                    .order_by((T.items.add_number).asc()).selectall()))
+
+                # print(itmes_numbers)
+                if itmes_numbers == ():
+                    new_offer_number = 1
+                else:
+                    itmes_numbers.insert(0, {'add_number': 0})
+                    for index, number_from_item in enumerate(itmes_numbers):
+                        try:
+                            if (int(number_from_item['add_number'])+1)!=int(itmes_numbers[index+1]['add_number']):
+                                new_offer_number = ((int(number_from_item['add_number'])+1))
+                                break
+                        except IndexError:
+                            new_offer_number = int(itmes_numbers[index]['add_number'])+1
+                        except TypeError:
+                            new_offer_number = 1
+                    
+
+
+            if type == 'Orders':
+                itmes_numbers = (await (Q(T.items)
+                    .fields(
+                        T.items.add_number
+                    ).where((T.items.project_id == selected_for_item_copy['project_id']) & (T.items.type == 20))
+                    .order_by((T.items.add_number).asc()).selectall()))
+                if itmes_numbers == ():
+                    new_offer_number = 1
+                else:
+                    itmes_numbers.insert(0, {'add_number': 0})
+                    for index, number_from_item in enumerate(itmes_numbers):
+                        try:
+                            if (int(number_from_item['add_number'])+1)!=int(itmes_numbers[index+1]['add_number']):
+                                new_offer_number = ((int(number_from_item['add_number'])+1))
+                                break
+                        except IndexError:
+                            new_offer_number = int(itmes_numbers[index]['add_number'])+1
+                        except TypeError:
+                            new_offer_number = 1
+                print(new_offer_number)
+                    
+
+
+            if type == 'StandingOrder':
+                itmes_numbers = (await (Q(T.items)
+                    .fields(
+                        T.items.add_number
+                    ).where((T.items.project_id == selected_for_item_copy['project_id']) & (T.items.type == 15))
+                    .order_by((T.items.add_number).asc()).selectall()))
+
+                # print(itmes_numbers)
+                if itmes_numbers == ():
+                    new_offer_number = 1
+                else:
+                    itmes_numbers.insert(0, {'add_number': 0})
+                    for index, number_from_item in enumerate(itmes_numbers):
+                        try:
+                            if (int(number_from_item['add_number'])+1)!=int(itmes_numbers[index+1]['add_number']):
+                                new_offer_number = ((int(number_from_item['add_number'])+1))
+                                break
+                        except IndexError:
+                            new_offer_number = int(itmes_numbers[index]['add_number'])+1
+                        except TypeError:
+                            new_offer_number = 1
+
+
+
+            await (Q()
+                .tables(T.items)
+                .insert({
+                    T.items.id: new_item_id,
+                    T.items.project_id:selected_for_item_copy['project_id'],
+                    T.items.status_set:selected_for_item_copy['status_set'],
+                    T.items.number:selected_for_item_copy['number'],
+                    T.items.date:selected_for_item_copy['date'],
+                    T.items.other:selected_for_item_copy['other'],
+                    T.items.place:selected_for_item_copy['place'],
+                    T.items.insurance_number:selected_for_item_copy['insurance_number'],
+                    T.items.work:selected_for_item_copy['work'],
+                    T.items.type:type_id['id'],
+                    T.items.tax:selected_for_item_copy['tax'],
+                    T.items.taxDub:selected_for_item_copy['taxDub'],
+                    T.items.taxP:selected_for_item_copy['taxP'],
+                    T.items.taxPDub:selected_for_item_copy['taxPDub'],
+                    T.items.disc:selected_for_item_copy['disc'],
+                    T.items.discP:selected_for_item_copy['discP'],
+                    T.items.butDiscPerc:selected_for_item_copy['butDiscPerc'],
+                    T.items.addtaxColapse:selected_for_item_copy['addtaxColapse'],
+                    T.items.dateEvent:selected_for_item_copy['dateEvent'],
+                    T.items.dateInspect:selected_for_item_copy['dateInspect'],
+                    T.items.ExamWorker:selected_for_item_copy['ExamWorker'],
+                    T.items.comment:selected_for_item_copy['comment'],
+                    T.items.insurname:selected_for_item_copy['insurname'],
+                    T.items.add_number:new_offer_number
+                }))
+
+            selected_for_table_copy = (await (Q()
+                .tables(T.tables)
+                .fields(
+                    T.tables.id,
+                    T.tables.name,
+                    T.tables.item_id,
+                    T.tables.obj,
+                    T.tables.selected,
+                    T.tables.device
+                )
+                .where(T.tables.item_id == id)
+                .selectall()))
+
+            for table in selected_for_table_copy:
+                new_table_id = None
+                max_table_id = (await (Q(T.tables)
+                    .fields(
+                        T.tables.id
+                    ).order_by(T.tables.id.desc())
+                    .selectone()))
+
+                for id_from_tables in range(1, max_table_id['id']):
+                    check_id = (await (Q()
+                    .tables(T.tables)
+                    .fields(
+                        T.tables.id
+                    )
+                    .where(T.tables.id == id_from_tables)
+                    .selectone()))
+                    if check_id==None:
+                        new_table_id = id_from_tables
+                        break
+
+                if new_table_id == None:
+                    new_table_id = max_table_id['id'] + 1
+
+                await (Q()
+                    .tables(T.tables)
+                    .insert({
+                        T.tables.id:new_table_id,
+                        T.tables.name:table['name'],
+                        T.tables.item_id:new_item_id,
+                        T.tables.obj:table['obj'],
+                        T.tables.selected:table['selected'],
+                        T.tables.device:table['device']
+                    }))
+
+
+                selected_for_rows_copy = (await (Q()
+                    .tables(T.rows_for_table)
+                    .fields(
+                        T.rows_for_table.count,
+                        T.rows_for_table.status,
+                        T.rows_for_table.alttax,
+                        T.rows_for_table.summa,
+                        T.rows_for_table.unit,
+                        T.rows_for_table.without,
+                        T.rows_for_table.done,
+                        T.rows_for_table.description_head,
+                        T.rows_for_table.description_work,
+                        T.rows_for_table.description_from_price,
+                        T.rows_for_table.discount,
+                        T.rows_for_table.position_number,
+                        T.rows_for_table.price,
+                        T.rows_for_table.table_id
+                    )
+                    .where(T.rows_for_table.table_id == table['id'])
+                    .selectall()))
+
+                for row in selected_for_rows_copy:
+                    new_row_id = None
+                    max_row_id = (await (Q(T.rows_for_table)
+                        .fields(
+                            T.rows_for_table.id
+                        ).order_by(T.rows_for_table.id.desc())
+                        .selectone()))
+
+                    for id_from_rows in range(1, max_row_id['id']):
+                        check_id = (await (Q()
+                        .tables(T.rows_for_table)
+                        .fields(
+                            T.rows_for_table.id
+                        )
+                        .where(T.rows_for_table.id == id_from_rows)
+                        .selectone()))
+                        if check_id==None:
+                            new_row_id = id_from_rows
+                            break
+
+                    if new_row_id == None:
+                        new_row_id = max_row_id['id'] + 1
+
+                    await (Q()
+                        .tables(T.rows_for_table)
+                        .insert({
+                        T.rows_for_table.id:new_row_id,
+                        T.rows_for_table.count:row['count'],
+                        T.rows_for_table.status:row['status'],
+                        T.rows_for_table.alttax:row['alttax'],
+                        T.rows_for_table.summa:row['summa'],
+                        T.rows_for_table.unit:row['unit'],
+                        T.rows_for_table.without:row['without'],
+                        T.rows_for_table.done:row['done'],
+                        T.rows_for_table.description_head:row['description_head'],
+                        T.rows_for_table.description_work:row['description_work'],
+                        T.rows_for_table.description_from_price:row['description_from_price'],
+                        T.rows_for_table.discount:row['discount'],
+                        T.rows_for_table.position_number:row['position_number'],
+                        T.rows_for_table.price:row['price'],
+                        T.rows_for_table.table_id:new_table_id,
+                        }))
+                # print(new_table_id, new_item_id)
+            return ''
+
+
             
     @classmethod
     async def get_types_for_tables(cls):
@@ -3717,11 +4280,15 @@ class Projects:
                     .fields(
                         T.project.project_number
                     ).order_by(T.project.id.desc()).selectone()))
+            if (nums == None):
+                start = 1
+            else:
+                start = (nums['project_number']+1)
             await (Q()
                   .tables(T.project)
                   .insert({
                   T.project.project_number_year: year,
-                  T.project.project_number: (nums['project_number']+1),
+                  T.project.project_number: start,
                   T.project.date: date,
                   T.project.user_id: user, 
                   T.project.street1: street,
@@ -3820,6 +4387,59 @@ class Projects:
                 .fields(T.changeDisableTable.id, T.changeDisableTable.fild, T.changeDisableTable.rows_id, T.changeDisableTable.user)
                 .selectall())
 
+    @classmethod
+    async def select_part(cls, type, mode):
+        async with database.query() as Q:
+            done = ''
+            if mode[0] == '1':
+                done = 'Done'
+            data = mode.split('|')
+
+            if (data[1]=='0000-00-00'):
+                fromData = (datetime.datetime.now() + datetime.timedelta(days = -365)).strftime("%Y-%m-%d")
+            else:    
+                fromData = data[1]
+
+            if (data[2]=='0000-00-00'):
+                toData = datetime.datetime.now().strftime("%Y-%m-%d")
+            else:    
+                toData = data[2]
+            n_result = []
+
+            result = (await (Q()
+                .tables(T.items)
+                .fields(
+                    T.items.id,
+                    T.items.project_id,
+                    T.items.status_set,
+                    T.items.number,
+                    T.items.date,
+                    T.items.other,
+                    T.items.place,
+                    T.items.insurance_number,
+                    T.items.work
+                        # T.items.tax,
+                        # T.items.taxDub,
+                        # T.items.taxP,
+                        # T.items.taxPDub,
+                        # T.items.disc,
+                        # T.items.discP,
+                        # T.items.butDiscPerc,
+                        # T.items.addtaxColapse,
+                        # T.items.dateEvent,
+                        # T.items.dateInspect,
+                        # T.items.ExamWorker,
+                        # T.items.comment,
+                        # T.items.insurname
+                    )
+                    .where((T.items.type == type)&((T.items.status_set == 'Open')|(T.items.status_set == done)))
+                .selectall()))
+
+            for item in result:
+                if (datetime.datetime.strptime(fromData, '%Y-%m-%d').date() < datetime.datetime.strptime(item['date'], '%Y-%m-%d').date() <= datetime.datetime.strptime(toData, '%Y-%m-%d').date()):
+                    n_result.append(item)
+
+            return n_result
         
 
 class Offer:
@@ -3932,8 +4552,21 @@ class Invoice:
         return sendResult
 
     @classmethod
-    async def add_invoice(cls, id, type, number, newRange):
+    async def add_invoice(cls, id, type, number, newRange, labelForDelete):
         async with database.query() as Q:
+
+            remove = 0
+            if type=='removeInvoices':
+                type = 'Invoices'
+                remove = 1
+
+            autoText = (await (Q()
+                .tables(T.content_for_factory)
+                .fields(
+                    T.content_for_factory.content
+                )
+                .where(T.content_for_factory.id == 11)
+                .selectone()))
 
             types = ( await (Q()
                 .tables(T.type_for_table)
@@ -3942,8 +4575,9 @@ class Invoice:
                 )
                 .where(T.type_for_table.type == type)
                 .selectone())
-            )         
-
+            )
+            # print(1)         
+            # print(types)
 
             result = ( await (Q()
                 .tables(T.items)
@@ -3971,7 +4605,16 @@ class Invoice:
                 .where(T.items.id == id)
                 .selectone())
              )
+            if remove == 1:
+                newNuber = result['number'].split(' ')[1]
+                maskNumber = newNuber
+                for x in range(int(4-len(str(newNuber)))): 
+                    maskNumber = '0' + str(maskNumber)
+                oldInvoiceNumber = maskNumber
             
+            # autoText['content'] = labelForDelete+': '+oldInvoiceNumber+'<br><br><br>'+autoText['content']
+            # print(2)         
+            # print(result)
             # number_documents = result['number']+' '+str(result['id'])
             number_documents = result['number'].split('-')[0]+'-'+datetime.datetime.now().strftime("%Y")+' '+str(result['id'])
             
@@ -3996,9 +4639,12 @@ class Invoice:
                        T.items.disc: result['disc'],
                        T.items.discP: result['discP'],
                        T.items.butDiscPerc: result['butDiscPerc'],
-                       T.items.addtaxColapse: result['addtaxColapse']
+                       T.items.addtaxColapse: result['addtaxColapse'],
+                       T.items.comment: autoText['content']
                        # T.items.year: datetime.datetime.now().strftime("%Y"),
                     }))
+            # print(3)         
+            # print('insert')
 
             invoiceIdx = ( await (Q()
                 .tables(T.items)
@@ -4008,15 +4654,19 @@ class Invoice:
                 .where(T.items.number == number_documents)
                 .selectall())
              )
+            # print(4)         
+            # print(invoiceIdx)
             invoiceId = invoiceIdx[len(invoiceIdx)-1]
 
             if type=='Invoices':
-
                 if (newRange=='true'):
                       await (Q()
                         .tables(T.number_for_invoice)
                         .where(T.number_for_invoice.id != 0)
                         .delete())
+                        
+                # print(5)         
+                # print('delete')
 
                 await (Q()
                         .tables(T.number_for_invoice)
@@ -4024,7 +4674,10 @@ class Invoice:
                             T.number_for_invoice.item_id : invoiceId['id'],
                             T.number_for_invoice.id : number
                         }))
-            
+
+                # print(6)         
+                # print('insert')
+
                 numberInvoice = ( await (Q()
                     .tables(T.number_for_invoice)
                     .fields(
@@ -4033,6 +4686,9 @@ class Invoice:
                     .where(T.number_for_invoice.item_id == invoiceId['id'])
                     .selectone())
                 )
+                # print(7)         
+                # print(numberInvoice)
+
 
                 await (Q()
                         .tables(T.items)
@@ -4040,7 +4696,10 @@ class Invoice:
                         .update({
                             T.items.number: result['number'].split('-')[0]+'-'+datetime.datetime.now().strftime("%Y")+' '+str(numberInvoice['id'])+' '+str(result['id'])
                         }))
-                
+
+                # print(8)
+                # print('update')
+
             if type=='SUB':
                 await (Q()
                         .tables(T.items)
@@ -4069,6 +4728,10 @@ class Invoice:
                 .where(T.tables.item_id == id)
                 .selectall()))
 
+            # print(9)
+            # print('update')
+
+
             for val in resultTables:
                     resultData = ( await (Q()
                     .tables(T.rows_for_table)
@@ -4092,6 +4755,9 @@ class Invoice:
                     .where(T.rows_for_table.table_id == val['id'])
                     .selectall())
                     )
+                    
+                    # print(10)
+                    # print(resultData)
 
                     if type == 'Damage Description':
                         sel = number.split(',')
@@ -4112,6 +4778,10 @@ class Invoice:
                             .selectone())
                         )
 
+                        # print(11)
+                        # print(gropupId)
+
+
                         for index, row in enumerate(resultData):
                             number = number.replace(' ', '')
                             val['name'] = val['name'].replace(' ', '')
@@ -4126,6 +4796,8 @@ class Invoice:
                                             T.task_for_damages.name : row['description_head'],
                                             T.task_for_damages.table_id : gropupId['id']
                                         }))
+                                    # print(12)
+
                     else:
                         if type!='SUB':
                             await (Q()
@@ -4146,6 +4818,7 @@ class Invoice:
                             .where((T.tables.name == val['name']) & (T.tables.item_id == invoiceId['id']))
                             .selectone())
                             )
+                            # print(13)
 
                             resultFiles = ( await (Q()
                             .tables(T.files)
@@ -4161,6 +4834,7 @@ class Invoice:
                             .where(T.files.group == val['id'])
                             .selectall())
                              )
+                            # print(14)
 
                             for file in resultFiles:
                                 await (Q()
@@ -4175,12 +4849,18 @@ class Invoice:
                                     T.files.added: file['added'],
                                     T.files.group: tableId['id']
                                 }))
+                            # print(15)
 
                             for row in resultData:
-                                    await (Q()
+                                if remove == 1:
+                                    count = '-'+row['count']
+                                if remove == 0:
+                                    count = row['count']
+
+                                await (Q()
                                     .tables(T.rows_for_table)
                                     .insert({
-                                        T.rows_for_table.count : row['count'],
+                                        T.rows_for_table.count : count,
                                         T.rows_for_table.status : row['status'],
                                         T.rows_for_table.alttax : row['alttax'],
                                         T.rows_for_table.summa : row['summa'],
@@ -4195,6 +4875,8 @@ class Invoice:
                                         T.rows_for_table.price : row['price'],
                                         T.rows_for_table.table_id : tableId['id']
                                     }))
+                            # print(16)
+
 
         return ''
 
@@ -4230,6 +4912,29 @@ class add_same:
                         )
                     .where(T.type_for_table.type == type)
                     .selectone()))
+
+                itmes_numbers = (await (Q(T.items)
+
+                    .fields(
+                        T.items.add_number
+                    ).where((T.items.project_id == add_project_id) & (T.items.type == 10))
+                    .order_by((T.items.add_number).asc()).selectall()))
+
+
+                new_offer_number = None
+                for index, number_from_item in enumerate(itmes_numbers):
+                    try:
+                        if (int(number_from_item['add_number'])+1)!=int(itmes_numbers[index+1]['add_number']):
+                            new_offer_number = ((int(number_from_item['add_number'])+1))
+                            break
+                    except IndexError:
+                        new_offer_number = int(itmes_numbers[index]['add_number'])+1
+                    except TypeError:
+                        new_offer_number = None
+                    
+                if itmes_numbers == ():
+                    new_offer_number = 1
+
                 return await (Q()
                     .tables(T.items)
                     .insert({
@@ -4247,7 +4952,8 @@ class add_same:
                         T.items.date: datetime.datetime.now().strftime("%Y-%m-%d"),
                         T.items.status_set: 'Open',
                         T.items.project_id: add_project_id,
-                        T.items.type: type_id['id']
+                        T.items.type: type_id['id'],
+                        T.items.add_number: new_offer_number,
                     }))
 class Del_offer:
     @classmethod
@@ -4314,6 +5020,7 @@ class Offers:
                 .selectall())
 
 
+
 class Docs:
     @classmethod
     async def mv_docs(cls, docs_ids, files_ids, new):
@@ -4336,6 +5043,34 @@ class Docs:
                     }))
 
             return ''
+
+    @classmethod
+    async def mv_images(cls, files_ids, new):
+        async with database.query() as Q:
+            # print(files_ids, new)    
+            for file_id in files_ids.split(","):
+                await (Q()
+                    .tables(T.files)
+                    .where(T.files.id == file_id)
+                    .update({
+                        T.files.folder_id: new
+                    }))
+
+            return ''
+
+    # @classmethod
+    # async def mv_sub_images(cls, files_ids, new):
+    #     async with database.query() as Q:
+    #         # print(files_ids, new)    
+    #         for file_id in files_ids.split(","):
+    #             await (Q()
+    #                 .tables(T.files_to_sub)
+    #                 .where(T.files_to_sub.id == file_id)
+    #                 .update({
+    #                     T.files_to_sub.folder_id: new
+    #                 }))
+
+    #         return ''
 
     @classmethod
     async def mv_files_sub(cls, files_ids, new):
@@ -4419,6 +5154,61 @@ class Docs:
                 .selectall())
 
     @classmethod
+    async def images_menu(cls, project):
+        async with database.query() as Q:
+            return await (Q(T.images_menu)
+                .fields(
+                    T.images_menu.id,
+                    T.images_menu.name,
+                    T.images_menu.parrent)
+                .where(T.images_menu.project == project)
+                .selectall())
+
+    @classmethod
+    async def images_sub_menu(cls, project):
+        async with database.query() as Q:
+            return await (Q(T.images_sub_menu)
+                .fields(
+                    T.images_sub_menu.id,
+                    T.images_sub_menu.name,
+                    T.images_sub_menu.parrent)
+                .where(T.images_sub_menu.project == project)
+                .selectall())
+
+    @classmethod
+    async def images_customer_menu(cls, project):
+        async with database.query() as Q:
+            return await (Q(T.images_customer_menu)
+                .fields(
+                    T.images_customer_menu.id,
+                    T.images_customer_menu.name,
+                    T.images_customer_menu.parrent)
+                .where(T.images_customer_menu.project == project)
+                .selectall())
+
+    @classmethod
+    async def images_person_menu(cls, project):
+        async with database.query() as Q:
+            return await (Q(T.images_person_menu)
+                .fields(
+                    T.images_person_menu.id,
+                    T.images_person_menu.name,
+                    T.images_person_menu.parrent)
+                .where(T.images_person_menu.project == project)
+                .selectall())
+
+    @classmethod
+    async def images_customer_person_menu(cls, project):
+        async with database.query() as Q:
+            return await (Q(T.images_customer_person_menu)
+                .fields(
+                    T.images_customer_person_menu.id,
+                    T.images_customer_person_menu.name,
+                    T.images_customer_person_menu.parrent)
+                .where(T.images_customer_person_menu.project == project)
+                .selectall())
+
+    @classmethod
     async def docs_sub_menu(cls, project):
         async with database.query() as Q:
             return await (Q(T.docs_sub_menu)
@@ -4497,15 +5287,102 @@ class Docs:
                 .selectall())
 
     @classmethod
-    async def add_docs_menu(cls, parent_id, project):
+    async def add_docs_menu(cls, parent_id, project, newName):
         async with database.query() as Q:
             return await (Q(T.docs_menu)
                 .tables(T.docs_menu)
                 .insert({
-                    T.docs_menu.name: 'New Part',
+                    T.docs_menu.name: newName,
                     T.docs_menu.parrent: parent_id,
                     T.docs_menu.project: project
             }))
+
+
+    @classmethod
+    async def foolder_check(cls, parent_id, project, newName):
+        async with database.query() as Q:
+            parrent_check = (await (Q(T.images_menu)
+                .fields(
+                    T.images_menu.id
+                )
+                .where((T.images_menu.name == newName) &
+                (T.images_menu.id == parent_id) &
+                (T.images_menu.project == project))
+                .selectone()))
+
+            if parrent_check == None:
+                return await (Q(T.images_menu)
+                    .fields(
+                        T.images_menu.id
+                    )
+                    .where((T.images_menu.name == newName) &
+                    (T.images_menu.parrent == parent_id) &
+                    (T.images_menu.project == project))
+                    .selectone())
+            else:
+                return parrent_check
+
+    @classmethod
+    async def add_images_menu(cls, parent_id, project, newName):
+        async with database.query() as Q:
+
+            await (Q(T.images_menu)
+                .tables(T.images_menu)
+                .insert({
+                    T.images_menu.name: newName,
+                    T.images_menu.parrent: parent_id,
+                    T.images_menu.project: project
+            }))
+            return await (Q(T.images_menu)
+                .fields(
+                    T.images_menu.name,
+                    T.images_menu.id
+                )
+                .where((T.images_menu.name == newName) &
+                (T.images_menu.parrent == parent_id) &
+                (T.images_menu.project == project))
+                .selectone())
+
+    @classmethod
+    async def add_images_person_menu(cls, parent_id, project, newName):
+        async with database.query() as Q:
+
+            await (Q(T.images_person_menu)
+                .tables(T.images_person_menu)
+                .insert({
+                    T.images_person_menu.name: newName,
+                    T.images_person_menu.parrent: parent_id,
+                    T.images_person_menu.project: project
+            }))
+            return await (Q(T.images_person_menu)
+                .fields(
+                    T.images_person_menu.name
+                )
+                .where((T.images_person_menu.name == newName) &
+                (T.images_person_menu.parrent == parent_id) &
+                (T.images_person_menu.project == project))
+                .selectone())
+
+    @classmethod
+    async def add_images_sperson_menu(cls, parent_id, project, newName):
+        async with database.query() as Q:
+
+            await (Q(T.images_customer_person_menu)
+                .tables(T.images_customer_person_menu)
+                .insert({
+                    T.images_customer_person_menu.name: newName,
+                    T.images_customer_person_menu.parrent: parent_id,
+                    T.images_customer_person_menu.project: project
+            }))
+            return await (Q(T.images_customer_person_menu)
+                .fields(
+                    T.images_customer_person_menu.name
+                )
+                .where((T.images_customer_person_menu.name == newName) &
+                (T.images_customer_person_menu.parrent == parent_id) &
+                (T.images_customer_person_menu.project == project))
+                .selectone())
+
 
     @classmethod
     async def add_docs_sub_menu(cls, parent_id, project):
@@ -4516,6 +5393,28 @@ class Docs:
                     T.docs_sub_menu.name: 'New Part',
                     T.docs_sub_menu.parrent: parent_id,
                     T.docs_sub_menu.project: project
+            }))
+
+    @classmethod
+    async def add_images_sub_menu(cls, parent_id, project):
+        async with database.query() as Q:
+            return await (Q(T.images_sub_menu)
+                .tables(T.images_sub_menu)
+                .insert({
+                    T.images_sub_menu.name: 'New Part',
+                    T.images_sub_menu.parrent: parent_id,
+                    T.images_sub_menu.project: project
+            }))
+
+    @classmethod
+    async def add_images_customer_menu(cls, parent_id, project):
+        async with database.query() as Q:
+            return await (Q(T.images_customer_menu)
+                .tables(T.images_customer_menu)
+                .insert({
+                    T.images_customer_menu.name: 'New Part',
+                    T.images_customer_menu.parrent: parent_id,
+                    T.images_customer_menu.project: project
             }))
 
     @classmethod
@@ -4594,6 +5493,47 @@ class Docs:
               .delete())
 
     @classmethod
+    async def remove_image_menu(cls, remove_id):
+        async with database.query() as Q:
+            return await (Q(T.images_menu)
+              .tables(T.images_menu)
+              .where(T.images_menu.id == remove_id)
+              .delete())
+
+    @classmethod
+    async def remove_image_customer_menu(cls, remove_id):
+        async with database.query() as Q:
+            return await (Q(T.images_customer_menu)
+              .tables(T.images_customer_menu)
+              .where(T.images_customer_menu.id == remove_id)
+              .delete())
+
+    @classmethod
+    async def remove_image_person_menu(cls, remove_id):
+        async with database.query() as Q:
+            return await (Q(T.images_person_menu)
+              .tables(T.images_person_menu)
+              .where(T.images_person_menu.id == remove_id)
+              .delete())
+
+    @classmethod
+    async def remove_image_sperson_menu(cls, remove_id):
+        async with database.query() as Q:
+            return await (Q(T.images_customer_person_menu)
+              .tables(T.images_customer_person_menu)
+              .where(T.images_customer_person_menu.id == remove_id)
+              .delete())
+
+    @classmethod
+    async def remove_image_sub_menu(cls, remove_id):
+        async with database.query() as Q:
+            return await (Q(T.images_sub_menu)
+              .tables(T.images_sub_menu)
+              .where(T.images_sub_menu.id == remove_id)
+              .delete())
+
+
+    @classmethod
     async def remove_docs_sub_menu(cls, remove_id):
         async with database.query() as Q:
             return await (Q(T.docs_sub_menu)
@@ -4617,6 +5557,56 @@ class Docs:
                 .where(T.docs_menu.id == id)
                 .update({
                     T.docs_menu.name: name
+                }))
+
+    @classmethod
+    async def update_name_images_menu(cls, name, id):
+        async with database.query() as Q:
+            return await (Q(T.images_menu)
+                .tables(T.images_menu)
+                .where(T.images_menu.id == id)
+                .update({
+                    T.images_menu.name: name
+                }))
+
+    @classmethod
+    async def update_name_images_sperson_menu(cls, name, id):
+        async with database.query() as Q:
+            return await (Q(T.images_customer_person_menu)
+                .tables(T.images_customer_person_menu)
+                .where(T.images_customer_person_menu.id == id)
+                .update({
+                    T.images_customer_person_menu.name: name
+                }))
+
+    @classmethod
+    async def update_name_images_customer_menu(cls, name, id):
+        async with database.query() as Q:
+            return await (Q(T.images_customer_menu)
+                .tables(T.images_customer_menu)
+                .where(T.images_customer_menu.id == id)
+                .update({
+                    T.images_customer_menu.name: name
+                }))
+
+    @classmethod
+    async def update_name_images_person_menu(cls, name, id):
+        async with database.query() as Q:
+            return await (Q(T.images_person_menu)
+                .tables(T.images_person_menu)
+                .where(T.images_person_menu.id == id)
+                .update({
+                    T.images_person_menu.name: name
+                }))
+    
+    @classmethod
+    async def update_name_images_sub_menu(cls, name, id):
+        async with database.query() as Q:
+            return await (Q(T.images_sub_menu)
+                .tables(T.images_sub_menu)
+                .where(T.images_sub_menu.id == id)
+                .update({
+                    T.images_sub_menu.name: name
                 }))
 
     @classmethod
@@ -4815,8 +5805,9 @@ class Docs:
                 content = contentFromDataBase['content']
             else:
                 content = contentFromDataBase['newImage']
+            return content
 
-            return b64encode(content).decode()
+            # return b64encode(content).decode()
 
     @classmethod
     async def select_file(cls, id):
@@ -5042,6 +6033,7 @@ class Docs:
     @classmethod
     async def upload_doc(cls, file, name, number, number_of_pages, group, added, user, resp, folder):
             async with database.query() as Q:
+                # print(folder)
                 return await (Q()
                     .tables(T.files)
                     .insert({
@@ -5109,7 +6101,7 @@ class Docs:
                     }))
 
     @classmethod
-    async def upload_to_sub(cls, file, name, number, number_of_pages, added, user, resp, folder):
+    async def upload_to_sub(cls, file, name, number, number_of_pages, group, added, user, resp, folder):
             async with database.query() as Q:
                 return await (Q()
                     .tables(T.files_to_sub)
@@ -5212,10 +6204,1032 @@ class Docs:
                         T.damage.content: data
                     }))
 
+    @classmethod
+    async def plan_mail(cls, item, period, sender, to, subject, content, autosend, autodate, pushToWorkDays, autoperiodworks, name):
+            async with database.query() as Q:
+                return await (Q()
+                  .tables(T.plansend)
+                  .insert({
+                      T.plansend.itemid: item,
+                      T.plansend.period: period,
+                      T.plansend.sender: sender,
+                      T.plansend.to: to,
+                      T.plansend.subject: subject,
+                      T.plansend.content: content,
+                      T.plansend.autosend: autosend,
+                      T.plansend.autoDate: autodate,
+                      T.plansend.pushToWorkDays: pushToWorkDays,
+                      T.plansend.autoPeriodWorks: autoperiodworks,
+                      T.plansend.name: name,
+                      T.plansend.lastsend : '2023-01-01 00:00:00'
+                  }))
+
+    @classmethod
+    async def replan_mail(cls, item, period, sender, to, subject, content, name, autosend, autodate, pushToWorkDays, autoperiodworks, id):
+            async with database.query() as Q:
+                return await (Q()
+                  .tables(T.plansend)
+                  .where(T.plansend.id == id)
+                  .update({
+                      T.plansend.itemid: item,
+                      T.plansend.period: period,
+                      T.plansend.sender: sender,
+                      T.plansend.to: to,
+                      T.plansend.subject: subject,
+                      T.plansend.content: content,
+                      T.plansend.autosend: autosend,
+                      T.plansend.autoDate: autodate,
+                      T.plansend.pushToWorkDays: pushToWorkDays,
+                      T.plansend.autoPeriodWorks: autoperiodworks,
+                      T.plansend.name: name
+                  }))
+
+    @classmethod
+    async def remove_mail(cls, id):
+            async with database.query() as Q:
+                return await (Q()
+                  .tables(T.plansend)
+                  .where(T.plansend.id == id)
+                  .delete())
+
+    @classmethod
+    async def get_plan(cls, id):
+            async with database.query() as Q:
+                return await (Q()
+                    .tables(T.plansend)
+                    .fields(
+                        T.plansend.id,
+                        T.plansend.itemid,
+                        T.plansend.period,
+                        T.plansend.sender,
+                        T.plansend.to,
+                        T.plansend.subject,
+                        T.plansend.content,
+                        T.plansend.name,
+                        T.plansend.autosend,
+                        T.plansend.autoDate,
+                        T.plansend.autoPeriodWorks,
+                        T.plansend.lastsend,
+                        T.plansend.pushToWorkDays
+                    ).where(T.plansend.itemid == id)
+                    .selectone())
+
+    @classmethod
+    async def plan_exec(cls, id, request, ws_clients):
+            async with database.query() as Q:
+                def digit_formater(val):
+                    value = round(val * 100) / 100
+                    parts = str(value).split('.')
+                    main = parts[0]
+                    lenx = len(main)
+                    output = ''
+                    i = lenx - 1
+
+                    while (i >= 0):
+                        output = main[i] + output
+                        if (((lenx - i) % 3 == 0) & (i > 0)):
+                            output = '.' + output
+                        i -= 1
+
+                    if (len(parts) > 1):
+                        output += ',' + parts[1]
+                        if (len(parts[1])==1):
+                            output += '0'
+                    else:
+                        output += ',00'
+                       
+                    output = output.replace('-.','-')
+                    return output
+                # print(id)
+                rowPlan = (await (Q()
+                            .tables(T.plansend)
+                            .fields(
+                                T.plansend.itemid,
+                                T.plansend.period,
+                                T.plansend.sender,
+                                T.plansend.to,
+                                T.plansend.subject,
+                                T.plansend.content,
+                                T.plansend.name,
+                                T.plansend.lastsend,
+                                T.plansend.autosend,
+                                T.plansend.autoPeriodWorks,
+                                T.plansend.autoDate,
+                                T.plansend.id
+                            ).where(T.plansend.id == id)
+                            .selectone()))
+                lastsend = datetime.datetime.strptime(rowPlan['lastsend'], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
+                current_year = datetime.datetime.now().year
+                if rowPlan['autoDate']==1:
+                    today = datetime.date.today()
+                    first = today.replace(day=1)
+                    if rowPlan['autoPeriodWorks']=='current':
+                        last_month = first 
+                    if rowPlan['autoPeriodWorks']=='previous':
+                        last_month = first - datetime.timedelta(days=1)
+                    month = int(last_month.strftime("%m"))
+                    days = monthrange(current_year, month)[1]
+
+                    f_data = str(days)+'.'+str(month)+'.'+str(current_year)
+                    s_data = '01.'+str(month)+'.'+str(current_year)
+                    dataFinishWork = 'Die Arbeit wurde ausgeführt: vom '+s_data+' bis '+f_data
+                else:
+                    dataFinishWork = ''
+
+                # dataOfSend = rowPlan['period']
+                # if rowPlan['period'] == 'mstart':
+                #     dataOfSend = '1'
+                # if rowPlan['period'] == 'mmidle':
+                #     dataOfSend = '15'
+                # if rowPlan['period'] == 'mend':
+                #     dataOfSend = days
+
+                number = (await Invoice.detect_invoice())
+                newNuber = number[len(number)-1]['lastNumber']
+                await Invoice.add_invoice(rowPlan['itemid'], 'Invoices', newNuber, 'false', '')
+                numberId = (await (Q()
+                    .tables(T.number_for_invoice)
+                    .fields(T.number_for_invoice.item_id)
+                    .where(T.number_for_invoice.id == newNuber)
+                    .selectone()))['item_id']
+                itemContent = (await (Q()
+                    .tables(T.items)
+                    .fields(
+                        T.items.id,
+                        T.items.project_id,
+                        T.items.status_set,
+                        T.items.number,
+                        T.items.date,
+                        T.items.other,
+                        T.items.place,
+                        T.items.insurance_number,
+                        T.items.work,
+                        T.items.type,
+                        T.items.tax,
+                        T.items.taxDub,
+                        T.items.taxP,
+                        T.items.taxPDub,
+                        T.items.disc,
+                        T.items.discP,
+                        T.items.butDiscPerc,
+                        T.items.addtaxColapse,
+                        T.items.dateEvent,
+                        T.items.dateInspect,
+                        T.items.ExamWorker,
+                        T.items.comment,
+                        T.items.insurname
+                        )
+                    .where(T.items.id == numberId)
+                    .selectone()))
+                getProject = (await Project.select_project(itemContent['project_id']))
+                getCustomer = (await Customer.select_customer(getProject['customer_id']))
+                getTables = str(await Projects.get_tables(numberId))
+
+                allTags = re.compile(r'<.*?>')
+                escape = re.compile(r'\\xa0')
+                getTables = (allTags.sub('', getTables))
+                getTables = (escape.sub('', getTables))
+
+                getTables = getTables.replace('None', 'null').replace('False', 'false').replace('True', 'true').replace('(', '[').replace(')', ']').replace("'", '"')
+                getTables = getTables.split(', {"taxs')[0]+']'
+
+                if itemContent['tax']==None:
+                    itemContent['tax']='0,0'
+                if itemContent['taxDub']==None:
+                    itemContent['taxDub']='0,0'
+                if itemContent['taxP']==None:
+                    itemContent['taxP']='0,0'
+                if itemContent['taxPDub']==None:
+                    itemContent['taxPDub']='0,0'
+                if itemContent['disc']==None:
+                    itemContent['disc']='0,0'
+                if itemContent['discP']==None:
+                    itemContent['discP']='0,0'
+                if itemContent['butDiscPerc']==None:
+                    itemContent['butDiscPerc']='%'
+                if itemContent['addtaxColapse']==None:
+                    itemContent['addtaxColapse']='false'
+
+                tax=(itemContent['tax'].replace(',', '.'))
+                taxDub=(itemContent['taxDub'].replace(',', '.'))
+                taxP=(itemContent['taxP'].replace(',', '.'))
+                taxPDub=(itemContent['taxPDub'].replace(',', '.'))
+                disc=(itemContent['disc'].replace(',', '.'))
+                discP=(itemContent['discP'].replace(',', '.'))
+                butDiscPerc=itemContent['butDiscPerc']
+                addtaxColapse=itemContent['addtaxColapse']
+
+                netto = 0
+                addt = 0
+                addt2 = 0
+                tables =(await (Q()
+                        .tables(T.tables)
+                        .fields(
+                            T.tables.id,
+                            T.tables.name,
+                            T.tables.obj,
+                            T.tables.selected
+                        )
+                        .where(T.tables.item_id == itemContent['id'])
+                        .selectall()))
+                # print(tables)
+                add = 0
+
+                for subIndex, val in enumerate(tables):
+
+                    rows =(await (Q()
+                                .tables(T.rows_for_table)
+                                .fields(
+                                T.rows_for_table.count,
+                                T.rows_for_table.price,
+                                T.rows_for_table.summa,
+                                T.rows_for_table.status,
+                                T.rows_for_table.alttax,
+                                T.rows_for_table.without,
+                                T.rows_for_table.unit
+                                )
+                                .where(T.rows_for_table.table_id == val['id'])
+                                .selectall()))
+
+                    for row in rows:
+                        if row['count']==None:
+                            row['count'] = '0'
+                        if row['price']==None:
+                            row['price'] = '0'
+
+                        if row['unit']=='%':
+                            # if row['count']==None:
+                            #     row['count']=1
+                            # if row['count']=='0':
+                            #     row['count']=1
+                            row['price']=0
+                            summax = 0
+
+                            for obj in val['obj'].split(','):
+                                selected = ['']
+                                if not '|' in val["selected"]:
+                                    if val["selected"]!='':
+                                        selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
+                                        if ('temp' + str(subIndex + 1)) in selected[obj]:
+
+                                            for val in selected[obj].split(','):
+
+                                                val = val.split('temp')
+                                                val[1]=int(val[1])-1
+
+                                                countx = 0
+                                                pricex = 0
+                                                
+                                                countx = rows[val[1]]['count'] 
+                                                pricex = rows[val[1]]['price']
+
+                                                summax += float(countx) * float(pricex)
+                                   
+                            row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
+                            # print(persent_from_summa)
+                            # print(persent_from_summa / float(rows[(subIndex)]['count']))
+                            
+                            # print(rows[(subIndex)]['price'])
+                            
+                            row['count']=1
+                        if row['status']=='yes':
+                            
+                            try:
+                               a = float(row['price'])
+                            except ValueError:
+                               row['price'] = 0
+                            netto += (float(row['count'])*float(row['price']))
+
+
+
+
+
+
+                        # print(str(row['count'])+'*'+str(row['price'])+'='+str(float(row['count'])*float(row['price'])))
+
+
+                            if row['without']=='true':
+                                add += (float(row['count'])*float(row['price']) / 100) * float(discP)
+
+                                # print(row['alttax'])
+                            if row['alttax']!='true':
+                                addt += (float(row['count'])*float(row['price']))
+                            else:
+                                addt2 += (float(row['count'])*float(row['price']))
+
+
+
+                   
+                if netto==0:
+                    netto=1
+                if butDiscPerc=='%':
+                    # print(netto, add)
+                    # netto = netto + add
+
+                    itemContent['netto']=str(netto-(netto/100*float(discP)))
+                    # print(item['netto'])
+                    itemContent['netto']=float(itemContent['netto'])+add
+                    # print(item['netto'], add)
+
+                    addt = addt-(addt/100)*float(discP)
+                    addt2 = addt2-(addt2/100)*float(discP)
+                
+                else:
+
+                    itemContent['netto']=str(netto-float(discP))
+                    
+                    addt = addt-(addt/100)*float(discP)*100/netto
+                    addt2 = addt2-(addt2/100)*float(discP)*100/netto
+                
+
+                
+                itemContent['brutto']=str(float(itemContent['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
+
+
+
+                
+
+                maskNumber = newNuber
+
+                for x in range(int(4-len(str(newNuber)))): 
+                    maskNumber = '0' + str(maskNumber)
+
+                test = (
+                {'dateInspect': itemContent['dateInspect'],
+                                'dateEvent': itemContent['dateEvent'],
+                                'worker': '',
+                                'customerСontract': itemContent['other'],
+                                'getCustomer': getProject['name'],
+                                'getPerson': getProject['appeal']+' '+getProject['names'],
+                                'getCustomerAdress': getCustomer['street'],
+                                'getCustomerAdress1': getCustomer['zip']+' '+getCustomer['city'],
+                                'offerHead': 'Invoices',
+                                'subHead': '',
+                                'editor': getProject['first_name']+' '+getProject['second_name'],
+                                'userTel': '',
+                                'userFax': '',
+                                'userMail': getProject['userMail'],
+                                'number': maskNumber+'-'+datetime.datetime.now().strftime("%Y"),
+                                'date': datetime.datetime.now().strftime("%d.%m.%Y"),
+                                'work': itemContent['work'],
+                                'pNumber': itemContent['number'].split(' ')[0],
+                                'street': getProject['street1'],
+                                'zip': getProject['zip1'],
+                                'contry': getProject['country'],
+                                'area': getProject['area'],
+                                'city': getProject['city1'],
+                                'dateProject': '', #getProject['date'],
+                                'insurance': itemContent['insurance_number'],
+                                'insurname': itemContent['insurname'],
+                                'place': itemContent['place'],
+                                'finishWork': dataFinishWork,
+                                'stworks': 'not set',
+                                'fworks': 'not set',
+                                'inspected': 'not set',
+                                'inspectedby': '',
+                                'positions': '',
+                                'comment': itemContent['comment'],
+                                'project_id': itemContent['project_id'],
+                                'selected_docs_list': '15',
+                                'tables': getTables,
+                                'summ': digit_formater(float(itemContent['netto'])),
+                                'summ1': digit_formater(float(itemContent['netto'])),
+                                'discP': discP,
+                                'butDiscPerc': butDiscPerc,
+                                'disc': digit_formater(float(disc)),
+                                'netto': digit_formater(float(itemContent['netto'])),
+                                'taxP': taxP,
+                                'tax': digit_formater(float(itemContent['netto'])/100*(float(taxP))),
+                                'taxP2': taxPDub,
+                                'tax2': digit_formater(float(taxDub)),
+                                'brutto': digit_formater(float(itemContent['brutto'])),
+                                'addtaxColapse': addtaxColapse,
+                                'workers': '',
+                                'addPdf': 'true'}
+                )
+
+                from gs_api.langcore import language
+                from email.mime.multipart import MIMEMultipart 
+                from email.mime.text import MIMEText
+                from email.mime.base import MIMEBase
+                from email import encoders
+                import smtplib
+
+                import imaplib
+                import time
+                from weasyprint import HTML, CSS
+                import io
+                import PyPDF2
+                import os
+                await language.pdf(request, test, ws_clients)
+
+                docsId = (await (Q(T.docs)
+                                .fields(T.docs.id)
+                                .where(T.docs.number == maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+                                .selectone()))
+
+              
+                senderFilename = rowPlan['name']
+                if senderFilename.find("@InvNo")!=-1:
+                    senderFilename = senderFilename.replace("@InvNo", maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+                 
+                sender = rowPlan['sender']
+                to = rowPlan['to']
+                subject = rowPlan['subject']
+                if subject.find("@InvNo")!=-1:
+                    subject = subject.replace("@InvNo", maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+
+                content = rowPlan['content']
+                if content.find("@InvNo")!=-1:
+                    content = content.replace("@InvNo", maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+
+                pass_from_mail = await Docs.user_pass(sender)
+                password = (pass_from_mail['pass_from_mail'])
+                toaddr = []
+                files = []
+                docs = []
+                ns=[]
+
+                for reciver in to.split(','):
+                    toaddr.append(reciver)
+
+                htmls = await Docs.select_split_doc([docsId['id']])
+
+                split_files = await Docs.select_split_files(files)
+
+                msg = MIMEMultipart() 
+                msg['From'] = sender 
+                msg['To'] = to 
+                msg['Subject'] = subject
+                body = """
+                <html>
+                  <head></head>
+                  <body>
+                  """+content+"""
+                 </body>
+                </html>
+                """
+                msg.attach(MIMEText(body, 'html')) 
+
+                html=''
+                for i, item  in enumerate(htmls):
+                    if i < len(htmls)-1:
+                        html = html + item['html'] + '<div style="page-break-before:always;"></div>'
+                    else:
+                        html = html + item['html']
+
+                html = re.sub("\\s+", " ", html.replace("\\n", '').replace("\\t", '').replace("\\", ""))
+
+                pdf = HTML(string=html).write_pdf(stylesheets=[CSS(string='@page { size: A4; margin-top: 5mm; margin-left: 10mm; margin-right: 10mm; margin-bottom: 3mm; }')])
+                file = bytes(pdf)
+                pdf_file = io.BytesIO(file)
+                pdfWriter = PyPDF2.PdfFileWriter()
+
+                if htmls!=[]:
+                    fff = PyPDF2.PdfFileReader(pdf_file, strict=False)
+                    for pageNum in range(fff.numPages):
+                        pageObj = fff.getPage(pageNum)
+                        pdfWriter.addPage(pageObj)
+
+                pdf_bytes = io.BytesIO()
+                pdfWriter.write(pdf_bytes)
+                pdf_bytes.seek(0)
+                attachment = pdf_bytes
+                
+                p = MIMEBase('application', 'octet-stream') 
+                p.set_payload((attachment).read()) 
+                encoders.encode_base64(p)
+                p.add_header('Content-Disposition', 'attachment', filename=os.path.basename(senderFilename.split('.pdf')[0]+'.pdf'))
+                msg.attach(p)
+                
+
+                s = smtplib.SMTP('mail.awe.do', 587)
+                s.starttls()
+                s.ehlo()
+                s.login(sender, password)
+                text = msg.as_string() 
+                s.sendmail(sender, toaddr, text) 
+                s.quit() 
+
+                imap = imaplib.IMAP4('mail.awe.do', 143)
+                imap.starttls()
+                imap.login(sender, password)
+                imap.select("Sent")
+                imap.append('Sent', '', imaplib.Time2Internaldate(time.time()), text.encode('utf8'))
+                imap.logout()
+                
+                await (Q()
+                .tables(T.plansend)
+                .where(T.plansend.id == rowPlan['id'])
+                .update({
+                    T.plansend.lastsend: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }))
+
+
+                for client in ws_clients:
+                    await client.send_str('get_types_for_tables_f')
+                print('finish')
+                return ''
+
+    @classmethod
+    async def start_mail_send(cls, request, ws_clients):
+            async with database.query() as Q:
+                # print(0)
+                def digit_formater(val):
+                    value = round(val * 100) / 100
+                    parts = str(value).split('.')
+                    main = parts[0]
+                    lenx = len(main)
+                    output = ''
+                    i = lenx - 1
+
+                    while (i >= 0):
+                        output = main[i] + output
+                        if (((lenx - i) % 3 == 0) & (i > 0)):
+                            output = '.' + output
+                        i -= 1
+
+                    if (len(parts) > 1):
+                        output += ',' + parts[1]
+                        if (len(parts[1])==1):
+                            output += '0'
+                    else:
+                        output += ',00'
+                       
+                    output = output.replace('-.','-')
+                    return output
+
+                rowsPlan = (await (Q()
+                            .tables(T.plansend)
+                            .fields(
+                                T.plansend.itemid,
+                                T.plansend.period,
+                                T.plansend.sender,
+                                T.plansend.to,
+                                T.plansend.subject,
+                                T.plansend.content,
+                                T.plansend.name,
+                                T.plansend.lastsend,
+                                T.plansend.autosend,
+                                T.plansend.autoPeriodWorks,
+                                T.plansend.autoDate,
+                                T.plansend.pushToWorkDays,
+                                T.plansend.id,
+                                T.plansend.templateId
+                            ).selectall()))
+
+                current_year = datetime.datetime.now().year
+
+                
+
+
+
+                for rowPlan in rowsPlan:
+                    if rowPlan['autosend']=='1':
+                        if rowPlan['autoDate']==1:
+                            today = datetime.date.today()
+                            first = today.replace(day=1)
+
+                            if rowPlan['autoPeriodWorks']=='current':
+                                last_month = first 
+                            if rowPlan['autoPeriodWorks']=='previous':
+                                last_month = first - datetime.timedelta(days=1)
+
+                            month = int(last_month.strftime("%m"))
+                            days = monthrange(current_year, month)[1]
+
+                            f_data = str(days)+'.'+str(month)+'.'+str(current_year)
+                            s_data = '01.'+str(month)+'.'+str(current_year)
+
+                            dataFinishWork = 'Die Arbeit wurde ausgeführt: vom '+s_data+' bis '+f_data
+                        else:
+                            dataFinishWork = ''
+        # print(0.5)
+                        lastsend = datetime.datetime.strptime(rowPlan['lastsend'], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
+                        dataforperiod = datetime.datetime.now().strftime("%Y-%m-%d")
+
+                        if(lastsend < datetime.datetime.now().strftime("%Y-%m-%d")):
+                            month = int(datetime.datetime.now().strftime("%m"))
+                            days = monthrange(current_year, month)[1]
+                            dataOfSend = rowPlan['period']
+                            if rowPlan['period'] == 'mstart':
+                                dataOfSend = '1'
+                            if rowPlan['period'] == 'mmidle':
+                                dataOfSend = days // 2
+                            if rowPlan['period'] == 'mend':
+                                dataOfSend = days
+                            if rowPlan['pushToWorkDays']=='1':
+                                weekDay = int(datetime.datetime.isoweekday(datetime.datetime.strptime(str(dataforperiod.split('-')[0])+'-'+str(dataforperiod.split('-')[1])+'-'+str(dataOfSend), "%Y-%m-%d")))
+                                if (weekDay>5):
+                                    if rowPlan['period'] == 'mend':
+                                        dataOfSend = int(dataOfSend)-(weekDay-5)
+                                    else:    
+                                        dataOfSend = int(dataOfSend)+(8-weekDay)
+
+                            if(int(dataOfSend) == int(datetime.datetime.now().strftime("%d"))):
+                                number = (await Invoice.detect_invoice())
+                                newNuber = number[len(number)-1]['lastNumber']
+                                await Invoice.add_invoice(rowPlan['itemid'], 'Invoices', newNuber, 'false', '')
+                                # print(newNuber)
+                                numberId = (await (Q()
+                                    .tables(T.number_for_invoice)
+                                    .fields(T.number_for_invoice.item_id)
+                                    .where(T.number_for_invoice.id == newNuber)
+                                    .selectone()))['item_id']
+
+                                # print(numberId)
+
+                                itemContent = (await (Q()
+                                    .tables(T.items)
+                                    .fields(
+                                        T.items.id,
+                                        T.items.project_id,
+                                        T.items.status_set,
+                                        T.items.number,
+                                        T.items.date,
+                                        T.items.other,
+                                        T.items.place,
+                                        T.items.insurance_number,
+                                        T.items.work,
+                                        T.items.type,
+                                        T.items.tax,
+                                        T.items.taxDub,
+                                        T.items.taxP,
+                                        T.items.taxPDub,
+                                        T.items.disc,
+                                        T.items.discP,
+                                        T.items.butDiscPerc,
+                                        T.items.addtaxColapse,
+                                        T.items.dateEvent,
+                                        T.items.dateInspect,
+                                        T.items.ExamWorker,
+                                        T.items.comment,
+                                        T.items.insurname
+                                        )
+                                    .where(T.items.id == numberId)
+                                    .selectone()))
+
+               
+                                getProject = (await Project.select_project(itemContent['project_id']))
+                                getCustomer = (await Customer.select_customer(getProject['customer_id']))
+                                getTables = str(await Projects.get_tables(numberId))
+                                # print(1)
+
+
+
+                                allTags = re.compile(r'<.*?>')
+                                escape = re.compile(r'\\xa0')
+                                getTables = (allTags.sub('', getTables))
+                                getTables = (escape.sub('', getTables))
+                                getTables = getTables.replace('None', 'null').replace('False', 'false').replace('True', 'true').replace('(', '[').replace(')', ']').replace("'", '"')
+                                getTables = getTables.split(', {"taxs')[0]+']'
+                                # print(getTables)
+
+                                if itemContent['tax']==None:
+                                    itemContent['tax']='0,0'
+                                if itemContent['taxDub']==None:
+                                    itemContent['taxDub']='0,0'
+                                if itemContent['taxP']==None:
+                                    itemContent['taxP']='0,0'
+                                if itemContent['taxPDub']==None:
+                                    itemContent['taxPDub']='0,0'
+                                if itemContent['disc']==None:
+                                    itemContent['disc']='0,0'
+                                if itemContent['discP']==None:
+                                    itemContent['discP']='0,0'
+                                if itemContent['butDiscPerc']==None:
+                                    itemContent['butDiscPerc']='%'
+                                if itemContent['addtaxColapse']==None:
+                                    itemContent['addtaxColapse']='false'
+
+                                tax=(itemContent['tax'].replace(',', '.'))
+                                taxDub=(itemContent['taxDub'].replace(',', '.'))
+                                taxP=(itemContent['taxP'].replace(',', '.'))
+                                taxPDub=(itemContent['taxPDub'].replace(',', '.'))
+                                disc=(itemContent['disc'].replace(',', '.'))
+                                discP=(itemContent['discP'].replace(',', '.'))
+                                butDiscPerc=itemContent['butDiscPerc']
+                                addtaxColapse=itemContent['addtaxColapse']
+
+                                netto = 0
+                                addt = 0
+                                addt2 = 0
+                                tables =(await (Q()
+                                        .tables(T.tables)
+                                        .fields(
+                                            T.tables.id,
+                                            T.tables.name,
+                                            T.tables.obj,
+                                            T.tables.selected
+                                        )
+                                        .where(T.tables.item_id == itemContent['id'])
+                                        .selectall()))
+                                # print(tables)
+                                add = 0
+
+                                for subIndex, val in enumerate(tables):
+                                    rows =(await (Q()
+                                                .tables(T.rows_for_table)
+                                                .fields(
+                                                    T.rows_for_table.count,
+                                                    T.rows_for_table.price,
+                                                    T.rows_for_table.summa,
+                                                    T.rows_for_table.status,
+                                                    T.rows_for_table.alttax,
+                                                    T.rows_for_table.without,
+                                                    T.rows_for_table.unit
+                                                )
+                                                .where(T.rows_for_table.table_id == val['id'])
+                                                .selectall()))
+
+                                    for row in rows:
+                                        if row['count']==None:
+                                            row['count'] = '0'
+                                        if row['price']==None:
+                                            row['price'] = '0'
+
+                                        if row['unit']=='%':
+                                            # if row['count']==None:
+                                            #     row['count']=1
+                                            # if row['count']=='0':
+                                            #     row['count']=1
+                                            row['price']=0
+                                            summax = 0
+
+                                            for obj in val['obj'].split(','):
+                                                selected = ['']
+                                                if not '|' in val["selected"]:
+                                                    if val["selected"]!='':
+                                                        selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
+                                                        if ('temp' + str(subIndex + 1)) in selected[obj]:
+
+                                                            for val in selected[obj].split(','):
+
+                                                                val = val.split('temp')
+                                                                val[1]=int(val[1])-1
+
+                                                                countx = 0
+                                                                pricex = 0
+                                                                
+                                                                countx = rows[val[1]]['count'] 
+                                                                pricex = rows[val[1]]['price']
+
+                                                                summax += float(countx) * float(pricex)
+                                               
+                                            row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
+                                            # print(persent_from_summa)
+                                            # print(persent_from_summa / float(rows[(subIndex)]['count']))
+                                                
+                                            # print(rows[(subIndex)]['price'])
+                                            
+                                            row['count']=1
+                                        if row['status']=='yes':
+                                            
+                                            try:
+                                               a = float(row['price'])
+                                            except ValueError:
+                                               row['price'] = 0
+                                            netto += (float(row['count'])*float(row['price']))
+
+                                                # print(str(row['count'])+'*'+str(row['price'])+'='+str(float(row['count'])*float(row['price'])))
+
+
+                                            if row['without']=='true':
+                                                add += (float(row['count'])*float(row['price']) / 100) * float(discP)
+
+                                            # print(row['alttax'])
+                                            if row['alttax']!='true':
+                                                addt += (float(row['count'])*float(row['price']))
+                                            else:
+                                                addt2 += (float(row['count'])*float(row['price']))
+
+
+
+                           
+                                if netto==0:
+                                    netto=1
+                                if butDiscPerc=='%':
+                                    # print(netto, add)
+                                    # netto = netto + add
+
+                                    itemContent['netto']=str(netto-(netto/100*float(discP)))
+                                    # print(item['netto'])
+                                    itemContent['netto']=float(itemContent['netto'])+add
+                                    # print(item['netto'], add)
+
+                                    addt = addt-(addt/100)*float(discP)
+                                    addt2 = addt2-(addt2/100)*float(discP)
+                                
+                                else:
+
+                                    itemContent['netto']=str(netto-float(discP))
+                                    
+                                    addt = addt-(addt/100)*float(discP)*100/netto
+                                    addt2 = addt2-(addt2/100)*float(discP)*100/netto
+                    
+                                itemContent['brutto']=str(float(itemContent['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
+
+                                maskNumber = newNuber
+                                for x in range(int(4-len(str(newNuber)))): 
+                                    maskNumber = '0' + str(maskNumber)
+                                if rowPlan['templateId']==None:
+                                    rowPlan['templateId'] = '15'
+                                test = (
+                                {'dateInspect': itemContent['dateInspect'],
+                                'dateEvent': itemContent['dateEvent'],
+                                'worker': '',
+                                'customerСontract': itemContent['other'],
+                                'getCustomer': getProject['name'],
+                                'getPerson': getProject['appeal']+' '+getProject['names'],
+                                'getCustomerAdress': getCustomer['street'],
+                                'getCustomerAdress1': getCustomer['zip']+' '+getCustomer['city'],
+                                'offerHead': 'Invoices',
+                                'subHead': '',
+                                'editor': getProject['first_name']+' '+getProject['second_name'],
+                                'userTel': '',
+                                'userFax': '',
+                                'userMail': getProject['userMail'],
+                                'number': maskNumber+'-'+datetime.datetime.now().strftime("%Y"),
+                                'date': datetime.datetime.now().strftime("%d.%m.%Y"),
+                                'work': itemContent['work'],
+                                'pNumber': itemContent['number'].split(' ')[0],
+                                'street': getProject['street1'],
+                                'zip': getProject['zip1'],
+                                'contry': getProject['country'],
+                                'area': getProject['area'],
+                                'city': getProject['city1'],
+                                'dateProject': '', #getProject['date'],
+                                'insurance': itemContent['insurance_number'],
+                                'insurname': itemContent['insurname'],
+                                'place': itemContent['place'],
+                                'finishWork': dataFinishWork,
+                                'stworks': 'not set',
+                                'fworks': 'not set',
+                                'inspected': 'not set',
+                                'inspectedby': '',
+                                'positions': '',
+                                'comment': itemContent['comment'],
+                                'project_id': itemContent['project_id'],
+                                'selected_docs_list': rowPlan['templateId'],
+                                'tables': getTables,
+                                'summ': digit_formater(float(itemContent['netto'])),
+                                'summ1': digit_formater(float(itemContent['netto'])),
+                                'discP': discP,
+                                'butDiscPerc': butDiscPerc,
+                                'disc': digit_formater(float(disc)),
+                                'netto': digit_formater(float(itemContent['netto'])),
+                                'taxP': taxP,
+                                'tax': digit_formater(float(itemContent['netto'])/100*(float(taxP))),
+                                'taxP2': taxPDub,
+                                'tax2': digit_formater(float(taxDub)),
+                                'brutto': digit_formater(float(itemContent['brutto'])),
+                                'addtaxColapse': addtaxColapse,
+                                'workers': '',
+                                'addPdf': 'true'}
+                                )
+
+                                from gs_api.langcore import language
+                                from email.mime.multipart import MIMEMultipart 
+                                from email.mime.text import MIMEText
+                                from email.mime.base import MIMEBase
+                                from email import encoders
+                                import smtplib
+
+                                import imaplib
+                                import time
+                                from weasyprint import HTML, CSS
+                                import io
+                                import PyPDF2
+                                import os
+
+                                await language.pdf(request, test, ws_clients)
+
+                                docsId = (await (Q(T.docs)
+                                    .fields(T.docs.id)
+                                    .where(T.docs.number == maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+                                    .selectone()))
+                                # print(docsId)
+              
+                                senderFilename = rowPlan['name']
+                                if senderFilename.find("@InvNo")!=-1:
+                                    senderFilename = senderFilename.replace("@InvNo", maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+                                sender = rowPlan['sender']
+                                to = rowPlan['to']
+                                subject = rowPlan['subject']
+                                if subject.find("@InvNo")!=-1:
+                                    subject = subject.replace("@InvNo", maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+                                content = rowPlan['content']
+                                if content.find("@InvNo")!=-1:
+                                    content = content.replace("@InvNo", maskNumber+'-'+datetime.datetime.now().strftime("%Y"))
+
+                                pass_from_mail = await Docs.user_pass(sender)
+                                password = (pass_from_mail['pass_from_mail'])
+                                toaddr = []
+                                files = []
+                                docs = []
+                                ns=[]
+
+                                for reciver in to.split(','):
+                                    toaddr.append(reciver)
+
+                                htmls = await Docs.select_split_doc([docsId['id']])
+                                split_files = await Docs.select_split_files(files)
+                                # print(htmls)
+
+                                # split_files = await Docs.select_split_files(files)
+
+                                msg = MIMEMultipart() 
+                                msg['From'] = sender 
+                                msg['To'] = to 
+                                msg['Subject'] = subject
+                                body = """
+                                <html>
+                                  <head></head>
+                                  <body>
+                                  """+content+"""
+                                 </body>
+                                </html>
+                                """
+                                msg.attach(MIMEText(body, 'html')) 
+
+                                html=''
+                                for i, item  in enumerate(htmls):
+                                    if i < len(htmls)-1:
+                                        html = html + item['html'] + '<div style="page-break-before:always;"></div>'
+                                    else:
+                                        html = html + item['html']
+
+                                html = re.sub("\\s+", " ", html.replace("\\n", '').replace("\\t", '').replace("\\", ""))
+
+                                pdf = HTML(string=html).write_pdf(stylesheets=[CSS(string='@page { size: A4; margin-top: 5mm; margin-left: 10mm; margin-right: 10mm; margin-bottom: 3mm; }')])
+                                file = bytes(pdf)
+                                pdf_file = io.BytesIO(file)
+                                pdfWriter = PyPDF2.PdfFileWriter()
+
+                                if htmls!=[]:
+                                    fff = PyPDF2.PdfFileReader(pdf_file, strict=False)
+                                    for pageNum in range(fff.numPages):
+                                        pageObj = fff.getPage(pageNum)
+                                        pdfWriter.addPage(pageObj)
+
+                                pdf_bytes = io.BytesIO()
+                                pdfWriter.write(pdf_bytes)
+                                pdf_bytes.seek(0)
+                                attachment = pdf_bytes
+                                
+                                p = MIMEBase('application', 'octet-stream') 
+                                p.set_payload((attachment).read()) 
+                                encoders.encode_base64(p)
+                                p.add_header('Content-Disposition', 'attachment', filename=os.path.basename(senderFilename.split('.pdf')[0]+'.pdf'))
+                                msg.attach(p)
+                                
+
+                                s = smtplib.SMTP('mail.awe.do', 587)
+                                s.starttls()
+                                s.ehlo()
+                                s.login(sender, password)
+                                text = msg.as_string() 
+                                # print(text)
+                                s.sendmail(sender, toaddr, text) 
+                                s.quit() 
+
+                                imap = imaplib.IMAP4('mail.awe.do', 143)
+                                imap.starttls()
+                                imap.login(sender, password)
+                                imap.select("Sent")
+                                imap.append('Sent', '', imaplib.Time2Internaldate(time.time()), text.encode('utf8'))
+                                imap.logout()
+                            
+                                await (Q()
+                                    .tables(T.plansend)
+                                    .where(T.plansend.id == rowPlan['id'])
+                                    .update({
+                                        T.plansend.lastsend: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                }))
+
+                for client in ws_clients:
+                    await client.send_str('get_types_for_tables_f')
+                print('auto send finished')
+                return ''
+
+    @classmethod
+    async def closeWasSent(cls, wassentids):
+        async with database.query() as Q:
+            for id in wassentids.split(','):
+                await (Q()
+                    .tables(T.plansend)
+                    .where(T.plansend.id == id)
+                    .update({
+                        T.plansend.lastSendShown: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }))
+
+            return ''
+
+
 class Customer:
     @classmethod
     async def detectSub(cls, name):
-        print(name)
+        # print(name)
         async with database.query() as Q:
             return await (Q()
                 .tables(T.customer)
@@ -5393,6 +7407,44 @@ class Customer:
                     T.person.customer_group
                 ).where(T.person.customer_group == id)
                 .selectall())
+
+    @classmethod
+    async def get_sub_emails(cls, name):
+        async with database.query() as Q:
+            result=[]
+            customerId = ( await (Q()
+                .tables(T.customer)
+                .fields(
+                    T.customer.id,
+                ).where(T.customer.name == name)
+                .selectone()))
+
+            customerEmails = (await (Q()
+                        .tables(T.mail)
+                        .fields(T.mail.mail)
+                        .where(T.mail.customer == customerId['id'])
+                        .selectall())
+                    )
+            for cusotmerMail in customerEmails:
+                result.append({'item':cusotmerMail['mail'],'name':cusotmerMail['mail']})
+
+            persons = (await (Q()
+                .tables(T.person)
+                .fields(
+                    T.person.person,
+                ).where(T.person.customer_group == customerId['id'])
+                .selectall()))
+
+            for personsEmails in persons:
+                mails = (await (Q()
+                            .tables(T.mail)
+                            .fields(T.mail.mail)
+                            .where(T.mail.person == personsEmails['person'])
+                            .selectall())
+                        )
+                for mail in mails:
+                    result.append({'item':cusotmerMail['mail'],'name':cusotmerMail['mail']})
+            return result
 
     @classmethod
     async def update(cls, id, data, fild):
@@ -5835,24 +7887,21 @@ class Devices:
             return await (Q(T.measure_protocol)
                 .tables(T.measure_protocol)
                 .insert({
-                    T.measure_protocol.sminsurface: 0,
-                    T.measure_protocol.smaxsurface: 0,
-                    T.measure_protocol.smindepth: 0,
-                    T.measure_protocol.smaxdepth: 0,
-                    T.measure_protocol.fminsurface: 0,
-                    T.measure_protocol.fmaxsurface: 0,
-                    T.measure_protocol.fmindepth: 0,
-                    T.measure_protocol.fmaxdepth: 0,
+                    T.measure_protocol.room: '',
+                    T.measure_protocol.install_surface: '',
+                    T.measure_protocol.install_deep: '',
+                    T.measure_protocol.uninstall_surface: '',
+                    T.measure_protocol.uninstall_deep: '',
                     T.measure_protocol.table_id: id
                 }))
 
-    # @classmethod
-    # async def delmeasrow(cls, id):
-    #     async with database.query() as Q:
-    #         return await (Q(T.measurement)
-    #             .tables(T.measurement)
-    #             .where(T.measurement.id == id)
-    #             .delete())
+    @classmethod
+    async def delmeasrow(cls, id):
+        async with database.query() as Q:
+            return await (Q(T.measurement)
+                .tables(T.measurement)
+                .where(T.measurement.id == id)
+                .delete())
 
     @classmethod
     async def measureProtocolDel(cls, id):
@@ -6612,16 +8661,30 @@ class Personals:
     #                             T.rows_for_table.description_work: ''
     #                     }))
     #     return ''        
+
 class Balance:
     @classmethod
     async def select_balances(cls, mode):
         async with database.query() as Q:
-            unpaid = mode[0]
-            paid = mode[1]
-            sub = mode[2]
-            subtype = None
-            if (sub == '1'):
-                subtype = 6
+            unpaid_all = mode[0]
+            me_sub = mode[1]
+            # print(unpaid_all, me_sub)
+            data = mode.split('|')
+            if (data[1]=='0000-00-00'):
+                fromData = (datetime.datetime.now() + datetime.timedelta(days = -365)).strftime("%Y-%m-%d")
+            else:    
+                fromData = data[1]
+
+            if (data[2]=='0000-00-00'):
+                toData = datetime.datetime.now().strftime("%Y-%m-%d")
+            else:    
+                toData = data[2]
+
+            if (me_sub == '1'):
+                items_type = 60
+            else:
+                items_type = 30
+
             n_result = []
             result = ( await (Q()
                 .tables(T.items & T.project & T.person)
@@ -6649,7 +8712,7 @@ class Balance:
                     T.project.street1,
                     T.person.names
                 )
-                .where((T.items.type == 3)|(T.items.type == subtype))
+                .where(T.items.type == items_type)
                 .order_by(T.project.id.desc()).selectall()))
 
             balance = ( await (Q()
@@ -6663,52 +8726,46 @@ class Balance:
                 )
                 .selectall()))
 
-
             for item in result:
-                id =  item['number'].split(' ')
-                if len(id)==2:
-                    for number in result:
-                        if int(id[1]) == number['id']: 
-                            item['contract_number']=number['number']
-
-            # for item in result:
-                ops=[]
-                for bal in balance:
-                    # print(item['id'], bal['invoice_id'])
-                    if str(item['id'])==bal['invoice_id']: 
-                        ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
-                item['op'] = ops
-
-                if item['tax']==None:
-                    item['tax']='0,0'
-                if item['taxDub']==None:
-                    item['taxDub']='0,0'
-                if item['taxP']==None:
-                    item['taxP']='0,0'
-                if item['taxPDub']==None:
-                    item['taxPDub']='0,0'
-                if item['disc']==None:
-                    item['disc']='0,0'
-                if item['discP']==None:
-                    item['discP']='0,0'
-                if item['butDiscPerc']==None:
-                    item['butDiscPerc']='%'
-                if item['addtaxColapse']==None:
-                    item['addtaxColapse']='false'
-
-                tax=(item['tax'].replace(',', '.'))
-                taxDub=(item['taxDub'].replace(',', '.'))
-                taxP=(item['taxP'].replace(',', '.'))
-                taxPDub=(item['taxPDub'].replace(',', '.'))
-                disc=(item['disc'].replace(',', '.'))
-                discP=(item['discP'].replace(',', '.'))
-                butDiscPerc=item['butDiscPerc']
-                addtaxColapse=item['addtaxColapse']
-                # print('start', item['number'], item['insurance_number'])
-                netto = 0
-                addt = 0
-                addt2 = 0
-                tables =(await (Q()
+                if (datetime.datetime.strptime(fromData, '%Y-%m-%d').date() < datetime.datetime.strptime(item['date'], '%Y-%m-%d').date() <= datetime.datetime.strptime(toData, '%Y-%m-%d').date()):
+                    id =  item['number'].split(' ')
+                    if len(id)==2:
+                        for number in result:
+                            if int(id[1]) == number['id']: 
+                                item['contract_number']=number['number']
+                    ops=[]
+                    for bal in balance:
+                        if str(item['id'])==bal['invoice_id']: 
+                            ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
+                    item['op'] = ops
+                    if item['tax']==None:
+                        item['tax']='0,0'
+                    if item['taxDub']==None:
+                        item['taxDub']='0,0'
+                    if item['taxP']==None:
+                        item['taxP']='0,0'
+                    if item['taxPDub']==None:
+                        item['taxPDub']='0,0'
+                    if item['disc']==None:
+                        item['disc']='0,0'
+                    if item['discP']==None:
+                        item['discP']='0,0'
+                    if item['butDiscPerc']==None:
+                        item['butDiscPerc']='%'
+                    if item['addtaxColapse']==None:
+                        item['addtaxColapse']='false'
+                    tax=(item['tax'].replace(',', '.'))
+                    taxDub=(item['taxDub'].replace(',', '.'))
+                    taxP=(item['taxP'].replace(',', '.'))
+                    taxPDub=(item['taxPDub'].replace(',', '.'))
+                    disc=(item['disc'].replace(',', '.'))
+                    discP=(item['discP'].replace(',', '.'))
+                    butDiscPerc=item['butDiscPerc']
+                    addtaxColapse=item['addtaxColapse']
+                    netto = 0
+                    addt = 0
+                    addt2 = 0
+                    tables =(await (Q()
                         .tables(T.tables)
                         .fields(
                             T.tables.id,
@@ -6718,134 +8775,138 @@ class Balance:
                         )
                         .where(T.tables.item_id == item['id'])
                         .selectall()))
-                add = 0
-                for subIndex, val in enumerate(tables):
-                    rows =(await (Q()
-                                .tables(T.rows_for_table)
-                                .fields(
-                                    T.rows_for_table.count,
-                                    T.rows_for_table.price,
-                                    T.rows_for_table.summa,
-                                    T.rows_for_table.status,
-                                    T.rows_for_table.alttax,
-                                    T.rows_for_table.without,
-                                    T.rows_for_table.unit,
-                                    T.rows_for_table.done
-                                )
-                                .where(T.rows_for_table.table_id == val['id'])
-                                .selectall()))
+                    add = 0
+                    for subIndex, val in enumerate(tables):
+                        rows =(await (Q()
+                                    .tables(T.rows_for_table)
+                                    .fields(
+                                        T.rows_for_table.count,
+                                        T.rows_for_table.price,
+                                        T.rows_for_table.summa,
+                                        T.rows_for_table.status,
+                                        T.rows_for_table.alttax,
+                                        T.rows_for_table.without,
+                                        T.rows_for_table.unit,
+                                        T.rows_for_table.done
+                                    )
+                                    .where(T.rows_for_table.table_id == val['id'])
+                                    .selectall()))
 
-                    for row in rows:
-                        if row['count']==None:
-                            row['count'] = '0'
-                        if row['price']==None:
-                            row['price'] = '0'
+                        for row in rows:
+                            if row['count']==None:
+                                row['count'] = '0'
+                            if row['price']==None:
+                                row['price'] = '0'
 
-                        if row['unit']=='%':
-                            row['price']=0
-                            summax = 0
+                            if row['unit']=='%':
+                                row['price']=0
+                                summax = 0
 
-                            for obj in val['obj'].split(','):
-                                selected = ['']
-                                if not '|' in val["selected"]:
-                                    selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
-                                    if ('temp' + str(subIndex + 1)) in selected[obj]:
+                                for obj in val['obj'].split(','):
+                                    selected = ['']
+                                    if not '|' in val["selected"]:
+                                        selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
+                                        if ('temp' + str(subIndex + 1)) in selected[obj]:
 
-                                        for val in selected[obj].split(','):
+                                            for val in selected[obj].split(','):
 
-                                            val = val.split('temp')
-                                            val[1]=int(val[1])-1
+                                                val = val.split('temp')
+                                                val[1]=int(val[1])-1
 
-                                            countx = 0
-                                            pricex = 0
-                                            
-                                            countx = rows[val[1]]['count'] 
-                                            pricex = rows[val[1]]['price']
+                                                countx = 0
+                                                pricex = 0
+                                                
+                                                countx = rows[val[1]]['count'] 
+                                                pricex = rows[val[1]]['price']
 
-                                            summax += float(countx) * float(pricex)
-                               
-                            row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
-                            row['count']=1
-                        if row['status']=='yes':
+                                                summax += float(countx) * float(pricex)
+                                   
+                                row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
+                                row['count']=1
+                            if row['status']=='yes':
+                                
+
+                                netto += (float(row['count'])*float(row['price']))
+                                if row['without']=='true':
+                                    add += (float(row['count'])*float(row['price']) / 100) * float(discP)
+                                if row['alttax']!='true':
+                                    addt += (float(row['count'])*float(row['price']))
+                                else:
+                                    addt2 += (float(row['count'])*float(row['price']))
+
+                    if butDiscPerc=='%':
+                        item['netto']=str(netto-(netto/100*float(discP)))
+                        item['netto']=float(item['netto'])+add
+                        addt = addt-(addt/100)*float(discP)
+                        addt2 = addt2-(addt2/100)*float(discP)
+                    else:
+                        item['netto']=str(netto-float(discP))
+                        addt = addt-(addt/100)*float(discP)*100/netto
+                        addt2 = addt2-(addt2/100)*float(discP)*100/netto
+                    
+                    item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
+                    # print(item['brutto'])
+
+                    vals = 0.0
+                    if(len(item['op'])>0):
+                        for val in item['op']:
+                            transformValue = val['value'].replace(',', '.')
+                            newVal = ''
+                            for index, dotCount in enumerate(transformValue.split('.')):
+                                if index == len(transformValue.split('.'))-1:
+                                    newVal = str(newVal)+'.'+str(dotCount)
+                                else:
+                                    newVal = str(newVal)+str(dotCount)
+                            if newVal[0]=='.':
+                                newVal = newVal.replace('.', '')
+                                newVal = newVal + '.00'
+                            transformValue = newVal
                             
 
-                            netto += (float(row['count'])*float(row['price']))
-                            if row['without']=='true':
-                                add += (float(row['count'])*float(row['price']) / 100) * float(discP)
+                            if val['type']=='DEBET':
+                                vals = vals + round(float(transformValue), 2)
 
-                            # print(row['alttax'])
-                            if row['alttax']!='true':
-                                addt += (float(row['count'])*float(row['price']))
-                            else:
-                                addt2 += (float(row['count'])*float(row['price']))
+                            if (val['type']=='CREDET')|(val['type']=='CREDIT'):
+                                vals = vals - round(float(transformValue), 2)
 
-                if butDiscPerc=='%':
-                    # print(netto, add)
-                    # netto = netto + add
-                    item['netto']=str(netto-(netto/100*float(discP)))
-                    # print(item['netto'])
-                    item['netto']=float(item['netto'])+add
-                    # print(item['netto'], add)
-                    addt = addt-(addt/100)*float(discP)
-                    addt2 = addt2-(addt2/100)*float(discP)
-                
-                else:
+                    if (item['brutto'] =='0.0'):
+                        item['brutto'] = 1.0
 
-                    item['netto']=str(netto-float(discP))
-                    addt = addt-(addt/100)*float(discP)*100/netto
-                    addt2 = addt2-(addt2/100)*float(discP)*100/netto
-                
-                item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
-                
-                vals = 0
-                if(len(item['op'])>0):
-                    for val in item['op']:
-                        transformValue = val['value'].replace('.', '')
-                        transformValue = transformValue.replace(',', '.')
-                        if val['type']=='DEBET':
-                            vals = vals + round(float(transformValue), 2)
-                        if val['type']=='CREDET':
-                            vals = vals - round(float(transformValue), 2)
+                    if unpaid_all == '0':
+                        if ((round(abs(float(vals)), 2)*100/round(abs(float(item['brutto'])), 2))<99): #unpaid
+                            n_result.append(item)
 
-                if paid == '1':
-                    if ((round(float(vals), 2)*100/round(float(item['brutto']), 2))>=99): #paid
-                        n_result.append(item)
-                        # if (item['brutto']=='1580.0701'):
-                        # # if (item['brutto']=='')
-                        #     print('val')
-                        #     print((round(float(vals), 2)))
-                        #     print('bru')
-                        #     print(round(float(item['brutto']), 2))
-                        #     print('net')
-                        #     print(round(float(item['netto']), 2))
-                        #     print('===')
-                            # print(((round(float(vals), 2)*100/round(float(item['brutto']), 2))>=99))
-                if unpaid == '1':
-                    if ((round(float(vals), 2)*100/round(float(item['brutto']), 2))<99): #unpaid
-                        n_result.append(item)
+                    if unpaid_all == '1':
+                        if ((round(abs(float(vals)), 2)*100/round(abs(float(item['brutto'])), 2))>99): #paid
+                            n_result.append(item)
                 
             return n_result               
-            #     vals = 0
-            #     if(len(item['op'])>0):
-            #         for val in item['op']:
-            #             transformValue = val['value'].replace('.', '')
-            #             transformValue = transformValue.replace(',', '.')
-            #             if val['type']=='DEBET':
-            #                 vals = vals + float(transformValue)
-            #             if val['type']=='CREDET':
-            #                 vals = vals - float(transformValue)
 
-            #     if paid == '1':
-            #         if ((float(vals)*100/float(item['brutto']))>=99): #paid
-            #             n_result.append(item)
-            #             print((float(vals)))
-            #             print(float(item['brutto']))
-            #             print(((float(vals)*100/float(item['brutto']))>=99))
-            #     if unpaid == '1':
-            #         if ((float(vals)*100/float(item['brutto']))<99): #unpaid
-            #             n_result.append(item)
-                
-            # return n_result
+
+    @classmethod
+    async def billing(cls):
+        current_year = datetime.datetime.now().year
+        month = int(datetime.datetime.now().strftime("%m"))
+        days = monthrange(current_year, (month-1))[1]
+        parametrs = ('110|'+str(current_year)+'-'+str(month-1)+'-01|'+str(current_year)+'-'+str(month-1)+'-'+str(days))
+        bruttos = float(0.0)
+        nettos = float(0.0)
+        rows = (await Balance.select_balances(parametrs))
+        # print(len(rows))
+        for row in rows:
+            # print(row['date'])
+            bruttos = bruttos+float(row['brutto'])
+            nettos = nettos+float(row['netto'])
+
+        formBrutto = (str(round(bruttos, 2)).replace('.', ','))
+        formNetto = (str(round(nettos, 2)).replace('.', ','))
+        persent = (str(round(((nettos/100)*1.5), 2)).replace('.', ','))
+
+        firma = (await Docs.date_logo())
+        return (firma['date_logo_address']+' | '
+        +'01.'+str(month-1)+'.'+str(current_year)+' - '+str(days)+'.'+str(month-1)+'.'+str(current_year)
+        +' | Netto: '+formNetto+' Brutto: '+formBrutto+' | 1,5%: '+persent)
+
 
     @classmethod
     # async def add_payment(cls, id, value, type):
@@ -6897,4 +8958,3 @@ class Balance:
                     .update({
                             T.sub_items.comment: value
                     }))
-           

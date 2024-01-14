@@ -15,6 +15,8 @@ from aiohttp_jinja2 import template
 from aiohttp_session import get_session
 from uuid import uuid4
 import re
+from PIL import Image
+from base64 import b64encode
 from gs_api.dictionary import Docs, Customer
 ###
 import asyncio
@@ -24,22 +26,33 @@ class language:
     @classmethod
     async def pdf(cls, request, data, ws_clients):
         result =  (await Docs.select_template(data['selected_docs_list']))
+
         docs = ''.join(map(str, result))
         docs = re.sub("\\s+", " ", docs.replace("'}{'template': '", '<div style="page-break-before:always;"></div>').replace("{'template': '", '').replace("'}", '').replace("\\n", '').replace("\\t", '').replace("\\", ""))
         template = Template(docs)
    
         # objs = await Docs.select_image_damage_pdf(json.loads(data['loadDamages']))
         # images_for_pdf = await Docs.images_for_pdf(152)
-
+        # print(data['tables'])
         tables=json.loads(data['tables'])
+        # print(tables)
         imagesForPdf=[]
         for table in tables:
             for damage in table['parts']['damage_content']:
                 image={}
+                # image['content'] = b64encode(await Docs.images_for_pdf(damage['imgId'])).decode()
                 image['content'] = await Docs.images_for_pdf(damage['imgId'])
+                im = Image.open(io.BytesIO(image['content']))
+                # im.thumbnail((100,100), Image.ANTIALIAS)
+                stream = io.BytesIO()
+                im.save(stream, "JPEG", quality=10)
+                
+                image['content'] = im
+
                 image['name'] = damage['name']
                 image['desc'] = damage['desc']
                 # image['rotate'] = damage['rotate']
+                print(image)
                 imagesForPdf.append(image)
 
 
@@ -190,7 +203,10 @@ class language:
         else:
             skontodate = (datetime.strptime(data['date'], '%d.%m.%Y') + timedelta(days=14)).strftime('%d.%m.%Y')
             date = data['date']
-
+        
+        # print(data['stworks'])
+        # print(data['fworks'])
+        
         h=template.render(
             date=date,
             skontodate=skontodate,
@@ -250,7 +266,7 @@ class language:
 
         # print(data['addPdf'])
         if data['addPdf'] == 'true':
-            print('true')
+            # print('true')
             date=data['date']
             offerHead=data['offerHead']
             number=data['number']

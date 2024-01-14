@@ -3,10 +3,14 @@ import aiohttp_security
 import aiohttp_jinja2
 import argparse
 parser = argparse.ArgumentParser(description="Example of a single flag acting as a boolean and an option.")
+parser.add_argument('--apparthotel', nargs='?', const="1", default=False)
+parser.add_argument('--demo', nargs='?', const="1", default=False)
 parser.add_argument('--bwsa', nargs='?', const="1", default=False)
 parser.add_argument('--awe', nargs='?', const="1", default=False)
 parser.add_argument('--awerus', nargs='?', const="1", default=False)
 parser.add_argument('--bundw', nargs='?', const="1", default=False)
+parser.add_argument('--christ', nargs='?', const="1", default=False)
+parser.add_argument('--baer', nargs='?', const="1", default=False)
 args = parser.parse_args()
 
 # import aiohttp_dashboard
@@ -43,12 +47,31 @@ def run(max_size=0):
     # do load file configuraion
     configuration.load()
     # do load database configuraion
-    if args.awerus:
+    listen = 8070
+    if args.baer:
+        listen=8090
+        dictionary.database.set_configuration(
+            host=configuration['database']['host'],
+            port=configuration['database']['port'],
+            name='baer',
+            user=configuration['database']['user'],
+            password=configuration['database']['password']
+        )
+    if args.apparthotel:
+        listen=8089
+        dictionary.database.set_configuration(
+            host=configuration['database']['host'],
+            port=configuration['database']['port'],
+            name='apparthotel',
+            user=configuration['database']['user'],
+            password=configuration['database']['password']
+        )
+    if args.demo:
         listen=8079
         dictionary.database.set_configuration(
             host=configuration['database']['host'],
             port=configuration['database']['port'],
-            name='awe_rus',
+            name='demo',
             user=configuration['database']['user'],
             password=configuration['database']['password']
         )
@@ -76,6 +99,15 @@ def run(max_size=0):
             host=configuration['database']['host'],
             port=configuration['database']['port'],
             name='bundw',
+            user=configuration['database']['user'],
+            password=configuration['database']['password']
+        )
+    if args.christ:
+        listen=8084
+        dictionary.database.set_configuration(
+            host=configuration['database']['host'],
+            port=configuration['database']['port'],
+            name='christ',
             user=configuration['database']['user'],
             password=configuration['database']['password']
         )

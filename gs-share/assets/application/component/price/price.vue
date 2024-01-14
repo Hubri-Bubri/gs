@@ -1,6 +1,6 @@
 <template>
-  <b-container fluid >
-    <b-modal size="md" centered id="column" ref="column" title="Edit Column">
+  <b-container fluid ref="heightTablePrice">
+    <b-modal size="md" centered id="column" ref="column" :title="$t('price.editColumn')">
       <b-row>
         <b-col>
           <b-form-checkbox-group buttons  style="width:100%" v-model="newFields" stacked :options="opt(fields)"/>
@@ -8,7 +8,7 @@
         <b-col class="text-center">
           <b-form-checkbox-group buttons  style="width:100%" v-model="newFields1" stacked :options="opt(fields1)"/>
           <b-button class="btn btn-light" @click="hideColumnfunc()">
-            {{hideColumn?'hide':'show'}} this column
+            {{hideColumn?$t('price.hide'):$t('price.show')}} {{$t('price.column')}}
           </b-button>
         </b-col>
       </b-row>
@@ -17,7 +17,7 @@
       </template>
     </b-modal>
     <b-row>
-      <b-col cols="3" class="block-1">
+      <b-col cols="12" lg="3" class="block-1" >
         <vue-drag-tree
         :data='itemsMenu'
         :allowDrag='allowDrag'
@@ -34,70 +34,110 @@
         @drop="dropHandler">
         </vue-drag-tree>                              
       </b-col>
-      <b-col :cols="hideColumn?5:9" class="block-2">
-        <b-table hover :items="items" :fields="getFields(fields, newFields)" small sticky-header  style="max-height:100%">
+      <b-col cols="12" :lg="hideColumn?5:9" class="block-2 m-0 p-0">
+        <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+        <b-table hover :items="items" :fields="getFields(fields, newFields)" small stacked="lg"
+        show-empty no-border-collapse >
           <template #cell(#)="data">
-            <div @click="rowSelected(data.item)" class="text-center w-100">
+            <div @click.prevent.stop="rowSelected(data.item)" class="text-center w-100">
               {{ data.index + 1 }}
             </div>
           </template>
           <template #cell(pos_num)="row">
-            <b-input  size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num" @change="updateDate($event, 'pos_num', row.item.id)"></b-input>
+            <b-col @click.prevent.stop="rowSelected(row.item)"
+            class="diveditable"
+            v-html="row.item.pos_num" />
           </template>
           <template #cell(name)="row">
-       <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.name" @change="updateDate($event, 'name', row.item.id)"></b-input> -->
-            <div :style="(row.item._rowVariant=='success')?rowColor:''+';width:100%;min-width:150px;'" contenteditable="true"  @blur="updateDate($event.target.innerText, 'name',  row.item.id)">{{row.item.name}}</div>
+          <div @click.prevent.stop="rowSelected(row.item)" :title="(row.item.desc&&row.item.desc.length!=0)?row.item.desc:'(You have not added an explanation for this item)'"
+            v-html="row.item.name" />
           </template>
           <template #cell(unit)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.unit" @change="updateDate($event, 'unit', row.item.id)"></b-input>
+            <div @click.prevent.stop="rowSelected(row.item)"
+            v-html="row.item.unit" />
           </template>
           <template #cell(price)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.price" @change="updateDate($event, 'price', row.item.id)"></b-input>
+          <div @click.prevent.stop="rowSelected(row.item)"
+          v-html="row.item.price" />
           </template>
           <template #cell(without)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.without" @change="updateDate($event, 'without', row.item.id)"></b-input>
+            <div @click.prevent.stop="rowSelected(row.item)"
+          v-html="row.item.without" />
           </template>
           <template #cell(percent)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.percent" @change="updateDate($event, 'percent', row.item.id)"></b-input>
-          </template>
-          <template #cell(show_details)="row">
-            <b-link @click="row.toggleDetails"  style="text-decoration: none;font-weight: normal;">
-              {{ row.detailsShowing ? '-' : '+'}}
-            </b-link>
+            <div @click.prevent.stop="rowSelected(row.item)"
+        v-html="row.item.percent" />
           </template>
           <template #cell(delete)="row">
-            <b-icon icon="trash" aria-hidden="true" @click.prevent.stop="delRow(row.item.id)"  />
-            <!-- <b-link @click.prevent.stop="delRow(row.item.id)" class="fas fa-trash fa-w-16 text-center" /> -->
+            <b-icon icon="trash" aria-hidden="true" @click.prevent.stop="delRow(row.item.id)"></b-icon>
           </template>
-          <template #row-details="row">
-            <div contenteditable="true" :style="(row.item._rowVariant=='success')?rowColor:''" @blur="updateDate($event.target.innerText, 'desc', row.item.id)">{{row.item.desc}}</div>
-          </template>
-        </b-table>  <span hidden>{{selectedPrice}}</span>                           
+        </b-table>
+      </div>
       </b-col>
-      <b-col cols="4" v-show="hideColumn" class="block-2">
-        <b-table:items="selectedPrice" :fields="getFields(fields1, newFields1)"  hover small  sticky-header  style="max-height:100%">
+      <b-col cols="4" v-show="hideColumn" class="block-1">
+        <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+ <b-table :items="selectedPrice" :fields="getFields(fields1, newFields1)"  hover small 
+ show-empty no-border-collapse>
           <template #cell(#)="data">
             <div @click="rowSelected(data.item)" class="text-center w-100">
               {{ data.index + 1 }}
             </div>
           </template>
           <template #cell(pos_num)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num" ></b-input>
+          <div
+          contenteditable="true"
+          @click.prevent.self 
+          class="diveditable"
+          @blur="updateDate($event.target.innerHTML, 'pos_num', row.item.id)"
+          v-html="row.item.pos_num" />
+
+            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num" ></b-input> -->
           </template>
           <template #cell(name)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.name" ></b-input>
+
+          <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'" :title="(row.item.desc)?row.item.desc:'(You have not added an explanation for this item)'"
+          contenteditable="true" @click.prevent.self v-html="row.item.name"
+          @blur="updateDate($event.target.innerHTML, 'name', row.item.id)" />
+
+            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.name" ></b-input> -->
           </template>
           <template #cell(unit)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.unit" ></b-input>
+          <div
+          contenteditable="true" @click.prevent.self 
+          class="diveditable"
+          @blur="updateDate($event.target.innerHTML, 'unit', row.item.id)"
+          v-html="row.item.unit" />
+
+
+            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.unit" ></b-input> -->
           </template>
           <template #cell(price)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.price" ></b-input>
+
+          <div
+          contenteditable="true" @click.prevent.self 
+          class="diveditable"
+          @blur="updateDate($event.target.innerHTML, 'price', row.item.id)"
+          v-html="valueDigital(row.item.price)" />
+
+            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.price" ></b-input> -->
           </template>
           <template #cell(without)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.without"></b-input>
+            <div
+        contenteditable="true" @click.prevent.self 
+        class="diveditable"
+        @blur="updateDate($event.target.innerHTML, 'without', row.item.id)"
+        v-html="valueDigital(row.item.without)" />
+            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.without"></b-input> -->
           </template>
           <template #cell(percent)="row">
-            <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.percent" ></b-input>
+
+            <div
+        contenteditable="true" @click.prevent.self 
+        class="diveditable"
+        @blur="updateDate($event.target.innerHTML, 'percent', row.item.id)"
+        v-html="valueDigital(row.item.percent)" />
+
+            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.percent" ></b-input> -->
           </template>
           <template #cell(show_details)="row">
             <b-link @click="row.toggleDetails"  style="text-decoration: none;font-weight: normal;">
@@ -105,11 +145,14 @@
             </b-link>
           </template>
           <template #row-details="row">
-            <div contenteditable="true" :style="(row.item._rowVariant=='success')?rowColor:''" >{{row.item.desc}}</div>
-          </template>
+            <div contenteditable="true" @blur="updateDate($event.target.innerHTML, 'desc', row.item.id)">{{row.item.desc}}</div>
+<!--             <div  :style="(row.item._rowVariant=='success')?rowColor:''" >{{row.item.desc}}</div>
+ -->          </template>
         </b-table>
+      </div>
       </b-col>
     </b-row>
+       <span hidden="">{{selectedPrice}}</span>    
   </b-container>
 </template>
 <script>
@@ -118,43 +161,53 @@ export default {
   props: ['howhight', 'idNode', 'parId', 'items', 'itemsMenu', 'selectedPrice', 'menuPriceTree'],
   data(){
     return{
-      newFields:['#', 'Position', 'i', 'Name', 'Price'],
-      newFields1:['#','Name'],
       rowColor:'background-color:#c3e6cb',
       hideColumn:false,
-      fields: [
+      fieldsForTable:[],
+      fields1ForTable:[],
+      drag1: null,
+      drag2: null,
+      newFields:['#', this.$t('lists.position'), this.$t('customerDetail.name'), this.$t('lists.price')],
+      newFields1:['#', this.$t('customerDetail.name'), 'i']
+    }
+  },
+   computed: {
+    // newFields(){
+    //   return['#', this.$t('lists.position'), this.$t('customerDetail.name'), this.$t('lists.price')]
+    // },
+    // newFields1(){
+    //   return['#', this.$t('customerDetail.name'), 'i']
+    // },
+    fields(){
+      return[
       {
         key: '#',
-        label:'#'
+        label: '#',
+        sortable: true
       },
       {
         key: 'pos_num',
-        label: 'Position',
+        label: this.$t('lists.position'), 
         sortable: true
       },
       {
         key: 'name',
-        label: 'Name',
+        label: this.$t('customerDetail.name'), 
         sortable: true
       },
       {
-        key: 'show_details',
-        label: 'i'
-        // tdClass: 'text-center'
-      },
-      {
         key: 'unit',
-        label: 'Unit',
+        label: this.$t('calcTable.unit'), 
         sortable: true
       },
       {
         key: 'price',
-        label: 'Price',
+        label: this.$t('lists.price'), 
         sortable: true
       },
       {
         key: 'without',
-        label: 'Without',
+        label: this.$t('lists.without'),
         sortable: true
       },
       {
@@ -164,55 +217,68 @@ export default {
       },
       {
         key: 'delete',
-        label: 'Del'
-      }],
-      fields1: [
+        label: this.$t('docs.delete')
+      }
+    ]
+  },
+      fields1(){
+      return[
       {
         key: '#',
-        label:'#'
+        label: '#',
+        sortable: true
       },
       {
         key: 'pos_num',
-        label: 'Position',
+        label: this.$t('lists.position'), 
         sortable: true
       },
       {
         key: 'name',
-        label: 'Name',
+        label: this.$t('customerDetail.name'), 
         sortable: true
       },
       {
         key: 'show_details',
         label: 'i'
-        // tdClass: 'text-center'
       },
       {
         key: 'unit',
-        label: 'Unit',
+        label: this.$t('calcTable.unit'), 
         sortable: true
       },
       {
         key: 'price',
-        label: 'Price',
+        label: this.$t('lists.price'), 
         sortable: true
       },
       {
         key: 'without',
-        label: 'Without',
+        label: this.$t('lists.without'),
         sortable: true
       },
       {
         key: 'percent',
         label: '%',
         sortable: true
-      }],
-      fieldsForTable:[],
-      fields1ForTable:[],
-      drag1: null,
-      drag2: null
-    }
-  },
+      }
+    ]
+  }
+    },
   methods: {
+    valueDigital(model){
+      var value = parseFloat(model)
+      value = value.toString()
+      value = value.replace('.',',')
+      value = (value=='NaN')?0:value
+      if (value.length < 3){
+        value = '&nbsp;&nbsp;'+value+'&nbsp;&nbsp;'
+      }
+      return value
+    },
+    updateWidth() {
+        this.width = window.innerWidth;
+    },
     rowSelected(items) {
       this.$emit('rowSelected', items)  
     },
@@ -247,8 +313,13 @@ export default {
     hidePosition(){
       this.$refs.column.show()    
     },
-    onClickOutside() {
-      this.$emit('onClickOutside')
+    // onClickOutside() {
+    //   this.$emit('onClickOutside')
+    // },
+    loded(){
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs.heightTablePrice.clientHeight, 200)
+      }, 1);     
     },
     allowDrag(model, component) {
       if (component.depth!=1){
@@ -269,7 +340,7 @@ export default {
       return false;
     },   
     curNodeClicked(model, component) { 
-      this.$emit('curNodeClicked', model, component)  
+      this.$emit('curNodeClicked', model, component)
     },
     curNodeClickedModal(model, component){
         this.idNodeModal=model.id
@@ -321,6 +392,12 @@ export default {
     // console.log('dropHandler: ', model, component, e);
       this.drag2=model.id;
     }
+  },
+  mounted(){
+    window.addEventListener('resize', this.updateWidth);
+    this.updateWidth();
+    this.$emit('loded', 'component', this.$refs.heightTablePrice.clientHeight, 200)
   }
+
 }
 </script>

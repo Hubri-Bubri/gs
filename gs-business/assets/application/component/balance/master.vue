@@ -6,39 +6,102 @@
     <container-body>
       <b-card class="gs-container" footer-class="cardFooterBorder">
         <template #header>
-          <b-row align-v="end">
-            <b-col col  xl="2" lg="2" md="12"  sm="12" xs="12">
+          <b-row align-v="end" align-h="between">
+             <b-col col xl="9" lg="8" md="8" sm="12" cols="12">
+            <b-input-group>
+              <template #prepend>
+              <b-dropdown  variant="primary" dropright>
+                <template #button-content>
+                  {{$t('states.mode')}}
+                  <!-- <b-icon icon="list-check" aria-hidden="true"></b-icon>  -->
+                </template>
+
+ <b-form-checkbox class="ml-2" style="width:200px;" switch @change="modeInvoice($event)">
+      {{(me_sub=='0')?$t('alert.Invoices'):$t('states.subInvoices')}}
+    </b-form-checkbox>
+    <b-form-checkbox class="ml-2" style="width:200px;" switch @change="paid($event)">
+      {{(unpaid_all=='0')?$t('states.unpaidInvoices'):$t('states.paidInvoices')}}
+    </b-form-checkbox>
+                
+              </b-dropdown>
+              </template>
+
+
               <b-form-input
-              class="w-100"
+
               v-model="filter"
               type="search"
-              placeholder="Search">
+              :placeholder="$t('projects.search')">
               </b-form-input>
-            </b-col>
-            <b-col col xl="6" lg="6" md="8"  sm="8" xs="8"> 
-              <b-form-checkbox-group
-              class="text-lg-center text-xl-center text-sm-left text-md-left"
+
+
+              <template #append>
+              <b-dropdown  variant="primary" dropright>
+                <template #button-content>
+                  {{$t('states.options')}}
+                  <!-- <b-icon icon="list-check" aria-hidden="true"></b-icon>  -->
+                </template>
+
+
+
+<!-- 
+            <b-form-checkbox-group 
+              class="m-2"
+              style="width:200px;"
               switches
-              v-model="filterOn">
-                <b-form-checkbox v-for="fild in filterFilds(fieldsTable)" :key="fild.key" :value="fild.key">
-                  {{fild.label}}
-                </b-form-checkbox>
-              </b-form-checkbox-group>
-            </b-col>
-            <b-col col xl="4" lg="4" md="4"  sm="4" xs="4">
-              <b-form-checkbox-group
-              class="text-sm-left text-md-left text-lg-right "
-              switches
-              v-model="selected"
+              :value="selmode"
               :options="typesForTablesOpt"
-              @change="keywordChange($event)"/>
+              @change="keywordChange($event)">
+                
+              </b-form-checkbox-group> -->
+
+   
+<b-form-checkbox-group
+                class="m-2"
+                switches
+                v-model="filterOn">
+                  <b-form-checkbox v-for="fild in filterFilds(fieldsTable)" :key="fild.key" :value="fild.key">
+                    {{fild.label}}
+                  </b-form-checkbox>
+                </b-form-checkbox-group>
+              </b-dropdown>
+            </template>
+            </b-input-group>
             </b-col>
+            <b-col col xl="3" lg="4" md="4" sm="12" cols="12" align-self="end">
+
+              <b-form-row style="width:260px;float: right;">
+              <b-form-datepicker style="max-width:125px;"
+              :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+              :locale="$i18n.locale"
+              :value="fromData"
+              :max="detectMax()"
+              @input="changeDate('min', $event)"
+              >
+              </b-form-datepicker>
+              
+             
+              <b-form-datepicker style="max-width:125px;"
+              :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+              :locale="$i18n.locale"
+              :value="toData"
+              :min="min"
+              :max="toData"
+              @input="changeDate('max', $event)"
+              >
+              </b-form-datepicker>
+           </b-form-row>
+       
+            </b-col>
+
+
           </b-row>
         </template>
         <container>
           <container-body>
-            <b-table @row-clicked="dataToFoot($event)" :items="items" :fields="getFields()" hover :filter="filter" :filter-included-fields="filterOn"
-              show-empty @filtered="onFiltered" sticky-header no-border-collapse style="max-height:100%" :busy="((items.length==0) && (selected.length!=0))">
+            <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+            <b-table @row-clicked="dataToFoot($event)" :items="items" :fields="getFields()" hover :filter="filter" :filter-included-fields="filterOn" stacked="lg"
+              show-empty @filtered="onFiltered"  no-border-collapse  :busy="((items.length==0) )">
               <template #cell(status_set)="it">
                   <line-chart :datas="dataCharts(it.item)" :height="50" style="max-width:200px;" />
               </template>
@@ -50,23 +113,24 @@
               <template #table-busy>
                 <div class="text-center text-info">
                   <b-spinner class="align-middle"></b-spinner>
-                  <strong>Loading...</strong>
+                  <strong>{{$t('projects.loading')}}...</strong>
                 </div>
               </template>
             </b-table>
+          </div>
           </container-body>
           </container>
           <template #footer>
-            <b-table-simple v-show="(rowId!=null)&addPaymentState">
+            <b-table-simple v-show="(rowId!=null)&addPaymentState" >
               <b-tbody>
                     <b-tr>
                       <b-td class="text-center">
-                        Amounts
+                        {{$t('balance.amounts')}}
                       </b-td>
                       <b-td>
                         <b-row>
                           <b-col col>
-                            Payments:
+                            {{$t('balance.payments')}}:
                           </b-col>
                           <b-col col>
                             {{Math.abs(summ())|thousandSeparator}} €
@@ -89,7 +153,7 @@
                       <b-td>
                         <b-row>
                           <b-col col>
-                            Invoice Amount:
+                            {{$t('balance.invoiceAmount')}}:
                           </b-col>
                           <b-col col>
                             {{amount|thousandSeparator}} €
@@ -99,7 +163,7 @@
                       <b-td>
                         <b-row>
                           <b-col col>
-                            Outstanding balance:
+                            {{$t('balance.outstandingBalance')}}:
                           </b-col>
                           <b-col col>
                             {{(Math.abs(summ())-Math.abs(amount))|thousandSeparator}} €
@@ -118,7 +182,7 @@
                     </b-tr>
                     <b-tr>
                       <b-td>
-                        <b-textarea :rows="textLength()" @change.native="updateComment(comment)" placeholder="Description" v-model="comment" />
+                        <b-textarea :rows="textLength()" @change.native="updateComment(comment)" :placeholder="$t('balance.description')" v-model="comment" />
                       </b-td>
                       <b-td colspan="2">
                         <b-row v-for="(operation, index) in op" :key="op.id" align-v="center" :class="(operation.new)?'bg-primary text-light':'bg-default'">
@@ -155,13 +219,13 @@
               <b-row align-v="end">
                 <b-col col cols="6">
               <b-button @click="addPayment"  v-show="addPaymentState" variant="primary" :disabled="(Math.abs(summ())>=Math.abs(amount))">
-                Add payment
+                {{$t('balance.addPayment')}}
               </b-button>
-              <b-button @click="op=[];items=[];getBalance(old_done)" variant="warning" v-show="(addPaymentState)&(cancelPay()!=0)">
-                Сancel all new payments
+              <b-button @click="op=[];items=[];getBalance(old_done+'|'+fd+'|'+td)" variant="warning" v-show="(addPaymentState)&(cancelPay()!=0)">
+                {{$t('balance.cancelAllNewPayments')}}
               </b-button>
               <b-button  variant="success" v-show="(addPaymentState)&(cancelPay()!=0)" @click="saveAll">
-                Save all new payments
+                {{$t('balance.saveAllNewPayments')}}
               </b-button>
             </b-col>
             <b-col col cols="6" class="text-right">
@@ -180,100 +244,176 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      selmode:[],
+      fd:'0000-00-00',
+      td:'0000-00-00',
+      me_sub: '0',
+      unpaid_all: '0',
+      max:null,
+      min:null,
       valueType:'',
       addPaymentState: false,
-      old_done: '100',
+      old_done: '00',
       result:[],
       keyword: '',
       bank:null,
       tabxmodal:false,
       items:[],
-      selected: ['Unpaid Invoices'],
       rowId:null,
       amount:null,
       op:[],
       comment:null,
-      typesForTablesOpt:['Unpaid Invoices', 'Paid Invoices', 'Sub Invoices'],
-      fieldsTable: [
-      {
-        key:'number',
-        label: 'Number',
-        sortable: true
-      },
-      {
-        key:'cnumber',
-        label: 'Contract',
-        sortable: true
-      },
-      {
-        key:'date',
-        label: 'Date',
-        sortable: true
-      },
-      {
-        key:'street1',
-        label: 'Street',
-        sortable: true
-      },
-      {
-        key:'names',
-        label: 'Customer',
-        sortable: true
-      },
-      {
-        key:'netto',
-        label: 'Netto',
-        sortable: true
-      },
-      {
-        key:'brutto',
-        label: 'Brutto',
-        sortable: true
-      },
-      {
-        key:'status_set',
-        label: 'Status',
-        sortable: true,
-        class: 'status'
-      },
-      {
-        key:'days',
-        label: 'Days',
-        sortable: true
-      }
-      ],
-      options: [
-      {
-        value: 'Open',
-        text: 'Open'
-      },
-      {
-        value: 'Done',
-        text: 'Done'
-      },
-      {
-        value: 'Invoice',
-        text: 'Invoice'
-      },
-      {
-        value: 'Desiccation',
-        text: 'Desiccation'
-      },
-      {
-        value: 'Leakage_Detection',
-        text: 'Leakage Detection'
-      },
-      {
-        value: 'Restoration',
-        text: 'Restoration'
-      }
-      ],
+      // options: [
+      // {
+      //   value: 'Open',
+      //   text: 'Open'
+      // },
+      // {
+      //   value: 'Done',
+      //   text: 'Done'
+      // },
+      // {
+      //   value: 'Invoice',
+      //   text: 'Invoice'
+      // },
+      // {
+      //   value: 'Desiccation',
+      //   text: 'Desiccation'
+      // },
+      // {
+      //   value: 'Leakage_Detection',
+      //   text: 'Leakage Detection'
+      // },
+      // {
+      //   value: 'Restoration',
+      //   text: 'Restoration'
+      // }
+      // ],
       totalRows: 1,
       filter: null,
       filterOn: []
     }
   },
+  computed: {
+    fromData(){
+      var date = new Date();
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var year = date.getFullYear() - 1;
+      var currentDate = `${year}-${month}-${day}`;
+      return currentDate
+    },
+    toData(){
+      var date = new Date();
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var year = date.getFullYear();
+      var currentDate = `${year}-${month}-${day}`;
+      return currentDate
+    },
+    // calendar(){
+    //   return {'de':{
+    //                       labelPrevDecade: this.$t('calendar.labelPrevDecade'),
+    //                       labelPrevYear: this.$t('calendar.labelPrevYear'),
+    //                       labelPrevMonth: this.$t('calendar.labelPrevMonth'),
+    //                       labelCurrentMonth: this.$t('calendar.labelCurrentMonth'),
+    //                       labelNextMonth: this.$t('calendar.labelNextMonth'),
+    //                       labelNextYear: this.$t('calendar.labelNextYear'),
+    //                       labelNextDecade: this.$t('calendar.labelNextDecade'),
+    //                       labelToday: this.$t('calendar.labelToday'),
+    //                       labelSelected: this.$t('calendar.labelSelected'),
+    //                       labelNoDateSelected: this.$t('calendar.labelNoDateSelected'),
+    //                       labelCalendar: this.$t('calendar.labelCalendar'),
+    //                       labelNav: this.$t('calendar.labelNav'),
+    //                       labelHelp: this.$t('calendar.labelHelp')}}
+            
+    // },
+    // typesForTablesOpt(){
+    //   return [
+    //   (this.old_done[1]==0)?this.$t('alert.Invoices'):this.$t('states.subInvoices'),
+    //   (this.old_done[0]==0)?this.$t('states.unpaidInvoices'):this.$t('states.paidInvoices')
+    //   ]
+    // },
+
+    // selected(){
+    //   return []
+    // },
+    fieldsTable() {
+      return [{
+        key: 'number',
+        label: this.$t('fields.number'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'cnumber',
+        label: this.$t('fields.contract'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'date',
+        label: this.$t('customerDetail.date'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'street1',
+        label: this.$t('fields.street'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'names',
+        label: this.$t('customerDetail.customer'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'netto',
+        label: this.$t('edit.netto'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'brutto',
+        label: this.$t('edit.brutto'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'status_set',
+        label: this.$t('fields.status'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'days',
+        label: this.$t('fields.days')
+      }]
+    }
+  },
   methods: {
+    detectMax(){
+      if (this.max == null){
+        var toData = this.toData.split('-')
+        return toData[0]+'-'+toData[1]+'-'+(toData[2]-1)
+      } else {
+        return this.max
+      }
+
+    },
+    changeDate(type, value){
+      if (type == 'max'){
+        this.max = value;
+        this.td = value;
+      }
+      if (type == 'min'){
+        this.min = value;
+        this.fd = value;
+      }
+      this.getBalance(this.old_done+'|'+this.fd+'|'+this.td)
+    },
     cancelPay(){
       var newTrue = 0
       this.items.filter((v)=>{
@@ -338,8 +478,11 @@ export default {
           mode: mode
         }
       }).then(response => {
+        // console.log('1')
         var countSelect = 0
         this.items = response.data.filter((v)=>{
+
+          // console.log('2')
           v.date = this.$options.filters.dateInverse(v.date)
           v.days = this.difdate(v.date)
           v.status_set = (this.summFromRow(v, v.brutto)*66/v.brutto)+((34-(-this.difdate(v.date))*34/14)/2)
@@ -351,19 +494,22 @@ export default {
               v.cnumber = v.number.split(' ')[2]
               v.number = v.number.split(' ')[3]+' - '+v.number.split(' ')[0]
             }
-          if (v.type==3){
+          if (v.type==30){
             v.type = 'DEBET'
             if((v.number.split(' ').length==1)|(v.number.split(' ').length==3)|(v.number.split(' ').length==5)){
               v.netto = this.$options.filters.thousandSeparator(v.netto)
               v.brutto = this.$options.filters.thousandSeparator(v.brutto)
             }
           }
-          if (v.type==6){
+          if (v.type==60){
+            // console.log('3')
             v.type = 'CREDIT'
-            v.netto = -v.netto
-            v.brutto = -v.brutto
-            v.netto = this.$options.filters.thousandSeparator(v.netto)
-            v.brutto = this.$options.filters.thousandSeparator(v.brutto)
+            // v.netto = -v.netto
+            // console.log(v.brutto)
+            // v.brutto = -v.brutto
+            // console.log(v.brutto)
+            v.netto = '-'+this.$options.filters.thousandSeparator(v.netto)
+            v.brutto = '-'+this.$options.filters.thousandSeparator(v.brutto)
           }
           if (this.rowId!=null){
             this.items = this.items.filter((selected)=>{
@@ -376,6 +522,10 @@ export default {
               return selected
             })
           }
+          // console.log(v.other=='TEC / 1 / 35.362 / 2022')
+          // if (v.id==552){
+          //   console.log(v)
+          // }
           return v
         })
         if(countSelect==0){
@@ -389,6 +539,7 @@ export default {
       row.op.forEach((v)=>{
         result = result + parseFloat(v.value)
       })
+      // console.log(result)
       return result
     },
     difdate(val){
@@ -401,28 +552,116 @@ export default {
       var daysLag = Math.ceil(Math.abs(date2.getTime() - date1.getTime()) / (1000 * 3600 * 24))
       return (-14+(daysLag-1))
     },
-    keywordChange(e){
-      var unpaid = '0'
-      var paid = '0'
-      var subinvoice = '0'
-        e.forEach((v)=>{
-          if(v=='Unpaid Invoices'){
-            unpaid='1'
-          }
-          if(v=='Paid Invoices'){
-            paid='1'
-          }
-          if(v=='Sub Invoices'){
-            subinvoice='1'
-          }
-        })
-      if ((unpaid+paid+subinvoice)!=this.old_done){
+
+    modeInvoice(e){
+      if(e==false){
+        this.me_sub='0'
+      }
+      if(e==true){
+        this.me_sub='1'
+      }
+      if ((this.unpaid_all+this.me_sub+'|'+this.fd+'|'+this.td)!=this.old_done+'|'+this.fd+'|'+this.td){
         this.op=[]
         this.items=[]
-        this.getBalance(unpaid+paid+subinvoice)
-        this.old_done = unpaid+paid+subinvoice
+        this.getBalance(this.unpaid_all+this.me_sub+'|'+this.fd+'|'+this.td)
+        this.old_done = this.unpaid_all+this.me_sub
+        // this.selmode=selected
       }
     },
+    paid(e){
+      if(e==false){
+        this.unpaid_all='0'
+      }
+      if(e==true){
+        this.unpaid_all='1'
+      }
+      if ((this.unpaid_all+this.me_sub+'|'+this.fd+'|'+this.td)!=this.old_done+'|'+this.fd+'|'+this.td){
+        this.op=[]
+        this.items=[]
+        this.getBalance(this.unpaid_all+this.me_sub+'|'+this.fd+'|'+this.td)
+        this.old_done = this.unpaid_all+this.me_sub
+        // this.selmode=selected
+      }
+    },
+
+
+    // keywordChange(e){
+    //   // console.log(e)
+    //   var unpaid_all = '0'
+    //   var me_sub = '0'
+    //   var selected = []
+    //   var same = false
+    //   // var subinvoice = '0'
+
+    //   console.log(this.selmode)
+    //     e.forEach((v)=>{
+
+
+          
+    //       if(v==this.$t('states.unpaidInvoices')){
+    //           same = false
+    //           this.selmode.forEach((oldval)=>{
+    //             console.log(v, oldval, this.selmode)
+    //             if (v == oldval) {
+    //               same = true
+    //             }
+    //           })
+    //           if (same == false){
+    //             console.log('!')
+    //             unpaid_all='1'
+    //             selected.push(this.$t('states.paidInvoices'))
+    //           }
+    //         }
+
+    //         if(v==this.$t('states.paidInvoices')){
+    //           same = false
+    //           this.selmode.forEach((oldval)=>{
+    //             if (v == oldval) {
+    //               same = true
+    //             }
+    //           })
+    //           if (same == false){
+    //             unpaid_all='0'
+    //             selected.push(this.$t('states.unpaidInvoices'))
+    //           }
+    //         }
+
+    //         if(v==this.$t('states.subInvoices')){
+    //           same = false
+    //           this.selmode.forEach((oldval)=>{
+    //             if (v == oldval) {
+    //               same = true
+    //             }
+    //           })
+    //         if (same == false){
+    //             me_sub='0'
+    //             selected.push(this.$t('alert.Invoices'))
+    //           }
+    //         }
+
+    //         if(v==this.$t('alert.Invoices')){
+    //           same = false
+    //           this.selmode.forEach((oldval)=>{
+    //             if (v == oldval) {
+    //               same = true
+    //             }
+    //         })
+    //         if (same == false){
+    //             me_sub='1'
+    //             selected.push(this.$t('states.subInvoices'))
+    //           }
+    //         }
+    //     })
+
+      
+    //   if ((unpaid_all+me_sub+'|'+this.fd+'|'+this.td)!=this.old_done+'|'+this.fd+'|'+this.td){
+    //     this.op=[]
+    //     this.items=[]
+    //     this.getBalance(unpaid_all+me_sub+'|'+this.fd+'|'+this.td)
+    //     this.old_done = unpaid_all+me_sub
+    //     this.selmode=selected
+    //   }
+    // },
     updateBalance(val, operation, type) {
       if (operation.new){
         this.$set(operation, type, val)
@@ -513,7 +752,7 @@ export default {
       }
     },
     removePay(id){
-      if (confirm("Are you sure?")) {
+      if (confirm(this.$t('alert.sure'))) {
         axios.get('/remove_payment', {
           params: {
             id: id
@@ -538,24 +777,27 @@ export default {
       var brutto = parseFloat(0.00)
       var netto = parseFloat(0.00)
       this.items.filter((v)=>{
+        v.brutto = v.brutto.replace('--', '-')
+        v.netto = v.netto.replace('--', '-')
         brutto = brutto + this.$options.filters.reThousandSeparator(v.brutto)
         netto = netto + this.$options.filters.reThousandSeparator(v.netto)
         // console.log(brutto, netto)
       })
-      if (
-        (this.$security.account['id']==1) ||
-        (this.$security.account['id']==3)
-      ){
+      // if (
+      //   (this.$security.account['id']==1) ||
+      //   (this.$security.account['id']==3)
+      // )
+      // {
         return 'Netto '+this.$options.filters.thousandSeparator(netto)+' €  Brutto '+this.$options.filters.thousandSeparator(brutto)+' €'
-      }
+      // }
     }
   },
   mounted(){
     this.totalRows = this.items.length
     setTimeout(() => {
       this.$socket.send('getBalance')
-      this.$options.sockets.onmessage = (data) => (data.data=='getBalance') ? this.getBalance('100'): ''
-      this.$options.sockets.onmessage = (data) => (data.data=='getBalanceAfterPay') ? this.getBalance(this.old_done): ''
+      this.$options.sockets.onmessage = (data) => (data.data=='getBalance') ? this.getBalance('00|0000-00-00|0000-00-00'): ''
+      this.$options.sockets.onmessage = (data) => (data.data=='getBalanceAfterPay') ? this.getBalance(this.old_done+'|'+this.fd+'|'+this.td): ''
     },1000);
   }
 }

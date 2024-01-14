@@ -1,31 +1,20 @@
 <template>
    <div>
     <hr />
-          <b-row>
-          <b-col cols="6">
-            <slot></slot>
-          </b-col>
-          <b-col cols="5">
-    
-              <slot name="Type"></slot>
-        
-              
-              
-         
-          </b-col>
-          <b-col cols="1">
-            <b-button size="sm" @click="printOffer()" v-if="!((tmp.typeOfHead=='Invoices')&&(tmp.number.split(' ').length==5))">
-              <b-icon icon="printer" aria-hidden="true"></b-icon>
-            </b-button>
-          </b-col>
-          </b-row>
-      <br/>
+    <b-row align-h="between" class="pr-2">
+        <slot></slot>
+        <b-button size="sm" @click="printOffer()" class="printForMobile"
+        v-if="!(((tmp.typeOfHead=='Invoices')&&(tmp.number.split(' ').length==5))||(tmp.typeOfHead=='StandingOrder'))">
+          <b-icon icon="printer" aria-hidden="true"></b-icon>
+        </b-button>
+    </b-row>
+    <br/>
       <b-modal size="lg" centered ok-only no-close-on-esc no-close-on-backdrop hide-header-close  :visible="windowPrint" v-if="makemodalpdf">
          <div slot="modal-title" class="w-100">
-            <div>Print</div>
+            <div>{{$t('print.print')}}</div>
          </div>
 
-         <iframe type="iframe" style="width:100%;height:550px;" name="myIframe" ></iframe>
+         <iframe type="iframe" style="width:100%;height:550px;" name="myIframe"  @load="loadFrame"></iframe>
 
          <form target="myIframe" :action="'/pdf'" method="post" style="display:none" ref="preForm">
             <input type="text" name="dateInspect" :value="tmp.dateInspect" />
@@ -88,55 +77,57 @@
             <b-row align-v="start">
                <b-col cols="6" align-self="end">
                   <b-form inline  v-if="tmp.typeOfHead!='Devices'">
-                     <b-col cols="4">Date Of Print</b-col>
+                     <b-col cols="4">{{$t('print.dateOfPrint')}}</b-col>
                      <b-col cols="8">
                         <b-input style="color:#000; padding-left: 5px !important; font-size: 16px;width:172px;"
                            size="sm" type="date" v-model="today" @change="preview" />
                      </b-col>
                   </b-form>
                    <b-form inline v-if="tmp.typeOfHead=='SUB' || tmp.typeOfHead=='Invoices'">
-                     <b-col cols="4">Start Works</b-col>
+                     <b-col cols="4">{{$t('print.startWorks')}}</b-col>
                      <b-col cols="8">
                         <b-input style="color:#000; padding-left: 5px !important; font-size: 16px;width:172px;" size="sm" type="date"
                            v-model="stworks"  @change="preview" />
                      </b-col>
                   </b-form>
                   <b-form inline v-if="tmp.typeOfHead!='Devices' & tmp.typeOfHead!='Damage'">
-                     <b-col cols="4">End Works</b-col>
+                     <b-col cols="4">{{$t('print.endWorks')}}</b-col>
                      <b-col cols="8">
                         <b-input style="color:#000; padding-left: 5px !important; font-size: 16px;width:172px;" size="sm" type="date"
                            v-model="dateForInvoice"  @change="preview" />
                      </b-col>
                   </b-form>
                   <b-form inline v-if="tmp.typeOfHead=='Damage'">
-                     <b-col cols="4">Inspect Date</b-col>
+                     <b-col cols="4">{{$t('print.inspectDate')}}</b-col>
                      <b-col cols="8">
                         <b-input style="color:#000; padding-left: 5px !important; font-size: 16px;width:172px;" size="sm" type="date"
                            v-model="dateForInspect"  @change="preview" />
                      </b-col>
                   </b-form>
                   <b-form inline v-if="tmp.typeOfHead=='Damage'">
-                     <b-col cols="4">Inspect By</b-col>
+                     <b-col cols="4">{{$t('print.inspectBy')}}</b-col>
                      <b-col cols="8">
-                <b-form-select style="color:#000; padding-left: 5px !important; font-size: 16px;" size="sm" 
+                <b-form-select style="color:#000; padding-left: 5px !important; font-size: 16px;" size="sm"  :disabled="addDocument"
                      :options="workers" :value="byForInspect" @change="toByForInspect($event)" >
                   </b-form-select>
                      </b-col>
                   </b-form>
 
                   <b-button-group size="sm" style="padding-top: 15px !important;padding-left: 15px !important;">
-                    <b-button variant="primary" @click="$emit('hideWindowPrint')">
-                        Close 
+                    <b-button variant="primary" @click="$emit('hideWindowPrint')" >
+                        {{$t('print.close')}} 
                      </b-button>
-                     <b-button variant="primary" @click="printPdf">
-                        Print
+                     <b-button variant="primary" @click="printPdf" >
+                        {{$t('print.print')}} 
                      </b-button>
-
-                     <b-button variant="primary" @click="addPdf">
-                        Add
+                     <b-button variant="primary" @click="addPdf" :disabled="addDocument">
+                        {{ addDocument?$t('projectDetail.docInProgress'):$t('projectDetail.add') }}
+                        <b-iconstack font-scale="1" v-if="addDocument">
+                          <b-icon stacked icon="circle-fill" animation="throb" variant="info"></b-icon>
+                        </b-iconstack>
                      </b-button>
-                     <b-button variant="primary" @click="addPdfSep" v-if="tmp.typeOfHead=='Devices'">
-                        Add Separated
+                     <b-button variant="primary" @click="addPdfSep" v-if="tmp.typeOfHead=='Devices'" :disabled="addDocument">
+                        {{$t('print.addSeparated')}} 
                      </b-button>                     
                   </b-button-group>
                </b-col>
@@ -184,12 +175,10 @@ export default {
     ],
     data() {
         return {
-
-
-
-            stworks:null,
-            customerContract: [],
-            today: (new Date().getFullYear() + '-' +
+          addDocument:false,
+          stworks:null,
+          customerContract: [],
+          today: (new Date().getFullYear() + '-' +
                     (((new Date().getFullYear() + '-' + (new Date().getMonth() + 1)).length == 6) ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1))) +
                 '-' +
                 (((new Date().getFullYear() + '-' + (new Date().getDate())).length == 6) ? '0' + (new Date().getDate()) : (new Date().getDate())),
@@ -243,8 +232,14 @@ export default {
         }
     },
     methods: {
+      loadFrame(){
+        if (this.addDocument)
+          {
+            this.addDocument=false;
+            this.$emit('hideWindowPrint')
+          }
+      },
         previewPDFForm(){
-          console.log('1')
           setTimeout(() => {
             this.$refs.preForm.submit()
           }, 20);
@@ -266,6 +261,7 @@ export default {
           this.$emit('selectedDocs', event)
         },
         addPdf() {
+          this.addDocument=true;
           this.$emit('addPdf')
         },
         addPdfSep() {

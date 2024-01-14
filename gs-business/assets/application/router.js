@@ -8,6 +8,11 @@ import PricesMaster from '@business/component/prices/master';
 import DevicesMaster from '@business/component/devices/master';
 import PersonalMaster from '@business/component/personals/master';
 import BalanceMaster from '@business/component/balance/master';
+
+import OffersMaster from '@business/component/offers/master';
+import ContractsMaster from '@business/component/contracts/master';
+import SubContractsMaster from '@business/component/subContracts/master';
+
 import SubMaster from '@business/component/sub/master';
 import SubDetail from '@business/component/sub/detail';
 
@@ -22,13 +27,18 @@ const router = new VueRouter({
         {path: "/", component: ProjectMaster},
         {path: "/project", component: ProjectMaster},
         {path: "/project/detail/:id", component: ProjectDetail, props: true},
-        {path: "/project/user/:id/:user", component: ProjectUser, props: true},
+        {path: "/I/:user/:id/:foolder", component: ProjectUser, props: true},
         {path: "/customer", component: CustomerMaster},
         {path: "/customer/detail/:id", component: CustomerDetail, props: true},
         {path: "/prices", component: PricesMaster},
         {path: "/devices", component: DevicesMaster},
         {path: "/personals", component: PersonalMaster},
         {path: "/balance", component: BalanceMaster},
+
+        {path: "/offers", component: OffersMaster},
+        {path: "/contracts", component: ContractsMaster},
+        {path: "/subcontracts", component: SubContractsMaster},
+        
         {path: "/form", component: Form},
         {path: "*", component: Error404},
         {path: "/sub", component: SubMaster},

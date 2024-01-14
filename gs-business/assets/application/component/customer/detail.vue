@@ -1,6 +1,22 @@
 <template>
   <container>
-    <b-modal size="md" centered  ref="movedoc" title="Move">
+      <b-modal size="md" centered  ref="moveImag" :title="$t('projectDetail.move')">
+         <b-form-select class="" v-model="selectedItems" :select-size="detectRowSise(itemsMenuImagSub)">
+            <option v-for="(item, i) in detectItem(itemsMenuImagSub)" @click="selectedModalImag(item)" :key="i">{{item.name}}</option>
+         </b-form-select>
+         <template slot="modal-footer">
+            <button type="button" class="btn btn-primary" @click="okMoveImg">OK</button> 
+         </template>
+      </b-modal>
+      <b-modal size="md" centered  ref="moveImag2" :title="$t('projectDetail.move')">
+         <b-form-select class="" v-model="selectedItems2" :select-size="detectRowSise(itemsMenuImagPerson)">
+            <option v-for="(item, i) in detectItem(itemsMenuImagPerson)" @click="selectedModalImagPerson(item)" :key="i">{{item.name}}</option>
+         </b-form-select>
+         <template slot="modal-footer">
+            <button type="button" class="btn btn-primary" @click="okMoveImg2">OK</button> 
+         </template>
+      </b-modal>
+    <b-modal size="md" centered  ref="movedoc" :title="$t('projectDetail.move')">
       <b-form-select class="" v-model="selectedSub" :select-size="detectRowSise(itemsMenuDoc)">
         <option v-for="(item, i) in detectItem(itemsMenuDoc)" @click="selectedModalSub(item)" :key="i">{{item.name}}</option>
       </b-form-select>
@@ -8,7 +24,7 @@
         <button type="button" class="btn btn-primary" @click="okMoveDoc">OK</button> 
       </template>
     </b-modal>
-    <b-modal size="md" centered  ref="moveSperson" title="Move">
+    <b-modal size="md" centered  ref="moveSperson" :title="$t('projectDetail.move')">
       <b-form-select class="" v-model="selectedSperson" :select-size="detectRowSise(itemsMenuSperson)">
         <option v-for="(item, i) in detectItem(itemsMenuSperson)" @click="selectedModalSperson(item)" :key="i">{{item.name}}</option>
       </b-form-select>
@@ -16,7 +32,7 @@
         <button type="button" class="btn btn-primary" @click="okMoveSperson">OK</button> 
       </template>
     </b-modal>
-    <b-modal size="md" centered ok-only ref="contact" title="Edit Contacts">
+    <b-modal size="md" centered ok-only ref="contact" :title="$t('customerDetail.editContacts')">
       <b-form-group horizontal :label-cols="2" :label="contactEditType+' '+(index+1)"
       v-for="(val, index) in contactEditData" :key="val.id">
         <b-input-group>
@@ -30,19 +46,19 @@
         </b-input-group>
       </b-form-group>
     </b-modal>
-    <b-modal size="lg" centered ok-only id="map" title="Track">
+    <b-modal size="lg" centered ok-only id="map" :title="$t('projectDetail.track')">
       <b-embed type="iframe" aspect="16by9" :src="'https://www.google.com/maps/embed/v1/directions?key=AIzaSyBFTr5-GCSd0rT-euE1Uarf64eF6mZVK9k&'+
       'origin=In+den+Leppsteinswiesen+8,+64380+Roßdorf&'+
       'destination='+city+'+'+street">
       </b-embed>
     </b-modal>
-    <b-modal centered id="personModal" ref="personModal" title="Add Person"  size="lg" >
-      <b-form-group label="Appeal:" label-cols="3">
+    <b-modal centered id="personModal" ref="personModal" :title="$t('customerDetail.addPerson')"  size="lg" >
+      <b-form-group :label="$t('customerDetail.appeal')+':'" label-cols="3">
         <b-select v-model="addAppeal"  :options="['Herr', 'Frau']" />
       </b-form-group>
       <b-form-group v-for="(name, index) in countNamePerson" :key="name.id" label-cols="3">
         <template #label>
-          Name{{(index==0)?'':' '+(index+1)}}:
+         {{$t('customerDetail.name')}}{{(index==0)?'':' '+(index+1)}}:
         </template>
         <b-input-group>
           <b-form-input type='text' :state="(countNamePerson.length>=2 && countNamePerson[0].length>=1 && countNamePerson[1].length>=1)?null:false"
@@ -51,15 +67,15 @@
           <b-button  v-else @click="countNamePerson.splice(index, 1)"><b-icon icon="trash" aria-hidden="true"></b-icon></b-button>
         </b-input-group>
       </b-form-group>
-      <b-form-group label="Deportament:" label-cols="3">
+      <b-form-group :label="$t('customerDetail.deportament')+':'" label-cols="3">
         <b-form-input type='text' v-model="addDep" />
       </b-form-group>
-      <b-form-group label="Position:" label-cols="3">
+      <b-form-group :label="$t('customerDetail.position')+':'" label-cols="3">
         <b-form-input type='text' v-model="addPos" />
       </b-form-group>
       <b-form-group v-for="(mail, index) in countMailPerson" :key="mail.id" label-cols="3">
         <template #label>
-          mail{{(index==0)?'':' '+(index+1)}}:
+          {{$t('customerDetail.mail')}}{{(index==0)?'':' '+(index+1)}}:
         </template>
         <b-input-group>
           <b-form-input type='text' v-model="countMailPerson[index]" />
@@ -69,7 +85,7 @@
       </b-form-group>
       <b-form-group v-for="(phone, index) in countPhonePerson" :key="phone.id" label-cols="3">
         <template #label>
-          phone{{(index==0)?'':' '+(index+1)}}:
+          {{$t('customerDetail.phone')}}{{(index==0)?'':' '+(index+1)}}:
         </template>
         <b-input-group>
           <b-form-input type='text' v-model="countPhonePerson[index]" />
@@ -98,34 +114,38 @@
     </container-header>
     <container-body class="container-fluid">
       <b-card-group deck>
-        <b-card no-body class="gs-container">
-          <b-tabs card>
-            <b-tab title="Customer">
+        <b-card no-body class="gs-container" :style="heightComponentforSm">
+          <b-tabs card v-model="tabIndex" class="tabs">
+            <b-tab>
+              <template #title>
+                <span v-if="name==undefined">{{$t('customerDetail.customer')}}</span>
+                <span v-else :title="$t('customerDetail.customer')+' '+toName(name)">{{toName(name)}}</span>
+              </template>
               <container>
                 <container-body>
-                  <b-container>
+                  <b-container fluid ref="hcus">
                     <b-row>
                       <b-col cols="12"><br></b-col>
                       <b-col md="12" lg="6">
-                        <b-form-group label="Name:" label-cols="2" label-size="sm">
-                          <b-form-input @change="searchZipName($event);updateCustomer('name', $event)" :value="name" type="text"  placeholder="Enter Name" size="sm"/>
+                        <b-form-group :label="$t('customerDetail.name')+':'" label-cols="2" label-size="sm">
+                          <b-form-input @change="updateCustomer('name', $event.split(' ').join('_'))" :value="toName(name)" type="text"  placeholder="Enter Name" size="sm"/>
                         </b-form-group>
-                        <b-form-group label="Zip:" label-cols="2" label-size="sm">
-                          <b-form-input @change="searchZipCustomer($event);updateCustomer('zip', $event)" :value="zip" type="text" placeholder="Enter zip code" size="sm"/>
+                        <b-form-group :label="$t('customerDetail.zip')+':'" label-cols="2" label-size="sm">
+                          <b-form-input @change="searchZipCustomer($event);updateCustomer('zip', $event)" :value="zip" type="text" :placeholder="$t('projects.ezip')" size="sm"/>
                         </b-form-group>
-                        <b-form-group label="City:" label-cols="2" label-size="sm">
-                          <b-form-input :value="city" @change="updateCustomer('city', $event)" type="text"  placeholder="Enter city" size="sm"/>
+                        <b-form-group :label="$t('customerDetail.city')+':'" label-cols="2" label-size="sm">
+                          <b-form-input :value="city" @change="updateCustomer('city', $event)" type="text"  :placeholder="$t('projects.ecity')" size="sm"/>
                         </b-form-group>
-                        <b-form-group label="Street:" label-cols="2" label-size="sm" >
+                        <b-form-group :label="$t('customerDetail.street')+':'" label-cols="2" label-size="sm" >
                           <b-input-group>
-                            <b-form-input :value="street" @change="updateCustomer('street', $event)" type="text" placeholder="Enter street" size="sm" />
+                            <b-form-input :value="street" @change="updateCustomer('street', $event)" type="text" :placeholder="$t('projects.estreet')" size="sm" />
                             <template #append><b-icon icon="pin-map" aria-hidden="true" v-b-modal.map /></template>
                           </b-input-group>
                         </b-form-group>
-                        <b-form-group label="Date:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('customerDetail.date')+':'" label-cols="2" label-size="sm">
                           <b-form-input :value="date" @change="updateCustomer('data', $event);" type="date" placeholder="Enter date" size="sm"/>
                         </b-form-group>
-                        <b-form-group label="Old:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('customerDetail.old')+':'" label-cols="2" label-size="sm">
                           <b-form-checkbox type="checkbox" switch @change="(old=old?0:1);updateCustomer('old', old);"  :checked="old=(old==0)?false:true" />
                         </b-form-group>
                       </b-col>
@@ -136,7 +156,7 @@
                         <b-form-group label="IBAN:" label-cols="2" label-size="sm">
                            <b-form-input  :value="iban" @change="updateCustomer('iban', $event)" type="text"  placeholder="Enter IBAN"  size="sm"/>
                         </b-form-group>
-                        <b-form-group label="TAX:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('edit.tax')+':'" label-cols="2" label-size="sm">
                            <b-form-input :value="tax" @change="updateCustomer('tax', $event)" :state="null" type="text"  placeholder="Enter TAX" size="sm"/>
                         </b-form-group>
                         <b-form-group label="Web:" label-cols="2" label-size="sm">
@@ -148,7 +168,7 @@
                             <template #append><b-icon icon="pencil-square" aria-hidden="true" @click.pervert="contactEdit('mail', mail)" class="m-1" /></template>
                           </b-input-group>
                         </b-form-group>
-                        <b-form-group label="Phone:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('customerDetail.phone')+':'" label-cols="2" label-size="sm">
                           <b-input-group>
                             <b-form-select v-model="phone[0]" :options="phone" type="text" size="sm"/>
                             <template #append><b-icon icon="pencil-square" aria-hidden="true" @click.pervert="contactEdit('phone', phone)" class="m-1"/></template>
@@ -159,24 +179,24 @@
                     <b-row align-h="between" align-v="end">
                       <b-col cols="12" md="6" lg="4">
                         <b-button @click="newPerson('')" size="sm">
-                          Add Person
+                          {{$t('customerDetail.addPerson')}}
                         </b-button>
                       </b-col>
                       <b-col cols="12" md="6" lg="4">
                         <b-form-checkbox-group
                         class="text-sm-left text-md-left text-lg-right "
-                        switches :options="['Old']"
+                        switches :options="[[$t('fields.showOld')]]"
                         @change="itemsFilter((show!='Show')?1:0);show=(show!='Show')?'Show':'Hide'" />
                       </b-col>
                     </b-row>
-                    <b-table  @row-clicked="inItemClick" hover :items="items" :fields="fields">
+                    <b-table @row-clicked="inItemClick" hover :items="items" :fields="fields" stacked="lg">
                       <template #cell(in)="data">
                         <div class="text-center w-100">
                           {{ data.index + 1 }}
                         </div>
                       </template>
                       <template #cell(delete)="item">
-                        <b-col >
+                        <b-col class="text-right">
                           <b-button @click.pervert="personDel(item.item.person)" size="sm">
                             <b-icon icon="trash" aria-hidden="true"></b-icon>
                           </b-button>
@@ -187,10 +207,11 @@
                 </container-body>
               </container>
             </b-tab>
-            <b-tab title="Docs">
+            <b-tab :title="$t('projectDetail.docs')">
               <container>
                 <container-body  style="overflow-x: hidden;">
                   <docs
+                  v-if="detect('docs')"
                   ref="fileSub"
                   :responseFiles="responseFilesSub"
                   :fieldsDocs="fieldsDocs"
@@ -212,8 +233,8 @@
                 </container-body>
                 <container-footer style="z-index:2">
                   <b-collapse v-model="dropDoc" id="dropDoc3">
-                    <vue-dropzone ref="myVueDropzone3" id="dz3" :options="dropzoneFilesSub" v-on:vdropzone-sending="sendingEventSub"
-                    v-on:vdropzone-success="fsadd3" :forceFallback="true">
+                    <vue-dropzone ref="myVueDropzone1" id="dz3" :options="dropzoneFilesSub" v-on:vdropzone-sending="sendingEventSub"
+                    v-on:vdropzone-success="fsadd1" :forceFallback="true">
                     </vue-dropzone>
                   </b-collapse>
                   <b-input-group>
@@ -221,9 +242,9 @@
                     <b-button @click="dropDoc=dropDoc?false:true">
                       <b-icon :icon="dropDoc?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
                     </b-button>
-                    <b-button @click="addDoc">+Part</b-button>
-                    <b-button @click="removeDoc" :disabled="(nameNodeDoc=='General Folder')?true:false">Remove</b-button>
-                    <b-button @click="moveDoc">Move</b-button>
+                    <b-button @click="addDoc">{{$t('projectDetail.plusPart')}}</b-button>
+                    <b-button @click="removeDoc" :disabled="(nameNodeDoc=='General Folder')?true:false">{{$t('projectDetail.remove')}}</b-button>
+                    <b-button @click="moveDoc">{{$t('projectDetail.move')}}</b-button>
                   </template>
                   <b-form-input v-model="nameNodeDoc" :style="nodeDisDoc?'background-color:grey':''" :disabled="(nameNodeDoc=='General Folder')?true:false"
                   @click.native="nodeDisDoc?nodeDisTurnDoc():''" @change="nodeDisDoc=true;toModelDoc(nameNodeDoc)"></b-form-input>
@@ -231,83 +252,89 @@
                 </container-footer>
               </container>
             </b-tab>
-            <b-tab title="Images">
+            <b-tab :title="$t('projectDetail.images')">
               <container>
-                <container-body  style="overflow-x: hidden;">
+                <container-body  style="overflow: hidden;">
                   <images
+                  v-if="detect('images')"
                   :domageImages="responseImageSub"
-                  :fieldsImages="fieldsImages"
-                  :selectedDamageImages="selectedImagesSub"
-                  :optImages="optImages"
-                  @resetFilds="presetFildsSub"
-                  @chvalueimages="pchvalueimagesSub"
-                  @updatefilename="updatefilenameSub"
-                  @showx="showxSub"
+                  ref="images1"
+                  :wwidth="wwidth"
+                  :idNodeImg="idNodeImg"
+                  :itemsMenuImag="itemsMenuImagSub"
+                  :selectedPriceImg="selectedPriceImg"
+                  @imageInTableSelected="prowSelectedImg"
+                  @pcurNodeClickedImg="pcurNodeClickedImg"
                   @filedel="filedelSub"
-                  @selectimagesarr="pselectimagesarr"
-                  @allselrow="pallselrow"
-                  @allselrowin="pallselrowin"
-                  @imageInTableSelected="pimageInTableSelected"
-                  ></images>
+                  @showx="showxSub"
+                  @loded="loded"
+                  />
                 </container-body>
                 <container-footer style="z-index:2">
-                  <b-collapse v-model="dropImage" id="dropImage2">
-                    <vue-dropzone ref="myVueDropzone2" id="dz2"
-                    :options="dropzoneImagesSub" v-on:vdropzone-sending="sendingEventSub"
-                    v-on:vdropzone-success="fsadd2" :forceFallback="true">
-                    </vue-dropzone>
-                  </b-collapse>
-                  <b-button @click="dropImage=dropImage?false:true">
-                    <b-icon :icon="dropImage?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
-                  </b-button>
+                                <b-collapse v-model="dropImage" id="dropImage2">
+                                <vue-dropzone ref="myVueDropzone2" id="dz2"
+                                :options="dropzoneImagesSub" v-on:vdropzone-sending="sendingEventSubImage"
+                                v-on:vdropzone-success="fsadd2" :forceFallback="true" />
+                              </b-collapse>
+                              <b-input-group>
+                                <template #prepend>
+                                  <b-button @click="dropImage=dropImage?false:true">
+                                    <b-icon :icon="dropImage?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
+                                  </b-button>
+                                  <b-button @click="addImag">{{$t('projectDetail.plusPart')}}</b-button>
+                                  <b-button @click="removeImag" :disabled="(nameNodeImag=='General Folder')?true:false">{{$t('projectDetail.remove')}}</b-button>
+                                  <b-button @click="moveImag">{{$t('projectDetail.move')}}</b-button>
+                                </template>
+                                <b-form-input  v-model="nameNodeImag" :style="nodeDisImag?'background-color:grey':''"
+                                :disabled="(nameNodeImag=='General Folder')?true:false"
+                                @click.native="nodeDisImag?nodeDisTurnImag():''" @change="nodeDisImag=true;toModelImag(nameNodeImag)" />
+                              </b-input-group>
                 </container-footer>
               </container>
             </b-tab>
           </b-tabs>
         </b-card>
-        <b-card no-body class="gs-container">
-          <b-tabs card>
-            <b-tab title="Person">
+        <b-card no-body class="gs-container" v-if="firstSelected">
+          <b-tabs card v-model="dubTabIndex">
+            <b-tab :title="$t('customerDetail.person')">
               <container>
                 <container-body>
                   <b-container>
                     <b-row v-if="tmp.person">
                       <b-col cols="12"><br></b-col>
                       <b-col lg="4" md="12">
-                        <b-form-group label="Data:" label-cols="2" label-size="sm">
+                        <b-form-group  :label="$t('customerDetail.date')+':'" label-cols="2" label-size="sm">
                             <b-form-input :value="tmp.data" @change="updatePerson(tmp.person, $event, 'data');" type="date"  size="sm" />
                         </b-form-group>
-                        <b-form-group label="Old:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('customerDetail.old')+':'" label-cols="2" label-size="sm">
                             <b-form-checkbox switch @change="(tmp.old=tmp.old?0:1);updatePerson(tmp.person, tmp.old, 'old');"
                             :checked="tmp.old=(tmp.old==0)?false:true" />
                         </b-form-group>
                       </b-col>
                       <b-col md="12" lg="8">
-                        <b-form-group label="Full Name:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('customerDetail.fullName')+':'"  label-cols="2" label-size="sm">
                           <b-input-group>
                             <template #prepend>
-                              <b-form-select class="select" label="name" v-model="tmp.appeal" :options="['Herr', 'Frau']"
+                              <b-form-select class="select" v-model="tmp.appeal" :options="['Herr', 'Frau']"
                               @change="updatePerson(tmp.person,  $event, 'appeal')" size="sm" />
                             </template>
                             <b-form-input  @change="updatePerson(tmp.person, $event, 'names')" :value="tmp.names" type="text" size="sm"/>
                           </b-input-group>
                         </b-form-group>
-                        <b-form-group label="Position:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('customerDetail.position')+':'" label-cols="2" label-size="sm">
                           <b-form-input  @change="updatePerson(tmp.person, $event, 'pos')" :value="tmp.pos" type="text"  placeholder="Enter Position" size="sm" />
                         </b-form-group>
-                        <b-form-group label="Department:" label-cols="2" label-size="sm">
+                        <b-form-group :label="$t('customerDetail.deportament')+':'" label-cols="2" label-size="sm">
                           <b-form-input  @change="updatePerson(tmp.person, $event, 'dep')" :value="tmp.dep"  type="text"  placeholder="Enter Department" size="sm" />
                         </b-form-group>
                       </b-col>
-                      
                       <b-col cols="12">
                         <br>
                       </b-col>
-
                       <b-col lg="4" md="12">
                         <b-form-group label-cols="2" label-size="sm" v-for="(m, index) in tmp.mail" :key="m.id">
                           <template #label>
-                            Mail {{(index+1)}}:
+                           {{$t('customerDetail.mail')}} {{(index+1)}}:
                           </template>
                           <b-input-group>
                             <b-form-input v-model="m.mail" @change="editContactInPerson('mail', tmp.mail)" type="text" placeholder="Enter mail" size="sm"/>
@@ -321,7 +348,7 @@
                       <b-col lg="4" md="12">
                         <b-form-group label-cols="2" label-size="sm" v-for="(p, index) in tmp.phone" :key="p.id">
                           <template #label>
-                            Phone {{(index+1)}}:
+                            {{$t('customerDetail.phone')}} {{(index+1)}}:
                           </template>
                           <b-input-group>
                             <b-form-input v-model="p.phone"  @change="editContactInPerson('phone', tmp.phone)" type="text" placeholder="Enter phone" size="sm"/>
@@ -346,13 +373,11 @@
                           </b-input-group>
                         </b-form-group>                                    
                       </b-col>
-
                       <b-col cols="12"><br></b-col>
-
                       <b-col lg="12">
                         <b-form-group label-cols="2" label-size="sm" v-for="(a, index) in tmp.adress" :key="a.id">
                           <template #label>
-                            Adress {{(index+1)}}:
+                            {{$t('customerDetail.adress')}} {{(index+1)}}:
                           </template>
                           <b-input-group>
                             <b-form-input :value="a.adress.split(';')[0]"
@@ -379,7 +404,7 @@
                 </container-body>
               </container>
             </b-tab>
-            <b-tab title="Docs">
+            <b-tab :title="$t('projectDetail.docs')">
               <container>
                 <container-body  style="overflow-x: hidden;">
                   <docs
@@ -405,7 +430,7 @@
                 <container-footer style="z-index:2">
                   <b-collapse v-model="dropSperson" id="dropDoc3">
                     <vue-dropzone ref="myVueDropzone3" id="dz3" :options="dropzoneSperson" v-on:vdropzone-sending="sendingEventSperson"
-                    v-on:vdropzone-success="fsadd5" :forceFallback="true">
+                    v-on:vdropzone-success="fsadd3" :forceFallback="true">
                     </vue-dropzone>
                   </b-collapse>
                   <b-input-group>
@@ -413,9 +438,9 @@
                     <b-button @click="dropSperson=dropSperson?false:true">
                       <b-icon :icon="dropSperson?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
                     </b-button>
-                    <b-button @click="addSperson">+Part</b-button>
-                    <b-button @click="removeSperson" :disabled="(nameNodePerson=='General Folder')?true:false">Remove</b-button>
-                    <b-button @click="moveSperson">Move</b-button>
+                    <b-button @click="addSperson">{{$t('projectDetail.plusPart')}}</b-button>
+                    <b-button @click="removeSperson" :disabled="(nameNodePerson=='General Folder')?true:false">{{$t('projectDetail.remove')}}</b-button>
+                    <b-button @click="moveSperson">{{$t('projectDetail.move')}}</b-button>
                   </template>
                   <b-form-input v-model="nameNodePerson" :style="nodeDisPerson?'background-color:grey':''" :disabled="(nameNodePerson=='General Folder')?true:false"
                   @click.native="nodeDisPerson?nodeDisTurnPerson():''" @change="nodeDisPerson=true;toModelPerson(nameNodePerson)"></b-form-input>
@@ -423,35 +448,43 @@
                 </container-footer>
               </container>
             </b-tab>
-            <b-tab title="Images">
+            <b-tab :title="$t('projectDetail.images')">
               <container>
-                <container-body  style="overflow-x: hidden;" >
+                <container-body  style="overflow: hidden;" >
                   <images
+                  v-if="detect('images2')"
                   :domageImages="responseImagesSperson"
-                  :fieldsImages="fieldsImages"
-                  :selectedDamageImages="selectedDamageImagesSperson"
-                  :optImages="optImages1"
-                  @resetFilds="presetFildsSperson"
-                  @chvalueimages="pchvalueimagesSperson"
-                  @updatefilename="updatefilenameSperson"
-                  @showx="showxSperson"
+                  ref="images2"
+                  :wwidth="wwidth"
+                  :idNodeImg="idNodeImgPerson"
+                  :itemsMenuImag="itemsMenuImagPerson"
+                  :selectedPriceImg="selectedPriceImg2"
+                  @imageInTableSelected="prowSelectedImg2"
+                  @pcurNodeClickedImg="pcurNodeClickedImg2"
                   @filedel="filedelSperson"
-                  @selectimagesarr="pselectimagesarr"
-                  @allselrow="pallselrow"
-                  @allselrowin="pallselrowin"
-                  @imageInTableSelected="pimageInTableSelected"
-                  ></images>
+                  @showx="showxSperson"
+                  @loded="loded"
+                  />
                 </container-body>
                <container-footer style="z-index:2">
-                  <b-collapse v-model="dropSpersonImage" id="dropImage4">
-                    <vue-dropzone ref="myVueDropzone2" id="dz2"
-                    :options="dropzoneImagesSperson" v-on:vdropzone-sending="sendingEventSperson"
-                    v-on:vdropzone-success="fsadd4" :forceFallback="true">
-                    </vue-dropzone>
-                  </b-collapse>
-                  <b-button @click="dropSpersonImage=dropSpersonImage?false:true">
-                    <b-icon :icon="dropSpersonImage?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
-                  </b-button>
+                    <b-collapse v-model="dropSpersonImage" id="dropImage4">
+                      <vue-dropzone ref="myVueDropzone4" id="dz4"
+                      :options="dropzoneImagesSperson" v-on:vdropzone-sending="sendingEventSubImagePerson"
+                      v-on:vdropzone-success="fsadd4" :forceFallback="true" />
+                    </b-collapse>
+                    <b-input-group>
+                      <template #prepend>
+                        <b-button @click="dropSpersonImage=dropSpersonImage?false:true">
+                          <b-icon :icon="dropSpersonImage?'folder2-open':'folder2'" aria-hidden="true"></b-icon>
+                        </b-button>
+                        <b-button @click="addImagPerson">{{$t('projectDetail.plusPart')}}</b-button>
+                        <b-button @click="removeImagPerson" :disabled="(nameNodeImagPerson=='General Folder')?true:false">{{$t('projectDetail.remove')}}</b-button>
+                        <b-button @click="moveImagPerson">{{$t('projectDetail.move')}}</b-button>
+                      </template>
+                        <b-form-input  v-model="nameNodeImagPerson" :style="nodeDisImagPerson?'background-color:grey':''"
+                        :disabled="(nameNodeImagPerson=='General Folder')?true:false"
+                        @click.native="nodeDisImagPerson?nodeDisTurnImagPerson():''" @change="nodeDisImagPerson=true;toModelImagPerson(nameNodeImagPerson)" />
+                    </b-input-group>
                 </container-footer>
               </container>
             </b-tab>                         
@@ -462,7 +495,6 @@
   </container>
 </template>
 <script type="text/javascript">
-import io from 'socket.io-client';
 import axios from 'axios';
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
@@ -475,6 +507,28 @@ export default {
   },
   data() {
     return {
+      heightComponentforSm:'min-height:934px',
+      dubTabIndex:null,
+      idNodeImgPerson:-1,
+      responseImagesSperson:[],
+      selectedPriceImg2:[],
+      oldIdNodeImgPerson:0,
+      itemsMenuImagPerson:[],
+      images_person_menu_ids:[],
+      selectedItems2:[],
+      nameNodeImagPerson:null,
+      nodeDisImagPerson:true,
+      tabIndex: null,
+      idNodeImg:-1,
+      itemsMenuImagSub:[],
+      selectedPriceImg:[],
+      wwidth:null,
+      nodeDisImag:true,
+      nameNodeImag:null,
+      images_sub_menu_ids:[],
+      selectedItems:[],
+      oldIdImg:0,
+      firstSelected:false,
       idNodeFileSub:-1,
       docs_menu_ids:[],
       itemsMenuDoc:[],
@@ -498,94 +552,32 @@ export default {
       dropSperson:true,
       dropSpersonImage:true,
       responseImageSub:[],
-      responseImagesSperson:[],
-      selectedImagesSub:'Image',
-      selectedDamageImagesSperson:'Image',
-      optImages:[],
-      optImages1:[],
-      fieldsDocs: [
-      {
-        key: 'type',
-        label: 'File',
-        sortable: true
-      },
-      {
-        key: 'name',
-        label: 'Name',
-        sortable: true
-      },
-      {
-        key: 'number',
-        label: '#',
-        sortable: true
-      },
-      {
-        key: 'added',
-        label: 'Date / Time',
-        sortable: true
-      },
-      {
-        key: 'user',
-        label: 'User',
-        sortable: true
-      },
-      {
-        key: 'delete',
-        label: 'Delete'
-      }
-      ],
-      fieldsImages: [
-      {   
-        key: 'id',
-        label: 'Image',
-        sortable: true
-      },
-      {
-        key: 'file_name',
-        label: 'Name',
-        sortable: true
-      },
-      {
-        key: 'date',
-        label: 'Date / Time',
-        sortable: true
-      },
-      {
-        key: 'user',
-        label: 'User',
-        sortable: true
-      },
-      {
-        key: 'delete',
-        label: 'Delete'
-      }
-      ],
       dropzoneFilesSub: {
         url: '/loadFilesToCustomer',
         thumbnailWidth: 50,
         parallelUploads: 20,
-        dictDefaultMessage: "Click or Drop",
+        dictDefaultMessage: this.$t('alert.clickOrDrop'),
         acceptedFiles: 'application/pdf'
       },
       dropzoneImagesSub: {
         url: '/loadFilesToCustomer',
         thumbnailWidth: 50,
         parallelUploads: 20,
-        dictDefaultMessage: "Click or Drop",
+        dictDefaultMessage: this.$t('alert.clickOrDrop'),
         acceptedFiles: 'image/*'
       },
       dropzoneSperson: {
         url: '/loadFilesToPerson',
         thumbnailWidth: 50,
         parallelUploads: 20,
-        dictDefaultMessage: "Click or Drop",
+        dictDefaultMessage: this.$t('alert.clickOrDrop'),
         acceptedFiles: 'application/pdf'
       },
       dropzoneImagesSperson: {
         url: '/loadFilesToPerson',
         thumbnailWidth: 50,
         parallelUploads: 20,
-        dictDefaultMessage: "Click or Drop",
+        dictDefaultMessage: this.$t('alert.clickOrDrop'),
         acceptedFiles: 'image/*'
       },
       responseFilesSub: [],
@@ -635,39 +627,7 @@ export default {
       fax: [],
       zip: null,
       items:[],
-      items1:[],
-      fields: [
-      {
-        key: 'appeal',
-        label: 'Appeal',
-        sortable: true
-      },
-      {
-        key: 'names',
-        label: 'Name',
-        sortable: true
-      },
-      {
-        key: 'data',
-        label: 'Registred',
-        sortable: true
-      },
-      {
-        key: 'pos',
-        label: 'Position',
-        sortable: true
-      },
-      {
-        key: 'dep',
-        label: 'Department',
-        sortable: true
-      },
-      {
-        key: 'delete',
-        label: 'Delete'
- 
-      }
-      ]
+      items1:[]
     } //return
   }, //data
   sockets:{
@@ -678,7 +638,317 @@ export default {
       console.log('this method fired by socket server. eg: io.emit("customEmit", data)')
     }
   },
+  computed: {
+      fieldsDocs(){
+      return[
+      {
+        key: 'type',
+        label: this.$t('docs.file'),
+        sortable: true
+      },
+      {
+        key: 'name',
+        label: this.$t('docs.name'),
+        sortable: true
+      },
+      {
+        key: 'added',
+        label: this.$t('docs.added'),
+        sortable: true
+      },
+      {
+        key: 'user',
+        label: this.$t('docs.user'),
+        sortable: true
+      },
+      {
+        key: 'delete',
+        label: this.$t('docs.delete')
+      }]},
+    fields() {
+      return [{
+        key: 'appeal',
+        label: this.$t('customerDetail.appeal'),
+        sortable: true
+      },
+      {
+        key: 'names',
+        label: this.$t('customerDetail.name'),
+        sortable: true
+      },
+      {
+        key: 'data',
+        label: this.$t('fields.registred'),
+        sortable: true
+      },
+      {
+        key: 'pos',
+        label: this.$t('customerDetail.position'),
+        sortable: true
+      },
+      {
+        key: 'dep',
+        label: this.$t('customerDetail.deportament'),
+        sortable: true
+      },
+      {
+        key: 'delete',
+        label: this.$t('docs.delete')
+ 
+      }]
+    }
+  },
   methods: {
+    toModelImag(enterVal){
+        function findLevel(obj, id) {
+            obj.forEach((val)=>{
+                if (val.id==id){
+                    axios.get('/update_name_images_customer_menu', {
+                        params: {
+                            name: enterVal,
+                            id: id
+                        }
+                    })
+                } else {
+                    if (val.children.length!=0){
+                        findLevel(val.children, id)
+                    }
+                }
+            })
+        }
+        findLevel(this.itemsMenuImagSub, this.idNodeImg)
+    },
+    toModelImagPerson(enterVal){
+        function findLevel(obj, id) {
+            obj.forEach((val)=>{
+                if (val.id==id){
+                    axios.get('/update_name_images_sperson_menu', {
+                        params: {
+                            name: enterVal,
+                            id: id
+                        }
+                    })
+                } else {
+                    if (val.children.length!=0){
+                        findLevel(val.children, id)
+                    }
+                }
+            })
+        }
+        findLevel(this.itemsMenuImagPerson, this.idNodeImgPerson)
+    },
+    nodeDisTurnImag(){
+          if (confirm(this.$t('alert.rename'))) {
+               this.nodeDisImag = false
+            }
+       },
+    nodeDisTurnImagPerson(){
+          if (confirm(this.$t('alert.rename'))) {
+               this.nodeDisImagPerson = false
+            }
+       },
+    selectedModalImagPerson(val){
+        var files_ids=[]
+            this.selectedPriceImg2.forEach((val)=>{
+                  var id = val.id.split('=')
+                  files_ids.push(id[1])
+            })
+             axios.get('/mv_files_person', {
+                 params: {
+                     files_ids: files_ids.join(),
+                     new_menu: val.id
+                 }
+             }).then(response=>{
+                     setTimeout(() => {
+                this.getFilesSperson(this.tmp.person);
+            }, 20);
+        })                      
+    },
+    selectedModalImag(val){
+        var files_ids=[]
+            this.selectedPriceImg.forEach((val)=>{
+                  var id = val.id.split('=')
+                  files_ids.push(id[1])
+            })
+             axios.get('/mv_files_customer', {
+                 params: {
+                     files_ids: files_ids.join(),
+                     new_menu: val.id
+                 }
+             }).then(response=>{
+                setTimeout(() => {
+                   this.getSubFiles();
+            }, 20);
+        })                      
+    },
+      okMoveImg(){
+        this.selectedPriceImg=[],
+        this.$refs.moveImag.hide()
+    },
+      okMoveImg2(){
+        this.selectedPriceImg2=[],
+        this.$refs.moveImag2.hide()
+    },
+          detect(type){
+          if (type == 'docs'){
+            if ((this.tabIndex==1)){
+              return true;
+            }
+          }
+          if (type == 'images'){
+            if ((this.tabIndex==2)){
+              return true;
+            }
+          }
+          if (type == 'images2'){
+            if ((this.dubTabIndex==2)){
+              return true;
+            }
+          }
+      },
+moveImag(){
+  this.$refs.moveImag.show()
+},
+moveImagPerson(){
+  this.$refs.moveImag2.show()
+},
+      removeImagPerson(){
+       if (this.idNodeImgPerson==null){
+            alert(this.$t('alert.noItemSelectForDel'))
+       }
+       else {
+            if (confirm(this.$t('alert.remove'))) {
+                axios.get('/remove_image_sperson_menu', {
+                    params: {
+                        remove_id: this.idNodeImgPerson
+                    }
+                }).then(response=>{
+                    this.idNodeImgPerson=null,
+                    this.nameNodeImagPerson=null
+                })
+            }
+        } 
+    },
+      removeImag(){
+       if (this.idNodeImg==null){
+            alert(this.$t('alert.noItemSelectForDel'))
+       }
+       else {
+            if (confirm(this.$t('alert.remove'))) {
+                axios.get('/remove_image_customer_menu', {
+                    params: {
+                        remove_id: this.idNodeImg
+                    }
+                }).then(response=>{
+                    this.idNodeImg=null,
+                    this.nameNodeImag=null
+                })
+            }
+        } 
+    },
+    addImag(){
+      var newName = this.$t('projectDetail.plusPart')
+      function findLevel(obj, id, project) {
+        if (id==null){
+            id=0,
+            obj.push({id:0, children:[]})
+        }
+            obj.forEach((val)=>{
+                if (val.id==id){
+                    axios.get('/add_images_customer_menu', {
+                        params: {
+                            parent_id: val.id,
+                            project: project,
+                            newName: newName
+                        }
+                    })
+                } else {
+                    if(val.children.length!=0) {
+                        findLevel(val.children, id, project, newName)
+                    }
+                }
+            })
+        }
+        findLevel(this.itemsMenuImagSub, this.idNodeImg, this.id)
+    },
+    addImagPerson(){
+      var newName = this.$t('projectDetail.plusPart')
+      function findLevel(obj, id, project) {
+        if (id==null){
+            id=0,
+            obj.push({id:0, children:[]})
+        }
+            obj.forEach((val)=>{
+                if (val.id==id){
+                    axios.get('/add_images_sperson_menu', {
+                        params: {
+                            parent_id: val.id,
+                            project: project,
+                            newName: newName
+                        }
+                    })
+                } else {
+                    if(val.children.length!=0) {
+                        findLevel(val.children, id, project, newName)
+                    }
+                }
+            })
+        }
+        findLevel(this.itemsMenuImagPerson, this.idNodeImgPerson, this.tmp.person)
+    },
+    pcurNodeClickedImg(model, component) {
+        this.nameNodeImag=model.name,
+        this.idNodeImg=model.id
+        if(this.idNodeImg == this.oldIdImg){
+            this.$refs.images1.loded()
+        }
+        this.oldIdImg = this.idNodeImg
+        if ((model.parrent == 0) && component.folder == false){
+            this.idNodeImg = null
+        }
+    },
+    pcurNodeClickedImg2(model, component) {
+        this.nameNodeImagPerson=model.name,
+        this.idNodeImgPerson=model.id
+        if(this.idNodeImgPerson == this.oldIdNodeImgPerson){
+            this.$refs.images2.loded()
+        }
+        this.oldIdNodeImgPerson = this.idNodeImgPerson
+        if ((model.parrent == 0) && component.folder == false){
+            this.idNodeImgPerson = null
+        }
+    },
+    loded(dir, elheight, add){
+      this.sm2lg(dir, elheight, add)
+    },
+      sm2lg(dir, val, add){
+        var result 
+        function changeSm2Lg(wwidth, height, add){
+          if(wwidth<=768){
+            if(height!=undefined){
+              return 'min-height:'+(height+add)+'px;'
+            }
+          }
+        }
+        result =  (changeSm2Lg(this.wwidth, val, add))
+        if (dir == 'component'){
+          this.wcval = val
+          this.wcadd = add
+          this.heightComponentforSm=result
+        }
+        if (dir == 'edit'){
+          this.weval = val
+          this.weadd = add
+          this.heightEditforSm=result
+        }
+      },
+    toName(val){
+      if (val!=null){
+        return val.split('_').join(' ')
+      } else {
+        return val
+      }
+    },
     selectedModalSub(val){
       var docs_ids=[]
       var files_ids=[]
@@ -731,10 +1001,10 @@ export default {
     },
     removeDoc(){
       if (this.idNodeFileSub==null){
-        alert('No menu item is selected for deletion.')
+        alert(this.$t('alert.noItemSelectForDel'))
       }
       else {
-        if (confirm("Are you sure want to remove?")) {
+        if (confirm(this.$t('alert.remove'))) {
           axios.get('/remove_docs_customer_menu', {
             params: {
               remove_id: this.idNodeFileSub
@@ -748,10 +1018,10 @@ export default {
     },
     removeSperson(){
       if (this.idNodeFileSperson==null){
-        alert('No menu item is selected for deletion.')
+        alert(this.$t('alert.noItemSelectForDel'))
       }
       else {
-        if (confirm("Are you sure want to remove?")) {
+        if (confirm(this.$t('alert.remove'))) {
           axios.get('/remove_docs_person_menu', {
             params: {
               remove_id: this.idNodeFileSperson
@@ -848,7 +1118,7 @@ export default {
       findLevel(this.itemsMenuSperson, this.idNodeFileSperson)
     },
     filedelSub(val) {
-      if (confirm("Are you sure?")) {
+      if (confirm(this.$t('alert.sure'))) {
         axios.get('/delfile_customer', {
           params: {
             id: val
@@ -857,7 +1127,7 @@ export default {
       }
     },
     filedelSperson(val) {
-      if (confirm("Are you sure?")) {
+      if (confirm(this.$t('alert.sure'))) {
         axios.get('/delfile_person', {
           params: {
             id: val
@@ -897,7 +1167,6 @@ export default {
         setTimeout(()=>{}, 15000);
       }
     },
-
     getFilesFirma(id){
       axios.get('/get_files_customer', {
         params: {
@@ -909,13 +1178,11 @@ export default {
             if((v.name.split('.')[v.name.split('.').length-1]) == 'pdf'){ return v}
           }
         })
-
         this.responseImageSub = response.data.filter(function (v){
           if(v.file_name != undefined){
               return v
           }
         })
-
       })
     },
     getFilesSperson(id){
@@ -966,6 +1233,39 @@ export default {
             }
           })
         })
+      axios.get('/images_customer_person_menu', {
+                params: {
+                    project:id
+                }
+            }).then(response => {
+            this.itemsMenuImagPerson=[];
+            this.itemsMenuImagPerson.push({id: -1, name: 'General Folder', parrent: 0, children:[]});
+            this.images_person_menu_ids.push(-1);
+               response.data.forEach((val)=>{
+                        if (val.parrent==0){
+                            val['children']=[]
+                            this.itemsMenuImagPerson.push(val);
+                        }
+               });
+
+                response.data.forEach((valResp)=>{
+                  function findLevel(obj, id)  {
+                        obj.forEach((val)=>{
+                            if (val.id==id){
+                                valResp['children']=[]
+                                val.children.push(valResp);
+                            } else{
+                                if (val.children.length!=0){
+                                    findLevel(val.children, id)
+                                }
+                            }
+                        })
+                    }
+                this.images_person_menu_ids.push(valResp.id)
+                findLevel(this.itemsMenuImagPerson, valResp.parrent)  
+               })
+            })
+
       })
     },
     addContactInPerson(fild, action, index){
@@ -989,6 +1289,8 @@ export default {
       value.forEach((v)=>{
         sendArr.push(v[fild])
       })
+
+      console.log(fild, sendArr, this.tmp.person)
       axios.get('/edit_contact_person', {
         params: {
           fild: fild,
@@ -999,7 +1301,7 @@ export default {
       })
     },
     personDel(val){
-      if (confirm("Are you sure?")) {
+      if (confirm(this.$t('alert.sure'))) {
         axios.get('/del_person', {
           params: {
             id: val
@@ -1015,17 +1317,6 @@ export default {
           id: id
         }
       })
-    },
-    insertCustomer(val, type){
-      if (confirm("Are you sure want to add "+type+": "+val[0]+" for "+this.name +" ?")) {
-        axios.get('/add_contact_from_customer', {
-          params: {
-            type: type,
-            val: val[0],
-            id: this.id,
-          }
-        })
-      }
     },
     updateContact(){
       axios.get('/updateContact', {params: {
@@ -1068,6 +1359,7 @@ export default {
         this.tmp.person = item.person
         this.tmp.pos = item.pos
         this.getFilesSperson(item.person)
+        this.firstSelected=true
       })
     },    
     updateCustomer(fild, newData){
@@ -1132,6 +1424,39 @@ export default {
       });
       this.responseFilesSub=[];
       this.getFilesFirma(this.id)
+              axios.get('/images_customer_menu', {
+                params: {
+                    project:this.id
+                }
+            }).then(response => {
+            this.itemsMenuImagSub=[];
+            this.itemsMenuImagSub.push({id: -1, name: 'General Folder', parrent: 0, children:[]});
+            this.images_sub_menu_ids.push(-1);
+               response.data.forEach((val)=>{
+                        if (val.parrent==0){
+                            val['children']=[]
+                            this.itemsMenuImagSub.push(val);
+                        }
+               });
+
+                response.data.forEach((valResp)=>{
+                  function findLevel(obj, id)  {
+                        obj.forEach((val)=>{
+                            if (val.id==id){
+                                valResp['children']=[]
+                                val.children.push(valResp);
+                            } else{
+                                if (val.children.length!=0){
+                                    findLevel(val.children, id)
+                                }
+                            }
+                        })
+                    }
+                this.images_sub_menu_ids.push(valResp.id)
+                findLevel(this.itemsMenuImagSub, valResp.parrent)  
+               })
+
+            })
     })
   },
   getPersons(){
@@ -1144,6 +1469,12 @@ export default {
       this.items1= response.data
       this.itemsFilter((this.show!='Show')?0:1)
     })
+
+    setTimeout(() => {
+      console.log('after')
+        this.sm2lg('component', this.$refs['hcus'].clientHeight, 110)
+        // this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 56)
+    }, 100);
   },
   getCustomerDetail(){
     axios.get('/customer_detail', {
@@ -1164,7 +1495,7 @@ export default {
       this.tax = response.data.tax,
       this.web = response.data.web,
       this.zip = response.data.zip
-      this.getSubFiles()
+      // this.getSubFiles()
       this.getPersons()
       axios.get('/get_contactData', {
         params: {
@@ -1201,30 +1532,34 @@ export default {
       })
       })
     },
-    pselectimagesarr(group){
-      var imagesarr = []
-      if (this.selectedDamageImages=='Image'){
-        this.responseImageSub.forEach((si)=>{
-          if(si._rowVariant=='success'){
-             imagesarr.push(si.id.split('=')[1])
-          }
-        })
-        this.updatefilenames(group, 'group',imagesarr.join())
-      }
-    },
-    pallselrow(){
-      this.responseImageSub.forEach((v)=>{
-          v._rowVariant='success'
-      })
-    },
-    pallselrowin(table){
-      table.forEach((v)=>{
-          v._rowVariant='success'
-      })
-    },
-    pimageInTableSelected(item){
-      item._rowVariant=(item._rowVariant=='success')?'':'success';
-    },
+        prowSelectedImg2(items) {
+          if(this.selectedPriceImg2.indexOf(items)==-1){
+              this.selectedPriceImg2 = this.selectedPriceImg2.filter((v)=>{
+                  if (v.id != items.id){
+                      return v
+                  }
+              });
+              this.selectedPriceImg2.push(items);
+              items._rowVariant='success';
+           } else{
+              this.selectedPriceImg2.splice(this.selectedPriceImg2.indexOf(items), 1)
+              items._rowVariant=''
+           }
+        },
+        prowSelectedImg(items) {
+          if(this.selectedPriceImg.indexOf(items)==-1){
+              this.selectedPriceImg = this.selectedPriceImg.filter((v)=>{
+                  if (v.id != items.id){
+                      return v
+                  }
+              });
+              this.selectedPriceImg.push(items);
+              items._rowVariant='success';
+           } else{
+              this.selectedPriceImg.splice(this.selectedPriceImg.indexOf(items), 1)
+              items._rowVariant=''
+           }
+        },
     searchZipCustomer(val){
       axios.get('https://maps.google.com/maps/api/geocode/json', {
         params: {
@@ -1237,26 +1572,6 @@ export default {
         if (JSON.parse(response.request.response).results[0]!=undefined){
           var city = JSON.parse(response.request.response).results[0].formatted_address.split(' ')[1].split(',')[0]
           this.city = city
-        }
-      })
-    },
-    searchZipName(val){
-      axios.get('https://maps.google.com/maps/api/geocode/json', {
-        params: {
-          components: "country:DE",
-          address: val,
-          sensor: "false",
-          language: "en",
-          key: "AIzaSyDKWZ-Jrk9KMoHYakuQfD6xQ4qUZ2XkGpo"
-        }
-      }).then(response => {
-        if (JSON.parse(response.request.response).results[0]!=undefined){
-          var street = JSON.parse(response.request.response).results[0].formatted_address.split(',')[0] 
-          var city = JSON.parse(response.request.response).results[0].formatted_address.split(',')[1].split(' ')[2]
-          var zip = JSON.parse(response.request.response).results[0].formatted_address.split(',')[1].split(' ')[1]
-          this.zip = zip,
-          this.city = city,
-          this.street = street
         }
       })
     },
@@ -1327,12 +1642,12 @@ export default {
       }
     },
     nodeDisTurnDoc(){
-      if (confirm("Are you sure want to rename?")) {
+      if (confirm(this.$t('alert.rename'))) {
         this.nodeDisDoc = false
       }
     },
     nodeDisTurnPerson(){
-      if (confirm("Are you sure want to rename?")) {
+      if (confirm(this.$t('alert.rename'))) {
         this.nodeDisPerson = false
       }
     },
@@ -1341,34 +1656,6 @@ export default {
     },
     moveSperson(){
       this.$refs.moveSperson.show()
-    },
-    presetFildsSub(){
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].thClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].thClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].thClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].tdClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].tdClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].tdClass=''
-      this.responseImageSub.forEach((v)=>{
-        v._rowVariant=''
-      })
-    },
-    presetFildsSperson(){
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].thClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].thClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].thClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].tdClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].tdClass=''
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].tdClass=''
-      this.domageImagesPerson.forEach((v)=>{
-        v._rowVariant=''
-      })
-    },
-    pchvalueimagesSub(val){
-      this.selectedDamageImagesCustomer=val
-    },
-    pchvalueimagesSperson(val){
-      this.selectedDamageImagesPerson=val
     },
     showxSub(classId, index){
       const viewer = this.$el.querySelector('.'+classId).$viewer
@@ -1380,6 +1667,9 @@ export default {
       viewer.index = index
       viewer.show()
     },   
+    fsadd1() {
+      this.$refs.myVueDropzone1.removeAllFiles()
+    },
     fsadd2() {
       this.$refs.myVueDropzone2.removeAllFiles()
     },
@@ -1387,10 +1677,7 @@ export default {
       this.$refs.myVueDropzone3.removeAllFiles()
     },
     fsadd4() {
-      this.$refs.myVueDropzone2.removeAllFiles()
-    },
-    fsadd5() {
-      this.$refs.myVueDropzone3.removeAllFiles()
+      this.$refs.myVueDropzone4.removeAllFiles()
     },
     ploadDocToFrameSub(row) {
       row.toggleDetails();
@@ -1410,20 +1697,24 @@ export default {
         }, 50);
       }
     },
-    fsadd2() {
-      this.$refs.myVueDropzone2.removeAllFiles()
-    },
-    fsadd3() {
-      this.$refs.myVueDropzone3.removeAllFiles()
-    },
     sendingEventSub(file, xhr, formData) {
       xhr.setRequestHeader('X-Number', this.id);
       xhr.setRequestHeader('X-Folder', this.idNodeFileSub);
       xhr.setRequestHeader('X-User',  this.$security.account['first_name']+'_'+this.$security.account['second_name']);
     },
+    sendingEventSubImage(file, xhr, formData) {
+      xhr.setRequestHeader('X-Number', this.id);
+      xhr.setRequestHeader('X-Folder', this.idNodeImg);
+      xhr.setRequestHeader('X-User',  this.$security.account['first_name']+'_'+this.$security.account['second_name']);
+    },
     sendingEventSperson(file, xhr, formData) {
       xhr.setRequestHeader('X-Number', this.tmp.person);
       xhr.setRequestHeader('X-Folder', this.idNodeFileSperson);
+      xhr.setRequestHeader('X-User',  this.$security.account['first_name']+'_'+this.$security.account['second_name']);
+    },
+    sendingEventSubImagePerson(file, xhr, formData) {
+      xhr.setRequestHeader('X-Number', this.tmp.person);
+      xhr.setRequestHeader('X-Folder', this.idNodeImgPerson);
       xhr.setRequestHeader('X-User',  this.$security.account['first_name']+'_'+this.$security.account['second_name']);
     },
     itemsFilter(val){
@@ -1447,7 +1738,6 @@ export default {
       this.$refs.contact.show()
     },
     newPerson(val){
-      // this.updatePojectFunc=1
       this.countNamePerson=val.split(' '),
       this.countMailPerson=[''],
       this.countPhonePerson=[''],
@@ -1461,10 +1751,26 @@ export default {
     },
   },
   watch:{
+    tabIndex: function(newv, oldv){
+      if (oldv!=null){
+        if (newv==0){
+          setTimeout(() => {
+              this.sm2lg('component', this.$refs['hcus'].clientHeight, 110)
+          }, 10);
+        }
+      }
+    },
+    wwidth: function() {
+      if ((this.wcval!=null)&&(this.wcadd!=null)){
+        this.sm2lg('component', this.wcval, this.wcadd)
+      }
+      if ((this.weval!=null)&&(this.weadd!=null)){
+        this.sm2lg('edit', this.weval, this.weadd)
+      }
+    },
     items (val) {
       val.forEach((v)=>{
         if (v.person==this.tmp.person){
-                    // this.tmp.adress=(v.adress!=this.tmp.adress)?v.adress:this.tmp.adress,
           this.tmp.appeal=(v.appeal!=this.tmp.appeal)?v.appeal:this.tmp.appeal,
           this.tmp.dep=(v.dep!=this.tmp.dep)?v.dep:this.tmp.dep,
           this.tmp.names=(v.names!=this.tmp.names)?v.names:this.tmp.names,
@@ -1480,13 +1786,13 @@ export default {
   },
   mounted(){
     setTimeout(() => {
-      this.$socket.send('getSubDetail')
-      this.$socket.send('getSubFiles')
+      this.getCustomerDetail()
+      this.getSubFiles()
       this.$options.sockets.onmessage = (data) => (data.data=='getCustomerFiles') ? this.getSubFiles(): ''
-      this.$options.sockets.onmessage = (data) => (data.data=='getSubDetail') ? (this.getCustomerDetail()):'';
-      this.$options.sockets.onmessage = (data) => (data.data=='get_persons') ? (this.getPersons()):'';
-      this.$options.sockets.onmessage = (data) => (data.data=='getSubContact') ? (this.getContact(this.tmp.person)):'';
-      this.$options.sockets.onmessage = (data) => (data.data=='getPersonFiles') ? (this.getFilesSperson(this.tmp.person)):'';
+      this.$options.sockets.onmessage = (data) => (data.data=='getSubDetail') ? (this.getCustomerDetail()):''
+      this.$options.sockets.onmessage = (data) => (data.data=='get_persons') ? (this.getPersons()):''
+      this.$options.sockets.onmessage = (data) => (data.data=='getSubContact') ? (this.getContact(this.tmp.person)):''
+      this.$options.sockets.onmessage = (data) => (data.data=='getPersonFiles') ? (this.getFilesSperson(this.tmp.person)):''
     },1000);
   }
 }

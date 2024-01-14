@@ -1,94 +1,230 @@
 <template>
-  <b-container fluid>
-    <b-row>
-      <b-col cols="6">
-        <b-form-group horizontal label-cols="7" label="Images group by:">
-          <b-select class="customButton" :value="selectedDamageImages" :options="labelForFieldsImages()" @change="chvalueimages($event);resetFilds()"  />
-        </b-form-group>
+  <b-container fluid :ref="heightImages">
+      <b-row >
+      <b-col lg="3" cols="12" class="block-1">
+        <vue-drag-tree
+        :data='itemsMenuImag'
+        :allowDrag='allowDrag'
+        :allowDrop='allowDrop'
+        :idNode="idNodeImg"
+        disableDBClick
+        @drag="dragHandler"
+        @drag-enter="dragEnterHandler"
+        @current-node-clicked="curNodeClicked"
+        @drag-leave="dragLeaveHandler"
+        @drag-over="dragOverHandler"
+        @drag-end="dragEndHandler"
+        @drop="dropHandler">
+        </vue-drag-tree>
+        <div hidden>{{selectedPriceImg}}</div>
       </b-col>
-      <b-col cols="6" v-show="((detselrow()==false)&&selectedDamageImages=='Image')">
-        <b-button @click="allselrow()" class="customButton"> Select All </b-button>
-      </b-col>
-      <b-col cols="6" v-show="detselrow()">
-        <b-form-group horizontal label-cols="7" label="To change table:">
-          <b-select class="customButton" @change="selectimagesarr($event)" :options="optImages" text-field="value" value-field="id" />
-        </b-form-group>
-      </b-col>
-    </b-row>
-    <br/>
-    <b-table :items="domageImages" :fields="fieldsImages" stacked="lg"  hover small  sticky-header  style="max-height:100%"
-    @row-clicked="image_in_table_selected" v-if="selectedDamageImages=='Image'">
-      <template #cell(id)="row">
-        <b-col cols="12" class="text-center">
-          <img :src="row.item.id" class="image" style="max-height:70px;max-width:70px" @click.stop="showx(className, row.index)">
-        </b-col>
-      </template>
-      <template #cell(file_name)="row">
-        <b-form-input type="text" @change="updatefilename($event, 'name', row.item.id.split('=')[1])" :title="row.item.file_name" size="sm"
-        :value="row.item.file_name" class="cForm-input" @focus.native="changeDisable('f', 'nameoffile', row.item.id.split('=')[1])"
-        @blur.native="changeDisable('b', 'nameoffile', row.item.id.split('=')[1])" :id="'nameoffile'+row.item.id.split('=')[1]" style="width:95%" /> 
-      </template>
-      <template #cell(delete)="it">
-        <b-icon icon="trash" aria-hidden="true" @click.stop="filedel(it.item.id.split('=')[1])"  />
-      </template>
-      <template #cell(group)="row">
-        <b-select size="sm" :value="row.item.group" :options="optImages"
-        text-field="value" value-field="id" 
-        @change="updatefilename($event, 'group', row.item.id.split('=')[1])" />
-      </template>
-      <template #cell(date)="data">
-        {{data.item.date | dateInverse}}
-      </template>
-    </b-table>
-    <div v-else  v-for="(item, i) in groupByFild(selectedDamageImages)">
-      <b-link v-b-toggle="item.id+'-'+i" class="butMore">
-        <span class="when-opened">- {{item.name}} <b-button @click.stop="allselrowin(item.table)" class="customButton when-opened" v-show="detselrowin(item.table)"> Select All </b-button></span>
-        <span class="when-closed">+ {{item.name}}</span>
-      </b-link> 
-      <b-collapse :id="item.id+'-'+i">
-        <b-table  v-viewer :items="item.table" :fields="fieldsImages" stacked="lg"   @row-clicked="image_in_table_selected" 
-        :class="'tableProject '+'im'+item.id+'-'+i" hover small  sticky-header  style="max-height:100%">
-          <template #cell(id)="row">
-            <b-col cols="12" class="text-center">
-              <img :src="row.item.id" class="image" style="max-height:100px;max-width:100px" @click.stop="showx('im'+item.id+'-'+i, row.index)">
-            </b-col>
-          </template>
-          <template #cell(file_name)="row">
-            <b-form-input :state="null" type="text" @change="updatefilename($event, 'name', row.item.id.split('=')[1])" :title="row.item.file_name"
-            :value="row.item.file_name" class="cForm-input" @focus.native="changeDisable('f', 'nameoffile', row.item.id.split('=')[1])" 
-            @blur.native="changeDisable('b', 'nameoffile', row.item.id.split('=')[1])" :id="'nameoffile'+row.item.id.split('=')[1]" style="width:95%" /> 
-          </template>
-          <template #cell(group)="row">
-            <b-select class="customButton" :value="row.item.group" :options="optImages"
-            style="width:95%" text-field="value" value-field="id" 
-            @change="updatefilename($event, 'group', row.item.id.split('=')[1])" />
-          </template>
-          <template #cell(delete)="it">
-            <b-col>
-              <b-link @click.stop="filedel(it.item.id.split('=')[1])" class="fas fa-trash fa-w-16" style="padding-top:7px;" />
-            </b-col>
-          </template>        
-          <template #cell(date)="data">
+      <b-col lg="9" cols="12" class="block-2 m-0 pr-4" style="overflow-y:auto;">
+
+ 
+   <b-input-group class="pb-0 mb-0">
+    <b-col cols="12" class="text-right p-2">
+    <b-button @click="plus" size="sm"><b-icon icon="zoom-in"></b-icon></b-button>
+    <b-button @click="minus" size="sm"><b-icon icon="zoom-out"></b-icon></b-button>
+    <b-button  size="sm" @click="showquality=true" v-show="!showquality"><b-icon icon="image-fill"></b-icon></b-button>
+    <b-form-input v-show="showquality" v-model="quality" @change="showquality=false" type="range" min="0" max="100" size="sm" style="max-width: 240px;padding-top: 15px;"></b-form-input>
+    </b-col>
+  </b-input-group>
+  
+  <!-- <b-col cols="12"> -->
+
+<b-card-group columns v-viewer class="images" :style="'column-count: '+size+';'">
+  <b-card v-for="(row, index) in foldershowfiles(domageImages)" :key="row.id" :img-src="row.id+'&q='+quality" 
+  @click.stop="showx('images', index)" class="cardimg text-justify" :border-variant="(row._rowVariant=='success')?'warning':''"
+  :bg-variant="(row._rowVariant=='success')?'warning':''">
+    <b-card-text @click.stop="$emit('imageInTableSelected', row)" style="cursor:pointer">
+      {{row.date.split(' ')[1]}}
+      <b-icon icon="trash" aria-hidden="true" @click.stop="filedel(row.id.split('=')[1])"  />
+    </b-card-text>
+  </b-card>
+</b-card-group>
+<!-- </b-col> -->
+<!-- 
+  <b-row class="text-right">
+    <b-col><b-button  size="sm" @click="gallery=false"><b-icon icon="table"></b-icon></b-button>
+      <b-button @click="size=size+1" size="sm"><b-icon icon="zoom-in"></b-icon></b-button>
+      <b-button @click="size=size-1" size="sm"><b-icon icon="zoom-out"></b-icon></b-button>
+    </b-col>
+  </b-row>
+  <b-row class="images p-0" fluid  v-viewer>
+    <b-col  v-for="(row, index) in foldershowfiles(domageImages)" :key="row.id"  :cols="size" >
+      <b-img thumbnail  :src="row.id" @click.stop="showx('images', index)"></b-img> -->
+      <!-- <h5>{{row.date | dateInverse}}<b-icon icon="trash" aria-hidden="true" @click.stop="filedel(row.id.split('=')[1])"  /></h5> -->
+<!--     </b-col>
+  </b-row>
+ --></b-col>
+<!-- <b-col lg="9" cols="12" class="block-2 m-0 p-0" v-else>
+  <b-row class="text-right">
+    <b-col><b-button  size="sm" @click="gallery=true"><b-icon icon="images"></b-icon></b-button>
+      <b-button @click="imegeSize=imegeSize+10" size="sm"><b-icon icon="zoom-in"></b-icon></b-button>
+      <b-button @click="imegeSize=imegeSize-10" size="sm"><b-icon icon="zoom-out"></b-icon></b-button>
+    </b-col>
+  </b-row>
+    <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+      <b-table :items="foldershowfiles(domageImages)"
+      class="images"
+      v-viewer
+      :fields="fieldsImages"
+      hover
+      small
+      stacked="lg"
+      show-empty
+      no-border-collapse
+      @row-clicked="image_in_table_selected">
+        <template #cell(id)="row">
+          <b-col cols="12" class="text-center">
+            <img :src="row.item.id"  :style="'max-height:'+imegeSize+'px;max-width:'+imegeSize+'px;'" @click.stop="showx('images', row.index)">
+          </b-col>
+        </template>
+         <template #cell(file_name)="row">
+          <b-form-input type="text" @change="updatefilename($event, 'name', row.item.id.split('=')[1])" :title="row.item.file_name" size="sm"
+          :value="row.item.file_name" class="cForm-input" @focus.native="changeDisable('f', 'nameoffile', row.item.id.split('=')[1])"
+          @blur.native="changeDisable('b', 'nameoffile', row.item.id.split('=')[1])" :id="'nameoffile'+row.item.id.split('=')[1]" style="width:95%" /> 
+        </template> -->
+       <!--  <template #cell(delete)="it">
+          <b-icon icon="trash" aria-hidden="true" @click.stop="filedel(it.item.id.split('=')[1])"  />
+        </template>
+
+        <template #cell(date)="data">
             {{data.item.date | dateInverse}}
-          </template>
-        </b-table>
-      </b-collapse>
-    </div>
+        </template>
+      </b-table>
+      </div>
+      </b-col>  -->
+    </b-row>
   </b-container>
 </template>
 <script type="text/javascript">
 export default {
-  props: ['domageImages', 'fieldsImages', 'selectedDamageImages', 'optImages', 'className'],
+  props: ['domageImages', 'idNodeImg', 'itemsMenuImag', 'selectedPriceImg', 'wwidth', 'heightTableImages'],
+    data() {
+      return {
+        // heightTableImages:'heightTableImages',
+        // gallery:true,
+        heightImages:null,
+        size:6,
+        quality:0,
+        showquality:false
+        // imegeSize:70,
+      }
+    },
+// selectedDamageImages
+// optImages
+// dropImage
+// imgIds
+// itemsImgs
+// oldIdImg
+// menuImgsTree
   methods: {
+    plus(){
+      this.size=this.size-1;
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs[this.heightImages].clientHeight, 250);
+      }, 200);     
+    },
+    minus(){
+      this.size=this.size+1;
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs[this.heightImages].clientHeight, 250);
+      }, 200);    
+    },
+    foldershowfiles(val){
+      // console.log(val)
+      if (this.idNodeImg != undefined){
+        return val.filter((itemImg)=>{
+          if (this.idNodeImg!=-1){
+            if(this.idNodeImg==itemImg.folder_id){
+              return itemImg
+            }
+          }
+          if (this.idNodeImg==-1) {
+            if((itemImg.folder_id==null)|(itemImg.folder_id==-1)){
+              return itemImg
+            }
+          }
+        })
+      }
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs[this.heightImages].clientHeight, 250);
+      }, 200);  
+    },
+
+    loded(){
+      // console.log('comeback!')
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs[this.heightImages].clientHeight, 250)
+      }, 200);     
+    },
+    allowDrag(model, component) {
+      if (component.depth!=1){
+      // if (model.name === 'Node 0-1') {
+      // can't be dragged
+        return true;
+      }
+      // can be dragged
+      return false;
+    },
+    allowDrop(model, component) {
+      if (component.depth==1){
+      // can't be placed
+        return true;
+      }
+      // can be placed
+      return false;
+    },
+    allowDragModal(model, component) {
+      return false;
+    },
+    allowDropModal(model, component) {
+      return false;
+    },   
+    curNodeClicked(model, component) { 
+      this.$emit('pcurNodeClickedImg', model, component)  
+    },
+    curNodeClickedModal(model, component){
+      this.idNodeModal=model.id
+    },
+    dragHandler(model, component, e) {
+      // console.log('dragHandler: ', model, component, e);
+    },
+    dragEnterHandler(model, component, e) {
+      // console.log('dragEnterHandler: ', model, component, e);
+    },
+    dragLeaveHandler(model, component, e) {
+      // console.log('dragLeaveHandler: ', model, component, e);
+    },
+    dragOverHandler(model, component, e) {
+      // console.log('dragOverHandler: ', model, component, e);
+     },
+    dragEndHandler(model, component, e) {
+    // console.log('dragEndHandler: ', model, component, e);
+      this.drag1=model.id;
+      axios.get('/change_parrent_menu_devices', {
+        params: {
+          drag1: this.drag1,
+          drag2: this.drag2
+        }
+      }).then(response=>{
+        this.drag1=null;
+        this.drag2=null;          
+      })
+    },
+    dropHandler(model, component, e) {
+       // console.log('dropHandler: ', model, component, e);
+      this.drag2=model.id;
+    },
+
     changeDisable(type_operation, fild, id){
       this.$emit('changeDisable', type_operation, fild, id)
     },
     filedel(val) {
       this.$emit('filedel', val)
     },
-    chvalueimages(val){
-      this.$emit('chvalueimages', val)
-    },
+
     image_in_table_selected(item){
       this.$emit('imageInTableSelected', item)
     },
@@ -98,99 +234,34 @@ export default {
     updatefilename(val, type, id){
       this.$emit('updatefilename', val, type, id)
     },
-    resetFilds(){
-      this.$emit('resetFilds')
-    },
-    labelForFieldsImages(){
-      var labelsArr = [];
-      this.fieldsImages.forEach((v)=>{
-        if(v.key=='id'){
-          labelsArr.push('Image')
-        } else {
-          if(v.key!='delete'){
-            labelsArr.push(v.key)
-          }
-        }
-      })
-        return labelsArr
-    },
-    allselrow(){
-      this.$emit('allselrow')
-    },
-    allselrowin(table){
-      this.$emit('allselrowin', table)
-    },
-    selectimagesarr(group){
-      this.$emit('selectimagesarr', group)
-    },
-    detselrow(){
-      var countdetect = 0
-      this.domageImages.forEach((v)=>{
-        if(v._rowVariant=='success'){
-          countdetect = countdetect + 1
-        }
-      })
-      if (countdetect > 0) return true
-        else{
-          return false
-        }
-    },
-    detselrowin(table){
-      var countdetect = 0
-      table.forEach((v)=>{
-        if(v._rowVariant=='success'){
-          countdetect = countdetect + 1
-        }
-      })
-      return ((countdetect==0) && (table.length > 1))
-    },
-    groupByFild(fild){
-      var tables = []
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == fild)].thClass='d-none'
-      this.fieldsImages[this.fieldsImages.findIndex(x => x.key == fild)].tdClass='d-none'
-      this.domageImages.forEach((v)=>{
-        var date = v.date
-        var user = v.user
-        var file_name = v.file_name
-        var id = v.id
-        var group = v.group
-        if (fild == 'date'){
-          var nameOfDate = v.date.split(' ')[0]
-          if (tables.findIndex(x => x.name == nameOfDate) == -1){
-            tables.push({'name':nameOfDate, 'table':[{'id':id, 'user':user, 'group':group, 'file_name':file_name, '_rowVariant':''}]})
-          } else {
-            tables[tables.findIndex(x => x.name == nameOfDate)].table.push({'id':id, 'user':user, 'file_name':file_name, 'group':group, 'date':date, '_rowVariant':''})
-          }
-        }
-        if (fild == 'file_name'){
-          var nameOfDate = v.file_name
-          if (tables.findIndex(x => x.name == nameOfDate) == -1){
-            tables.push({'name':nameOfDate, 'table':[{'id':id, 'user':user, 'group':group, 'date':date, '_rowVariant':''}]})
-          } else {
-            tables[tables.findIndex(x => x.name == nameOfDate)].table.push({'id':id, 'user':user, 'file_name':file_name, 'group':group, 'date':date, '_rowVariant':''})
-          }
-        }
-        if (fild == 'user'){
-          var nameOfDate = v.user
-          if (tables.findIndex(x => x.name == nameOfDate) == -1){
-            tables.push({'name':nameOfDate, 'table':[{'id':id, 'group':group, 'file_name':file_name, 'date':date, '_rowVariant':''}]})
-          } else {
-            tables[tables.findIndex(x => x.name == nameOfDate)].table.push({'id':id, 'user':user, 'file_name':file_name, 'group':group, 'date':date, '_rowVariant':''})
-          }
-        }
-        if (fild == 'group'){
-          var nameOfDate = v.group
-          if (this.optImages[this.optImages.findIndex(y => y.id == group)]){
-            if (tables.findIndex(x => x.name == this.optImages[this.optImages.findIndex(y => y.id == group)].value) == -1){
-              tables.push({'name':this.optImages[this.optImages.findIndex(y => y.id == group)].value, 'table':[{'id':id, 'user':user, 'file_name':file_name, 'date':date, '_rowVariant':''}]})
-            } else {
-              tables[tables.findIndex(x => x.name == this.optImages[this.optImages.findIndex(y => y.id == group)].value)].table.push({'id':id, 'user':user, 'file_name':file_name, 'group':group, 'date':date, '_rowVariant':''})
+
+  },mounted(){
+    this.heightImages='hi'+(Math.ceil(Math.random()*1000000))
+    setTimeout(() => {
+          if(this.wwidth<=768){
+            this.size = 2
+          }else{
+            this.quality = 50
+            if(this.wwidth<=1200){
+              this.size = 3
+            }else{
+              if(this.wwidth<=1400){
+                this.size = 4
+              }else{
+                if(this.wwidth<=1600){
+                this.size = 5
+                }else{
+                  if(this.wwidth<=1800){
+                    this.size = 6
+                  }
+                }
+              }
             }
           }
-        }
-      })
-      return tables
-    }
+      setTimeout(() => {
+        this.$emit('loded', 'component', this.$refs[this.heightImages].clientHeight, 250);
+      }, 1500);  
+    }, 200);     
   }
 }
 </script>

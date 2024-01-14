@@ -46,7 +46,7 @@
 
     
     <!-- <i :class="[(idNode==model.id) ? 'fa fa-folder-open' : 'fa fa-folder']" style="font-size: 14px; color: #fd7e14; padding-left:10px;"></i> -->
-    <span style="padding-left:10px;padding-right:10px;white-space: nowrap;font-size: 14px;">
+    <span style="padding-left:10px;padding-right:10px;white-space: nowrap;font-size: 12px;">
       <b-icon aria-hidden="true" :icon="(idNode==model.id) ? 'folder2-open' : 'folder2'" /> {{model.name}}
     </span>
           
@@ -134,6 +134,7 @@ export default {
       }
       // 调用vue-drag-tree的父组件中的方法,以传递出当前被点击的节点的id值
       //　API: 对外开放的当前被点击节点的信息
+      // console.log(this)
       rootTree.emitCurNodeClicked(this.model, this);
       // 纪录节点被点击的状态
       this.isClicked = !this.isClicked;

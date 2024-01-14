@@ -1,6 +1,7 @@
 <template>
   <b-container fluid>
-    <b-table  stacked="lg" @row-clicked="$emit('dataToFoot', $event)" class="tableProject" striped hover  :items="items_search()" :fields="fieldsTable"  busy.sync="isBusy">
+    <b-table  stacked="lg" @row-clicked="$emit('dataToFoot', $event)" class="tableProject" striped hover  :items="items_search()" :fields="fieldsTable"
+     busy.sync="isBusy" stacked="lg">
       <template #cell(status_set)="it">
         <span style="height:30px;">
           <line-chart :datas="dataCharts(it.item)" :height="50" style="max-width:200px;" />

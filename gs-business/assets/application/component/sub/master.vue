@@ -8,39 +8,46 @@
         <template #header>
           <b-row align-v="end">
             <b-col col xl="2" lg="2" md="12" sm="12" xs="12">
-              <b-button variant="primary" class="text-nowrap" @click="addCustomer">Add SUB</b-button>
+              <b-button variant="primary" class="text-nowrap" @click="addCustomer">{{$t('subs.addSub')}}</b-button>
             </b-col>
             <b-col col xl="2" lg="2" md="12"  sm="12" xs="12">
               <b-form-input
               class="w-100"
               v-model="filter"
               type="search"
-              placeholder="Search">
+              :placeholder="$t('projects.search')">
               </b-form-input>
             </b-col>
             <b-col col xl="6" lg="6" md="8"  sm="8" xs="8"> 
-              <b-form-checkbox-group
-              class="text-lg-center text-xl-center text-sm-left text-md-left"
-              switches
-              v-model="filterOn">
-                <b-form-checkbox v-for="fild in filterFilds(fields)" :key="fild.key" :value="fild.key">
-                  {{fild.label}}
-                </b-form-checkbox>
-              </b-form-checkbox-group>
+              <b-dropdown  variant="primary" dropright>
+                 <template #button-content>
+                    <b-icon icon="list-check" aria-hidden="true"></b-icon> 
+                  </template>
+                    <b-form-checkbox-group
+                    class="m-2"
+                    switches
+                    v-model="filterOn">
+                    <b-form-checkbox v-for="fild in filterFilds(fields)" :key="fild.key" :value="fild.key">
+                      {{fild.label}}
+                    </b-form-checkbox>
+                    </b-form-checkbox-group>
+                  </b-dropdown>
             </b-col>
             <b-col col xl="2" lg="2" md="4"  sm="4" xs="4">
               <b-form-checkbox-group
               class="text-sm-left text-md-left text-lg-right "
               switches
-              :options="['Old']"
+              :options="[$t('fields.showOld')]"
               @change="itemsFilter((show!='Show')?1:0);show=(show!='Show')?'Show':'Hide'"/>
             </b-col>
           </b-row>
         </template>
         <container>
           <container-body>
+            <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
             <b-table stacked="lg" :items="items" :fields="getFields()" @row-clicked="inItemClick"   hover :filter="filter" :filter-included-fields="filterOn"
-              show-empty @filtered="onFiltered" sticky-header no-border-collapse style="max-height:100%" :busy="(items.length==0)">
+              show-empty @filtered="onFiltered"  no-border-collapse >
+              <!-- :busy="(items.length==0)" -->
               <template #cell(in)="data">
                 <div class="text-center w-100">
                   {{ data.index + 1 }}
@@ -55,10 +62,11 @@
               <template #table-busy>
                 <div class="text-center text-info">
                   <b-spinner class="align-middle"></b-spinner>
-                  <strong>Loading...</strong>
+                  <strong>{{$t('projects.loading')}}...</strong>
                 </div>
               </template>
             </b-table>
+          </div>
           </container-body>
         </container>
       </b-card>
@@ -81,47 +89,57 @@ export default {
       addDep:null,
       addPos:null,
       show:"Show",
-      fields: [
-        {
-          key:'in',
-          label: 'Number'
-        },
-        {
-          key:'name',
-          label: 'Name',
-          sortable: true
-        },
-        {
-          key:'data',
-          label: 'Registred',
-          sortable: true
-        },
-        {
-          key:'zip',
-          label: 'ZIP',
-          sortable: true
-        },
-        {
-          key:'city',
-          label: 'City',
-          sortable: true
-        },
-        {
-          key:'street',
-          label: 'Street',
-          sortable: true
-        },
-        {
-          key:'old',
-          label: 'Old',
-          sortable: true
-        }
-      ],
       items: [],
       items1:[],
       totalRows: 1,
       filter: null,
       filterOn: []
+    }
+  },
+  computed: {
+    fields() {
+      return [{
+        key: 'in',
+        label: this.$t('fields.number'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'name',
+        label: this.$t('customerDetail.name'), 
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'data',
+        label: this.$t('customerDetail.date'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'zip',
+        label: this.$t('fields.zip'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'city',
+        label: this.$t('fields.city'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'street',
+        label: this.$t('fields.street'),
+        sortable: true,
+        variant: 'default'
+      },
+      {
+        key: 'old',
+        label: this.$t('customerDetail.old'),
+        sortable: true,
+        variant: 'default'
+      }]
     }
   },
   methods: {
