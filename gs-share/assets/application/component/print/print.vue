@@ -16,7 +16,7 @@
 
          <iframe type="iframe" style="width:100%;height:550px;" name="myIframe"  @load="loadFrame"></iframe>
 
-         <form target="myIframe" action="/pdf" method="post" style="display:" ref="preForm">
+         <form target="myIframe" action="/pdf" method="post" style="display:none" ref="preForm">
             <input type="text" name="dateInspect" :value="tmp.dateInspect" />
             <input type="text" name="dateEvent" :value="tmp.dateEvent" />
             <input type="text" name="worker" :value="tmp.worker" />

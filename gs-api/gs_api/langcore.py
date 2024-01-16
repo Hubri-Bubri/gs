@@ -298,17 +298,21 @@ class language:
             project_id=data['project_id']
             user=data['editor']
 
+            resp = web.StreamResponse(headers={
+                'CONTENT-DISPOSITION': 'inline'
+            })
+            resp.content_type ="application/pdf"
+            await resp.prepare(request)
             for index, page in enumerate(h.split('<html>')):
                 if index > 0:
                     part = '<html>'+page
 
                     pdf = HTML(string=part).write_pdf(stylesheets=[CSS(string='@page { size: A4; margin-top: 5mm; margin-left: 10mm; margin-right: 10mm; margin-bottom: 3mm; }')])
-                    resp = web.StreamResponse(headers={
-                    'CONTENT-DISPOSITION': 'inline'
-                    })
-                    resp.content_type ="application/pdf"
-                    await resp.prepare(request)
-                    await resp.write(pdf)
+                   
+                    
+                    
+                    resp.write(pdf)
+                    
                     file = bytes(pdf)
                     number_of_pages=0
                     pdf_file = io.BytesIO(file)
