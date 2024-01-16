@@ -309,8 +309,6 @@ class language:
 
                     pdf = HTML(string=part).write_pdf(stylesheets=[CSS(string='@page { size: A4; margin-top: 5mm; margin-left: 10mm; margin-right: 10mm; margin-bottom: 3mm; }')])
                    
-                    
-                    
                     resp.write(pdf)
                     
                     file = bytes(pdf)

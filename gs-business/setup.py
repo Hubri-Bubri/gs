@@ -36,7 +36,7 @@ prod_requires = [
 
 setup(
     name='gs-business',
-    version="0.1.19"
+    version="0.1.20"
     ,
     install_requires=prod_requires,
     packages=['gs_business'],

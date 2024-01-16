@@ -31,10 +31,11 @@
     ref="print"
     >
 
-      <b-col lg="6" md="12"></b-col>
-      <b-col class="cForm col-12 col-lg-4" style="padding:0px;" slot="Type"></b-col>
-      <b-col class="cForm col-12 col-lg-4" style="padding:0px;" slot="Work"></b-col>
+      <b-col lg="5" md="12"></b-col>
+      <!-- <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Type"></b-col>
+      <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Work"></b-col> -->
     </print>
+    
     <div v-for="(part, index) in showTable()" :key="part.id">
       <devices-table
       :value="part"
@@ -50,6 +51,7 @@
           </span>
         </div>
       </devices-table>
+
       <devices-measurement
       :value="part"
       :tableId="index"
