@@ -16,7 +16,7 @@
 
          <iframe type="iframe" style="width:100%;height:550px;" name="myIframe"  @load="loadFrame"></iframe>
 
-         <form target="myIframe" :action="'/pdf'" method="post" style="display:none" ref="preForm">
+         <form target="myIframe" action="/pdf" method="post" style="display:" ref="preForm">
             <input type="text" name="dateInspect" :value="tmp.dateInspect" />
             <input type="text" name="dateEvent" :value="tmp.dateEvent" />
             <input type="text" name="worker" :value="tmp.worker" />
@@ -311,15 +311,5 @@ export default {
             return summa;
         },
     },
-  // watch: {
-  //   windowPrint:function(value) {
-  //     this.windowPrintModel = value
-  //   },
-  //   windowPrintModel: function(value) {
-  //     if (value == false){
-  //       this.$emit('hideWindowPrint')
-  //     }
-  //   }
-  // }
 }
 </script>

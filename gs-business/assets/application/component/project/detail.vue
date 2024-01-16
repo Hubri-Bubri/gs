@@ -4311,7 +4311,7 @@ inItemGetData(item, index) {
       this.selrow = item.id,
       item._rowVariant = (item.id==this.selrow)?'secondary':'',
       this.generalComments=false,
-      this.tmp.typeOfHead = item.type,
+      this.tmp.typeOfHead = (this.tmp.typeOfHead=='Devices')?'Devices':item.type,
       // console.log(item.type),
       this.beforeTab = item.type,
       this.tmp.number = item.number,
@@ -4560,13 +4560,12 @@ project_detail_f(old){
 getProjectDetail(old){
   // alert()
   axios.get('/date_logo').then(response => {
-          var separator = response.data.date_logo_address.split('- ')[0]+'- ';
-          var address = response.data.date_logo_address.split(separator)[1];
-          this.mail_address = address;
-          this.mail_logo = response.data.date_logo_image;
-          this.mail_date = response.data.date_logo.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig)[0];
-          
-        })
+    var separator = response.data.date_logo_address.split('- ')[0]+'- ';
+    var address = response.data.date_logo_address.split(separator)[1];
+    this.mail_address = address;
+    this.mail_logo = response.data.date_logo_image;
+    this.mail_date = response.data.date_logo.match(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig)[0];
+  })
 
 
   if (this.typesForTables.length==0){
@@ -4621,6 +4620,7 @@ getProjectDetail(old){
     },
 
     dubTabIndex: function(value){
+      console.log('dubTabIndex')
           if(this.$refs.devices!=undefined){
             if (this.$refs.devices.localActive){
               this.tmp.typeOfHead = 'Devices'
