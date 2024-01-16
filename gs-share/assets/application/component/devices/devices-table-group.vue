@@ -30,8 +30,8 @@
     @hideWindowPrint="hideWindowPrint"
     ref="print"
     >
+    <b-col></b-col>
 
-      <b-col lg="5" md="12"></b-col>
       <!-- <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Type"></b-col>
       <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Work"></b-col> -->
     </print>
@@ -42,9 +42,9 @@
       :tableId="index"
       :workers="workers">
         <div slot-scope="table" slot="tableHead">
-          <b-link style="width:100%" @click="toog(value[index].parts.id)">
-            <span :id="'dp'+value[index].parts.id" style="display:none">+</span>
-            <span :id="'dm'+value[index].parts.id">-</span>
+          <b-link style="width:100%" @click="toog(part.parts.id)">
+            <span :id="'dp'+part.parts.id" style="display:none">+</span>
+            <span :id="'dm'+part.parts.id">-</span>
           </b-link>
           <span :contenteditable="true" @blur="updateNameDevice($event, part.parts.id, part.parts.part_name_device)" @click.prevent.self>
             {{part.parts.part_name_device?part.parts.part_name_device:part.parts.part_name}}
@@ -57,9 +57,9 @@
       :tableId="index"
       :workers="workers">
         <div slot-scope="table" slot="tableHead"> 
-          <b-link style="width:100%" @click="toogMeas(value[index].parts.id)">
-            <span :id="'measurementProtocolClose'+value[index].parts.id" style="display:none">+ {{$t('measurement.measurementProtocol')}}</span>
-            <span :id="'measurementProtocolOpen'+value[index].parts.id">- {{$t('measurement.measurementProtocol')}}</span>
+          <b-link style="width:100%" @click="toogMeas(part.parts.id)">
+            <span :id="'measurementProtocolClose'+part.parts.id" style="display:none">+ {{$t('measurement.measurementProtocol')}}</span>
+            <span :id="'measurementProtocolOpen'+part.parts.id">- {{$t('measurement.measurementProtocol')}}</span>
           </b-link>
         </div>
       </devices-measurement>
@@ -104,6 +104,9 @@ export default {
   ],
   methods: {
     toog(val){
+      console.log('dev'+val)
+      console.log(document.getElementById('dev'+val))
+
       document.getElementById('dm'+val).style.display = document.getElementById('dev'+val).style.display = (document.getElementById('dev'+val).style.display=='none') ? '' : 'none'
       document.getElementById('dp'+val).style.display = (document.getElementById('dm'+val).style.display=='none') ? '' : 'none'
     },

@@ -3321,7 +3321,7 @@ findLevel(this.itemsMenuReport, valResp.parrent)
         this.domageImages = response.data.filter(function (v){
           if((v.file_name.split('.')[v.file_name.split('.').length-1]) != 'pdf'){ return v}
         })
-         console.log(this.domageImages)
+        //  console.log(this.domageImages)
         })
 
         // console.log((this.project.number==null)?'0001':this.project.number, this.domageImages )
@@ -4620,7 +4620,7 @@ getProjectDetail(old){
     },
 
     dubTabIndex: function(value){
-      console.log('dubTabIndex')
+      // console.log('dubTabIndex')
           if(this.$refs.devices!=undefined){
             if (this.$refs.devices.localActive){
               this.tmp.typeOfHead = 'Devices'

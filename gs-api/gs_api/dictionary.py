@@ -9116,8 +9116,13 @@ class Balance:
     async def billing(cls):
         current_year = datetime.datetime.now().year
         month = int(datetime.datetime.now().strftime("%m"))
+        if (month-1)==0:
+            current_year = current_year - 1
+            month=13
+        
         days = monthrange(current_year, (month-1))[1]
-        parametrs = ('110|'+str(current_year)+'-'+str(month-1)+'-01|'+str(current_year)+'-'+str(month-1)+'-'+str(days))
+
+        parametrs = ('10|'+str(current_year)+'-'+str(month-1)+'-01|'+str(current_year)+'-'+str(month-1)+'-'+str(days))
         bruttos = float(0.0)
         nettos = float(0.0)
         rows = (await Balance.select_balances(parametrs))

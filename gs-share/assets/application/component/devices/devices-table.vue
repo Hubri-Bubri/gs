@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid>
+  <b-container>
     <slot name="tableHead" :tableId="tableId" ></slot>
      <div visible :id="'dev'+value.parts.id">
         <b-table-simple>

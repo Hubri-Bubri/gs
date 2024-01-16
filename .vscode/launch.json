@@ -1,5 +1,6 @@
 {
     "configurations": [
+
         {
             "name": "dashboard",
             "type": "python",
@@ -42,6 +43,15 @@
             "program": "~/project/awe/gs-business/gs_business/__main__.py",
             "console": "integratedTerminal",
             "args": ["--demo"],
+            "justMyCode": false,
+        }
+        {
+            "name": "christ",
+            "type": "python",
+            "request": "launch",
+            "program": "~/project/awe/gs-business/gs_business/__main__.py",
+            "console": "integratedTerminal",
+            "args": ["--christ"],
             "justMyCode": false,
         }
     ]
