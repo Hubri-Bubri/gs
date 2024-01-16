@@ -55,6 +55,7 @@
         "replaning" : "Reschedule",
         "planing" : "Schedule",
         "priceList" : "Price List",
+        "reportList": "reports",
         "plusPart" : "New Part",
         "remove" : "Remove",
         "plusRow" : "New Row",

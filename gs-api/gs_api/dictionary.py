@@ -8162,6 +8162,235 @@ class Devices:
                     .delete())
 
 
+class Reports:
+    # @classmethod
+    # async def select_reports(cls, id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.reports)
+    #             .fields(
+    #                 T.reports.pos_num,
+    #                 T.reports.designation,
+    #                 T.reports.comment,
+    #                 T.reports.kilowatt,
+    #                 T.reports.time,
+    #                 T.reports.manufacturer,
+    #                 T.reports.serial,
+    #                 T.reports.order,
+    #                 T.reports.check_date,
+    #                 T.reports.next_check_date,
+    #                 T.reports.id
+    #             )
+    #             .where(T.reports.item_id == id)
+    #             .selectall())
+
+    @classmethod
+    async def reports_menu(cls):
+        async with database.query() as Q:
+            return await (Q(T.reports_menu)
+                .fields(
+                    T.reports_menu.id,
+                    T.reports_menu.name,
+                    T.reports_menu.parrent
+                ).selectall())
+
+    # @classmethod
+    # async def change_parrent_menu_reports(cls, drag1, drag2):
+    #     async with database.query() as Q:
+    #         return await (Q(T.price_menu)
+    #             .tables(T.price_menu)
+    #             .where(T.price_menu.id == drag1)
+    #             .update({
+    #                 T.price_menu.parrent: drag2
+    #             }))
+
+    @classmethod
+    async def add_reports_menu(cls, parent_id):
+        async with database.query() as Q:
+            return await (Q(T.reports_menu)
+                .tables(T.reports_menu)
+                .insert({
+                    T.reports_menu.name: 'New Part',
+                    T.reports_menu.parrent: parent_id
+                })) 
+
+   
+    # @classmethod
+    # async def remove_reports_menu(cls, remove_id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.reports_menu)
+    #           .tables(T.reports_menu)
+    #           .where(T.reports_menu.id == remove_id)
+    #           .delete())
+
+    # @classmethod
+    # async def update_name_reports_menu(cls, name, id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.reports_menu)
+    #             .tables(T.reports_menu)
+    #             .where(T.reports_menu.id == id)
+    #             .update({
+    #                 T.reports_menu.name: name
+    #             }))
+
+    # @classmethod
+    # async def add_reports(cls, id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.reports_menu)
+    #             .tables(T.reports)
+    #             .insert({
+    #                 T.reports.item_id: id
+    #             }))
+
+    # @classmethod
+    # async def remove_reports(cls, id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.reports_menu)
+    #             .tables(T.reports)
+    #             .where(T.reports.id == id)
+    #             .delete())
+
+    # @classmethod
+    # async def update_reports(cls, data, fild, id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.reports)
+    #             .tables(T.reports)
+    #             .where(T.reports.id == id)
+    #             .update({
+    #                 T.reports[fild]: data
+    #             }))
+
+    # @classmethod
+    # async def cp_mv_to_reports(cls, ids, new, op):
+    #     async with database.query() as Q:
+    #         if  op=='move':
+    #             for v in ids.split(","):
+    #                 await (Q()
+    #                     .tables(T.reports)
+    #                     .where(T.reports.id == v)
+    #                     .update({
+    #                           T.reports.item_id: new
+    #                     }))
+    #         if  op=='copy':
+    #             for v in ids.split(","):
+    #               item = (await (Q()
+    #                     .tables(T.reports)
+    #                     .fields(
+    #                         T.reports.pos_num,
+    #                         T.reports.name,
+    #                         T.reports.desc,
+    #                         T.reports.unit,
+    #                         T.reports.price,
+    #                         T.reports.without,
+    #                         T.reports.percent
+    #                     )
+    #                     .where(T.reports.id == v)
+    #                     .selectone()))
+    #               await (Q(T.reports_menu)
+    #                 .tables(T.reports)
+    #                 .insert({
+    #                         T.reports.pos_num: item['pos_num'],
+    #                         T.reports.name: item['name'],
+    #                         T.reports.desc: item['desc'],
+    #                         T.reports.unit: item['unit'],
+    #                         T.reports.price: item['price'],
+    #                         T.reports.without: item['without'],
+    #                         T.reports.percent: item['percent'],
+    #                         T.reports.item_id: new
+    #                 }))
+
+    #         return ''
+
+    # @classmethod
+    # async def send_reports(cls, ids, names):
+    #     #print(type, ids, names, item_id)
+    #     # arr=[]
+    #     # for v in ids.split(","):
+    #     #    arr=arr+','+v
+ 
+    #     async with database.query() as Q:
+    #         items = (await (Q()
+    #                         .tables(T.reports)
+    #                         .fields(
+    #                             T.reports.pos_num,
+    #                             T.reports.designation,
+    #                             T.reports.comment,
+    #                             T.reports.kilowatt,
+    #                             T.reports.time,
+    #                             T.reports.manufacturer,
+    #                             T.reports.serial,
+    #                             T.reports.order,
+    #                             T.reports.check_date,
+    #                             T.reports.next_check_date
+    #                         )
+    #                         .where(T.reports.id.in_(ids.split(",")))
+    #                         .selectall()))
+
+    #         for item in items:
+    #             newPrice = item['kilowatt'].replace(',','.')
+    #             try:
+    #                 newPrice = float(newPrice)
+    #             except:
+    #                 newPrice = 0
+
+    #             if item['comment']==None:
+    #                 item['comment'] = ' '
+
+    #             for v in names.split(","):
+    #                     devName = (await (Q()
+    #                     .tables(T.tables)
+    #                     .fields(
+    #                         T.tables.name
+    #                     )
+    #                     .where(T.tables.id == v)
+    #                     .selectone()))
+
+    #                     await (Q()
+    #                     .tables(T.tables)
+    #                     .where(T.tables.id == v)
+    #                     .update({
+    #                           T.tables.reports: devName['name']
+    #                     }))
+
+    #                     await (Q(T.rows_for_reports)
+    #                         .tables(T.rows_for_reports)
+    #                         .insert({
+    #                                 T.rows_for_reports.table_id: v,
+    #                                 T.rows_for_reports.pos_num: item['pos_num'],
+    #                                 T.rows_for_reports.designation: item['designation'],
+    #                                 T.rows_for_reports.kilowatt: item['kilowatt'],
+    #                                 T.rows_for_reports.comment: item['comment'],
+    #                                 T.rows_for_reports.time: item['time'],
+    #                                 T.rows_for_reports.manufacturer: item['manufacturer'],
+    #                                 T.rows_for_reports.serial: item['serial'],
+    #                                 T.rows_for_reports.order: item['order'],
+    #                                 T.rows_for_reports.check_date: item['check_date'],
+    #                                 T.rows_for_reports.next_check_date: item['next_check_date'],
+    #                                 T.rows_for_reports.sdate: datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+    #                                 T.rows_for_reports.fdate: (datetime.datetime.now() + datetime.timedelta(days = 7)).strftime("%Y-%m-%d %H:%M"),
+    #                                 T.rows_for_reports.smReading: '0.00',
+    #                                 T.rows_for_reports.fmReading: '0.00',
+    #                                 T.rows_for_reports.location: 'Undefined'
+    #                         }))
+    #     return ''
+
+    # @classmethod
+    # async def updateDeviceList(cls, newDate, fild, id):
+    #     async with database.query() as Q:
+    #              await (Q()
+    #                  .tables(T.rows_for_reports)
+    #                  .where(T.rows_for_reports.id == id)
+    #                  .update({
+    #                      T.rows_for_reports[fild]: newDate
+    #                  }))
+    #     return ''
+
+    # @classmethod
+    # async def del_row_from_eports(cls, id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.rows_for_reports)
+    #                 .where(T.rows_for_reports.id == id)
+    #                 .delete())
+
 class Personals:
     @classmethod
     async def get_templates_for_factory(cls):

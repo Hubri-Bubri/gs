@@ -9,12 +9,40 @@
             "justMyCode": false
         },
         {
-            "name": "business",
+            "name": "bwsa",
             "type": "python",
             "request": "launch",
             "program": "~/project/awe/gs-business/gs_business/__main__.py",
             "console": "integratedTerminal",
-            "justMyCode": false
+            "args": ["--bwsa"],
+            "justMyCode": false,
+        }
+        {
+            "name": "baer",
+            "type": "python",
+            "request": "launch",
+            "program": "~/project/awe/gs-business/gs_business/__main__.py",
+            "console": "integratedTerminal",
+            "args": ["--baer"],
+            "justMyCode": false,
+        }
+        {
+            "name": "awe",
+            "type": "python",
+            "request": "launch",
+            "program": "~/project/awe/gs-business/gs_business/__main__.py",
+            "console": "integratedTerminal",
+            "args": ["--awe"],
+            "justMyCode": false,
+        }
+        {
+            "name": "demo",
+            "type": "python",
+            "request": "launch",
+            "program": "~/project/awe/gs-business/gs_business/__main__.py",
+            "console": "integratedTerminal",
+            "args": ["--demo"],
+            "justMyCode": false,
         }
     ]
 }

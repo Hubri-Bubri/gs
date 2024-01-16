@@ -1,6 +1,6 @@
 <template>
 <container>
-  <input ref="unfocus" style="width: 0px; height: 0px; position: absolute; top: 0; left: 0; margin:0; padding:0; border: 0;"></input>
+  <input ref="unfocus" style="width: 0px; height: 0px; position: absolute; top: 0; left: 0; margin:0; padding:0; border: 0;" /> 
 <!--     <b-modal size="md" centered id="move" ref="move" title="Move">
         // @change="moveToCopySelect($event, moveToCopyRadio)" v-model="moveToCopy" //
          <b-form-select class="" id="move" v-model="selectedItems" :select-size="detectRowSise(itemsMenu)">
@@ -320,7 +320,6 @@
                         <template #title>
                             {{$t('projectDetail.priceList')}}
                             <!-- <b-link @click="menuPriceTree=menuPriceTree?false:true">Price List</b-link> -->
-                          </div>
                         </template>
                         <container>
                           <container-body>
@@ -363,7 +362,6 @@
                         <template #title>
                             {{$t('projectDetail.devicesList')}}
                             <!-- <b-link @click="menuDevicesTree=menuDevicesTree?false:true">Devices List</b-link> -->
-                            </div>
                         </template>
                         <container>
                           <container-body>
@@ -392,7 +390,7 @@
                              <b-button @click="removeDevice">{{$t('projectDetail.remove')}}</b-button>
                              <b-button @click="addRowDevice">{{$t('projectDetail.plusRow')}}</b-button>
                              <!--  <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpDevice">mv/cp</b-button></b-col> -->
-                              <b-button @click="sendDevice">{{$t('projectDetail.send')}}</b-button>
+                              <b-button @click="sendDevice" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
                               
                               <b-button @click="$refs.devChild1.hidePosition()" >
                                 <b-icon icon="layout-three-columns" aria-hidden="true"></b-icon>
@@ -521,11 +519,62 @@
                                 <b-form-input  v-model="nameNodeImag" :style="nodeDisImag?'background-color:grey':''"
                                 :disabled="(nameNodeImag=='General Folder')?true:false"
                                 @click.native="nodeDisImag?nodeDisTurnImag():''" @change="nodeDisImag=true;toModelImag(nameNodeImag)" />
-                                <b-button v-show="butifsel()" @click="sendtodamage()">{{$t('projectDetail.send')}}</b-button>
+                                <b-button v-show="butifsel()" @click="sendtodamage()" :disabled="selectedTables.length<=0"></b-button>>{{$t('projectDetail.send')}}</b-button>
                               </b-input-group>
                             </container-footer>
                           </container>
                         </b-tab>
+                        <b-tab style="padding:0px;"  >
+                        <template #title>
+                            {{$t('projectDetail.reportList')}}
+                            <!-- <b-link @click="menuPriceTree=menuPriceTree?false:true">Price List</b-link> -->
+                        </template>
+                        <container>
+                          <container-body>
+                              <reports v-if="(tabIndex==5) && (comtomodal!='reportList')"
+                              @loded="loded"
+                              ref="reportChild1"
+
+                              :menuPriceTree="menuReportTree"
+                              :idNode="idNodeReport"
+                              :items="itemsReport"
+                              :itemsMenu="itemsMenuReport"
+                              :oldId="oldIdReport"
+                              :selectedPrice="selectedReport"
+
+ 
+                              @curNodeClickedReport="pcurNodeClickedReport"
+                              @rowSelectedReport="prowSelectedReport"
+                               ></reports>
+
+                          </container-body>
+                <container-footer style="overflow: hidden;">
+                        <b-input-group>
+                            <b-button @click="addReport">{{$t('projectDetail.plusPart')}}</b-button>
+                            <b-button @click="removeReport">{{$t('projectDetail.remove')}}</b-button>
+                            <b-button @click="addRowReport">{{$t('projectDetail.plusRow')}}</b-button>
+                            <!-- <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpPrice">mv/cp</b-button></b-col> -->
+
+                            <b-button  @click="sendReport" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
+                              <b-button  @click="$refs.reportChild1.hidePosition()" >
+
+                                <b-icon icon="layout-three-columns" aria-hidden="true"></b-icon>
+                                <!-- <i class="fas fa-columns"></i> -->
+                              </b-button>
+                                               
+                              <b-form-input v-model="nameNodeReport" :style="nodeDisReport?'background-color:grey':''"
+                                  @click.native="nodeDisReport?nodeDisTurnReport():''" @change="nodeDisReport=true;toModelReport(nameNodeReport)"></b-form-input>
+                            
+
+                            
+                            
+                       </b-input-group>
+                </container-footer>
+         
+
+                          </container>
+                        </b-tab>
+
                     </b-tabs>
                 </b-card>
                 <b-card no-body class="gs-container" :style="heightEditforSm">
@@ -856,6 +905,14 @@ export default {
         selectedFiles:null,
         mailSelect:[],
         mailSelectPlan:[],
+        
+        oldIdReport:0,
+        idNodeReport:null,
+        itemsReport:[],
+        itemsMenuReport:[],
+        selectedReport:[],
+        nameNodeReport:null,
+        nodeDisReport:true,
 
         dropImage:true,
         dropDoc:true,
@@ -885,6 +942,7 @@ export default {
         itemsMenuDoc:[],
         itemsMenuImag:[],
         selectedItems:[],
+        menuReportTree: false,
 
         moveToCopyRadio:'move',
         selectedPrice:[],
@@ -2109,7 +2167,20 @@ tabletopartx(tables){
             items._rowVariant=''
          }
     },
-
+    prowSelectedReport(items) {
+         if(this.selectedReport.indexOf(items)==-1){
+            this.selectedReport = this.selectedReport.filter((v)=>{
+                if (v.id != items.id){
+                    return v
+                }
+            });
+            this.selectedReport.push(items);
+            items._rowVariant='success';
+         } else{
+            this.selectedReport.splice(this.selectedReport.indexOf(items), 1)
+            items._rowVariant=''
+         }
+    },
     prowSelectedDoc(items) {
         // console.log(items)
          if(this.selectedPriceDoc.indexOf(items)==-1){
@@ -2341,6 +2412,40 @@ tabletopartx(tables){
             })
         })
     },
+    sendReport(){
+        var ids=[]
+        // var names=[]
+        // console.log(this.selectedTransfer)
+        // this.partx.forEach((valuePart)=> {
+        //         if (valuePart.parts.toggle) {
+        //             // valuePart.parts.part_content.forEach((v)=>{
+        //                 // item_id = v.item_id
+        //                 names.push(valuePart.parts.id)
+        //             // })
+        //         }
+        // })
+        this.selectedReport.forEach((v, i)=>{
+            ids.push(v.id)
+        })
+
+        // function onlyUnique(value, index, self) { 
+        //     return self.indexOf(value) === index;
+        // }
+
+        // var unique = names.filter(onlyUnique)
+
+        axios.get('/send_reports', {
+                  params: {
+                        ids: ids.join(),
+                        names: this.selectedTables.join()
+                  }
+        }).then(response=>{
+            this.selectedReport=[]
+            this.itemsReport.forEach(v=>{
+               v._rowVariant=''  
+            })
+        })
+    },
       mv_cpPrice(){
         if (this.idNode==null){
             alert(this.$t('alert.noItemSelect'))
@@ -2389,7 +2494,18 @@ tabletopartx(tables){
         }
          location.href = "#finishList"
     },
-
+    addRowReport(){
+        if (this.idNode==null){
+            alert(this.$t('alert.noSelectedForAdd'))
+        } else {
+            axios.get('/add_price', {
+                params: {
+                    id: this.idNodeReport
+                }
+            })
+        }
+         location.href = "#finishList"
+    },
     removePrice(){
        if (this.idNode==null){
             alert(this.$t('alert.noItemSelectForDel'))
@@ -2454,6 +2570,23 @@ tabletopartx(tables){
                 }).then(response=>{
                     this.idNodeImg=null,
                     this.nameNodeImag=null
+                })
+            }
+        } 
+    },
+    removeReport(){
+       if (this.idNodeReport==null){
+            alert(this.$t('alert.noItemSelectForDel'))
+       }
+       else {
+            if (confirm(this.$t('alert.remove'))) {
+                axios.get('/remove_report_menu', {
+                    params: {
+                        remove_id: this.idNodeReport
+                    }
+                }).then(response=>{
+                    this.idNodeReport=null,
+                    this.nameNodeReport=null
                 })
             }
         } 
@@ -2557,6 +2690,29 @@ tabletopartx(tables){
 
         findLevel(this.itemsMenuImag, this.idNodeImg, this.id)
     },
+    addReport(){
+      function findLevel(obj, id) {
+        if (id==null){
+            id=0,
+            obj.push({id:0, children:[]})
+        }
+            obj.forEach((val)=>{
+                if (val.id==id){
+                    axios.get('/add_report_menu', {
+                        params: {
+                            parent_id: val.id
+                        }
+                    })
+                } else {
+                    if(val.children.length!=0) {
+                        findLevel(val.children, id)
+                    }
+                }
+            })
+        }
+
+        findLevel(this.itemsMenuReport, this.idNodeReport)  
+    },
        getPrices(){
 
 
@@ -2649,6 +2805,50 @@ tabletopartx(tables){
                });
             })
         },
+        getReports(){
+
+
+// delete this.$options.sockets.onmessage;
+
+
+if (this.idNodeDev!=null){
+    axios.get('/reports', {
+        params: {
+            id:this.idNodeReport?this.idNodeReport:0
+        }
+    }).then(response => {
+        this.itemsReport = response.data
+        // this.$socket.send('getPrices')
+        // this.$options.sockets.onmessage = (data) => (data.data=='getPrices') ? this.getPrices(): ''
+    })
+}
+axios.get('/reports_menu').then(response => {
+    this.itemsMenuReport=[];
+       response.data.forEach((val)=>{
+                 if (val.parrent==0){
+                    val['children']=[]
+                    this.itemsMenuReport.push(val);
+                }
+       });
+
+        response.data.forEach((valResp)=>{
+          function findLevel(obj, id) {
+                obj.forEach((val)=>{
+                    if (val.id==id){
+                        valResp['children']=[]
+                        val.children.push(valResp);
+                    } else{
+                        if (val.children.length!=0){
+                            findLevel(val.children, id)
+                        }
+                    }
+                })
+            }
+
+findLevel(this.itemsMenuReport, valResp.parrent)  
+       });
+    })
+},
    getDocs(){
 
         // delete this.$options.sockets.onmessage;
@@ -2834,6 +3034,11 @@ tabletopartx(tables){
                this.nodeDisDev = false
             }
        },
+    nodeDisTurnReport(){
+          if (confirm(this.$t('alert.rename'))) {
+               this.nodeDisReport = false
+            }
+    },
     nodeDisTurnDoc(){
           if (confirm(this.$t('alert.rename'))) {
                this.nodeDisDoc = false
@@ -2909,7 +3114,38 @@ tabletopartx(tables){
             this.idNodeDev = null
         }
     },
+    pcurNodeClickedReport(model, component) {
+        this.nameNodeReport = model.name,
+        this.idNodeReport=model.id
 
+        if(this.idNodeReport == this.oldIdReport){
+             if (this.itemsReport.length>0){
+                this.itemsReport=[]
+            } else{
+            axios.get('/reports', {
+                 params: {
+                     id: model.id
+                 }
+             }).then(response => {
+                 this.itemsReport = response.data;
+                 this.$refs.reportChild1.loded();
+             })
+            }
+        }else{
+            axios.get('/reports', {
+                 params: {
+                     id: model.id
+                 }
+             }).then(response => {
+                 this.itemsReport = response.data;
+                 this.$refs.reportChild1.loded();
+             })
+        }
+        this.oldIdReport = this.idNodeReport
+        if ((model.parrent == 0) && component.folder == false){
+            this.idNodeReport = null
+        }
+    },
     pcurNodeClickedDoc(model, component) {
         this.nameNodeDoc = model.name,
         this.idNodeDoc=model.id
@@ -4428,6 +4664,7 @@ getProjectDetail(old){
         this.getPrices();
         this.getDevices();
         this.getDocs();
+        this.getReports();
         // this.$socket.send('getProjectDetail')
         // this.$socket.send('get_type_works')
         // this.$socket.send('getPrices')
@@ -4444,6 +4681,7 @@ getProjectDetail(old){
         this.$options.sockets.onmessage = (data) => (data.data=='getLoocks') ? (this.getLoocks()): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getPrices') ? this.getPrices(): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getDevices') ? this.getDevices(): ''
+        this.$options.sockets.onmessage = (data) => (data.data=='getReports') ? this.getReports(): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getDocs') ? this.getDocs(): ''
         // this.displaytime()
         },1000);

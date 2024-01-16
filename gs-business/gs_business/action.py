@@ -38,7 +38,8 @@ from aiohttp_session import get_session
 from uuid import uuid4
 from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
-from gs_api.dictionary import Application, User, Project, Projects, Offer, Invoice, add_same, Del_offer, Offers, Docs, Customer, Prices, Devices, Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Del_offer_sub
+from gs_api.dictionary import (Application, User, Project, Projects, Offer, Invoice, add_same, Del_offer, Offers, Docs, Customer, Prices, Devices,
+                               Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Del_offer_sub, Reports)
 from gs_api.langcore import language
 from asyncio import ensure_future, gather, shield
 
@@ -1061,6 +1062,17 @@ async def method (request):
     for client in ws_clients:
         await client.send_str('getDevices')
     return result
+
+@routes.get('/add_report_menu')
+async def method (request):
+    result = web.json_response(await Reports.add_reports_menu(request.query['parent_id']))
+    for client in ws_clients:
+        await client.send_str('getReports')
+    return result
+
+@routes.get('/reports_menu')
+async def method (request):
+    return web.json_response(await Reports.reports_menu())
 
 @routes.get('/add_docs_menu')
 async def method (request):

@@ -10,7 +10,7 @@
     :taxP='taxP' :taxPDub='taxPDub'
     :netto='netto' :brutto='brutto'
     :butDiscPerc='butDiscPerc'
-    :partx='value' :head="tmp.typeOfHead"
+    :partx='showTable()' :head="tmp.typeOfHead"
     :addtaxColapsel="addtaxColapse"
     :workers="workers" :comments="comments"
     :customer="customer"
@@ -30,6 +30,8 @@
     @hideWindowPrint="hideWindowPrint"
     ref="print"
     >
+
+
       <b-col lg="6" md="12"></b-col>
       <b-col class="cForm col-12 col-lg-4" style="padding:0px;" slot="Type"></b-col>
       <b-col class="cForm col-12 col-lg-4" style="padding:0px;" slot="Work"></b-col>

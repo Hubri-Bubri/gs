@@ -57,6 +57,7 @@ import edevices from '@share/component/project/edevices';
 
 import price from '@share/component/price/price';
 import devices from '@share/component/devices/devices';
+import reports from '@share/component/report/report';
 
 // import balance from '@share/component/balance/balance';
 
@@ -171,6 +172,7 @@ Vue.component('devices-measurement', DevicesMeasurement);
 
 Vue.component('price', price);
 Vue.component('devices', devices);
+Vue.component('reports', reports);
 
 Vue.component('print', print);
 // Vue.component('balance', balance);

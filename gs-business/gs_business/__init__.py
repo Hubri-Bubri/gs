@@ -47,7 +47,7 @@ def run(max_size=0):
     # do load file configuraion
     configuration.load()
     # do load database configuraion
-    listen = 8070
+
     if args.baer:
         listen=8090
         dictionary.database.set_configuration(
