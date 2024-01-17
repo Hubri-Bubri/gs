@@ -40,19 +40,19 @@ class language:
         for table in tables:
             for damage in table['parts']['damage_content']:
                 image={}
-                # image['content'] = b64encode(await Docs.images_for_pdf(damage['imgId'])).decode()
-                image['content'] = await Docs.images_for_pdf(damage['imgId'])
-                im = Image.open(io.BytesIO(image['content']))
+                image['content'] = b64encode(await Docs.images_for_pdf(damage['imgId'])).decode()
+                #image['content'] = await Docs.images_for_pdf(damage['imgId'])
+                #im = Image.open(io.BytesIO(image['content']))
                 # im.thumbnail((100,100), Image.ANTIALIAS)
-                stream = io.BytesIO()
-                im.save(stream, "JPEG", quality=10)
+                #stream = io.BytesIO()
+                #im.save(stream, "JPEG", quality=10)
                 
-                image['content'] = im
+                #image['content'] = im
 
                 image['name'] = damage['name']
                 image['desc'] = damage['desc']
                 # image['rotate'] = damage['rotate']
-                print(image)
+                # print(image)
                 imagesForPdf.append(image)
 
 

@@ -340,7 +340,7 @@
                         <b-input-group>
                             <b-button @click="addPrice">{{$t('projectDetail.plusPart')}}</b-button>
                             <b-button @click="removePrice">{{$t('projectDetail.remove')}}</b-button>
-                            <b-button @click="addRowPrice">{{$t('projectDetail.plusRow')}}</b-button>
+                            <!-- <b-button @click="addRowPrice">{{$t('projectDetail.plusRow')}}</b-button> -->
                             <!-- <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpPrice">mv/cp</b-button></b-col> -->
 
                             <b-button  @click="sendPrice" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
@@ -388,7 +388,7 @@
                           <b-input-group>
                              <b-button @click="addDevice">{{$t('projectDetail.plusPart')}}</b-button>
                              <b-button @click="removeDevice">{{$t('projectDetail.remove')}}</b-button>
-                             <b-button @click="addRowDevice">{{$t('projectDetail.plusRow')}}</b-button>
+                             <!-- <b-button @click="addRowDevice">{{$t('projectDetail.plusRow')}}</b-button> -->
                              <!--  <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpDevice">mv/cp</b-button></b-col> -->
                               <b-button @click="sendDevice" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
                               
@@ -519,7 +519,7 @@
                                 <b-form-input  v-model="nameNodeImag" :style="nodeDisImag?'background-color:grey':''"
                                 :disabled="(nameNodeImag=='General Folder')?true:false"
                                 @click.native="nodeDisImag?nodeDisTurnImag():''" @change="nodeDisImag=true;toModelImag(nameNodeImag)" />
-                                <b-button v-show="butifsel()" @click="sendtodamage()" :disabled="selectedTables.length<=0"></b-button>>{{$t('projectDetail.send')}}</b-button>
+                                <b-button v-show="butifsel()" @click="sendtodamage()" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
                               </b-input-group>
                             </container-footer>
                           </container>
@@ -541,10 +541,9 @@
                               :itemsMenu="itemsMenuReport"
                               :oldId="oldIdReport"
                               :selectedPrice="selectedReport"
+                              @curNodeClicked="pcurNodeClickedReport"
+                              @rowSelected="prowSelectedReport"
 
- 
-                              @curNodeClickedReport="pcurNodeClickedReport"
-                              @rowSelectedReport="prowSelectedReport"
                                ></reports>
 
                           </container-body>
@@ -552,7 +551,7 @@
                         <b-input-group>
                             <b-button @click="addReport">{{$t('projectDetail.plusPart')}}</b-button>
                             <b-button @click="removeReport">{{$t('projectDetail.remove')}}</b-button>
-                            <b-button @click="addRowReport">{{$t('projectDetail.plusRow')}}</b-button>
+                            <!-- <b-button @click="addRowReport">{{$t('projectDetail.plusRow')}}</b-button> -->
                             <!-- <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpPrice">mv/cp</b-button></b-col> -->
 
                             <b-button  @click="sendReport" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
@@ -2579,7 +2578,9 @@ tabletopartx(tables){
             alert(this.$t('alert.noItemSelectForDel'))
        }
        else {
+        console.log('1')
             if (confirm(this.$t('alert.remove'))) {
+              console.log('2')
                 axios.get('/remove_report_menu', {
                     params: {
                         remove_id: this.idNodeReport
@@ -3115,6 +3116,7 @@ findLevel(this.itemsMenuReport, valResp.parrent)
         }
     },
     pcurNodeClickedReport(model, component) {
+      console.log(model)
         this.nameNodeReport = model.name,
         this.idNodeReport=model.id
 

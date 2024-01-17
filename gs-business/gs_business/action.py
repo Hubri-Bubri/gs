@@ -978,6 +978,10 @@ async def method (request):
 async def method (request):
     return web.json_response(await Invoice.select_invoices(request.query['id']))
 
+@routes.get('/reports')
+async def method (request):
+    return web.json_response(await Reports.select_reports(request.query['id']))
+
 @routes.get('/prices')
 async def method (request):
     return web.json_response(await Prices.select_prices(request.query['id']))
@@ -1274,6 +1278,14 @@ async def method (request):
     result = web.json_response(await Devices.add_devices(request.query['id']))
     for client in ws_clients:
         await client.send_str('getDevices')
+    return result
+
+
+@routes.get('/remove_report_menu')
+async def method (request):
+    result = web.json_response(await Reports.remove_reports_menu(request.query['remove_id']))
+    for client in ws_clients:
+        await client.send_str('getReports')
     return result
 
 @routes.get('/remove_price')

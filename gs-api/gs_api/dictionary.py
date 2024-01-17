@@ -8163,25 +8163,22 @@ class Devices:
 
 
 class Reports:
-    # @classmethod
-    # async def select_reports(cls, id):
-    #     async with database.query() as Q:
-    #         return await (Q(T.reports)
-    #             .fields(
-    #                 T.reports.pos_num,
-    #                 T.reports.designation,
-    #                 T.reports.comment,
-    #                 T.reports.kilowatt,
-    #                 T.reports.time,
-    #                 T.reports.manufacturer,
-    #                 T.reports.serial,
-    #                 T.reports.order,
-    #                 T.reports.check_date,
-    #                 T.reports.next_check_date,
-    #                 T.reports.id
-    #             )
-    #             .where(T.reports.item_id == id)
-    #             .selectall())
+    @classmethod
+    async def select_reports(cls, id):
+        async with database.query() as Q:
+            return await (Q(T.reports)
+                .fields(
+                    T.reports.pos_num,
+                    T.reports.name,
+                    T.reports.desc,
+                    T.reports.unit,
+                    T.reports.price,
+                    T.reports.without,
+                    T.reports.percent,
+                    T.reports.id
+                )
+                .where(T.reports.item_id == id)
+                .selectall())
 
     @classmethod
     async def reports_menu(cls):
@@ -8214,13 +8211,13 @@ class Reports:
                 })) 
 
    
-    # @classmethod
-    # async def remove_reports_menu(cls, remove_id):
-    #     async with database.query() as Q:
-    #         return await (Q(T.reports_menu)
-    #           .tables(T.reports_menu)
-    #           .where(T.reports_menu.id == remove_id)
-    #           .delete())
+    @classmethod
+    async def remove_reports_menu(cls, remove_id):
+        async with database.query() as Q:
+            return await (Q(T.reports_menu)
+              .tables(T.reports_menu)
+              .where(T.reports_menu.id == remove_id)
+              .delete())
 
     # @classmethod
     # async def update_name_reports_menu(cls, name, id):

@@ -5,6 +5,7 @@ import ProjectUser from '@business/component/project/user';
 import CustomerMaster from '@business/component/customer/master';
 import CustomerDetail from '@business/component/customer/detail';
 import PricesMaster from '@business/component/prices/master';
+import ReportsMaster from '@business/component/reports/master';
 import DevicesMaster from '@business/component/devices/master';
 import PersonalMaster from '@business/component/personals/master';
 import BalanceMaster from '@business/component/balance/master';
@@ -31,6 +32,7 @@ const router = new VueRouter({
         {path: "/customer", component: CustomerMaster},
         {path: "/customer/detail/:id", component: CustomerDetail, props: true},
         {path: "/prices", component: PricesMaster},
+        {path: "/reports", component: ReportsMaster},
         {path: "/devices", component: DevicesMaster},
         {path: "/personals", component: PersonalMaster},
         {path: "/balance", component: BalanceMaster},

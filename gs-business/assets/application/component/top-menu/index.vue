@@ -36,6 +36,7 @@
                         <b-dropdown-item href="#">Expert</b-dropdown-item> -->
                         <b-dropdown-item style="white-space: nowrap;" to="/prices">{{$t('topMenu.priceList')}}</b-dropdown-item>
                         <b-dropdown-item style="white-space: nowrap;" to="/devices" >{{$t('topMenu.devicesList')}}</b-dropdown-item>
+                        <b-dropdown-item style="white-space: nowrap;" to="/reports" >{{$t('projectDetail.reportList')}}</b-dropdown-item>
                     </b-nav-item-dropdown>
 <!-- 
                     <b-nav-item-dropdown text="Statistics">
