@@ -206,10 +206,11 @@
 
     <b-modal ok-only ref="sentInvoices" :title="$t('projects.sentInvoices')" size="lg" no-close-on-esc no-close-on-backdrop hide-header-close>
       <b-row v-for="rowMail in sentEmails" :key="rowMail.id">
-        <b-col cols="2">{{rowMail.sent}}</b-col>
-        <b-col cols="4">{{$t('projects.wasSent')}}</b-col>
-        <b-col cols="6">
-          {{rowMail.to.split(',').join(', ')}}.
+        <b-col>
+          {{rowMail.sent}}
+          {{$t('projects.wasSent')}}
+          {{rowMail.to.split(',').join(', ')}} {{$t('projects.wasSentDe')}}
+          
         </b-col>
       </b-row>
       <template slot="modal-footer">
@@ -218,6 +219,7 @@
         </b-button>
       </template>
     </b-modal>
+
   </container>
 </template>
 <script>

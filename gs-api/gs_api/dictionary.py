@@ -1750,6 +1750,45 @@ class Del_offer_sub:
 
 
 #####end Sub
+class General:
+    @classmethod
+    async def new_id(cls, table, id_name):
+        async with database.query() as Q:
+            items = (await (Q((table))
+                .fields(table[id_name])
+                .selectall()))
+            old = newId = 0
+            if items[0][id_name]==0:
+                old = newId = -1
+            for x in range((len(items))):
+                if ((old+1) != items[x][id_name]):
+                    break
+                old = newId = items[x][id_name]
+            return (newId+1)
+        
+    @classmethod
+    async def new_list_ids(cls, table, id_name):
+        async with database.query() as Q:
+            items = (await (Q((table))
+                .fields(table[id_name])
+                .selectall()))
+            old = newId = 0
+            list_ids=[]
+            if items[0][id_name]==0:
+                old = newId = -1
+            for x in range((len(items))):
+                if ((old+1) != items[x][id_name]):
+                    list_ids.append(old+1)
+                old = newId = items[x][id_name]
+            return (list_ids, len(items))
+    classmethod
+    async def removeDouble(arr):
+            n = []
+            for i in arr:
+                if i not in n:
+                    n.append(i)
+            return n
+
 class Project:
 
     @classmethod
@@ -1802,11 +1841,20 @@ class Project:
     @classmethod
     async def get_addresbook(cls):
         async with database.query() as Q:
-            return await(Q()
+            allMails =  (await(Q()
+                .tables(T.mail)
+                .fields(T.mail.mail)
+                .selectall()
+                ))
+            
+            adresBook = (await(Q()
                 .tables(T.addresbook)
                 .fields(T.addresbook.mail)
                 .selectall()
-                )
+                ))
+
+            return (await General.removeDouble(list(allMails+adresBook)))
+            
 
     @classmethod
     async def countries(cls):
@@ -4045,27 +4093,8 @@ class Projects:
                 .where(T.items.id == id)
                 .selectone()))
             
-            new_item_id = None
-            max_item_id = (await (Q(T.items)
-                .fields(
-                    T.items.id
-                ).order_by(T.items.id.desc())
-                .selectone()))
-
-            for id_from_item in range(1, max_item_id['id']):
-                check_id = (await (Q()
-                .tables(T.items)
-                .fields(
-                    T.items.id
-                )
-                .where(T.items.id == id_from_item)
-                .selectone()))
-                if check_id==None:
-                    new_item_id = id_from_item
-                    break
-            if new_item_id == None:
-                new_item_id = max_item_id['id'] + 1
-            
+ 
+            new_item_id  = (await General.new_id(T.items, 'id'))
             new_offer_number = None
 
             if type == 'Offers':
@@ -4111,7 +4140,7 @@ class Projects:
                             new_offer_number = int(itmes_numbers[index]['add_number'])+1
                         except TypeError:
                             new_offer_number = 1
-                print(new_offer_number)
+                # print(new_offer_number)
                     
 
 
@@ -4136,8 +4165,6 @@ class Projects:
                             new_offer_number = int(itmes_numbers[index]['add_number'])+1
                         except TypeError:
                             new_offer_number = 1
-
-
 
             await (Q()
                 .tables(T.items)
@@ -4167,7 +4194,7 @@ class Projects:
                     T.items.insurname:selected_for_item_copy['insurname'],
                     T.items.add_number:new_offer_number
                 }))
-
+            
             selected_for_table_copy = (await (Q()
                 .tables(T.tables)
                 .fields(
@@ -4180,30 +4207,9 @@ class Projects:
                 )
                 .where(T.tables.item_id == id)
                 .selectall()))
-
             for table in selected_for_table_copy:
                 new_table_id = None
-                max_table_id = (await (Q(T.tables)
-                    .fields(
-                        T.tables.id
-                    ).order_by(T.tables.id.desc())
-                    .selectone()))
-
-                for id_from_tables in range(1, max_table_id['id']):
-                    check_id = (await (Q()
-                    .tables(T.tables)
-                    .fields(
-                        T.tables.id
-                    )
-                    .where(T.tables.id == id_from_tables)
-                    .selectone()))
-                    if check_id==None:
-                        new_table_id = id_from_tables
-                        break
-
-                if new_table_id == None:
-                    new_table_id = max_table_id['id'] + 1
-
+                new_table_id  = (await General.new_id(T.tables, 'id'))
                 await (Q()
                     .tables(T.tables)
                     .insert({
@@ -4214,8 +4220,6 @@ class Projects:
                         T.tables.selected:table['selected'],
                         T.tables.device:table['device']
                     }))
-
-
                 selected_for_rows_copy = (await (Q()
                     .tables(T.rows_for_table)
                     .fields(
@@ -4236,30 +4240,12 @@ class Projects:
                     )
                     .where(T.rows_for_table.table_id == table['id'])
                     .selectall()))
-
-                for row in selected_for_rows_copy:
-                    new_row_id = None
-                    max_row_id = (await (Q(T.rows_for_table)
-                        .fields(
-                            T.rows_for_table.id
-                        ).order_by(T.rows_for_table.id.desc())
-                        .selectone()))
-
-                    for id_from_rows in range(1, max_row_id['id']):
-                        check_id = (await (Q()
-                        .tables(T.rows_for_table)
-                        .fields(
-                            T.rows_for_table.id
-                        )
-                        .where(T.rows_for_table.id == id_from_rows)
-                        .selectone()))
-                        if check_id==None:
-                            new_row_id = id_from_rows
-                            break
-
-                    if new_row_id == None:
-                        new_row_id = max_row_id['id'] + 1
-
+                list_ids, lenItems = ((await General.new_list_ids(T.rows_for_table, 'id')))
+                for index, row in enumerate(selected_for_rows_copy):
+                    if (len(list_ids)-(index+1)) <= 0: 
+                        new_row_id = lenItems+index+2
+                    else:
+                        new_row_id  = list_ids[index]
                     await (Q()
                         .tables(T.rows_for_table)
                         .insert({
@@ -4279,7 +4265,6 @@ class Projects:
                         T.rows_for_table.price:row['price'],
                         T.rows_for_table.table_id:new_table_id,
                         }))
-                # print(new_table_id, new_item_id)
             return ''
 
 
@@ -4573,7 +4558,7 @@ class Invoice:
     @classmethod
     async def add_invoice(cls, id, type, number, newRange, labelForDelete):
         async with database.query() as Q:
-
+  
             remove = 0
             if type=='removeInvoices':
                 type = 'Invoices'
@@ -4595,8 +4580,8 @@ class Invoice:
                 .where(T.type_for_table.type == type)
                 .selectone())
             )
-            # print(1)         
-            # print(types)
+            print('опредиление типов')         
+            print(types)
 
             result = ( await (Q()
                 .tables(T.items)
@@ -4632,8 +4617,8 @@ class Invoice:
                 oldInvoiceNumber = maskNumber
             
             # autoText['content'] = labelForDelete+': '+oldInvoiceNumber+'<br><br><br>'+autoText['content']
-            # print(2)         
-            # print(result)
+            print('Скопированный item')         
+            print(result)
             # number_documents = result['number']+' '+str(result['id'])
             number_documents = result['number'].split('-')[0]+'-'+datetime.datetime.now().strftime("%Y")+' '+str(result['id'])
             
@@ -4662,9 +4647,8 @@ class Invoice:
                        T.items.comment: autoText['content']
                        # T.items.year: datetime.datetime.now().strftime("%Y"),
                     }))
-            # print(3)         
-            # print('insert')
-
+            
+            print('вставка item')         
             invoiceIdx = ( await (Q()
                 .tables(T.items)
                 .fields(
@@ -4673,9 +4657,10 @@ class Invoice:
                 .where(T.items.number == number_documents)
                 .selectall())
              )
-            # print(4)         
-            # print(invoiceIdx)
+
             invoiceId = invoiceIdx[len(invoiceIdx)-1]
+            print('Наверно это будующий id')         
+            print(invoiceIdx)
 
             if type=='Invoices':
                 if (newRange=='true'):
@@ -4684,7 +4669,7 @@ class Invoice:
                         .where(T.number_for_invoice.id != 0)
                         .delete())
                         
-                # print(5)         
+                print('Если новый круг счетов')         
                 # print('delete')
 
                 await (Q()
@@ -4695,7 +4680,7 @@ class Invoice:
                         }))
 
                 # print(6)         
-                # print('insert')
+                print('вставка нового номера счета')
 
                 numberInvoice = ( await (Q()
                     .tables(T.number_for_invoice)
@@ -4705,8 +4690,8 @@ class Invoice:
                     .where(T.number_for_invoice.item_id == invoiceId['id'])
                     .selectone())
                 )
-                # print(7)         
-                # print(numberInvoice)
+                print('выбран новый идентификатора номера')         
+                print(numberInvoice)
 
 
                 await (Q()
@@ -4717,7 +4702,7 @@ class Invoice:
                         }))
 
                 # print(8)
-                # print('update')
+                print('Обновление информации о номере счета')
 
             if type=='SUB':
                 await (Q()
@@ -4735,24 +4720,34 @@ class Invoice:
                         .update({
                             T.items.number:result['number']+' '+number+' '+str(result['id'])
                         }))
-
-            resultTables = ( await (Q()
-                .tables(T.tables)
-                .fields(
-                    T.tables.id,
-                    T.tables.name,
-                    T.tables.obj,
-                    T.tables.selected
+            selected_for_table_copy=[]
+            if type!='SUB':
+                selected_for_table_copy = (await (Q()
+                    .tables(T.tables)
+                    .fields(
+                        T.tables.id,
+                        T.tables.name,
+                        T.tables.item_id,
+                        T.tables.obj,
+                        T.tables.selected,
+                        T.tables.device
                     )
-                .where(T.tables.item_id == id)
-                .selectall()))
-
-            # print(9)
-            # print('update')
-
-
-            for val in resultTables:
-                    resultData = ( await (Q()
+                    .where(T.tables.item_id == id)
+                    .selectall()))
+            for table in selected_for_table_copy:
+                new_table_id = None
+                new_table_id  = (await General.new_id(T.tables, 'id'))
+                await (Q()
+                    .tables(T.tables)
+                    .insert({
+                        T.tables.id:new_table_id,
+                        T.tables.name:table['name'],
+                        T.tables.item_id:invoiceId['id'],
+                        T.tables.obj:table['obj'],
+                        T.tables.selected:table['selected'],
+                        T.tables.device:table['device']
+                    }))
+                selected_for_rows_copy = (await (Q()
                     .tables(T.rows_for_table)
                     .fields(
                         T.rows_for_table.count,
@@ -4767,137 +4762,51 @@ class Invoice:
                         T.rows_for_table.description_from_price,
                         T.rows_for_table.discount,
                         T.rows_for_table.position_number,
-                        T.rows_for_table.description_from_price,
                         T.rows_for_table.price,
-                        T.rows_for_table.id
-                        )
-                    .where(T.rows_for_table.table_id == val['id'])
-                    .selectall())
+                        T.rows_for_table.table_id
                     )
-                    
-                    # print(10)
-                    # print(resultData)
+                    .where(T.rows_for_table.table_id == table['id'])
+                    .selectall()))
+                list_ids, lenItems = ((await General.new_list_ids(T.rows_for_table, 'id')))
+                for index, row in enumerate(selected_for_rows_copy):
+                    if remove == 1:
+                        count = '-'+row['count']
+                    if remove == 0:
+                        count = row['count']
 
-                    if type == 'Damage Description':
-                        sel = number.split(',')
-
-                        await (Q()
-                             .tables(T.group_for_damages)
-                             .insert({
-                               T.group_for_damages.name : val['name'],
-                               T.group_for_damages.item_id : invoiceId['id'],
-                        }))
-
-                        gropupId = (await (Q()
-                            .tables(T.group_for_damages)
-                            .fields(
-                                T.group_for_damages.id
-                            )
-                            .where((T.group_for_damages.name == val['name']) & (T.group_for_damages.item_id == invoiceId['id']))
-                            .selectone())
-                        )
-
-                        # print(11)
-                        # print(gropupId)
-
-
-                        for index, row in enumerate(resultData):
-                            number = number.replace(' ', '')
-                            val['name'] = val['name'].replace(' ', '')
-                            sel = number.split(',')
-
-                            for sindex, i in enumerate(sel):
-                                item = i.split('-')
-                                if ((val['name']==str(item[0])) & (index == int(item[1]))):
-                                    await (Q()
-                                        .tables(T.task_for_damages)
-                                        .insert({
-                                            T.task_for_damages.name : row['description_head'],
-                                            T.task_for_damages.table_id : gropupId['id']
-                                        }))
-                                    # print(12)
-
+                    if (len(list_ids)-(index+1)) <= 0: 
+                        new_row_id = lenItems+index+2
                     else:
-                        if type!='SUB':
-                            await (Q()
-                                 .tables(T.tables)
-                                 .insert({
-                                   T.tables.name : val['name'],
-                                   T.tables.item_id : invoiceId['id'],
-                                   T.tables.obj: val['obj'],
-                                   T.tables.selected: val['selected']
-                                   # T.items.year: datetime.datetime.now().strftime("%Y"),
-                                }))
+                        new_row_id  = list_ids[index]
+                    await (Q()
+                        .tables(T.rows_for_table)
+                        .insert({
+                        T.rows_for_table.id:new_row_id,
+                        T.rows_for_table.count:count,
+                        T.rows_for_table.status:row['status'],
+                        T.rows_for_table.alttax:row['alttax'],
+                        T.rows_for_table.summa:row['summa'],
+                        T.rows_for_table.unit:row['unit'],
+                        T.rows_for_table.without:row['without'],
+                        T.rows_for_table.done:row['done'],
+                        T.rows_for_table.description_head:row['description_head'],
+                        T.rows_for_table.description_work:row['description_work'],
+                        T.rows_for_table.description_from_price:row['description_from_price'],
+                        T.rows_for_table.discount:row['discount'],
+                        T.rows_for_table.position_number:row['position_number'],
+                        T.rows_for_table.price:row['price'],
+                        T.rows_for_table.table_id:new_table_id,
+                        }))
+            return ''
 
-                            tableId = ( await (Q()
-                            .tables(T.tables)
-                            .fields(
-                                T.tables.id
-                                )
-                            .where((T.tables.name == val['name']) & (T.tables.item_id == invoiceId['id']))
-                            .selectone())
-                            )
-                            # print(13)
-
-                            resultFiles = ( await (Q()
-                            .tables(T.files)
-                            .fields(
-                                T.files.content,
-                                T.files.name,
-                                T.files.number,
-                                T.files.pages,
-                                T.files.resp,
-                                T.files.html,
-                                T.files.added
-                                )
-                            .where(T.files.group == val['id'])
-                            .selectall())
-                             )
-                            # print(14)
-
-                            for file in resultFiles:
-                                await (Q()
-                                .tables(T.files)
-                                .insert({
-                                    T.files.content: file['content'],
-                                    T.files.name: file['name'],
-                                    T.files.number: file['number'],
-                                    T.files.pages: file['pages'],
-                                    T.files.resp: file['resp'],
-                                    T.files.html: file['html'],
-                                    T.files.added: file['added'],
-                                    T.files.group: tableId['id']
-                                }))
-                            # print(15)
-
-                            for row in resultData:
-                                if remove == 1:
-                                    count = '-'+row['count']
-                                if remove == 0:
-                                    count = row['count']
-
-                                await (Q()
-                                    .tables(T.rows_for_table)
-                                    .insert({
-                                        T.rows_for_table.count : count,
-                                        T.rows_for_table.status : row['status'],
-                                        T.rows_for_table.alttax : row['alttax'],
-                                        T.rows_for_table.summa : row['summa'],
-                                        T.rows_for_table.unit : row['unit'],
-                                        T.rows_for_table.without : row['without'],
-                                        T.rows_for_table.done : row['done'],
-                                        T.rows_for_table.description_head : row['description_head'],
-                                        T.rows_for_table.description_work : row['description_work'],
-                                        T.rows_for_table.description_from_price : row['description_from_price'],
-                                        T.rows_for_table.discount : row['discount'],
-                                        T.rows_for_table.position_number : row['position_number'],
-                                        T.rows_for_table.price : row['price'],
-                                        T.rows_for_table.table_id : tableId['id']
-                                    }))
-                            # print(16)
+           
 
 
-        return ''
+    
+
+
+
+    
 
     @classmethod
     async def select_invoices(cls, id):
@@ -9162,21 +9071,22 @@ class Balance:
                                 for obj in val['obj'].split(','):
                                     selected = ['']
                                     if not '|' in val["selected"]:
-                                        selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
-                                        if ('temp' + str(subIndex + 1)) in selected[obj]:
+                                        try:
+                                            selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
+                                            if ('temp' + str(subIndex + 1)) in selected[obj]:
+                                                for val in selected[obj].split(','):
+                                                    val = val.split('temp')
+                                                    val[1]=int(val[1])-1
 
-                                            for val in selected[obj].split(','):
+                                                    countx = 0
+                                                    pricex = 0
+                                                    
+                                                    countx = rows[val[1]]['count'] 
+                                                    pricex = rows[val[1]]['price']
 
-                                                val = val.split('temp')
-                                                val[1]=int(val[1])-1
-
-                                                countx = 0
-                                                pricex = 0
-                                                
-                                                countx = rows[val[1]]['count'] 
-                                                pricex = rows[val[1]]['price']
-
-                                                summax += float(countx) * float(pricex)
+                                                    summax += float(countx) * float(pricex)
+                                        except:
+                                            print('not have ":" in obj selected')
                                    
                                 row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
                                 row['count']=1

@@ -189,7 +189,7 @@ class="text-right"  ref="other"
                                                   <b-col class="text-right" style="white-space: nowrap;">{{netto}} €</b-col>
                                                </b-form-group>
 
-                                              <b-form-group :label="$t('edit.tax')+':'" label-cols="4" label-size="sm">
+                                              <b-form-group :label="$t('edit.taxCountName')+':'" label-cols="4" label-size="sm">
                                                   <b-input-group>
                                                     
                                                       <b-link v-b-toggle="'addtax'" @click="saveCol($event)" >
@@ -204,7 +204,7 @@ class="text-right"  ref="other"
                                                   </b-input-group>
                                                </b-form-group>
                                                <b-collapse style="width:100%" id="addtax" v-model="addtaxColapse">
-                                                <b-form-group :label="$t('edit.tax')+':'" label-cols="4" label-size="sm">
+                                                <b-form-group :label="$t('edit.taxCountName')+':'" label-cols="4" label-size="sm">
                                                   <b-input-group>
 
                                                     <b-link v-b-toggle="'addtax'" @click="saveCol" >

@@ -24,7 +24,8 @@
         "addProjectWithDate": "Daten des Projekts",
         "sentInvoices":"Gesendete Rechnungen",
         "in" : "um",
-        "wasSent" : "die Rechnung wurde an gesendet",
+        "wasSent" : "Rechnung wurde an",
+        "wasSentDe":"gesendet",
         "country": "Land",
         "zip": "PLZ",
         "ezip": "Bitte Postleitzahl eingeben",
@@ -139,7 +140,8 @@
         "insName":"Ver.Name",
         "discont":"Rabatt",
         "netto":"Netto",
-        "tax":"MwSt",
+        "tax":"USt-IdNr.",
+        "taxCountName":"MwSt",
         "brutto":"Brutto"
     },
     "project": {

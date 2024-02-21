@@ -80,7 +80,7 @@
                         </b-button>
                       </b-col>
                       <b-col class="text-right">
-                        <b-button type="submit" variant="primary" @click="addOk">
+                        <b-button type="submit" variant="primary" @click="addOk(add_offer.work)">
                             {{$t('projectDetail.add')}}
                         </b-button>
                       </b-col>

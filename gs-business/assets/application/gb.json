@@ -25,6 +25,7 @@
         "sentInvoices":"Sent invoices",
         "in" : "at",
         "wasSent" : "the invoice was sent to",
+        "wasSentDe":"",
         "country": "Country",
         "zip": "ZIP Code",
         "ezip": "Enter ZIP Code",
@@ -139,7 +140,8 @@
         "insName":"Ins.Name",
         "discont":"Discount",
         "netto":"Net",
-        "tax":"Tax",
+        "tax":"VAT ID No.",
+        "taxCountName":"VAT",
         "brutto":"Gross"
     },
     "project": {
