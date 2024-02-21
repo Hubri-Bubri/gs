@@ -235,6 +235,7 @@ class="text-right"  ref="other"
 
         </b-col>
                                         </b-row>
+
 <calc-table-group
 :windowPrint="windowPrint"
 :works="works"
@@ -273,21 +274,21 @@ class="text-right"  ref="other"
 :addPdfs="addPdfs"
 :makemodalpdf="makemodalpdf"
 :typeDocsList="typeDocsList"
+:rowsBusy = "rowsBusy"
+:rowsLoading = "rowsLoading"
 
 :availableMails="availableMails"
 :plan="plan"
+
 @seltable="$emit('seltable')"
 @sendMail="$emit('sendMail', availableMails)"
-
 @selectedDocs="selectedDocs"
 @addPdf="addPdf"
 @printPdf="printPdf"
 @preview="preview"
 @printOffer="printOffer"
-
 @worker="worker"
 @hideWindowPrint="hideWindowPrint"
-
 @changeSum="discOfPercent()"
 ref="calcGroup"
 ></calc-table-group>
@@ -308,7 +309,7 @@ export default {
   'selectedCornty', 'id', 'comments', 'responseFiles', 'selectedWorkers',
   'typesForTables', 'workers', 'funcStop', 'loadDamages', 'plan',
   'partx', 'person', 'customer', 'selectCustomer', 'selectPerson',
-  'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList'
+  'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList', 'rowsBusy', 'rowsLoading'
   ],
 
 

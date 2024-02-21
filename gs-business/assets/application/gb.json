@@ -19,6 +19,7 @@
         "addProject": "New",
         "search": "Search",
         "loading": "Loading",
+        "empty":"There's nothing here yet",
         "list": "List",
         "addProjectWithDate": "Data Of Project",
         "sentInvoices":"Sent invoices",
@@ -55,11 +56,12 @@
         "replaning" : "Reschedule",
         "planing" : "Schedule",
         "priceList" : "Price List",
-        "reportList": "reports",
+        "reportList": "Reports List",
         "plusPart" : "New Part",
         "remove" : "Remove",
         "plusRow" : "New Row",
         "devicesList" : "Devices List",
+        "reports":"Reports",
         "docs" : "Docs",
         "images": "Images",
         "edit": "Edit",
@@ -151,6 +153,10 @@
         "linkForWorkers":"Link For Workers"
     },
     "calcTableGroup" : {
+        "yes":"Yes",
+        "no":"No",
+        "etc":"Etc",
+        "alternative": "Alternative",
         "reports": "Reports",
         "numberOfInvoice" : "Number Of Invoice",
         "newRange" : "There will be a new account range.",
@@ -319,5 +325,11 @@
         "mesuninstallation" : "Measurement during dismantling",
         "surface" : "Surface measurement",
         "deep" : "Depth measurement"
+    },
+    "reports":{
+        "service":"services",
+        "time":"Time",
+        "workers":"Workers",
+        "addWorkrers":"Add workers"
     }
 }

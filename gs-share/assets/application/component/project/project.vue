@@ -151,9 +151,14 @@
       <Spinner size="large" ></Spinner>
     </div> -->
 
-    <div class="text-center text-info" v-show="typesForTables.length==0">
-            <b-spinner class="align-middle" ></b-spinner>
-            <strong>{{$t('projects.loading')}}...</strong>
+    <div class="text-center" v-show="tablesBusy">
+      
+            
+            <strong v-if="tableLoading" class="text-info">
+              <b-spinner class="align-middle" ></b-spinner>
+              {{$t('projects.loading')}}...
+            </strong>
+            <div v-else class="text-center">{{$t('projects.empty')}}</div>
           </div>
 
     <div v-for="name in typesForTables" v-if="getItems(name.type)!=''">
@@ -244,7 +249,7 @@ export default {
   components: {
     VueEditor,
   },
-  props: ['projectfild', 'project', 'dislink',
+  props: ['projectfild', 'project', 'dislink', 'tablesBusy', 'tableLoading',
   'id', 'tmp', 'itemsTable', 'showsubarr',
    'availablePersons', 'responseFiles', 'selrow',
   'area', 'typesForTables', 'availablePhons', 

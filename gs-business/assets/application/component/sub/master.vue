@@ -46,7 +46,7 @@
           <container-body>
             <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
             <b-table stacked="lg" :items="items" :fields="getFields()" @row-clicked="inItemClick"   hover :filter="filter" :filter-included-fields="filterOn"
-              show-empty @filtered="onFiltered"  no-border-collapse >
+            show-empty :busy="isBusy" @filtered="onFiltered"  no-border-collapse >
               <!-- :busy="(items.length==0)" -->
               <template #cell(in)="data">
                 <div class="text-center w-100">
@@ -58,6 +58,9 @@
                   <b-form-checkbox @change="changeOld(data.item.id, $event);(data.item.old=data.item.old?0:1);(show=='Show')?itemsFilter(1):'';" 
                   plain :checked="data.item.old=(data.item.old==0)?false:true"  style="margin: 0px;" class="withoutPad"></b-form-checkbox>
                 </b-form>
+              </template>
+              <template #empty>
+                <div class="text-center">{{$t('projects.empty')}}</div>
               </template>
               <template #table-busy>
                 <div class="text-center text-info">
@@ -78,6 +81,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isBusy: true,
       additem:[],
       countNamePerson:[''],
       countMailPerson:[''],
@@ -195,8 +199,9 @@ export default {
         this.items= this.items1 = response.data.filter((v)=>{
           v.name = v.name.split('_').join(' ')
           return v
-        })
-        this.itemsFilter((this.show!='Show')?0:1)
+        });
+        this.isBusy = false;
+        this.itemsFilter((this.show!='Show')?0:1);
       })
     },
     changeOld(id, eve){

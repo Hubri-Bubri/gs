@@ -205,6 +205,7 @@ export default {
     }
   },mounted(){
      this.$emit('loded', 'component', this.$refs.heightTableDocs.clientHeight, 220)
+      this.$options.sockets.onmessage = (data) => (data.data=='getDocs') ? this.$emit('getDocs'): '';
   }
 }
 </script>

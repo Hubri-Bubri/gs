@@ -10,7 +10,7 @@
             <option v-for="item in detectItem(items_menu)" @click="selectedModal(item)">{{item.name}}</option>
          </b-form-select>
 
-         <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[$t('company.copy'), $t('company.move')]" />
+         <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[{'text':$t('company.copy'), 'value':'copy'}, {'text':$t('company.move'), 'value':'move'}]" />
          <template slot="modal-footer">
 <!--             <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>-->
             <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button> 

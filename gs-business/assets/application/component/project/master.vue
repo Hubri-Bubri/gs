@@ -51,13 +51,15 @@
           <container-body>
             <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
               <!-- :busy="((items.length==0) && (selected.length!=0))" -->
+
             <b-table hover :items="items" :fields="getFields()" @row-clicked="inItemClick" 
               :filter="filter"
               :filter-included-fields="filterOn"
-              show-empty 
               @filtered="onFiltered"
               no-border-collapse
               stacked="lg"
+              show-empty
+              :busy="isBusy"
              >
               <template #cell(status_set)="data" >
 
@@ -88,6 +90,9 @@
                     {{data.item.number}}
                   </b-col>
                 </b-row>
+              </template>
+              <template #empty>
+                <div class="text-center">{{$t('projects.empty')}}</div>
               </template>
               <template #table-busy>
                 <div class="text-center text-info">
@@ -220,6 +225,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isBusy: true,
       hideNumberOfYear:null,
       addressfild:null,
       wassentids:[],
@@ -698,6 +704,7 @@ export default {
          }
          return v
         });
+        this.isBusy = false;
       });
 
       // this.$refs.sentInvoices.show();

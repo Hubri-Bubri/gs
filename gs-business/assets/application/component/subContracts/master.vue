@@ -71,7 +71,7 @@
             hover
             :filter="filter"
             :filter-included-fields="filterOn"
-            show-empty
+            show-empty :busy="isBusy"
             @filtered="onFiltered" 
             no-border-collapse
             stacked="lg"
@@ -121,6 +121,9 @@
                   </option>
                 </b-form-select>
               </template>
+              <template #empty>
+                <div class="text-center">{{$t('projects.empty')}}</div>
+              </template>
               <template #table-busy>
                 <div class="text-center text-info">
                   <b-spinner class="align-middle"></b-spinner>
@@ -140,6 +143,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isBusy: true,
       fd:'0000-00-00',
       td:'0000-00-00',
       max:null,
@@ -512,7 +516,8 @@ export default {
           v.firma = v.number.split(' ')[0].split('_').join(' ')
           v.number = v.number.split(' ')[2]
           return v
-        })
+        });
+        this.isBusy = false;
       })
     },
     difdate(val){

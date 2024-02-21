@@ -1,11 +1,11 @@
 <template>
    <div>
-    <b-modal size="lg" centered id="reports" ref="reports" :title="$t('calcTableGroup.reports')" body-class="workerHeight">
+    <!-- <b-modal size="lg" centered id="reports" ref="reports" :title="$t('calcTableGroup.reports')" body-class="workerHeight">
       <b-table class="tableProject" striped hover :fields="fieldsTableD" :items="raports" @row-clicked="inItemGetData" />        
             <template slot="modal-footer">
               <button type="button" left class="btn btn-secondary" @click="addInvoice('Damage Description')">{{$t('projectDetail.add')}}</button>
            </template>
-        </b-modal>
+        </b-modal> -->
 
 <!--     <b-modal size="sm" centered id="worker" ref="worker" title="Select Workers" body-class="workerHeight">
         <b-form-input type="text" v-model="searchWorker"  style="margin-bottom: 4px !important;"/>
@@ -101,7 +101,7 @@
           </template>
       </b-modal>
 
-      <print v-if="tmp.typeOfHead != 'Devices' & tmp.typeOfHead != 'Damage'" 
+      <print v-if="tmp.typeOfHead != 'Devices' & tmp.typeOfHead != 'Damage' & tmp.typeOfHead != 'Reports'" 
       :windowPrint="windowPrint"
       :selectedCornty="selectedCornty"
       :project="project" :tmp="tmp"
@@ -202,46 +202,66 @@
 
 <!-- this.$t('calcTableGroup.work') -->
 </print>
-  <div class="text-center text-info" v-show="value.length==0">
-    <b-spinner class="align-middle" ></b-spinner>
-    <strong>{{$t('projects.loading')}}...</strong>
-  </div>
+<!-- value.length==0 -->
+
+
+  <div class="text-center" v-show="rowsBusy">
+    <strong v-if="rowsLoading" class="text-info">
+        <b-spinner class="align-middle" ></b-spinner>
+        {{$t('projects.loading')}}...
+      </strong>
+      <div v-else class="text-center">{{$t('projects.empty')}}</div>
+    </div>
+
+
   <draggable :value="value" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
          :no-transition-on-drag="true" @start="drag=true" @end="checkMove($event)">
          <div v-for="(part, index) in value" :key="part.id">
           <calc-table :nowTableId="value" :value="sort(value[index])" :addtaxColapse="addtaxColapse" :tableId="index" :butDiscPerc="butDiscPerc" :unitType="unitType" :looks="looks"
             :color="color" :selectedWorkers="selectedWorkers" :toggle="value[index].parts.toggle" :type="type" :funcStop="funcStop"  v-on:changeSum="discOfPercent()"  :discP="discP">
-               <b-checkbox plain name="partx" slot-scope="table" class="withoutbox"
-                :class="{ 'table-dark' : value[index].parts.toggle,' handleTitle':type!='Invoices'}"
+            <!-- :class="{ 'table-dark' : value[index].parts.toggle,' handleTitle':type!='Invoices'}"    -->
+            <b-checkbox plain name="partx" slot-scope="table" class="withoutbox"
+                :class="{' handleTitle':type!='Invoices'}"
                 v-model="value[index].parts.toggle" slot="tableHead" @change="$emit('seltable')"> 
 
                     <b-link style="width:100%" @click="toog(value[index].parts.id)">
-                     <span :id="'p'+value[index].parts.id" style="display:none">+ {{total(value[index].parts.part_content) | thousandSeparator }} € </span>
-                     <span :id="'m'+value[index].parts.id">-</span>
+                     <span :id="'p'+value[index].parts.id" style="display:none;vertical-align: middle;padding-right: 3px;" >
+
+                      <b-icon icon="arrow-down" font-scale="1"></b-icon>
+
+ {{total(value[index].parts.part_content) | thousandSeparator }} € </span>
+                     <span :id="'m'+value[index].parts.id" style="vertical-align: middle;">
+
+                      <b-icon icon="arrow-up" font-scale="1"></b-icon>
+                    
+                    </span>
                     </b-link>
                     <span class="forFinger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <b-icon icon="circle-fill" aria-hidden="true"></b-icon>
+
+                    <!-- <b-icon icon="circle-fill" aria-hidden="true"></b-icon> -->
+                    <b-icon :icon="(value[index].parts.toggle)?'chat-square-text-fill':'chat-square-text'" font-scale="1.5" aria-hidden="true" :variant="(value[index].parts.toggle)?'success':''"></b-icon>
+                    
                     <span class="forFinger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <!-- <i class="fas fa-dot-circle" style="font-size:12px"></i>  -->
                     <span :contenteditable="type!='Invoices'" class="diveditable" @blur="toModel($event, value[index].parts.id, value[index].parts.part_name)" @click.prevent.self>
                         {{value[index].parts.part_name}}
                     </span>
-                       <span v-for="file in responseFiles" v-if="file.id==value[index].parts.id">
+                       <!-- <span v-for="file in responseFiles" v-if="file.id==value[index].parts.id"> -->
                          
-                        <span v-viewer :class="'im'+value[index].parts.id" style="display:none">
+                        <!-- <span v-viewer :class="'im'+value[index].parts.id" style="display:none">
                         <template v-for="image in file.gallery">
                               <img :src="image" class="image" :key="image" height="200px">
                         </template>
-                        </span> 
-                        <b-link class="butMore" style="padding-left:0px;" @click="showImages('im'+value[index].parts.id)">Images</b-link> 
-                      </span>
+                        </span>  -->
+                        <!-- <b-link class="butMore" style="padding-left:0px;" @click="showImages('im'+value[index].parts.id)">Images</b-link>  -->
+                      <!-- </span> -->
                       
                       <b-icon icon="trash" aria-hidden="true"  @click="partDel(value[index].parts.id)"></b-icon>
-
+                     
                     <!-- <b-link class="fas fa-trash  butMore" style="padding-left: 0px; font-size:12px;" @click="partDel(value[index].parts.id)"/> -->
                 </b-checkbox>
             </calc-table>
-
+            <hr style="padding:0;margin:5px;display:none;" :id="'hr'+value[index].parts.id"/>
         </div>
       </draggable>
 
@@ -257,7 +277,7 @@ export default {
     },
     props: ['value', 'tmp', 'addtaxColapse', 'workers', 'toggle', 'responseFiles', 'type', 'id', 'funcStop', 'opt', 'butDiscPerc', 'looks', 'availableMails', 'plan',
     'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList','selectedCornty', 'project',  'account', 'pid', 'person', 'customer', 'selectCustomer', 'selectPerson', 'windowPrint',
-    'disc', 'discP', 'tax', 'taxDub', 'taxP', 'taxPDub', 'netto', 'brutto', 'comments', 'loadDamages', 'works', 'selectedWorkers'],
+    'disc', 'discP', 'tax', 'taxDub', 'taxP', 'taxPDub', 'netto', 'brutto', 'comments', 'loadDamages', 'works', 'selectedWorkers', 'rowsBusy', 'rowsLoading', 'wwidth'],
     data() {
         return {
             lastButton: false,
@@ -319,11 +339,7 @@ export default {
         }
     },
 computed: {
-    workers_list() {
-      return this.workers.filter(post => {
-        return post.toLowerCase().includes(this.searchWorker.toLowerCase())
-      })
-    },
+
     total: function() {
         var vm = this;
             return function(value) {
@@ -407,6 +423,7 @@ detectOfWork(){
 toog(val){
   document.getElementById('m'+val).style.display = document.getElementById('partx'+val).style.display = (document.getElementById('partx'+val).style.display=='none') ? '' : 'none'
   document.getElementById('p'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
+  document.getElementById('hr'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
 
 },
 
@@ -610,10 +627,10 @@ inItemGetData(item, index) {
           // this.type = type
           }
         },
-        showImages(classId){
-          const viewer = this.$el.querySelector('.'+classId).$viewer
-          viewer.show()
-        },
+        // showImages(classId){
+        //   const viewer = this.$el.querySelector('.'+classId).$viewer
+        //   viewer.show()
+        // },
         toModel(newVal, id, partName) {
             // partName = newVal.target.innerText
             if(newVal.target.innerText != partName){

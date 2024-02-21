@@ -19,6 +19,7 @@
         "addProject": "Neu",
         "search": "Suche",
         "loading": "Wird geladen",
+        "empty":"Hier ist noch nichts",
         "list": "Übersicht",
         "addProjectWithDate": "Daten des Projekts",
         "sentInvoices":"Gesendete Rechnungen",
@@ -55,11 +56,12 @@
         "replaning" : "Neu planen",
         "planing" : "Zeitplan",
         "priceList" : "Preisliste",
-        "reportList": "Berichte",
+        "reportList": "Berichteliste",
         "plusPart" : "neu Ordner",
         "remove" : "Löschen",
         "plusRow" : "neu Zeile",
         "devicesList" : "Geräteliste",
+        "reports":"Berichte",
         "docs" : "Dokumentation",
         "images": "Bilder",
         "edit": "Edit",
@@ -151,6 +153,10 @@
         "linkForWorkers":"Link für Mitarbeiter"
     },
     "calcTableGroup" : {
+        "yes":"Ja",
+        "no":"Nien",
+        "etc":"Eventuell",
+        "alternative": "Alternative",
         "reports": "Berichte",
         "numberOfInvoice" : "Anzahl der Rechnungen",
         "newRange" : "Es wird einen neuen Kontobereich geben.",
@@ -319,5 +325,11 @@
         "mesuninstallation" : "Messung bei Abbau",
         "surface" : "Oberflächenmessung",
         "deep" : "Tiefenmessung"
+    },
+    "reports":{
+        "service":"Dienstleistungen",
+        "time":"Zeit",
+        "workers":"Arbeiter",
+        "addWorkrers":"Arbeiter hinzufügen"
     }
 }

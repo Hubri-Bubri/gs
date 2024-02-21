@@ -301,6 +301,9 @@
                                 :responseFiles="responseFiles"
                                 :selrow="selrow"
                                 :showsubarr="showsubarr"
+                                :tablesBusy="tablesBusy"
+                                :tableLoading="tableLoading"
+
                                 ref="calProject"
                                 @linkForWorkers="linkForWorkers"
                                 @addSameModal="addSameModal"
@@ -439,6 +442,7 @@
                                    
                                     @curNodeClickedDoc="pcurNodeClickedDoc"
                                     @rowSelectedDoc="prowSelectedDoc"
+                                    @getDocs="getDocs()"
                             
 
                                     >
@@ -497,6 +501,7 @@
                               @filedel="filedel"
                               @showx="showx"
                               @loded="loded"
+                              @getDocs="getDocs()"
                              ></images>
                              <!-- @updatefilename="updatefilename" -->
 
@@ -555,6 +560,7 @@
                             <!-- <b-col lg="1" cols="4" style="padding:1px;"><b-button class="w-100" @click="mv_cpPrice">mv/cp</b-button></b-col> -->
 
                             <b-button  @click="sendReport" :disabled="selectedTables.length<=0">{{$t('projectDetail.send')}}</b-button>
+
                               <b-button  @click="$refs.reportChild1.hidePosition()" >
 
                                 <b-icon icon="layout-three-columns" aria-hidden="true"></b-icon>
@@ -611,6 +617,9 @@
                                   :addPdfs="addPdfs"
                                   :makemodalpdf="makemodalpdf"
                                   :typeDocsList="typeDocsList"
+                                  :rowsBusy = "rowsBusy"
+                                  :rowsLoading = "rowsLoading"
+
 
                                   :availableMails="availableMails"
                                   @sendMail="sendTimeTableMail"
@@ -777,6 +786,7 @@ class="text-right"  ref="refCommentOfTable" id="refCommentOfTable"
                                   :addPdfs="addPdfs"
                                   :makemodalpdf="makemodalpdf"
                                   :typeDocsList="typeDocsList"
+                                  :wwidth="wwidth"
 
                                   @selectedDocs="selectedDocs"
                                   @addPdf="addPdf"
@@ -790,6 +800,45 @@ class="text-right"  ref="refCommentOfTable" id="refCommentOfTable"
                               </container-body>
                               </container>        
                         </b-tab>
+                        <b-tab v-if="reportsTab()" ref="reports">
+                          <template #title>
+                            {{$t('projectDetail.reports')}}
+                          </template>
+                            <container>
+                                <container-body >
+                                  <ereports
+                                  :tmp="tmp"
+                                  :project="project"
+                                  :selectedCornty="selectedCornty"
+                                  :id="id"
+                                  :workers="workers"
+                                  :partx="partx"
+                                  :customer="customer"
+                                  :person="person"
+                                  :selectCustomer="selectCustomer"
+                                  :selectPerson="selectPerson"
+                                  :selectedDocsList="selectedDocsList"
+                                  :windowPrint="windowPrint"
+                                  :addPdfs="addPdfs"
+                                  :makemodalpdf="makemodalpdf"
+                                  :typeDocsList="typeDocsList"
+                                  :looks="looks"
+                                  @worker="worker"
+                                  :selectedWorkers="selectedWorkers"
+                                  @selectedDocs="selectedDocs"
+                                  @addPdf="addPdf"
+                                  @addPdfSep="addPdfSep"
+                                  @printPdf="printPdf"
+                                  @preview="preview"
+                                  @printOffer="printOffer"
+                                  @hideWindowPrint="hideWindowPrint"
+                                  ref="ereportsList"
+                                  ></ereports>
+                                  
+                              </container-body>
+                              </container>        
+                        </b-tab>
+
                     </b-tabs>
                 </b-card>
             </b-card-group>
@@ -840,6 +889,10 @@ export default {
     },
     data() {
         return {
+        rowsBusy:true,
+        rowsLoading:true,
+        tablesBusy:true,
+        tableLoading:true,
         hideNumberOfYear:null,
         selectedTables:[],
         dislink:false,
@@ -1588,7 +1641,16 @@ this.project.other = val
     },
 
 
-
+    
+        reportsTab(){
+          var countDev = 0
+          this.partx.forEach((valuePart)=> {
+            if(valuePart.parts.reports_content.length>0){
+              countDev = countDev + 1
+            }
+          })
+          return (countDev>0)
+        },
         damageTab(){
           var countDev = 0
           this.partx.forEach((valuePart)=> {
@@ -1642,7 +1704,7 @@ this.project.other = val
             // }, 20);
         },
         printPdf() {
-            this.preview()
+               this.preview()
             setTimeout(function() {
                 window.frames["myIframe"].focus();
                 window.frames["myIframe"].print();
@@ -1658,11 +1720,15 @@ this.project.other = val
             if (this.$refs.damageList.$refs.damageGroup.$refs.print!=undefined){
               this.$refs.damageList.$refs.damageGroup.$refs.print.previewPDFForm();
             }
-
           }
           if (this.$refs.edeviceList != undefined) {
             if (this.$refs.edeviceList.$refs.deviceGroup.$refs.print!=undefined){
               this.$refs.edeviceList.$refs.deviceGroup.$refs.print.previewPDFForm();
+            }
+          }
+          if (this.$refs.ereportsList != undefined) {
+            if (this.$refs.ereportsList.$refs.reportGroup.$refs.print!=undefined){
+              this.$refs.ereportsList.$refs.reportGroup.$refs.print.previewPDFForm();
             }
           }
         },
@@ -1680,7 +1746,8 @@ this.project.other = val
           if (this.tmp.typeOfHead == 'Orders') {this.selectedDocsList=['38']}
           if (this.tmp.typeOfHead == 'SUB') {this.selectedDocsList=['41']}
           if (this.tmp.typeOfHead == 'Devices') {this.selectedDocsList=['45']}
-            if (this.tmp.typeOfHead == 'Damage') {this.selectedDocsList=['48']}
+          if (this.tmp.typeOfHead == 'Damage') {this.selectedDocsList=['48']}
+          if (this.tmp.typeOfHead == 'Reports') {this.selectedDocsList=['50']}
           // setTimeout(() => {
             this.openWindowPrint()
             // this.$refs.printOffer.show()
@@ -2122,6 +2189,12 @@ hideWindowPrint(){
 tabletopartx(tables){
   this.partx=[];
   this.partx = tables;
+  this.rowsLoading = false;
+  if (this.partx.length>0){
+    this.rowsBusy = false;
+  } else {
+    this.rowsBusy = true;
+  }
 },
         ploadDocToFrame(row) {
             row.toggleDetails();
@@ -2578,9 +2651,9 @@ tabletopartx(tables){
             alert(this.$t('alert.noItemSelectForDel'))
        }
        else {
-        console.log('1')
+
             if (confirm(this.$t('alert.remove'))) {
-              console.log('2')
+
                 axios.get('/remove_report_menu', {
                     params: {
                         remove_id: this.idNodeReport
@@ -3116,7 +3189,7 @@ findLevel(this.itemsMenuReport, valResp.parrent)
         }
     },
     pcurNodeClickedReport(model, component) {
-      console.log(model)
+      // console.log(model)
         this.nameNodeReport = model.name,
         this.idNodeReport=model.id
 
@@ -4100,24 +4173,24 @@ axios.get('/get_tables', {
         //         }
         //     });
         // },
-inItemClickDamage(item, index) {
-  this.tmp.typeOfHead = 'Damage',
-  this.tmp.number = item.damage_number,
-  this.tmp.place = item.place,
-  this.tmp.insurance = item.insurance_number,
-  this.tmp.insurname = item.insurname,
-  this.tmp.work = item.work,
-  this.tmp.other = item.other,
-  this.tmp.type='damage',
-  this.partx=[]
-},
-addGropuDamage(){
-    axios.get('/add_group_damage', {
-        params: {
-          item_id: this.tmp.id
-        }
-    })
-},
+// inItemClickDamage(item, index) {
+//   this.tmp.typeOfHead = 'Damage',
+//   this.tmp.number = item.damage_number,
+//   this.tmp.place = item.place,
+//   this.tmp.insurance = item.insurance_number,
+//   this.tmp.insurname = item.insurname,
+//   this.tmp.work = item.work,
+//   this.tmp.other = item.other,
+//   this.tmp.type='damage',
+//   this.partx=[]
+// },
+// addGropuDamage(){
+//     axios.get('/add_group_damage', {
+//         params: {
+//           item_id: this.tmp.id
+//         }
+//     })
+// },
 worker() {
   this.workerModal=true
 },
@@ -4125,15 +4198,15 @@ closeWorkerModal(){
   this.workerModal=false;
   if (this.comtomodal!=null) this.tabxmodal=true;
 },
-damageToBase(fild, event, id){
-       axios.get('/damage_update', {
-        params: {
-          fild: fild,
-          event: event,
-          id: id
-        }
-    })
-},
+// damageToBase(fild, event, id){
+//        axios.get('/damage_update', {
+//         params: {
+//           fild: fild,
+//           event: event,
+//           id: id
+//         }
+//     })
+// },
         // keyupMethod(event) {
         //     if (event.keyCode === 113) {
         //         this.tmouseOver()
@@ -4170,8 +4243,8 @@ damageToBase(fild, event, id){
                         id: this.id
                       }
                     }).then(response => {
-
                         this.itemsTable = response.data;
+                        this.tablesBusy = false;
                     })
                 })
         },
@@ -4313,7 +4386,8 @@ inItemGetData(item, index) {
       this.selrow = item.id,
       item._rowVariant = (item.id==this.selrow)?'secondary':'',
       this.generalComments=false,
-      this.tmp.typeOfHead = (this.tmp.typeOfHead=='Devices')?'Devices':item.type,
+      this.tmp.typeOfHead =  ((this.tmp.typeOfHead!='Devices')&(this.tmp.typeOfHead!='Damage')&(this.tmp.typeOfHead!='Reports'))?item.type:this.tmp.typeOfHead,
+      // this.tmp.typeOfHead =item.type
       // console.log(item.type),
       this.beforeTab = item.type,
       this.tmp.number = item.number,
@@ -4399,6 +4473,7 @@ get_types_for_tables_f(call){
         return v
       }
     });
+    this.tableLoading = false;
   });
   if (call=='socket'){
     this.project_detail_new_f()
@@ -4410,7 +4485,7 @@ get_workers_f(){
     this.workers = [],
     response.data.forEach((v)=>{
       this.workers.push((v.short_name!=null)?v.short_name:v.name),
-      this.workersForSend.push({'value':v.id, 'text':((v.short_name!=null)?v.short_name:v.name)})   
+      this.workersForSend.push({'value':v.id, 'text':((v.short_name!=null)?v.short_name:v.name)})
     })
   })
 },
@@ -4478,6 +4553,11 @@ project_detail_new_f(){
       return v;
     })
     this.itemsTable = response.data;
+    if (this.itemsTable.length>0){
+      this.tablesBusy = false;
+    } else {
+      this.tablesBusy = true;
+    }
     setTimeout(() => {
         this.sm2lg('component', this.$refs['hproject'].clientHeight, 110)
         this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 56)
@@ -4622,10 +4702,14 @@ getProjectDetail(old){
     },
 
     dubTabIndex: function(value){
-      // console.log('dubTabIndex')
-          if(this.$refs.devices!=undefined){
+           if(this.$refs.devices!=undefined){
             if (this.$refs.devices.localActive){
               this.tmp.typeOfHead = 'Devices'
+            }
+          }
+          if(this.$refs.reports!=undefined){
+            if (this.$refs.reports.localActive){
+              this.tmp.typeOfHead = 'Reports'
             }
           }
           if(this.$refs.damage!=undefined){
@@ -4634,7 +4718,9 @@ getProjectDetail(old){
             }
           }
           if (((this.$refs.devices==undefined)||(this.$refs.devices.localActive==false))&&
-            ((this.$refs.damage==undefined)||(this.$refs.damage.localActive==false))){
+            ((this.$refs.damage==undefined)||(this.$refs.damage.localActive==false))&&
+            ((this.$refs.reports==undefined)||(this.$refs.reports.localActive==false))
+            ){
               this.tmp.typeOfHead = this.beforeTab
           }
     }
@@ -4684,7 +4770,7 @@ getProjectDetail(old){
         this.$options.sockets.onmessage = (data) => (data.data=='getPrices') ? this.getPrices(): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getDevices') ? this.getDevices(): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getReports') ? this.getReports(): ''
-        this.$options.sockets.onmessage = (data) => (data.data=='getDocs') ? this.getDocs(): ''
+
         // this.displaytime()
         },1000);
         },
@@ -4763,6 +4849,24 @@ getProjectDetail(old){
   height: 250px !important;
 }
 
+.cindex{
+  width: 10px;
+}
+.cservice{
+  
+}
+.cdate{
+  width: 100px;
+}
+.ctime{
+  width: 100px;
+}
+.cworkers{
+  width: 200px;
+}
+.cdel{
+  width: 10px;
+}
 
 
 </style>

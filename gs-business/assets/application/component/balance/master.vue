@@ -101,7 +101,7 @@
           <container-body>
             <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
             <b-table @row-clicked="dataToFoot($event)" :items="items" :fields="getFields()" hover :filter="filter" :filter-included-fields="filterOn" stacked="lg"
-              show-empty @filtered="onFiltered"  no-border-collapse  :busy="((items.length==0) )">
+            show-empty :busy="isBusy" @filtered="onFiltered"  no-border-collapse >
               <template #cell(status_set)="it">
                   <line-chart :datas="dataCharts(it.item)" :height="50" style="max-width:200px;" />
               </template>
@@ -109,6 +109,9 @@
                 <b-link :to="'/project/detail/'+it.item.project_id" variant="primary">
                   {{it.item.cnumber}}
                 </b-link>
+              </template>
+              <template #empty>
+                <div class="text-center">{{$t('projects.empty')}}</div>
               </template>
               <template #table-busy>
                 <div class="text-center text-info">
@@ -244,6 +247,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isBusy: true,
       selmode:[],
       fd:'0000-00-00',
       td:'0000-00-00',
@@ -521,13 +525,15 @@ export default {
               } 
               return selected
             })
+            
           }
           // console.log(v.other=='TEC / 1 / 35.362 / 2022')
           // if (v.id==552){
           //   console.log(v)
           // }
           return v
-        })
+        });
+        this.isBusy = false;
         if(countSelect==0){
           this.addPaymentState = false
           this.op=[]

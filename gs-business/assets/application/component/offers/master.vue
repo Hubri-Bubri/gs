@@ -73,7 +73,10 @@
           <container-body>
             <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
             <b-table :items="items" :fields="getFields()" hover :filter="filter" :filter-included-fields="filterOn" stacked="lg"
-              show-empty @filtered="onFiltered" show-empty  no-border-collapse >
+              @filtered="onFiltered"
+              show-empty
+              :busy="isBusy"
+               no-border-collapse >
               <!-- :busy="((items.length==0) && (selected.length!=0))" -->
               <template #cell(number)="it">
                 <b-link :to="'/project/detail/'+it.item.project_id" variant="primary">
@@ -119,6 +122,9 @@
                   </option>
                 </b-form-select>
               </template>
+              <template #empty>
+                <div class="text-center">{{$t('projects.empty')}}</div>
+              </template>
               <template #table-busy>
                 <div class="text-center text-info">
                   <b-spinner class="align-middle"></b-spinner>
@@ -138,6 +144,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isBusy: true,
       fd:'0000-00-00',
       td:'0000-00-00',
       max:null,
@@ -500,7 +507,8 @@ export default {
           mode: mode
         }
       }).then(response => {
-        this.items = response.data
+        this.items = response.data;
+        this.isBusy = false;
       })
     },
     difdate(val){

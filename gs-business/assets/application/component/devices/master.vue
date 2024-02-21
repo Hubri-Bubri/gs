@@ -33,12 +33,18 @@
                   @drag-over="dragOverHandler"
                   @drag-end="dragEndHandler"
                   @drop="dropHandler"
-                  :thrId="idNode"
-                  :parId="parId">
+          
+
+                  >
+
+
+
+
                   </vue-drag-tree> 
               </b-col>
               <b-col cols="9" class="block-2">
                 <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
+                  
                   <b-table :items="items" :fields="fields" stacked="lg"
                   show-empty
                   no-border-collapse
@@ -51,16 +57,20 @@
                       </div>
                     </template>
                     <template #cell(pos_num)="row">
-                      <b-input  size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num" @change="updateDate($event, 'pos_num', row.item.id)"></b-input>
+                      <b-input  size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num"
+                      @change="updateDate($event, 'pos_num', row.item.id)"></b-input>
                     </template>
                     <template #cell(designation)="row">
-                      <div contenteditable="true"  @blur="updateDate($event.target.innerText, 'designation', row.item.id)">{{row.item.designation}}</div>
+                      <div contenteditable="plaintext-only"
+                      @blur="updateDate($event.target.innerText, 'designation', row.item.id)">{{row.item.designation}}</div>
                     </template>
                     <template #cell(kilowatt)="row">
-                      <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.kilowatt" @change="updateDate($event, 'kilowatt', row.item.id)"></b-input>
+                      <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.kilowatt"
+                      @change="updateDate($event, 'kilowatt', row.item.id)"></b-input>
                     </template>
                     <template #cell(time)="row">
-                      <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.time" @change="updateDate($event, 'time', row.item.id)"></b-input>
+                      <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.time"
+                      @change="updateDate($event, 'time', row.item.id)"></b-input>
                     </template>
                     <template #cell(manufacturer)="row">
                       <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.manufacturer" @change="updateDate($event, 'manufacturer', row.item.id)"></b-input>
@@ -78,7 +88,7 @@
                       <b-input type="date" size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.next_check_date" @change="updateDate($event, 'next_check_date', row.item.id)"></b-input>
                     </template>
                     <template #cell(comment)="row">
-                      <div contenteditable="true"  @blur="updateDate($event.target.innerText, 'comment', row.item.id)">{{row.item.comment}}</div>
+                      <div contenteditable="plaintext-only"  @blur="updateDate($event.target.innerText, 'comment', row.item.id)">{{row.item.comment}}</div>
                     </template>
                     <template #cell(delete)="row">
                       <b-link @click="delRow(row.item.id)" ><b-icon icon="trash" aria-hidden="true"></b-icon></b-link>

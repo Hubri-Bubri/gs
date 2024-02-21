@@ -32,17 +32,35 @@
       @hideWindowPrint="hideWindowPrint"
       ref="print"
       >
-        <b-col lg="6" md="12"></b-col>
+        <b-col lg="6" md="12"> 
+          <b-input-group class="pb-0 mb-0">
+    <b-col cols="12" class="text-left p-2">
+    <b-button @click="plus" size="sm"><b-icon icon="zoom-in"></b-icon></b-button>
+    <b-button @click="minus" size="sm"><b-icon icon="zoom-out"></b-icon></b-button>
+    <b-button  size="sm" @click="showquality=true" v-show="!showquality"><b-icon icon="image-fill"></b-icon></b-button>
+    <b-form-input v-show="showquality" v-model="quality" @change="showquality=false" type="range" min="0" max="100" size="sm" style="max-width: 240px;padding-top: 15px;"></b-form-input>
+    </b-col>
+  </b-input-group>
+          
+
+  
+  
+  </b-col>
+
+        
         <b-col class="cForm col-12 col-lg-4" style="padding:0px;" slot="Type"></b-col>
         <b-col class="cForm col-12 col-lg-4" style="padding:0px;" slot="Work"></b-col>
       </print>
     <div v-for="(part, index) in showTable()" :key="part.id">
       <damages-table
       :value="part"
-      :tableId="index"
+      :tableId="part.parts.damage_content"
+      :nowTableId="value"
       :workers="workers"
       :index="index"
-      @edit="edit"
+      :quality="quality"
+      :size="size"
+       @edit="edit"
       >
         <div slot-scope="table" slot="tableHead">
           <b-link style="width:100%" @click="toog(value[index].parts.id)">
@@ -87,6 +105,12 @@ export default {
     'selectPerson'],
     data() {
       return {
+
+        heightImages:null,
+        size:300,
+        quality:0,
+        showquality:false,
+
           initimage:{
               url:null,
               schema: null
@@ -95,6 +119,16 @@ export default {
       }
     },
     methods: {
+
+      plus(){
+      this.size=this.size+10;
+  
+    },
+    minus(){
+      this.size=this.size-10;
+   
+    },
+
       toog(val){
         document.getElementById('dm'+val).style.display = document.getElementById('damage'+val).style.display = (document.getElementById('damage'+val).style.display=='none') ? '' : 'none'
         document.getElementById('dp'+val).style.display = (document.getElementById('dm'+val).style.display=='none') ? '' : 'none'
@@ -160,6 +194,33 @@ export default {
           }
         })
       }
-    }
+    },
+    mounted(){
+    this.heightImages='hi'+(Math.ceil(Math.random()*1000000))
+    setTimeout(() => {
+          if(this.wwidth<=768){
+            this.size = 2
+          }else{
+            this.quality = 50
+            if(this.wwidth<=1200){
+              this.size = 3
+            }else{
+              if(this.wwidth<=1400){
+                this.size = 4
+              }else{
+                if(this.wwidth<=1600){
+                this.size = 5
+                }else{
+                  if(this.wwidth<=1800){
+                    this.size = 6
+                  }
+                }
+              }
+            }
+          }
+
+    }, 200);     
+  }
+
 }
 </script>

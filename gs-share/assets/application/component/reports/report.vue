@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid ref="heightTablePrice">
+  <b-container fluid ref="heightTableReports">
     <b-modal size="md" centered id="column" ref="column" :title="$t('price.editColumn')">
       <b-row>
         <b-col>
@@ -48,26 +48,15 @@
             class="diveditable"
             v-html="row.item.pos_num" />
           </template>
-          <template #cell(name)="row">
-          <div @click.prevent.stop="rowSelected(row.item)" :title="(row.item.desc&&row.item.desc.length!=0)?row.item.desc:'(You have not added an explanation for this item)'"
-            v-html="row.item.name" />
-          </template>
-          <template #cell(unit)="row">
+          <template #cell(service)="row">
             <div @click.prevent.stop="rowSelected(row.item)"
-            v-html="row.item.unit" />
+            v-html="row.item.service" />
           </template>
-          <template #cell(price)="row">
+          <template #cell(time)="row">
           <div @click.prevent.stop="rowSelected(row.item)"
-          v-html="row.item.price" />
+          v-html="row.item.time" />
           </template>
-          <template #cell(without)="row">
-            <div @click.prevent.stop="rowSelected(row.item)"
-          v-html="row.item.without" />
-          </template>
-          <template #cell(percent)="row">
-            <div @click.prevent.stop="rowSelected(row.item)"
-        v-html="row.item.percent" />
-          </template>
+          
           <template #cell(delete)="row">
             <b-icon icon="trash" aria-hidden="true" @click.prevent.stop="delRow(row.item.id)"></b-icon>
           </template>
@@ -90,64 +79,23 @@
           class="diveditable"
           @blur="updateDate($event.target.innerHTML, 'pos_num', row.item.id)"
           v-html="row.item.pos_num" />
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num" ></b-input> -->
           </template>
-          <template #cell(name)="row">
-
-          <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'" :title="(row.item.desc)?row.item.desc:'(You have not added an explanation for this item)'"
-          contenteditable="true" @click.prevent.self v-html="row.item.name"
-          @blur="updateDate($event.target.innerHTML, 'name', row.item.id)" />
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.name" ></b-input> -->
-          </template>
-          <template #cell(unit)="row">
+          <template #cell(service)="row">
           <div
           contenteditable="true" @click.prevent.self 
           class="diveditable"
-          @blur="updateDate($event.target.innerHTML, 'unit', row.item.id)"
-          v-html="row.item.unit" />
-
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.unit" ></b-input> -->
+          @blur="updateDate($event.target.innerHTML, 'service', row.item.id)"
+          v-html="row.item.service" />
           </template>
-          <template #cell(price)="row">
-
+          <template #cell(time)="row">
           <div
           contenteditable="true" @click.prevent.self 
           class="diveditable"
-          @blur="updateDate($event.target.innerHTML, 'price', row.item.id)"
-          v-html="valueDigital(row.item.price)" />
+          @blur="updateDate($event.target.innerHTML, 'time', row.item.id)"
+          v-html="valueDigital(row.item.time)" />
+          </template>
 
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.price" ></b-input> -->
-          </template>
-          <template #cell(without)="row">
-            <div
-        contenteditable="true" @click.prevent.self 
-        class="diveditable"
-        @blur="updateDate($event.target.innerHTML, 'without', row.item.id)"
-        v-html="valueDigital(row.item.without)" />
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.without"></b-input> -->
-          </template>
-          <template #cell(percent)="row">
 
-            <div
-        contenteditable="true" @click.prevent.self 
-        class="diveditable"
-        @blur="updateDate($event.target.innerHTML, 'percent', row.item.id)"
-        v-html="valueDigital(row.item.percent)" />
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.percent" ></b-input> -->
-          </template>
-          <template #cell(show_details)="row">
-            <b-link @click="row.toggleDetails"  style="text-decoration: none;font-weight: normal;">
-              {{ row.detailsShowing ? '-' : '+'}}
-            </b-link>
-          </template>
-          <template #row-details="row">
-            <div contenteditable="true" @blur="updateDate($event.target.innerHTML, 'desc', row.item.id)">{{row.item.desc}}</div>
-<!--             <div  :style="(row.item._rowVariant=='success')?rowColor:''" >{{row.item.desc}}</div>
- -->          </template>
         </b-table>
       </div>
       </b-col>
@@ -167,17 +115,11 @@ export default {
       fields1ForTable:[],
       drag1: null,
       drag2: null,
-      newFields:['#', this.$t('lists.position'), this.$t('customerDetail.name'), this.$t('lists.price')],
+      newFields:['#', this.$t('lists.position'), this.$t('reports.service'), this.$t('reports.time')],
       newFields1:['#', this.$t('customerDetail.name'), 'i']
     }
   },
    computed: {
-    // newFields(){
-    //   return['#', this.$t('lists.position'), this.$t('customerDetail.name'), this.$t('lists.price')]
-    // },
-    // newFields1(){
-    //   return['#', this.$t('customerDetail.name'), 'i']
-    // },
     fields(){
       return[
       {
@@ -191,28 +133,13 @@ export default {
         sortable: true
       },
       {
-        key: 'name',
-        label: this.$t('customerDetail.name'), 
+        key: 'service',
+        label: this.$t('reports.service'), 
         sortable: true
       },
       {
-        key: 'unit',
-        label: this.$t('calcTable.unit'), 
-        sortable: true
-      },
-      {
-        key: 'price',
-        label: this.$t('lists.price'), 
-        sortable: true
-      },
-      {
-        key: 'without',
-        label: this.$t('lists.without'),
-        sortable: true
-      },
-      {
-        key: 'percent',
-        label: '%',
+        key: 'time',
+        label: this.$t('reports.time'), 
         sortable: true
       },
       {
@@ -234,32 +161,13 @@ export default {
         sortable: true
       },
       {
-        key: 'name',
-        label: this.$t('customerDetail.name'), 
+        key: 'service',
+        label: this.$t('reports.service'), 
         sortable: true
       },
       {
-        key: 'show_details',
-        label: 'i'
-      },
-      {
-        key: 'unit',
-        label: this.$t('calcTable.unit'), 
-        sortable: true
-      },
-      {
-        key: 'price',
-        label: this.$t('lists.price'), 
-        sortable: true
-      },
-      {
-        key: 'without',
-        label: this.$t('lists.without'),
-        sortable: true
-      },
-      {
-        key: 'percent',
-        label: '%',
+        key: 'time',
+        label: this.$t('reports.time'), 
         sortable: true
       }
     ]
@@ -378,7 +286,7 @@ export default {
     dragEndHandler(model, component, e) {
     //console.log('dragEndHandler: ', model, component, e);
       this.drag1=model.id;
-      axios.get('/change_parrent_menu', {
+      axios.get('/change_parrent_menu_reports', {
         params: {
           drag1: this.drag1,
           drag2: this.drag2
@@ -396,7 +304,7 @@ export default {
   mounted(){
     window.addEventListener('resize', this.updateWidth);
     this.updateWidth();
-    this.$emit('loded', 'component', this.$refs.heightTablePrice.clientHeight, 200)
+    this.$emit('loded', 'component', this.$refs.heightTableReports.clientHeight, 200)
   }
 
 }

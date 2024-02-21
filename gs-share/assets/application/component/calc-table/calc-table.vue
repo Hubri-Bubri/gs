@@ -2,17 +2,19 @@
   <div>
     <slot name="tableHead" :tableId="tableId" @click.prevent.self></slot>
     <input ref="unfocus" style="width: 0px; height: 0px; position: absolute; top: 0; left: 0; margin:0; padding:0; border: 0"></input>
-        <div :class="{ 'table-dark': toggle }" :id="'partx'+value.parts.id">
+        <!-- <div :class="{ 'table-dark': toggle }" :id="'partx'+value.parts.id"> -->
+          <div :id="'partx'+value.parts.id">
           <b-table-simple small borderless responsive class="withoutBorderInInput">
             <b-thead>
               <b-tr>
                 <b-th style='width:40px;'>
                   <b-icon icon='hash' aria-hidden="true" />
-                  <b-icon icon='arrow-bar-right' aria-hidden="true" @click.stop="showPos=showPos?false:true" v-show="!showPos" />
+                  <b-link><b-icon icon='arrow-bar-right' aria-hidden="true" @click.stop="showPos=showPos?false:true" v-show="!showPos" /></b-link>
                 </b-th>
                 <b-th v-show="showPos" style='min-width:70px;'>
-                  <b-icon icon='arrow-bar-left' aria-hidden="true" @click.stop="showPos=showPos?false:true"  />
-                  <b-icon :icon="'sort-numeric-'+sort" aria-hidden="true" class="ml-3"  @click.stop="sort=(sort=='down')?'up':'down';byField(sort)"/>
+                  <b-link><b-icon icon='arrow-bar-left' aria-hidden="true" @click.stop="showPos=showPos?false:true"  /></b-link>
+                  <b-link><b-icon :icon="'sort-numeric-'+sort" aria-hidden="true" class="ml-3"
+                  @click.stop="sort=(sort=='down')?'up':'down';byField(sort)"/></b-link>
                 </b-th>
                      <!-- <b-col :style="'width:'+(computedWithDesc(value.parts.checkbox_list.flavours)+(showPos?0:-10))+'%'">Description Head</b-col> -->
                 <b-th :style="'max-width:'+(width/4.90)+'px;white-space: nowrap;overflow: hidden;'">{{$t('calcTable.description')}}</b-th>
@@ -159,8 +161,14 @@
                             {{disablefildUser('count', content.id)}}
                         </b-tooltip>
                         <b-td style="vertical-align:top;">
+                          <!-- @focus.native="changeDisable('f', 'unit', content.id)"
+                             @blur.native="changeDisable('b', 'unit', content.id)" -->
+                             <!-- @change="persent($event, subIndex, value.parts.checkbox_list, value.parts.part_content.length);
+                              sendDataTable(content.id, 'unit', $event);" -->
+
                            <b-select  class="text-center"  size="sm" :value="valOrProc(content, subIndex)" :disabled="disablefild('unit', content.id)"
-                             @change="persent($event, subIndex, value.parts.checkbox_list, value.parts.part_content.length);sendDataTable(content.id, 'unit', $event);" @focus.native="changeDisable('f', 'unit', content.id)" @blur.native="changeDisable('b', 'unit', content.id)" :ref="'unit'+content.id"
+                             @change="changeUnit($event, subIndex, value, content.id)"
+                             :ref="'unit'+content.id"
                              :style="(content.done!=false) ? 'color:green' : ''" :id="'unit'+content.id">
                               <option v-for="opt in unitType" :disabled="disOptPercent(value.parts.part_content, opt)">
                                  {{opt}} 
@@ -256,8 +264,23 @@
                           {{content.without=false}}
                         </b-td>
                         <b-td style="vertical-align:top;">
-                           <b-form-select  size="sm"  :disabled="disablefild('calc', content.id)" style="min-width:45px" :options="calc" @change="sendDataTable(content.id, 'status', $event)"
-                           :value="content.status" :style="(content.done!=false) ? 'color:green' : ''" @focus.native="changeDisable('f', 'calc', content.id)" @blur.native="changeDisable('b', 'calc', content.id)" :id="'calc'+content.id"  />
+                          
+                           <b-form-select
+                           
+                           size="sm"
+                           :disabled="disablefild('calc', content.id)"
+                           style="min-width:45px"
+
+                           @change="sendDataTable(content.id, 'status', $event)"
+                           :value="content.status" 
+                           :style="(content.done!=false) ? 'color:green' : ''" @focus.native="changeDisable('f', 'calc', content.id)"
+                           @blur.native="changeDisable('b', 'calc', content.id)"
+                           :id="'calc'+content.id">
+                          <option value="yes">{{$t('calcTableGroup.yes')}}</option>
+                          <option value="no">{{$t('calcTableGroup.no')}}</option>
+                          <option value="etc">{{$t('calcTableGroup.etc')}}</option>
+                          <option value="alternative">{{$t('calcTableGroup.alternative')}}</option>
+                          </b-form-select>
                         </b-td>
                          <b-tooltip  triggers="none" :show="disablefild('calc', content.id)" :target="'calc'+content.id">
                             {{disablefildUser('calc', content.id)}}
@@ -428,7 +451,7 @@ export default {
           //   height: 0
           // },
             // unit_type: ['Psch.', '%', 'Stück.', 'Sack.', 'm²'],
-            calc: ['yes', 'no', 'etc', 'alternative'],
+            // calc: ['yes', 'no', 'etc', 'alternative'],
            
             // disable: []
         } //return
@@ -873,6 +896,11 @@ export default {
                     //     this.value.parts.checkbox_list.flavours[property].splice(subDel_id, 1)
                     // }
                 }
+        },
+
+        changeUnit(event, subIndex, value, id){
+          this.persent(event, subIndex, value.parts.checkbox_list, value.parts.part_content.length);
+          this.sendDataTable(id, 'unit', event);
         },
         persent(val, index, checkbox_in_table, how_many_rows) {
             this.persentCounter = val

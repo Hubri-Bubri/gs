@@ -236,6 +236,7 @@ export default {
     },
 
   },mounted(){
+    this.$options.sockets.onmessage = (data) => (data.data=='getDocs') ? this.$emit('getDocs'): '';
     this.heightImages='hi'+(Math.ceil(Math.random()*1000000))
     setTimeout(() => {
           if(this.wwidth<=768){
@@ -260,7 +261,7 @@ export default {
           }
       setTimeout(() => {
         this.$emit('loded', 'component', this.$refs[this.heightImages].clientHeight, 250);
-      }, 1500);  
+      }, 1500);
     }, 200);     
   }
 }

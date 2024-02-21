@@ -14,7 +14,22 @@
             <div>{{$t('print.print')}}</div>
          </div>
 
-         <iframe type="iframe" style="width:100%;height:550px;" name="myIframe"  @load="loadFrame"></iframe>
+
+     
+                <b-container v-show="printBusy">
+                <b-row align-v="center" class="text-center" style="width:100%;height:550px;">
+                    <b-col>
+                <strong class="text-info">
+                <b-spinner class="align-middle"  ></b-spinner>
+                    {{$t('projects.loading')}}...
+                </strong>
+                    </b-col>
+                </b-row>
+                </b-container>
+                
+
+         <iframe v-show="printBusy==false" type="iframe" style="width:100%;height:550px;" name="myIframe"  @load="loadFrame"></iframe>
+
 
          <form target="myIframe" action="/pdf" method="post" style="display:none" ref="preForm">
             <input type="text" name="dateInspect" :value="tmp.dateInspect" />
@@ -72,6 +87,7 @@
             <input type="text" name="addtaxColapse" :value="addtaxColapse" />
             <input type="text" name="workers" :value="workers" />
             <input type="text" name="addPdf" :value="addPdfs" />
+            <button type="submit">!!!!</button>
          </form>
          <div slot="modal-footer" class="w-100">
             <b-row align-v="start">
@@ -90,7 +106,7 @@
                            v-model="stworks"  @change="preview" />
                      </b-col>
                   </b-form>
-                  <b-form inline v-if="tmp.typeOfHead!='Devices' & tmp.typeOfHead!='Damage'">
+                  <b-form inline v-if="tmp.typeOfHead!='Devices' & tmp.typeOfHead!='Damage' & tmp.typeOfHead!='Reports'">
                      <b-col cols="4">{{$t('print.endWorks')}}</b-col>
                      <b-col cols="8">
                         <b-input style="color:#000; padding-left: 5px !important; font-size: 16px;width:172px;" size="sm" type="date"
@@ -114,7 +130,7 @@
                   </b-form>
 
                   <b-button-group size="sm" style="padding-top: 15px !important;padding-left: 15px !important;">
-                    <b-button variant="primary" @click="$emit('hideWindowPrint')" >
+                    <b-button variant="primary" @click="(printBusy=true)+$emit('hideWindowPrint')" >
                         {{$t('print.close')}} 
                      </b-button>
                      <b-button variant="primary" @click="printPdf" >
@@ -175,6 +191,7 @@ export default {
     ],
     data() {
         return {
+          printBusy:true,
           addDocument:false,
           stworks:null,
           customerContract: [],
@@ -258,7 +275,9 @@ export default {
         },
 
         selectedDocs(event){
+          this.printBusy=true;
           this.$emit('selectedDocs', event)
+          
         },
         addPdf() {
           this.addDocument=true;
@@ -311,5 +330,8 @@ export default {
             return summa;
         },
     },
+    mounted(){
+        this.$options.sockets.onmessage = (data) => (data.data=='preview') ? this.printBusy=false: ''
+    }
 }
 </script>

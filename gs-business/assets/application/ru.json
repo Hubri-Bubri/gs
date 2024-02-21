@@ -19,6 +19,7 @@
         "addProject": "Новый",
         "search": "Поиск",
         "loading": "Загрузка",
+        "empty":"Здесь пока ничего нет",
         "list": "Список",
         "addProjectWithDate": "Данные проекта",
         "sentInvoices":"Отправленные счета",
@@ -55,7 +56,7 @@
         "replaning" : "Перепланировать",
         "planing" : "Запланировать",
         "priceList" : "Список цен",
-        "reportList": "Отчеты",
+        "reportList": "Список отчетов",
         "plusPart" : "Новая папка",
         "remove" : "Удалить",
         "plusRow" : "Новая строка",
@@ -64,6 +65,7 @@
         "images": "Изображения",
         "edit": "Редактор",
         "devices": "Устройства",
+        "reports":"Отчеты",
         "damage": "Повреждения",
         "general" : "Общая сумма",
         "alternative" : "Альтернативная сумма",
@@ -151,6 +153,10 @@
         "linkForWorkers":"Ссылка для рабочих"
     },
     "calcTableGroup" : {
+        "yes":"Да",
+        "no":"Нет",
+        "etc":"Другое",
+        "alternative": "Алтернативно",
         "reports": "Отчеты",
         "numberOfInvoice" : "Номер счета",
         "newRange" : "Будет новый диапазон счетов.",
@@ -319,5 +325,11 @@
         "mesuninstallation" : "Замеры при демонтаже",
         "surface" : "Измерение поверхности",
         "deep" : "Измерение глубины"
+    },
+    "reports":{
+        "service":"Услуги",
+        "time":"Время",
+        "workers":"Рабочии",
+        "addWorkrers":"Добавить рабочих"
     }
 }

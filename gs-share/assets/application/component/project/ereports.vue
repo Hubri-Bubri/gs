@@ -1,5 +1,5 @@
-<template> 
-  <damages-table-group 
+<template>
+  <reports-table-group 
 :windowPrint="windowPrint"
 :works="works"
 
@@ -38,7 +38,6 @@ v-model="partx"
 :addPdfs="addPdfs"
 :makemodalpdf="makemodalpdf"
 :typeDocsList="typeDocsList"
-:wwidth="wwidth"
 
 @selectedDocs="selectedDocs"
 @addPdf="addPdf"
@@ -49,19 +48,19 @@ v-model="partx"
 
 @worker="worker"
 @hideWindowPrint="hideWindowPrint"
-ref="damageGroup"
-  ></damages-table-group>
+ref="reportGroup"
+  ></reports-table-group>
 </template>
 
 <script type="text/javascript">
 import axios from 'axios';
 export default {
   props: [
-  'tmp', 'project', 'looks',  'works', 'windowPrint', 'wwidth',
-  'selectedCornty', 'id', 'comments', 'responseFiles', 'selectedWorkers',
+  'tmp', 'project', 'looks',  'works', 'windowPrint',
+  'selectedCornty', 'id', 'comments', 'responseFiles',
   'typesForTables', 'workers', 'funcStop', 'loadDamages',
   'partx', 'person', 'customer', 'selectCustomer', 'selectPerson',
-  'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList'
+  'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList', 'selectedWorkers'
   ],
 
   data(){

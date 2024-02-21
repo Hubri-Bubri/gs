@@ -40,19 +40,15 @@ class language:
         for table in tables:
             for damage in table['parts']['damage_content']:
                 image={}
-                image['content'] = b64encode(await Docs.images_for_pdf(damage['imgId'])).decode()
-                #image['content'] = await Docs.images_for_pdf(damage['imgId'])
-                #im = Image.open(io.BytesIO(image['content']))
-                # im.thumbnail((100,100), Image.ANTIALIAS)
-                #stream = io.BytesIO()
-                #im.save(stream, "JPEG", quality=10)
-                
-                #image['content'] = im
-
+                stream = io.BytesIO()
+                image['content'] = await Docs.images_for_pdf(damage['imgId'])
+                im = Image.open(io.BytesIO(image['content']))
+                conv = im.convert('RGB')
+                conv.save(stream, 'JPEG', quality=40)
+                img_str = b64encode(stream.getvalue()).decode()
+                image['content'] = img_str
                 image['name'] = damage['name']
                 image['desc'] = damage['desc']
-                # image['rotate'] = damage['rotate']
-                # print(image)
                 imagesForPdf.append(image)
 
 
@@ -334,8 +330,10 @@ class language:
             await resp.prepare(request)
             await resp.write(pdf)
 
-            # for client in ws_clients:
-            #     await client.send_str('getDocs')
-            #     await client.send_str('getProjectDetail')
+            for client in ws_clients:
+                await client.send_str('preview')
+
+                # await client.send_str('getDocs')
+                # await client.send_str('getProjectDetail')
 
         return resp

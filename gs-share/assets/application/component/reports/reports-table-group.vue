@@ -1,6 +1,7 @@
 <template>
   <b-container>
-    <print v-if="tmp.typeOfHead == 'Devices'"
+
+    <print v-if="tmp.typeOfHead == 'Reports'"
     :windowPrint="windowPrint"
     :selectedCornty="selectedCornty"
     :project="project" :tmp="tmp"
@@ -21,6 +22,8 @@
     :addPdfs="addPdfs"
     :makemodalpdf="makemodalpdf"
     :typeDocsList="typeDocsList"
+    
+
     @selectedDocs="selectedDocs"
     @addPdf="addPdf"
     @addPdfSep="addPdfSep"
@@ -30,39 +33,37 @@
     @hideWindowPrint="hideWindowPrint"
     ref="print"
     >
-    <b-col></b-col>
+
+    
+    <b-col><b-button  size="sm" @click="worker" >
+            {{$t('calcTableGroup.workers')}}
+          </b-button></b-col>
 
       <!-- <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Type"></b-col>
       <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Work"></b-col> -->
     </print>
     
+
     <div v-for="(part, index) in showTable()" :key="part.id">
-      <devices-table
+      <reports-table
       :value="part"
       :tableId="index"
-      :workers="workers">
+      :workers="workers"
+      :looks="looks"
+      :selectedWorkers="selectedWorkers" 
+      >
+
         <div slot-scope="table" slot="tableHead">
           <b-link style="width:100%" @click="toog(part.parts.id)">
             <span :id="'dp'+part.parts.id" style="display:none">+</span>
             <span :id="'dm'+part.parts.id">-</span>
           </b-link>
-          <span :contenteditable="true" @blur="updateNameDevice($event, part.parts.id, part.parts.part_name_device)" @click.prevent.self>
-            {{part.parts.part_name_device?part.parts.part_name_device:part.parts.part_name}}
+          <span :contenteditable="true" @blur="updateNameReport($event, part.parts.id, part.parts.part_name_report)" @click.prevent.self>
+            {{part.parts.part_name_report?part.parts.part_name_report:part.parts.part_name}}
           </span>
         </div>
-      </devices-table>
+      </reports-table>
 
-      <devices-measurement
-      :value="part"
-      :tableId="index"
-      :workers="workers">
-        <div slot-scope="table" slot="tableHead"> 
-          <b-link style="width:100%" @click="toogMeas(part.parts.id)">
-            <span :id="'measurementProtocolClose'+part.parts.id" style="display:none">+ {{$t('measurement.measurementProtocol')}}</span>
-            <span :id="'measurementProtocolOpen'+part.parts.id">- {{$t('measurement.measurementProtocol')}}</span>
-          </b-link>
-        </div>
-      </devices-measurement>
       <br>
     </div>
   </b-container>
@@ -100,8 +101,10 @@ export default {
     'customer',
     'person',
     'selectCustomer',
-    'selectPerson'
-  ],
+    'selectPerson',
+    'looks',
+    'selectedWorkers'
+    ],
   methods: {
     toog(val){
       document.getElementById('dm'+val).style.display = document.getElementById('dev'+val).style.display = (document.getElementById('dev'+val).style.display=='none') ? '' : 'none'
@@ -135,11 +138,11 @@ export default {
     openWindowPrint(){
       this.$emit('openWindowPrint')
     },
-    updateNameDevice(newVal, id, partName) {
+    updateNameReport(newVal, id, partName) {
       if(newVal.target.innerText != partName){
-        axios.get('/updateNameDevice', {
+        axios.get('/updateNameReport', {
           params: {
-            nameDevice: newVal.target.innerText.replace(/[\s]{2,}/, ''),
+            nameReport: newVal.target.innerText.replace(/[\s]{2,}/, ''),
             id: id
           }
         })
@@ -147,11 +150,14 @@ export default {
     }, 
     showTable(){
       return this.value.filter((v)=>{
-        if(v.parts.devices_content.length>0){
+        if(v.parts.reports_content.length>0){
           return v
         }
       })
-    }
+    },
+        worker() {
+          this.$emit('worker')
+        }
   }
 }
 </script>

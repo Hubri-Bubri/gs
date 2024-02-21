@@ -10,7 +10,7 @@
             <option v-for="item in detectItem(items_menu)" @click="selectedModal(item)">{{item.name}}</option>
          </b-form-select>
 
-         <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[$t('company.copy'), $t('company.move')]" />
+         <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[{'text':$t('company.copy'), 'value':'copy'}, {'text':$t('company.move'), 'value':'move'}]" />
          <template slot="modal-footer">
 <!--             <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>-->
             <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button> 
@@ -49,58 +49,15 @@
    @drag-end="dragEndHandler"
    @drop="dropHandler"
    >
-    <!-- customize your node here if don't like the default / 如果你不喜欢默认样式，可以在这里定制你自己的节点 -->
-<!--     <span :class="[slotProps.isClicked ? 'i-am-clicked' : 'i-am-not-clicked']"></span>
-    <span class='i-am-node-name'>{{slotProps.nodeName}}</span> -->
+
     </vue-drag-tree>
 
 </b-col>
 <b-col cols="9" class="block-2">
 
 
-
-                               <!--      <b-button @click="idNode=null; modshow(items_menu);">
-                                        Clear
-                                    </b-button>
- -->
-                                <!-- </div>  -->
-                                <!-- <div style="padding:0;width:30%;">&nbsp;</div> -->
-                                <!-- <div style="padding:0; width:70%;background-color: white;" class="border border-right-0 border-top-0 border-bottom-0"> -->
-                      
-                            <!--              <b-table borderless  hover  class="tableProject fi" small   :items="items" :fields="fields"
-                                         >
-                                             <template slot="index" slot-scope="data" >
-                                                <div @click="rowSelected(data.item)">
-                                                {{ data.index + 1 }}
-                                                </div>
-                                              </template>
-                                            <template slot="pos_num" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num" @change="updateDate($event, 'pos_num', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="unit" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.unit" @change="updateDate($event, 'unit', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="price" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.price" @change="updateDate($event, 'price', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="without" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.without" @change="updateDate($event, 'without', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="percent" slot-scope="row">
-                                                <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.percent" @change="updateDate($event, 'percent', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="name" slot-scope="row">
-                                                <b-input size="sm" style="min-width:150px;" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.name" @change="updateDate($event, 'name', row.item.id)"></b-input>
-                                            </template>
-                                            <template slot="desc" slot-scope="row">
-                                                <div contenteditable="true"  @blur="updateDate($event.target.innerText, 'desc', row.item.id)">{{row.item.desc}}</div>
-                                            </template>
-                                            <template slot="delete" slot-scope="row">
-                                                   <b-link @click="delRow(row.item.id)" class="fas fa-trash fa-w-16 text-center" />
-                                            </template> 
-                                    </b-table> -->
 <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
-  <b-table-simple hover  show-empty no-border-collapse stacked="lg">
+  <b-table-simple hover show-empty no-border-collapse stacked="lg">
   <b-thead>
     <b-tr  >
       <b-th v-for="(fild, index) in fields" :key="fild.key">{{fild.label}}</b-th>
@@ -115,93 +72,31 @@
       <div
         contenteditable="true" @click.prevent.self 
         class="diveditable"
-        @click.prevent.self
+
         @blur="updateDate($event.target.innerHTML, 'pos_num', tr.id)"
         v-html="tr.pos_num" />
       </b-td>
-<!--         <b-input size="sm" :value="tr.pos_num" @change="updateDate($event, 'pos_num', tr.id)"></b-input></b-td> -->
-      <!-- <b-td >
-        <b-input size="sm" style="min-width:150px;" :style="(tr._rowVariant=='success')?rowColor:''"
-        class="cForm-input" :value="tr.name" @change="updateDate($event, 'name', tr.id)"></b-input></b-td> -->
 
 
-      <b-td style="width:35%">
 
+      <b-td>
+ 
   <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'"
-  contenteditable="true" @click.prevent.self v-html="tr.name"
-  @blur="updateDate($event.target.innerHTML, 'name', tr.id)" />
+  contenteditable="true" @click.prevent.self v-html="tr.service"
+  @blur="updateDate($event.target.innerHTML, 'service', tr.id)" />
 
-<!--         <b-form-textarea size="sm"
-        rows="1"
-        max-rows="8"
-        :disabled="disablefild('priceName', tr.id)"
-        :value="tr.name"
-        @change="updateDate($event, 'name', tr.id)"
-        /> -->
+
       </b-td>
-<!--         <div  :contenteditable="!disablefild('priceName', tr.id)"
-        @focus="changeDisable('f', 'priceName', tr.id)" @blur="updateDate($event.target.innerText, 'name', tr.id);changeDisable('b', 'priceName', tr.id);"
-        
-        :id="'priceName'+tr.id" >{{tr.name}}</div></b-td> -->
-      <!-- <b-tooltip triggers="none" :show="disablefild('priceName', tr.id)" :target="'priceName'+tr.id">{{disablefildUser('priceName', tr.id)}}</b-tooltip> -->
+
+      <b-td>
+ 
+ <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'"
+ contenteditable="true" @click.prevent.self v-html="tr.time"
+ @blur="updateDate(parseFloat($event.target.innerHTML), 'time', tr.id)" />
+
+
+     </b-td>
       
-
-      <b-td  style="width:35%">
-
-  <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'"
-  :contenteditable="true" @click.prevent.self v-html="tr.desc"
-  @blur="updateDate($event.target.innerHTML, 'desc', tr.id)" />
-<!--         <b-form-textarea size="sm"
-        rows="1"
-        max-rows="8"
-        :disabled="disablefild('priceDesc', tr.id)"
-        :value="tr.desc"
-        @change="updateDate($event, 'desc', tr.id)"
-        /> -->
-<!-- 
-        <div  :contenteditable="!disablefild('priceDesc', tr.id)"
-        @focus="changeDisable('f', 'priceDesc', tr.id)"  @blur="updateDate($event.target.innerText, 'desc', tr.id);changeDisable('b', 'priceDesc', tr.id)"
-
-        :id="'priceDesc'+tr.id" >{{tr.desc}}</div> -->
-      </b-td>
-
-
-      <b-td>
-            <div
-        contenteditable="true" @click.prevent.self 
-        class="diveditable"
-        @click.prevent.self
-        @blur="updateDate($event.target.innerHTML, 'unit', tr.id)"
-        v-html="tr.unit" />
-        <!-- <b-input size="sm" :value="tr.unit" @change="updateDate($event, 'unit', tr.id)"></b-input> -->
-      </b-td>
-      <b-td>
-            <div
-        :id="'price-'+tr.id"
-        contenteditable="true"
-        class="diveditable"
-        @click.prevent.stop="selectAll('price-'+tr.id)"
-        @blur="updateDate($event.target.innerHTML, 'price', tr.id)"
-        v-html="valueDigital(tr.price)" />
-        <!-- <b-input size="sm" :value="tr.price" @change="updateDate($event, 'price', tr.id)"></b-input> -->
-      </b-td>
-<!--       <b-td>
-            <div
-        contenteditable="true" @click.prevent.self 
-        class="diveditable"
-        @click.prevent.self
-        @blur="updateDate($event.target.innerHTML, 'without', tr.id)"
-        v-html="valueDigital(tr.without)" />
-
-      </b-td> -->
-<!--       <b-td>
-            <div
-        contenteditable="true" @click.prevent.self 
-        class="diveditable"
-        @click.prevent.self
-        @blur="updateDate($event.target.innerHTML, 'percent', tr.id)"
-        v-html="valueDigital(tr.percent)" />
-      </b-td> -->
       <b-td><b-link @click="delRow(tr.id)"><b-icon icon="trash" aria-hidden="true"></b-icon></b-link></b-td>
     </b-tr>
 </draggable>
@@ -211,11 +106,7 @@
 </b-row>
 
                                     <div hidden>{{ selected }}</div>
-                                <!-- </div> -->
-                            <!-- </b-row> -->
-                             
-                        <!-- </b-container> -->
-                        <!-- <a name="finishList"></a> -->
+
                     </container-body>
                 </container>
                 <b-card-footer>
@@ -285,35 +176,15 @@ export default {
         sortable: true
       },
       {
-        key: 'name',
-        label: this.$t('customerDetail.name'), 
+        key: 'service',
+        label: this.$t('reports.service'), 
         sortable: true
       },
       {
-        key: 'desc',
-        label: this.$t('calcTable.description'), 
+        key: 'time',
+        label: this.$t('reports.time'), 
         sortable: true
       },
-      {
-        key: 'unit',
-        label: this.$t('calcTable.unit'), 
-        sortable: true
-      },
-      {
-        key: 'price',
-        label: this.$t('lists.price'), 
-        sortable: true
-      },
-                // {
-                //     key: 'without',
-                //     label: 'Without',
-                //     sortable: true
-                // },
-                // {
-                //     key: 'percent',
-                //     label: '%',
-                //     sortable: true
-                // },
       {
         key: 'delete',
         label: this.$t('docs.delete')
@@ -543,7 +414,7 @@ getLoocks(){
        }
        else {
             if (confirm(this.$t('alert.remove'))) {
-                axios.get('/remove_reports_menu', {
+                axios.get('/remove_report_menu', {
                     params: {
                         remove_id: this.idNode
                     }
@@ -676,15 +547,15 @@ getLoocks(){
         return returnArr.length
     },
     selectedModal(val){
-        var price_ids=[]
+        var reports_ids=[]
         if (confirm(this.$t('alert.to')+" "+this.moveToCopyRadio+' '+this.selected.length+
             ' rows in to '+val.name+"?")) {
             this.selected.forEach((val)=>{
-                price_ids.push(val.id)
+                reports_ids.push(val.id)
             })
              axios.get('/cp_mv_to_report', {
                  params: {
-                     price_ids: price_ids.join(),
+                    reports_ids: reports_ids.join(),
                      new_menu: val.id,
                      operation: this.moveToCopyRadio
                  }
@@ -708,20 +579,19 @@ getLoocks(){
     //    // console.log('dragOverHandler: ', model, component, e);
      },
     
-    dragEndHandler(model, component, e) {
-        console.log('dragEndHandler: ', model, component, e);
+     dragEndHandler(model, component, e) {
+      //console.log('dragEndHandler: ', model, component, e);
         this.drag1=model.id;
-        // console.log(this.drag1, this.drag2);
-        // axios.get('/change_parrent_menu', {
-        //     params: {
-        //         drag1: this.drag1,
-        //         drag2: this.drag2
-        //     }
-        // }).then(response=>{
-        //     this.drag1=null;
-        //     this.drag2=null;          
-        // })
-    },
+        axios.get('/change_parrent_menu_reports', {
+          params: {
+            drag1: this.drag1,
+            drag2: this.drag2
+          }
+        }).then(response=>{
+          this.drag1=null;
+          this.drag2=null;          
+        })
+      },
     
     dropHandler(model, component, e) {
        // console.log('dropHandler: ', model, component, e);
@@ -735,7 +605,7 @@ mounted(){
     this.updateWidth();
   setTimeout(() => {
         this.$socket.send('getReports')
-        this.$options.sockets.onmessage = (data) => (data.data=='getReports') ? this.getPrices(): ''
+        this.$options.sockets.onmessage = (data) => (data.data=='getReports') ? this.getReports(): ''
         this.$options.sockets.onmessage = (data) => (data.data=='getLoocks') ? (this.getLoocks()): ''
         },1000);
 
