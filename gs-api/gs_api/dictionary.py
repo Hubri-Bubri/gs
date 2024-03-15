@@ -208,18 +208,18 @@ class Sub:
                 # .where(T.sub_items.order_id == id)
                 .selectall())
 
-    @classmethod
-    async def add_part(cls, part_name, item_id):
-        async with database.query() as Q:
-                await (Q()
-                    .tables(T.sub_tables)
-                    .insert({
-                        T.sub_tables.name: part_name,
-                        T.sub_tables.item_id: item_id,
-                        T.sub_tables.obj: '',
-                        T.sub_tables.selected: ''
-                    }))
-        return ''
+    # @classmethod
+    # async def add_part(cls, part_name, item_id):
+    #     async with database.query() as Q:
+    #             await (Q()
+    #                 .tables(T.sub_tables)
+    #                 .insert({
+    #                     T.sub_tables.name: part_name,
+    #                     T.sub_tables.item_id: item_id,
+    #                     T.sub_tables.obj: '',
+    #                     T.sub_tables.selected: ''
+    #                 }))
+    #     return ''
 
     # @classmethod
     # async def select_project(cls, id):
@@ -562,216 +562,216 @@ class Sub:
                             .update({
                                 T.sub_rows_for_table.id: new
                             }))
-    @classmethod
-    async def update_id_in_one_table(cls, newIndex, oldIndex, newPart):
-        async with database.query() as Q:
-            table =(await (Q()
-                    .tables(T.sub_tables)
-                    .fields(
-                        T.sub_tables.id,
-                        T.sub_tables.obj,
-                        T.sub_tables.selected
-                    )
-                    .where((T.sub_tables.id == newPart))
-                    .selectone()))
+    # @classmethod
+    # async def update_id_in_one_table(cls, newIndex, oldIndex, newPart):
+    #     async with database.query() as Q:
+    #         table =(await (Q()
+    #                 .tables(T.sub_tables)
+    #                 .fields(
+    #                     T.sub_tables.id,
+    #                     T.sub_tables.obj,
+    #                     T.sub_tables.selected
+    #                 )
+    #                 .where((T.sub_tables.id == newPart))
+    #                 .selectone()))
 
 
-            # print(table)
-            table['selected'] = table['selected'].replace('|', '"], ')
-            table['selected'] = '{'+table['selected'].replace(':', '":[')+'"]}'
-            table['selected'] = table['selected'].replace('in', '"in')
-            table['selected'] = table['selected'].replace('temp', '"')
-            table['selected'] = table['selected'].replace(',"', '","')
+    #         # print(table)
+    #         table['selected'] = table['selected'].replace('|', '"], ')
+    #         table['selected'] = '{'+table['selected'].replace(':', '":[')+'"]}'
+    #         table['selected'] = table['selected'].replace('in', '"in')
+    #         table['selected'] = table['selected'].replace('temp', '"')
+    #         table['selected'] = table['selected'].replace(',"', '","')
             
-            # befor_selected = table['selected']
-            if table['selected'] != '{"]}':
-                befor_selected = json.loads(table['selected'])
-            else:
-                befor_selected = ''       
-            after_selected = ''
-            # print(oldIndex, newIndex)
-            for index, selected_group in enumerate(befor_selected):
-                selected_group_new = ''
-                for i, selected in enumerate(befor_selected[selected_group]):
-                    old_select_index = int(selected) - 1
-                    if i == 0:
-                        if (int(newIndex) <= old_select_index) & (int(oldIndex) > old_select_index):
-                            old_select_index = old_select_index + 1
-                        if (int(newIndex) >= old_select_index) & (int(oldIndex) < old_select_index):
-                            old_select_index = old_select_index - 1
-                    else:
-                        if int(oldIndex) == old_select_index:
-                            old_select_index = int(newIndex)
+    #         # befor_selected = table['selected']
+    #         if table['selected'] != '{"]}':
+    #             befor_selected = json.loads(table['selected'])
+    #         else:
+    #             befor_selected = ''       
+    #         after_selected = ''
+    #         # print(oldIndex, newIndex)
+    #         for index, selected_group in enumerate(befor_selected):
+    #             selected_group_new = ''
+    #             for i, selected in enumerate(befor_selected[selected_group]):
+    #                 old_select_index = int(selected) - 1
+    #                 if i == 0:
+    #                     if (int(newIndex) <= old_select_index) & (int(oldIndex) > old_select_index):
+    #                         old_select_index = old_select_index + 1
+    #                     if (int(newIndex) >= old_select_index) & (int(oldIndex) < old_select_index):
+    #                         old_select_index = old_select_index - 1
+    #                 else:
+    #                     if int(oldIndex) == old_select_index:
+    #                         old_select_index = int(newIndex)
                     
-                    new_select_index = old_select_index + 1
+    #                 new_select_index = old_select_index + 1
 
-                    selected_group_new = selected_group_new + ',temp'+str(new_select_index)
+    #                 selected_group_new = selected_group_new + ',temp'+str(new_select_index)
                 
-                if index == 0:
-                    add = ''
-                else:
-                    add = '|'
+    #             if index == 0:
+    #                 add = ''
+    #             else:
+    #                 add = '|'
 
-                after_selected = after_selected + add +'in' + str(index) + ':' + str(selected_group_new)
-                after_selected = after_selected.replace(':,', ':')
-                after_selected = after_selected.replace(':,', ':')
+    #             after_selected = after_selected + add +'in' + str(index) + ':' + str(selected_group_new)
+    #             after_selected = after_selected.replace(':,', ':')
+    #             after_selected = after_selected.replace(':,', ':')
 
-            await (Q()
-                     .tables(T.sub_tables)
-                     .where(T.sub_tables.id == newPart)
-                     .update({
-                         T.sub_tables.selected: after_selected
-                     }))
+    #         await (Q()
+    #                  .tables(T.sub_tables)
+    #                  .where(T.sub_tables.id == newPart)
+    #                  .update({
+    #                      T.sub_tables.selected: after_selected
+    #                  }))
 
-            oldrows =(await (Q()
-                .tables(T.sub_rows_for_table)
-                .fields(
-                    T.sub_rows_for_table.id,
-                    T.sub_rows_for_table.without
-                )
-                .where((T.sub_rows_for_table.table_id == newPart))
-                .selectall()))
+    #         oldrows =(await (Q()
+    #             .tables(T.sub_rows_for_table)
+    #             .fields(
+    #                 T.sub_rows_for_table.id,
+    #                 T.sub_rows_for_table.without
+    #             )
+    #             .where((T.sub_rows_for_table.table_id == newPart))
+    #             .selectall()))
 
-            new = (oldrows[int(newIndex)]['id'])
-            old = (oldrows[int(oldIndex)]['id'])
+    #         new = (oldrows[int(newIndex)]['id'])
+    #         old = (oldrows[int(oldIndex)]['id'])
   
-            await Sub.change(old, new)
+    #         await Sub.change(old, new)
 
-            newrows =(await (Q()
-                .tables(T.sub_rows_for_table)
-                .fields(
-                    T.sub_rows_for_table.id,
-                    T.sub_rows_for_table.count
-                )
-                .where((T.sub_rows_for_table.table_id == newPart))
-                .selectall()))
+    #         newrows =(await (Q()
+    #             .tables(T.sub_rows_for_table)
+    #             .fields(
+    #                 T.sub_rows_for_table.id,
+    #                 T.sub_rows_for_table.count
+    #             )
+    #             .where((T.sub_rows_for_table.table_id == newPart))
+    #             .selectall()))
 
-            newx = (newrows[int(newIndex)]['id'])
+    #         newx = (newrows[int(newIndex)]['id'])
 
-            if((int(oldIndex)-int(newIndex))!=1):
-                if oldIndex>newIndex:
-                    start = int(newIndex)
-                    end = int(oldIndex)
-                else:
-                    start = int(oldIndex)
-                    end = int(newIndex)
-                for  x in range(start, end):
+    #         if((int(oldIndex)-int(newIndex))!=1):
+    #             if oldIndex>newIndex:
+    #                 start = int(newIndex)
+    #                 end = int(oldIndex)
+    #             else:
+    #                 start = int(oldIndex)
+    #                 end = int(newIndex)
+    #             for  x in range(start, end):
         
-                    if oldIndex>newIndex:
-                        if ((((int(oldIndex)!=0) * (int(oldIndex)!=(len(oldrows))-1)) + ((int(newIndex)!=0) * (int(newIndex)!=(len(oldrows))-1)))==2):
-                            approx = int(newIndex)-2
-                            index = (len(oldrows)-x+approx)
-                            move = -1
-                        else:
-                            approx = int(newIndex)-1
-                            index = (len(oldrows)-x+approx)
-                            move = -1
-                            if ((int(newIndex)==0) & (int(oldIndex)!=(len(oldrows)-1))):
-                                index=index-(len(oldrows)-int(oldIndex))+1
-                    else:
-                        index = x
-                        move =  1
+    #                 if oldIndex>newIndex:
+    #                     if ((((int(oldIndex)!=0) * (int(oldIndex)!=(len(oldrows))-1)) + ((int(newIndex)!=0) * (int(newIndex)!=(len(oldrows))-1)))==2):
+    #                         approx = int(newIndex)-2
+    #                         index = (len(oldrows)-x+approx)
+    #                         move = -1
+    #                     else:
+    #                         approx = int(newIndex)-1
+    #                         index = (len(oldrows)-x+approx)
+    #                         move = -1
+    #                         if ((int(newIndex)==0) & (int(oldIndex)!=(len(oldrows)-1))):
+    #                             index=index-(len(oldrows)-int(oldIndex))+1
+    #                 else:
+    #                     index = x
+    #                     move =  1
 
-                    old = (newrows[index]['id'])
-                    new = ((oldrows[index+move]['id']))
+    #                 old = (newrows[index]['id'])
+    #                 new = ((oldrows[index+move]['id']))
 
-                    if ((newx!=newrows[index]['id']) & (newx!=(oldrows[index+move]['id']))):
-                        await Sub.change(old, new)
+    #                 if ((newx!=newrows[index]['id']) & (newx!=(oldrows[index+move]['id']))):
+    #                     await Sub.change(old, new)
 
-        return ''
+    #     return ''
 
-    @classmethod
-    async def update_id(cls, newIndex, newPart, oldIndex, oldPart):
-        async with database.query() as Q:
+    # @classmethod
+    # async def update_id(cls, newIndex, newPart, oldIndex, oldPart):
+    #     async with database.query() as Q:
 
-            table =(await (Q()
-                    .tables(T.sub_tables)
-                    .fields(
-                        T.sub_tables.id,
-                        T.sub_tables.obj,
-                        T.sub_tables.selected
-                    )
-                    .where((T.sub_tables.id == oldPart))
-                    .selectone()))
+    #         table =(await (Q()
+    #                 .tables(T.sub_tables)
+    #                 .fields(
+    #                     T.sub_tables.id,
+    #                     T.sub_tables.obj,
+    #                     T.sub_tables.selected
+    #                 )
+    #                 .where((T.sub_tables.id == oldPart))
+    #                 .selectone()))
 
-            el = int(oldIndex)+1
-            el = ',temp' + str(el)
-            oldselected = str(table['selected'])
-            after_selected = oldselected.replace(el, '')
-            # print(after_selected)
+    #         el = int(oldIndex)+1
+    #         el = ',temp' + str(el)
+    #         oldselected = str(table['selected'])
+    #         after_selected = oldselected.replace(el, '')
+    #         # print(after_selected)
 
-            await (Q()
-                     .tables(T.sub_tables)
-                     .where(T.sub_tables.id == oldPart)
-                     .update({
-                         T.sub_tables.selected: after_selected
-                     }))
+    #         await (Q()
+    #                  .tables(T.sub_tables)
+    #                  .where(T.sub_tables.id == oldPart)
+    #                  .update({
+    #                      T.sub_tables.selected: after_selected
+    #                  }))
 
-            newrows =(await (Q()
-                .tables(T.sub_rows_for_table)
-                .fields(
-                    T.sub_rows_for_table.id,
-                    T.sub_rows_for_table.count
-                )
-                .where((T.sub_rows_for_table.table_id == newPart))
-                .selectall()))
+    #         newrows =(await (Q()
+    #             .tables(T.sub_rows_for_table)
+    #             .fields(
+    #                 T.sub_rows_for_table.id,
+    #                 T.sub_rows_for_table.count
+    #             )
+    #             .where((T.sub_rows_for_table.table_id == newPart))
+    #             .selectall()))
 
-            oldrows =(await (Q()
-                .tables(T.sub_rows_for_table)
-                .fields(
-                    T.sub_rows_for_table.id
-                )
-                .where((T.sub_rows_for_table.table_id == oldPart))
-                .selectall()))
+    #         oldrows =(await (Q()
+    #             .tables(T.sub_rows_for_table)
+    #             .fields(
+    #                 T.sub_rows_for_table.id
+    #             )
+    #             .where((T.sub_rows_for_table.table_id == oldPart))
+    #             .selectall()))
 
-            try:
-                newrows[int(newIndex)]
-            except IndexError:
-                new = (oldrows[int(oldIndex)]['id'])
-            else:
-                new = (newrows[int(newIndex)]['id'])
+    #         try:
+    #             newrows[int(newIndex)]
+    #         except IndexError:
+    #             new = (oldrows[int(oldIndex)]['id'])
+    #         else:
+    #             new = (newrows[int(newIndex)]['id'])
 
-            old = (oldrows[int(oldIndex)]['id'])
+    #         old = (oldrows[int(oldIndex)]['id'])
 
-            await (Q()
-                 .tables(T.sub_rows_for_table)
-                 .where(T.sub_rows_for_table.id == old)
-                 .update({
-                     T.sub_rows_for_table.table_id: newPart
-                 }))
+    #         await (Q()
+    #              .tables(T.sub_rows_for_table)
+    #              .where(T.sub_rows_for_table.id == old)
+    #              .update({
+    #                  T.sub_rows_for_table.table_id: newPart
+    #              }))
 
-            after_add =(await (Q()
-                .tables(T.sub_rows_for_table)
-                .fields(
-                    T.sub_rows_for_table.id
-                )
-                .where((T.sub_rows_for_table.table_id == newPart))
-                .selectall()))
-            new = (after_add[int(newIndex)]['id'])
-            await Sub.change(old, new)
-            newTable = (await (Q()
-                .tables(T.sub_rows_for_table)
-                .fields(
-                    T.sub_rows_for_table.id,
-                    T.sub_rows_for_table.count
-                )
-                .where((T.sub_rows_for_table.table_id == newPart))
-                .selectall()))
+    #         after_add =(await (Q()
+    #             .tables(T.sub_rows_for_table)
+    #             .fields(
+    #                 T.sub_rows_for_table.id
+    #             )
+    #             .where((T.sub_rows_for_table.table_id == newPart))
+    #             .selectall()))
+    #         new = (after_add[int(newIndex)]['id'])
+    #         await Sub.change(old, new)
+    #         newTable = (await (Q()
+    #             .tables(T.sub_rows_for_table)
+    #             .fields(
+    #                 T.sub_rows_for_table.id,
+    #                 T.sub_rows_for_table.count
+    #             )
+    #             .where((T.sub_rows_for_table.table_id == newPart))
+    #             .selectall()))
 
 
-            for index, row in enumerate(newTable):
-                if (int(index) > (int(newIndex)+1)):
-                        old = int(newrows[index-1]['id'])
-                        new = int(row['id'])
-                        # print(newrows[index-1]['count']+'->'+row['count'])
-                        await Sub.change(old, new)
-                if (int(index) < (int(newIndex)-1)):
-                        old = int(newrows[index]['id'])
-                        new = int(row['id'])
-                        # print(newrows[index]['count']+'->'+row['count'])
-                        await Sub.change(old, new)
+    #         for index, row in enumerate(newTable):
+    #             if (int(index) > (int(newIndex)+1)):
+    #                     old = int(newrows[index-1]['id'])
+    #                     new = int(row['id'])
+    #                     # print(newrows[index-1]['count']+'->'+row['count'])
+    #                     await Sub.change(old, new)
+    #             if (int(index) < (int(newIndex)-1)):
+    #                     old = int(newrows[index]['id'])
+    #                     new = int(row['id'])
+    #                     # print(newrows[index]['count']+'->'+row['count'])
+    #                     await Sub.change(old, new)
 
-        return ''
+    #     return ''
 
 
     @classmethod
@@ -828,155 +828,155 @@ class Sub:
                  }))
         return ''
 
-    @classmethod
-    async def get_tables(cls, id):
-        async with database.query() as Q:
-            item = (await (Q()
-            .tables(T.sub_items)
-            .fields(
-                    T.sub_items.tax,
-                    T.sub_items.taxDub,
-                    T.sub_items.taxP,
-                    T.sub_items.taxPDub,
-                    T.sub_items.disc,
-                    T.sub_items.discP,
-                    T.sub_items.butDiscPerc,
-                    T.sub_items.addtaxColapse
+    # @classmethod
+    # async def get_tables(cls, id):
+    #     async with database.query() as Q:
+    #         item = (await (Q()
+    #         .tables(T.sub_items)
+    #         .fields(
+    #                 T.sub_items.tax,
+    #                 T.sub_items.taxDub,
+    #                 T.sub_items.taxP,
+    #                 T.sub_items.taxPDub,
+    #                 T.sub_items.disc,
+    #                 T.sub_items.discP,
+    #                 T.sub_items.butDiscPerc,
+    #                 T.sub_items.addtaxColapse
 
-                )
-            .where(T.sub_items.id == id)
-            .selectone()))
+    #             )
+    #         .where(T.sub_items.id == id)
+    #         .selectone()))
 
-            if item['tax']==None:
-                    item['tax']='0,0'
-            if item['taxDub']==None:
-                    item['taxDub']='0,0'
-            if item['taxP']==None:
-                    item['taxP']='0,0'
-            if item['taxPDub']==None:
-                    item['taxPDub']='0,0'
-            if item['disc']==None:
-                    item['disc']='0,0'
-            if item['discP']==None:
-                    item['discP']='0,0'
-            if item['butDiscPerc']==None:
-                    item['butDiscPerc']='%'
-            if item['addtaxColapse']==None:
-                    item['addtaxColapse']='false'
+    #         if item['tax']==None:
+    #                 item['tax']='0,0'
+    #         if item['taxDub']==None:
+    #                 item['taxDub']='0,0'
+    #         if item['taxP']==None:
+    #                 item['taxP']='0,0'
+    #         if item['taxPDub']==None:
+    #                 item['taxPDub']='0,0'
+    #         if item['disc']==None:
+    #                 item['disc']='0,0'
+    #         if item['discP']==None:
+    #                 item['discP']='0,0'
+    #         if item['butDiscPerc']==None:
+    #                 item['butDiscPerc']='%'
+    #         if item['addtaxColapse']==None:
+    #                 item['addtaxColapse']='false'
 
-            tax=(item['tax'].replace(',', '.'))
-            taxDub=(item['taxDub'].replace(',', '.'))
-            taxP=(item['taxP'].replace(',', '.'))
-            taxPDub=(item['taxPDub'].replace(',', '.'))
-            disc=(item['disc'].replace(',', '.'))
-            discP=(item['discP'].replace(',', '.'))
-            butDiscPerc=item['butDiscPerc']
-            addtaxColapse=item['addtaxColapse']
+    #         tax=(item['tax'].replace(',', '.'))
+    #         taxDub=(item['taxDub'].replace(',', '.'))
+    #         taxP=(item['taxP'].replace(',', '.'))
+    #         taxPDub=(item['taxPDub'].replace(',', '.'))
+    #         disc=(item['disc'].replace(',', '.'))
+    #         discP=(item['discP'].replace(',', '.'))
+    #         butDiscPerc=item['butDiscPerc']
+    #         addtaxColapse=item['addtaxColapse']
 
          
 
 
-            partx = []
-            tables =(await (Q()
-                    .tables(T.sub_tables)
-                    .fields(
-                        T.sub_tables.id,
-                        T.sub_tables.name,
-                        T.sub_tables.obj,
-                        T.sub_tables.selected
-                    )
-                    .where(T.sub_tables.item_id == id)
-                    .selectall()))
+    #         partx = []
+    #         tables =(await (Q()
+    #                 .tables(T.sub_tables)
+    #                 .fields(
+    #                     T.sub_tables.id,
+    #                     T.sub_tables.name,
+    #                     T.sub_tables.obj,
+    #                     T.sub_tables.selected
+    #                 )
+    #                 .where(T.sub_tables.item_id == id)
+    #                 .selectall()))
              
-            for val in tables:                
-                rows =(await (Q()
-                            .tables(T.sub_rows_for_table)
-                            .fields(
-                                T.sub_rows_for_table.id,
-                                T.sub_rows_for_table.table_id,
-                                T.sub_rows_for_table.count,
-                                T.sub_rows_for_table.status,
-                                T.sub_rows_for_table.alttax,
-                                T.sub_rows_for_table.summa,
-                                T.sub_rows_for_table.unit,
-                                T.sub_rows_for_table.without,
-                                T.sub_rows_for_table.done,
-                                T.sub_rows_for_table.description_head,
-                                T.sub_rows_for_table.description_work,
-                                T.sub_rows_for_table.description_from_price,
-                                T.sub_rows_for_table.discount,
-                                T.sub_rows_for_table.position_number,
-                                T.sub_rows_for_table.description_from_price,
-                                T.sub_rows_for_table.price,
-                                T.sub_rows_for_table.id
-                            )
-                            .where(T.sub_rows_for_table.table_id == val['id'])
-                            .selectall()))
+    #         for val in tables:                
+    #             rows =(await (Q()
+    #                         .tables(T.sub_rows_for_table)
+    #                         .fields(
+    #                             T.sub_rows_for_table.id,
+    #                             T.sub_rows_for_table.table_id,
+    #                             T.sub_rows_for_table.count,
+    #                             T.sub_rows_for_table.status,
+    #                             T.sub_rows_for_table.alttax,
+    #                             T.sub_rows_for_table.summa,
+    #                             T.sub_rows_for_table.unit,
+    #                             T.sub_rows_for_table.without,
+    #                             T.sub_rows_for_table.done,
+    #                             T.sub_rows_for_table.description_head,
+    #                             T.sub_rows_for_table.description_work,
+    #                             T.sub_rows_for_table.description_from_price,
+    #                             T.sub_rows_for_table.discount,
+    #                             T.sub_rows_for_table.position_number,
+    #                             T.sub_rows_for_table.description_from_price,
+    #                             T.sub_rows_for_table.price,
+    #                             T.sub_rows_for_table.id
+    #                         )
+    #                         .where(T.sub_rows_for_table.table_id == val['id'])
+    #                         .selectall()))
                 
                 
-                flavours={}
-                objNone={}
-                disable=[]
-                selResults={}
-                if val['obj'] is not None:
+    #             flavours={}
+    #             objNone={}
+    #             disable=[]
+    #             selResults={}
+    #             if val['obj'] is not None:
                     
-                    for obj in val['obj'].split(','):
-                        count=0
-                        objs=[]
+    #                 for obj in val['obj'].split(','):
+    #                     count=0
+    #                     objs=[]
 
-                        for row in rows:
-                            row['upHere']=False
-                            count=count+1
-                            objs.append('temp'+str(count))
+    #                     for row in rows:
+    #                         row['upHere']=False
+    #                         count=count+1
+    #                         objs.append('temp'+str(count))
 
-                            if row['done']==None:
-                                row['done']=''
-                            if row['done']=='false':
-                                row['done']=''
-                            if row['alttax']=='true':
-                                row['alttax']=True
-                            if row['alttax']=='false':
-                                row['alttax']=False
+    #                         if row['done']==None:
+    #                             row['done']=''
+    #                         if row['done']=='false':
+    #                             row['done']=''
+    #                         if row['alttax']=='true':
+    #                             row['alttax']=True
+    #                         if row['alttax']=='false':
+    #                             row['alttax']=False
 
-                            if row['without']=='true':
-                                row['without']=True
-                            else:
-                                row['without']=False
+    #                         if row['without']=='true':
+    #                             row['without']=True
+    #                         else:
+    #                             row['without']=False
                            
-                        flavours[obj]=objs
-                        objNone[obj]=False
+    #                     flavours[obj]=objs
+    #                     objNone[obj]=False
 
-                    selResults={}
-                    for sel in val['selected'].split('|'):
+    #                 selResults={}
+    #                 for sel in val['selected'].split('|'):
 
-                        select = sel.split(':')
-                        if len(select)==2:
-                            if select[1]=='':
-                                select=''
+    #                     select = sel.split(':')
+    #                     if len(select)==2:
+    #                         if select[1]=='':
+    #                             select=''
 
-                            selResults[select[0]]=select[1].split(',')
-                            for dis in select[1].split(','):
-                                disRow = dis.split('temp')[1]
-                                disRow = select[0]+'-'+str(int(disRow)-1)
-                                disable.append(disRow)
+    #                         selResults[select[0]]=select[1].split(',')
+    #                         for dis in select[1].split(','):
+    #                             disRow = dis.split('temp')[1]
+    #                             disRow = select[0]+'-'+str(int(disRow)-1)
+    #                             disable.append(disRow)
 
-                        else:
-                            flavours={}
-                            objNone={}
-                # print(disable)
-                # print(flavours)
-                partx.append({'parts':{'id': val['id'], 'part_name': val['name'], 'toggle': False,
-                                        'checkbox_list':{
-                                            'disable':disable,
-                                            'flavours':flavours,
-                                            'selected':selResults,
-                                            'allSelected':objNone,
-                                            'indeterminate':objNone
-                                        },
-                                        'part_content':rows}})
-            #print(item['butDiscPerc'])
-            partx.append({'taxs' : item})
-            return partx
+    #                     else:
+    #                         flavours={}
+    #                         objNone={}
+    #             # print(disable)
+    #             # print(flavours)
+    #             partx.append({'parts':{'id': val['id'], 'part_name': val['name'], 'toggle': False,
+    #                                     'checkbox_list':{
+    #                                         'disable':disable,
+    #                                         'flavours':flavours,
+    #                                         'selected':selResults,
+    #                                         'allSelected':objNone,
+    #                                         'indeterminate':objNone
+    #                                     },
+    #                                     'part_content':rows}})
+    #         #print(item['butDiscPerc'])
+    #         partx.append({'taxs' : item})
+    #         return partx
 
     @classmethod
     async def update_checkbox_table(cls, id, fild, data):
@@ -1421,236 +1421,236 @@ class SubInvoice:
                     sendResult.append(res)
         return sendResult
 
-    @classmethod
-    async def add_invoice(cls, id, type, number):
-        async with database.query() as Q:
-            types = ( await (Q()
-                .tables(T.type_for_table)
-                .fields(
-                    T.type_for_table.id 
-                    )
-                .where(T.type_for_table.type == type)
-                .selectone())
-             )
+    # @classmethod
+    # async def add_invoice(cls, id, type, number):
+    #     async with database.query() as Q:
+    #         types = ( await (Q()
+    #             .tables(T.type_for_table)
+    #             .fields(
+    #                 T.type_for_table.id 
+    #                 )
+    #             .where(T.type_for_table.type == type)
+    #             .selectone())
+    #          )
 
-            result = ( await (Q()
-                .tables(T.sub_items)
-                .fields(
-                    T.sub_items.project_id,
-                    T.sub_items.number,
-                    T.sub_items.date,
-                    T.sub_items.status_set,
-                    T.sub_items.other,
-                    T.sub_items.place,
-                    T.sub_items.insurance_number,
-                    T.sub_items.work,
-                    T.sub_items.type,
-                    T.sub_items.id,
-                    T.sub_items.tax,
-                    T.sub_items.taxDub,
-                    T.sub_items.taxP,
-                    T.sub_items.taxPDub,
-                    T.sub_items.disc,
-                    T.sub_items.discP,
-                    T.sub_items.butDiscPerc,
-                    T.sub_items.addtaxColapse
-                    )
-                .where(T.sub_items.id == id)
-                .selectone())
-             )
+    #         result = ( await (Q()
+    #             .tables(T.sub_items)
+    #             .fields(
+    #                 T.sub_items.project_id,
+    #                 T.sub_items.number,
+    #                 T.sub_items.date,
+    #                 T.sub_items.status_set,
+    #                 T.sub_items.other,
+    #                 T.sub_items.place,
+    #                 T.sub_items.insurance_number,
+    #                 T.sub_items.work,
+    #                 T.sub_items.type,
+    #                 T.sub_items.id,
+    #                 T.sub_items.tax,
+    #                 T.sub_items.taxDub,
+    #                 T.sub_items.taxP,
+    #                 T.sub_items.taxPDub,
+    #                 T.sub_items.disc,
+    #                 T.sub_items.discP,
+    #                 T.sub_items.butDiscPerc,
+    #                 T.sub_items.addtaxColapse
+    #                 )
+    #             .where(T.sub_items.id == id)
+    #             .selectone())
+    #          )
             
 
-            await (Q()
-                     .tables(T.sub_items)
-                     .insert({
-                       T.sub_items.project_id : result['project_id'],
-                       T.sub_items.number : result['number']+' '+str(result['id']),
-                       T.sub_items.date : datetime.datetime.now().strftime("%Y-%m-%d"),
-                       T.sub_items.status_set : result['status_set'],
-                       T.sub_items.other : result['other'],
-                       T.sub_items.place : result['place'],
-                       T.sub_items.insurance_number : result['insurance_number'],
-                       T.sub_items.work : result['work'],
-                       T.sub_items.type: types['id'],
-                       T.sub_items.tax: result['tax'],
-                       T.sub_items.taxDub: result['taxDub'],
-                       T.sub_items.taxP: result['taxP'],
-                       T.sub_items.taxPDub: result['taxPDub'],
-                       T.sub_items.disc: result['disc'],
-                       T.sub_items.discP: result['discP'],
-                       T.sub_items.butDiscPerc: result['butDiscPerc'],
-                       T.sub_items.addtaxColapse: result['addtaxColapse']
-                       # T.sub_items.year: datetime.datetime.now().strftime("%Y"),
-                    }))
+    #         await (Q()
+    #                  .tables(T.sub_items)
+    #                  .insert({
+    #                    T.sub_items.project_id : result['project_id'],
+    #                    T.sub_items.number : result['number']+' '+str(result['id']),
+    #                    T.sub_items.date : datetime.datetime.now().strftime("%Y-%m-%d"),
+    #                    T.sub_items.status_set : result['status_set'],
+    #                    T.sub_items.other : result['other'],
+    #                    T.sub_items.place : result['place'],
+    #                    T.sub_items.insurance_number : result['insurance_number'],
+    #                    T.sub_items.work : result['work'],
+    #                    T.sub_items.type: types['id'],
+    #                    T.sub_items.tax: result['tax'],
+    #                    T.sub_items.taxDub: result['taxDub'],
+    #                    T.sub_items.taxP: result['taxP'],
+    #                    T.sub_items.taxPDub: result['taxPDub'],
+    #                    T.sub_items.disc: result['disc'],
+    #                    T.sub_items.discP: result['discP'],
+    #                    T.sub_items.butDiscPerc: result['butDiscPerc'],
+    #                    T.sub_items.addtaxColapse: result['addtaxColapse']
+    #                    # T.sub_items.year: datetime.datetime.now().strftime("%Y"),
+    #                 }))
 
-            invoiceIdx = ( await (Q()
-                .tables(T.sub_items)
-                .fields(
-                    T.sub_items.id
-                    )
-                .where(T.sub_items.number == (result['number']+' '+str(result['id'])))
-                .selectall())
-             )
-            invoiceId = invoiceIdx[len(invoiceIdx)-1]
-            if type=='Invoices':
-                await (Q()
-                        .tables(T.sub_number_for_invoice)
-                        .insert({
-                            T.sub_number_for_invoice.item_id : invoiceId['id'],
-                            T.sub_number_for_invoice.name : number
-                        }))
+    #         invoiceIdx = ( await (Q()
+    #             .tables(T.sub_items)
+    #             .fields(
+    #                 T.sub_items.id
+    #                 )
+    #             .where(T.sub_items.number == (result['number']+' '+str(result['id'])))
+    #             .selectall())
+    #          )
+    #         invoiceId = invoiceIdx[len(invoiceIdx)-1]
+    #         if type=='Invoices':
+    #             await (Q()
+    #                     .tables(T.sub_number_for_invoice)
+    #                     .insert({
+    #                         T.sub_number_for_invoice.item_id : invoiceId['id'],
+    #                         T.sub_number_for_invoice.name : number
+    #                     }))
             
-                numberInvoice = ( await (Q()
-                    .tables(T.sub_number_for_invoice)
-                    .fields(
-                        T.sub_number_for_invoice.name
-                        )
-                    .where(T.sub_number_for_invoice.item_id == invoiceId['id'])
-                    .selectone())
-                )
+    #             numberInvoice = ( await (Q()
+    #                 .tables(T.sub_number_for_invoice)
+    #                 .fields(
+    #                     T.sub_number_for_invoice.name
+    #                     )
+    #                 .where(T.sub_number_for_invoice.item_id == invoiceId['id'])
+    #                 .selectone())
+    #             )
 
-                await (Q()
-                        .tables(T.sub_items)
-                        .where(T.sub_items.number == (result['number']+' '+str(result['id'])))
-                        .update({
-                            T.sub_items.number: result['number']+' '+str(numberInvoice['name'])+' '+str(result['id'])
-                        }))
-            resultTables = ( await (Q()
-                .tables(T.sub_tables)
-                .fields(
-                    T.sub_tables.id,
-                    T.sub_tables.name,
-                    T.sub_tables.obj,
-                    T.sub_tables.selected
-                    )
-                .where(T.sub_tables.item_id == id)
-                .selectall()))
+    #             await (Q()
+    #                     .tables(T.sub_items)
+    #                     .where(T.sub_items.number == (result['number']+' '+str(result['id'])))
+    #                     .update({
+    #                         T.sub_items.number: result['number']+' '+str(numberInvoice['name'])+' '+str(result['id'])
+    #                     }))
+    #         resultTables = ( await (Q()
+    #             .tables(T.sub_tables)
+    #             .fields(
+    #                 T.sub_tables.id,
+    #                 T.sub_tables.name,
+    #                 T.sub_tables.obj,
+    #                 T.sub_tables.selected
+    #                 )
+    #             .where(T.sub_tables.item_id == id)
+    #             .selectall()))
 
-            for val in resultTables:
-                    resultData = ( await (Q()
-                    .tables(T.sub_rows_for_table)
-                    .fields(
-                        T.sub_rows_for_table.count,
-                        T.sub_rows_for_table.status,
-                        T.sub_rows_for_table.alttax,
-                        T.sub_rows_for_table.summa,
-                        T.sub_rows_for_table.unit,
-                        T.sub_rows_for_table.without,
-                        T.sub_rows_for_table.done,
-                        T.sub_rows_for_table.description_head,
-                        T.sub_rows_for_table.description_work,
-                        T.sub_rows_for_table.description_from_price,
-                        T.sub_rows_for_table.discount,
-                        T.sub_rows_for_table.position_number,
-                        T.sub_rows_for_table.description_from_price,
-                        T.sub_rows_for_table.price,
-                        T.sub_rows_for_table.id
-                        )
-                    .where(T.sub_rows_for_table.table_id == val['id'])
-                    .selectall())
-                    )
+    #         for val in resultTables:
+    #                 resultData = ( await (Q()
+    #                 .tables(T.sub_rows_for_table)
+    #                 .fields(
+    #                     T.sub_rows_for_table.count,
+    #                     T.sub_rows_for_table.status,
+    #                     T.sub_rows_for_table.alttax,
+    #                     T.sub_rows_for_table.summa,
+    #                     T.sub_rows_for_table.unit,
+    #                     T.sub_rows_for_table.without,
+    #                     T.sub_rows_for_table.done,
+    #                     T.sub_rows_for_table.description_head,
+    #                     T.sub_rows_for_table.description_work,
+    #                     T.sub_rows_for_table.description_from_price,
+    #                     T.sub_rows_for_table.discount,
+    #                     T.sub_rows_for_table.position_number,
+    #                     T.sub_rows_for_table.description_from_price,
+    #                     T.sub_rows_for_table.price,
+    #                     T.sub_rows_for_table.id
+    #                     )
+    #                 .where(T.sub_rows_for_table.table_id == val['id'])
+    #                 .selectall())
+    #                 )
 
-                    if type == 'Damage Description':
-                        sel = number.split(',')
+    #                 if type == 'Damage Description':
+    #                     sel = number.split(',')
 
-                        await (Q()
-                             .tables(T.sub_group_for_damages)
-                             .insert({
-                               T.sub_group_for_damages.name : val['name'],
-                               T.sub_group_for_damages.item_id : invoiceId['id'],
-                        }))
+    #                     await (Q()
+    #                          .tables(T.sub_group_for_damages)
+    #                          .insert({
+    #                            T.sub_group_for_damages.name : val['name'],
+    #                            T.sub_group_for_damages.item_id : invoiceId['id'],
+    #                     }))
 
-                        gropupId = (await (Q()
-                            .tables(T.sub_group_for_damages)
-                            .fields(
-                                T.sub_group_for_damages.id
-                            )
-                            .where((T.sub_group_for_damages.name == val['name']) & (T.sub_group_for_damages.item_id == invoiceId['id']))
-                            .selectone())
-                        )
+    #                     gropupId = (await (Q()
+    #                         .tables(T.sub_group_for_damages)
+    #                         .fields(
+    #                             T.sub_group_for_damages.id
+    #                         )
+    #                         .where((T.sub_group_for_damages.name == val['name']) & (T.sub_group_for_damages.item_id == invoiceId['id']))
+    #                         .selectone())
+    #                     )
 
-                        for index, row in enumerate(resultData):
-                            number = number.replace(' ', '')
-                            val['name'] = val['name'].replace(' ', '')
-                            sel = number.split(',')
+    #                     for index, row in enumerate(resultData):
+    #                         number = number.replace(' ', '')
+    #                         val['name'] = val['name'].replace(' ', '')
+    #                         sel = number.split(',')
 
-                            for sindex, i in enumerate(sel):
-                                item = i.split('-')
-                                if ((val['name']==str(item[0])) & (index == int(item[1]))):
-                                    await (Q()
-                                        .tables(T.sub_task_for_damages)
-                                        .insert({
-                                            T.sub_task_for_damages.name : row['description_head'],
-                                            T.sub_task_for_damages.table_id : gropupId['id']
-                                        }))
-                    else:
-                        await (Q()
-                             .tables(T.sub_tables)
-                             .insert({
-                               T.sub_tables.name : val['name'],
-                               T.sub_tables.item_id : invoiceId['id'],
-                               T.sub_tables.obj: val['obj'],
-                               T.sub_tables.selected: val['selected']
-                               # T.sub_items.year: datetime.datetime.now().strftime("%Y"),
-                            }))
+    #                         for sindex, i in enumerate(sel):
+    #                             item = i.split('-')
+    #                             if ((val['name']==str(item[0])) & (index == int(item[1]))):
+    #                                 await (Q()
+    #                                     .tables(T.sub_task_for_damages)
+    #                                     .insert({
+    #                                         T.sub_task_for_damages.name : row['description_head'],
+    #                                         T.sub_task_for_damages.table_id : gropupId['id']
+    #                                     }))
+    #                 else:
+    #                     await (Q()
+    #                          .tables(T.sub_tables)
+    #                          .insert({
+    #                            T.sub_tables.name : val['name'],
+    #                            T.sub_tables.item_id : invoiceId['id'],
+    #                            T.sub_tables.obj: val['obj'],
+    #                            T.sub_tables.selected: val['selected']
+    #                            # T.sub_items.year: datetime.datetime.now().strftime("%Y"),
+    #                         }))
 
-                        tableId = ( await (Q()
-                        .tables(T.sub_tables)
-                        .fields(
-                            T.sub_tables.id
-                            )
-                        .where((T.sub_tables.name == val['name']) & (T.sub_tables.item_id == invoiceId['id']))
-                        .selectone())
-                        )
+    #                     tableId = ( await (Q()
+    #                     .tables(T.sub_tables)
+    #                     .fields(
+    #                         T.sub_tables.id
+    #                         )
+    #                     .where((T.sub_tables.name == val['name']) & (T.sub_tables.item_id == invoiceId['id']))
+    #                     .selectone())
+    #                     )
 
-                        resultFiles = ( await (Q()
-                        .tables(T.files)
-                        .fields(
-                            T.files.content,
-                            T.files.name,
-                            T.files.number,
-                            T.files.pages,
-                            T.files.resp,
-                            T.files.html,
-                            T.files.added
-                            )
-                        .where(T.files.group == val['id'])
-                        .selectall())
-                         )
-                        for file in resultFiles:
-                            await (Q()
-                            .tables(T.files)
-                            .insert({
-                                T.files.content: file['content'],
-                                T.files.name: file['name'],
-                                T.files.number: file['number'],
-                                T.files.pages: file['pages'],
-                                T.files.resp: file['resp'],
-                                T.files.html: file['html'],
-                                T.files.added: file['added'],
-                                T.files.group: tableId['id']
-                            }))
-                        for row in resultData:
-                                await (Q()
-                                .tables(T.sub_rows_for_table)
-                                .insert({
-                                    T.sub_rows_for_table.count : row['count'],
-                                    T.sub_rows_for_table.status : row['status'],
-                                    T.sub_rows_for_table.alttax : row['alttax'],
-                                    T.sub_rows_for_table.summa : row['summa'],
-                                    T.sub_rows_for_table.unit : row['unit'],
-                                    T.sub_rows_for_table.without : row['without'],
-                                    T.sub_rows_for_table.done : row['done'],
-                                    T.sub_rows_for_table.description_head : row['description_head'],
-                                    T.sub_rows_for_table.description_work : row['description_work'],
-                                    T.sub_rows_for_table.description_from_price : row['description_from_price'],
-                                    T.sub_rows_for_table.discount : row['discount'],
-                                    T.sub_rows_for_table.position_number : row['position_number'],
-                                    T.sub_rows_for_table.price : row['price'],
-                                    T.sub_rows_for_table.table_id : tableId['id']
-                                }))
+    #                     resultFiles = ( await (Q()
+    #                     .tables(T.files)
+    #                     .fields(
+    #                         T.files.content,
+    #                         T.files.name,
+    #                         T.files.number,
+    #                         T.files.pages,
+    #                         T.files.resp,
+    #                         T.files.html,
+    #                         T.files.added
+    #                         )
+    #                     .where(T.files.group == val['id'])
+    #                     .selectall())
+    #                      )
+    #                     for file in resultFiles:
+    #                         await (Q()
+    #                         .tables(T.files)
+    #                         .insert({
+    #                             T.files.content: file['content'],
+    #                             T.files.name: file['name'],
+    #                             T.files.number: file['number'],
+    #                             T.files.pages: file['pages'],
+    #                             T.files.resp: file['resp'],
+    #                             T.files.html: file['html'],
+    #                             T.files.added: file['added'],
+    #                             T.files.group: tableId['id']
+    #                         }))
+    #                     for row in resultData:
+    #                             await (Q()
+    #                             .tables(T.sub_rows_for_table)
+    #                             .insert({
+    #                                 T.sub_rows_for_table.count : row['count'],
+    #                                 T.sub_rows_for_table.status : row['status'],
+    #                                 T.sub_rows_for_table.alttax : row['alttax'],
+    #                                 T.sub_rows_for_table.summa : row['summa'],
+    #                                 T.sub_rows_for_table.unit : row['unit'],
+    #                                 T.sub_rows_for_table.without : row['without'],
+    #                                 T.sub_rows_for_table.done : row['done'],
+    #                                 T.sub_rows_for_table.description_head : row['description_head'],
+    #                                 T.sub_rows_for_table.description_work : row['description_work'],
+    #                                 T.sub_rows_for_table.description_from_price : row['description_from_price'],
+    #                                 T.sub_rows_for_table.discount : row['discount'],
+    #                                 T.sub_rows_for_table.position_number : row['position_number'],
+    #                                 T.sub_rows_for_table.price : row['price'],
+    #                                 T.sub_rows_for_table.table_id : tableId['id']
+    #                             }))
 
-        return ''
+    #     return ''
 
     @classmethod
     async def select_invoices(cls, id):
@@ -1748,7 +1748,6 @@ class Del_offer_sub:
                 .delete())
 
 
-
 #####end Sub
 class General:
     @classmethod
@@ -1772,15 +1771,18 @@ class General:
             items = (await (Q((table))
                 .fields(table[id_name])
                 .selectall()))
-            old = newId = 0
+            old = 0
             list_ids=[]
+            lastIndex = int(items[len(items)-1]['id']+1)
             if items[0][id_name]==0:
-                old = newId = -1
+                old  = -1
             for x in range((len(items))):
+                # print((old+1), items[x][id_name])
                 if ((old+1) != items[x][id_name]):
                     list_ids.append(old+1)
-                old = newId = items[x][id_name]
-            return (list_ids, len(items))
+                old = items[x][id_name]
+            return (list_ids, lastIndex)
+        
     classmethod
     async def removeDouble(arr):
             n = []
@@ -1788,9 +1790,102 @@ class General:
                 if i not in n:
                     n.append(i)
             return n
+    
+    classmethod
+    async def ceckbox_calc(id_percent, table_id, rows_for_percent, discont, ws_clients):
+        gensumma = float(0)
+        indexForRowWithPercent = None
+        update = None
+        for index_for_percent, row in enumerate(rows_for_percent):
+            if row['checked_for_percent']=='in'+str(id_percent):
+                gensumma = gensumma+float(row['summa'])
+            if str(row['id'])==str(id_percent):
+                indexForRowWithPercent = str(index_for_percent)
+                count = row['count']
+                without = row['without']
+        if indexForRowWithPercent!=None:
+            #внутри for нужно организовать общее уведомление
+            await Project.update_table_data(table_id, id_percent, 'price', gensumma, indexForRowWithPercent, True, ws_clients)
 
+            if (without==None)|(without=='false'):
+                percent_without_discont = (float(gensumma)/100)*float(count)
+                percent = (((float(gensumma)/100)*float(count)))-(((((float(gensumma)/100)*float(count)))/100)*discont)
+            else:
+                percent_without_discont = percent = (float(gensumma)/100)*float(count)
+            await Project.update_table_data(table_id, id_percent, 'summa_without_discont', percent_without_discont, indexForRowWithPercent, False, ws_clients)
+            await Project.update_table_data(table_id, id_percent, 'summa', percent, indexForRowWithPercent, False, ws_clients)
+
+            data = General.digit_formater(float(percent))
+            update = json.dumps({'table_id':table_id, 'index':indexForRowWithPercent, 'fild':'summa', 'value':data})
+
+        if update != None:
+            for client in ws_clients:
+                await client.send_str('updateFild:'+(update))
+
+    
+    classmethod
+    async def toTableSumm(table_id, item_id,  rows_for_summa, discont, send, ws_clients):
+        toSumm = 0
+        altSumm = 0
+        toDiscont = 0
+        # print(rows_for_summa)
+        for row in rows_for_summa:
+            if row['status'] == 'yes':
+                if (row['without']==None)|(row['without']=='false'):
+                    if (discont > 0):
+
+                        if row['summa_without_discont'] == None:
+                            summa_without_discont = 0
+                        else:
+                            summa_without_discont = row['summa_without_discont']
+                        if row['summa'] == None:
+                            summa = 0
+                        else:
+                            summa = row['summa']
+
+                        percent = float(summa_without_discont)-float(summa)
+                        toDiscont = toDiscont + percent
+
+                toSumm = toSumm + float(row['summa'])
+            if row['status'] == 'alternative':
+                altSumm = altSumm + float(row['summa'])
+        if send==True:
+            await Project.update_part_parametrs(table_id, toSumm, altSumm, toDiscont, send, ws_clients)
+            await Project.toTablesSumms(item_id, send, ws_clients)
+        if send!=True:
+            for_return=(await Project.update_part_parametrs(table_id, toSumm, altSumm, toDiscont, send, ws_clients))
+            await Project.toTablesSumms(item_id, send, ws_clients)
+            return for_return
+    
+        
+     
+
+    classmethod
+    def digit_formater(val):
+        value = round(val * 100) / 100
+        parts = str(value).split('.')
+        main = parts[0]
+        lenx = len(main)
+        output = ''
+        i = lenx - 1
+
+        while (i >= 0):
+            output = main[i] + output
+            if (((lenx - i) % 3 == 0) & (i > 0)):
+                output = '.' + output
+            i -= 1
+
+        if (len(parts) > 1):
+            output += ',' + parts[1]
+            if (len(parts[1])==1):
+                output += '0'
+        else:
+            output += ',00'
+           
+        output = output.replace('-.','-')
+        return output
+    
 class Project:
-
     @classmethod
     async def update_id_in_prise(cls, newid, oldid):
         async with database.query() as Q:
@@ -1874,22 +1969,14 @@ class Project:
             allResult = (await(Q()
                 .tables(T.price)
                 .fields(T.price.unit)
+                .where((T.price.unit != None)&(T.price.unit != '%'))
                 .selectall()
                 ))
 
             result = []
-            
-            for res in allResult:
-                same = 0
-                for resafter in result:
-                    if resafter==res['unit']:
-                        same = 1
-
-                if same==0:
-                    result.append(res['unit'])
-
+            result = [i['unit'] for n, i in enumerate(allResult) if i not in allResult[:n]]
+            result.append('%')
         return result
-
     @classmethod
     async def select_project(cls, id):
         async with database.query() as Q:
@@ -2125,22 +2212,261 @@ class Project:
                 .selectall())
 
     @classmethod
-    async def update_table_data(cls, id, fild, data):
+    async def update_table_data(cls, table_id, id, fild, data, index, send, ws_clients):
         async with database.query() as Q:
-            # print(id, fild, data)
-            # if fild == 'without':
-            #     if data == true:
-            #         data
-            #     else:
-            if data=='Null':
-                data = ''
-            return await (Q()
+            await (Q()
                 .tables(T.rows_for_table)
                 .where(T.rows_for_table.id == id)
                 .update({
                     T.rows_for_table[fild]: data
                 }))
+            if (fild == 'price')|(fild == 'summa'):
+                data = General.digit_formater(float(data))
+            update = json.dumps({'table_id':table_id, 'index':index, 'fild':fild, 'value':data})
+            if send==True: 
+                for client in ws_clients:
+                    await client.send_str('updateFild:'+(update))
 
+    
+    @classmethod
+    async def chenge_unit_type(cls, table_id, id, data, index, item_id, ws_clients):
+        async with database.query() as Q:
+            fild = 'unit'
+            rows_for_percent = (await (Q() # Получим список идентификаторов строк в которых были галочки до обновления.
+                    .tables(T.rows_for_table)
+                    .fields(
+                        T.rows_for_table.id,
+                        T.rows_for_table.checked_for_percent
+                    ).where(T.rows_for_table.table_id == table_id)
+                    .selectall()))
+            
+            await Project.update_table_data(table_id, id, fild, data, index, True, ws_clients)
+            
+            # for index_for_percent, row in enumerate(rows_for_percent):
+            #     if (str(index_for_percent) == str(index)):id_percent
+            #     checked_id = row[id]
+            for index_for_percent, row in enumerate(rows_for_percent):
+                if (row['checked_for_percent']) == 'in'+str(id):
+                    await Project.checked_for_percent(table_id, row['id'], 'false', index_for_percent, row['checked_for_percent'], 'null', item_id, False, ws_clients)
+                if data=='%':
+                    if (str(index_for_percent) == str(index)):
+                        await Project.checked_for_percent(table_id, row['id'], 'false', index_for_percent, row['checked_for_percent'], 'null', item_id, False, ws_clients)
+
+            await Project.update_table_data(table_id, id, 'price', 0, index, True, ws_clients) #что бы при расстановки галочек добавление на чалось с 0 или при возврате к обчному умножению
+            await Project.update_table_data(table_id, id, 'summa', 0, index, True, ws_clients)
+            await Project.update_table_data(table_id, id, 'summa_without_discont', 0, index, True, ws_clients)
+
+            discont = (await (Q() # Получим скидку.
+                .tables(T.items)
+                .fields(
+                    T.items.discP,
+                    T.items.butDiscPerc
+                ).where(T.items.id == item_id)
+                .selectone()))
+            
+            if discont['butDiscPerc']=='%':
+                discont = float(discont['discP'])
+            else:
+                discont = 0
+
+            rows_for_summa = (await (Q()
+                .tables(T.rows_for_table)
+                .fields(
+                    T.rows_for_table.summa_without_discont,
+                    T.rows_for_table.status,
+                    T.rows_for_table.summa,
+                    T.rows_for_table.without,
+                ).where(T.rows_for_table.table_id == table_id)
+                .selectall()))
+
+            await General.toTableSumm(table_id, item_id, rows_for_summa, discont, True, ws_clients)
+            return ''
+        
+    @classmethod
+    async def checked_for_percent(cls, table_id, id, event, index, part_percent, old, item_id, send, ws_clients):
+        async with database.query() as Q:
+            discont = (await (Q() # Получим скидку.
+                .tables(T.items)
+                .fields(
+                    T.items.discP,
+                    T.items.butDiscPerc
+                ).where(T.items.id == item_id)
+                .selectone()))
+            
+            if discont['butDiscPerc']=='%':
+                discont = float(discont['discP'])
+            else:
+                discont = 0
+
+            if event == 'true':
+                checkbox_name = part_percent
+            if event == 'false':
+                checkbox_name = None
+            await Project.update_table_data(table_id, id, 'checked_for_percent', checkbox_name, index, send, ws_clients)
+
+            if part_percent!=None:
+                id_percent = part_percent.split('in')[1]
+
+                rows_for_percent = (await (Q()  # Получим список  строк в которых были галочки для общий суммы.
+                .tables(T.rows_for_table)
+                .fields(
+                    T.rows_for_table.id,
+                    T.rows_for_table.count,
+                    T.rows_for_table.summa,
+                    T.rows_for_table.summa_without_discont,
+                    T.rows_for_table.without,
+                    T.rows_for_table.checked_for_percent
+                ).where(T.rows_for_table.table_id == table_id)
+                .selectall()))
+
+                await General.ceckbox_calc(id_percent, table_id, rows_for_percent, discont, ws_clients)
+                if (old!='null'):
+                    old_percent = old.split('in')[1]
+                    await General.ceckbox_calc(old_percent, table_id, rows_for_percent, discont, ws_clients)
+
+            rows_for_summa = (await (Q()
+                    .tables(T.rows_for_table)
+                    .fields(
+                        T.rows_for_table.summa_without_discont,
+                        T.rows_for_table.status,
+                        T.rows_for_table.summa,
+                        T.rows_for_table.without,
+                    ).where(T.rows_for_table.table_id == table_id)
+                    .selectall()))
+            await General.toTableSumm(table_id, item_id, rows_for_summa, discont, send, ws_clients)
+
+
+    @classmethod
+    async def update_for_summ(cls, table_id, id, fild, data, index, item_id, send, ws_clients):
+        async with database.query() as Q:
+            discont = (await (Q() # Получим скидку.
+                .tables(T.items)
+                .fields(
+                    T.items.discP,
+                    T.items.butDiscPerc
+                ).where(T.items.id == item_id)
+                .selectone()))
+            
+            if discont['butDiscPerc']=='%':
+                discont = float(discont['discP'])
+            else:
+                discont = 0
+                
+            row_for_percent = (await (Q() # Получим список  строк в которых были галочки для общий суммы.
+                .tables(T.rows_for_table)
+                .fields(
+                    T.rows_for_table.count,
+                    T.rows_for_table.unit,
+                    T.rows_for_table.price,
+                    T.rows_for_table.without,
+                    T.rows_for_table.checked_for_percent
+                ).where(T.rows_for_table.id == id)
+                .selectone()))
+            
+
+
+            if row_for_percent['unit'] != '%':
+                # Название полей, если передан price то нужно его умножить на старое значение count и наооборот
+                fild1=row_for_percent['count'] 
+                fild2=row_for_percent['price']
+                
+                if fild=='count':
+                    data = data.replace(',', '.')
+                    fild1 = data
+                if fild=='price':
+                    data = data.replace(',', '.')
+                    fild2 = data
+
+                if (row_for_percent['without']==None)|(row_for_percent['without']=='false'):
+                    summa_without_discont = (float(fild1)*float(fild2))
+                    summa = (float(fild1)*float(fild2))-(((float(fild1)*float(fild2))/100)*discont)
+                else:
+                    summa_without_discont = summa = (float(fild1)*float(fild2)) #не может конвертировать ''
+                    
+                update_rows = json.dumps({'table_id':table_id, 'index':index, 'fild':'summa', 'value':General.digit_formater(float(summa))})
+                await Project.update_table_data(table_id, id, 'summa', float(summa), index, send, ws_clients)
+                await Project.update_table_data(table_id, id, 'summa_without_discont', float(summa_without_discont), index, False, ws_clients)
+                await Project.update_table_data(table_id, id, fild, float(data), index, send, ws_clients)
+
+                if row_for_percent['checked_for_percent']!=None:
+
+                    rows_for_percent = (await (Q()  # Получим список  строк в которых были галочки для общий суммы.
+                    .tables(T.rows_for_table)
+                    .fields(
+                        T.rows_for_table.id,
+                        T.rows_for_table.count,
+                        T.rows_for_table.summa,
+                        T.rows_for_table.without,
+                        T.rows_for_table.summa_without_discont,
+                        T.rows_for_table.checked_for_percent
+                    ).where(T.rows_for_table.table_id == table_id)
+                    .selectall()))
+
+                    id_percent = row_for_percent['checked_for_percent'].split('in')[1]
+                    await General.ceckbox_calc(id_percent, table_id, rows_for_percent, discont, ws_clients)
+                    
+            if row_for_percent['unit'] == '%':
+                if fild=='count':
+                    data = data.replace(',', '.')
+                    await Project.update_table_data(table_id, id, fild, float(data), index, send, ws_clients)
+                    if (row_for_percent['without']==None)|(row_for_percent['without']=='false'):
+                        percent_without_discont = ((float(row_for_percent['price'])/100)*float(data))
+                        percent = (((float(row_for_percent['price'])/100)*float(data)))-(((((float(row_for_percent['price'])/100)*float(data)))/100)*discont)
+                    else:
+                        percent_without_discont = percent = (((float(row_for_percent['price'])/100)*float(data)))
+
+
+                    update_rows = json.dumps({'table_id':table_id, 'index':index, 'fild':'summa', 'value':General.digit_formater(float(percent))})
+
+                    await Project.update_table_data(table_id, id, 'summa', percent, index, send, ws_clients)
+                    await Project.update_table_data(table_id, id, 'summa_without_discont', percent_without_discont, index, False, ws_clients)
+
+            rows_for_summa = (await (Q()
+                    .tables(T.rows_for_table)
+                    .fields(
+                        T.rows_for_table.summa_without_discont,
+                        T.rows_for_table.status,
+                        T.rows_for_table.summa,
+                        T.rows_for_table.without,
+                    ).where(T.rows_for_table.table_id == table_id)
+                    .selectall()))
+            if send==True:
+                await General.toTableSumm(table_id, item_id, rows_for_summa, discont, send, ws_clients)
+            else:
+                return (await General.toTableSumm(table_id, item_id, rows_for_summa, discont, send, ws_clients))+'|'+update_rows
+
+
+    @classmethod
+    async def send_discont(cls, table_id, id, data, index, item_id, ws_clients):
+        await Project.update_table_data(table_id, id, 'without', data, index, True, ws_clients)
+        async with database.query() as Q:
+            row_for_percent = (await (Q()
+            .tables(T.rows_for_table)
+            .fields(
+                T.rows_for_table.count
+            ).where(T.rows_for_table.id == id)
+            .selectone()))
+        await Project.update_for_summ(table_id, id, 'count', row_for_percent['count'], index, item_id, True, ws_clients)
+
+    @classmethod
+    async def send_mode_calc(cls, table_id, id, data, index, item_id, ws_clients):
+        await Project.update_table_data(table_id, id, 'status', data, index, True, ws_clients)
+        async with database.query() as Q:
+            row_for_status = (await (Q()
+            .tables(T.rows_for_table)
+            .fields(
+                T.rows_for_table.count
+            ).where(T.rows_for_table.id == id)
+            .selectone()))
+        await Project.update_for_summ(table_id, id, 'count', row_for_status['count'], index, item_id, True, ws_clients)
+
+    
+    @classmethod
+    async def chenge_tax(cls, table_id, id, data, index, item_id, ws_clients):
+        await Project.update_table_data(table_id, id, 'alttax', data, index, True, ws_clients)
+        await Project.toTablesSumms(item_id, True, ws_clients)
+
+    
     @classmethod
     async def add_part_form_price(cls, part_name, type,
         item_id, position_number, description_head, description_work,
@@ -2400,7 +2726,7 @@ class Project:
             parse_parts_names = json.loads(parts_names)
             # print(parse_parts_names)
             for index, part_names in enumerate(parse_parts_names):
-
+                # print(index, part_names)
                 nameofpart = part_names['nameofpart']
                 if (nameofpart=='' or nameofpart==' ' or nameofpart==None):
                     nameofpart = 'nameless'
@@ -2417,29 +2743,28 @@ class Project:
                         folderInImages = 'nameless'
                 else:
                     folderInImages = False
-# add_docs_menu?parent_id=-1&project=142
                 await (Q()
                     .tables(T.tables)
                     .insert({
                         T.tables.name: nameofpart,
                         T.tables.item_id: item_id,
                         T.tables.obj: '',
-                        T.tables.selected: ''
+                        T.tables.summa: 0,
+                        T.tables.alt_summa: 0,
+                        T.tables.discont: 0
                     }))
                 if folderInDocuments != False:
                     await Docs.add_docs_menu(-1, pid, folderInDocuments)
                 if folderInImages != False:
                     await Docs.add_images_menu(-1, pid, folderInImages)
 
-
-
             for client in ws_clients:
-                await client.send_str('getProjectDetail')
+                await client.send_str('add_part:'+str(item_id))
                 await client.send_str('getDocs')
-        return ''
+
 
     @classmethod
-    async def update_part(cls, part_name, id):
+    async def update_part(cls, part_name, id, ws_clients):
         async with database.query() as Q:
                 await (Q()
                      .tables(T.tables)
@@ -2447,8 +2772,146 @@ class Project:
                      .update({
                          T.tables.name: part_name
                      }))
+                for client in ws_clients:
+                    await client.send_str('update_part:'+str(id))
+
+
+    @classmethod
+    async def update_part_parametrs(cls, table_id, toSumm, altSumm, toDiscont, send, ws_clients):
+        async with database.query() as Q:
+            # print(table_id, toSumm, altSumm, toDiscont)
+            await (Q()
+                .tables(T.tables)
+                .where(T.tables.id == table_id)
+                .update({
+                    T.tables.summa: toSumm,
+                    T.tables.alt_summa: altSumm,
+                    T.tables.discont: toDiscont,
+                }))
+            if send==True:
+                update = json.dumps({'table_id':table_id, 'toSumm':General.digit_formater(float(toSumm)), 'altSumm':General.digit_formater(float(altSumm)), 'toDiscont':General.digit_formater(float(toDiscont))})
+                for client in ws_clients:
+                    await client.send_str('update_part_parametrs:'+update)
+            else:
+                return json.dumps({'table_id':table_id, 'toSumm':General.digit_formater(float(toSumm)), 'altSumm':General.digit_formater(float(altSumm)), 'toDiscont':General.digit_formater(float(toDiscont))})
+ 
+    
+    @classmethod
+    async def toTablesSumms(cls, item_id, send, ws_clients):
+        
+        async with database.query() as Q:
+            taxes = (await (Q() # Получим скидку.
+                .tables(T.items)
+                .fields(
+                    T.items.addtaxColapse,
+                    T.items.taxP,
+                    T.items.taxPDub,
+                    T.items.butDiscPerc,
+                    T.items.discP
+                ).where(T.items.id == item_id)
+                .selectone()))
+
+            tables =(await (Q()
+                .tables(T.tables)
+                .fields(
+                    T.tables.id,
+                    T.tables.summa,
+                    T.tables.discont
+                )
+            .where(T.tables.item_id == item_id)
+            .selectall()))
+            genSumma = 0
+            genDiscont = 0
+            gen_tax1 = 0
+            gen_tax2 = 0
+            tax1 = float(taxes['taxP'])
+            tax2 = float(taxes['taxPDub'])
+            for row in tables:
+                genSumma = genSumma + float(row['summa'])
+                if taxes['butDiscPerc'] == '%':
+                    genDiscont = genDiscont + float(row['discont'])
+                else:
+                    genDiscont = float(taxes['discP'])
+                    genSumma = genSumma-genDiscont
+                # print(genDiscont)
+                
+                rows_for_tax = (await (Q()
+                        .tables(T.rows_for_table)
+                        .fields(
+                            T.rows_for_table.summa,
+                            T.rows_for_table.alttax,
+                            T.rows_for_table.status,
+                        ).where(T.rows_for_table.table_id == row['id'])
+                        .selectall()))
+                # print(rows_for_tax)
+                for row_for_tax in rows_for_tax:
+                    if row_for_tax['status']=='yes':
+                        if taxes['addtaxColapse']=='true':
+                            if row_for_tax['alttax']!='true':
+                                gen_tax1 = gen_tax1 + ((float(row_for_tax['summa'])/100)*tax1)
+                            else:
+                                gen_tax2 = gen_tax2 + ((float(row_for_tax['summa'])/100)*tax2)
+                        else:
+                            gen_tax1 = gen_tax1 + ((float(row_for_tax['summa'])/100)*tax1)
+
+
+            # await Project.update_item(gen_tax1, 'tax', item_id, ws_clients)
+            # await Project.update_item(gen_tax2, 'taxDub', item_id, ws_clients)
+            # await Project.update_item(genDiscont, 'gen_discont', item_id, ws_clients)
+            # await Project.update_item(genSumma, 'gen_summa', item_id, ws_clients)
+            # await Project.update_item(genSumma+(gen_tax1+gen_tax2), 'brutto', item_id, ws_clients)
+
+            await (Q()
+                     .tables(T.items)
+                     .where(T.items.id == item_id)
+                     .update({
+                         T.items['tax']: gen_tax1,
+                         T.items['taxDub']: gen_tax2,
+                         T.items['gen_discont']: genDiscont,
+                         T.items['gen_summa']: genSumma,
+                         T.items['brutto']: (genSumma+(gen_tax1+gen_tax2))
+                     }))
+            if send==True:
+                for client in ws_clients:
+                    await client.send_str('update_item:'+(json.dumps({'item_id':item_id, 'type':'tax', 'val':General.digit_formater(float(gen_tax1))})))
+                    await client.send_str('update_item:'+(json.dumps({'item_id':item_id, 'type':'taxDub', 'val':General.digit_formater(float(gen_tax2))})))
+                    await client.send_str('update_item:'+(json.dumps({'item_id':item_id, 'type':'gen_discont', 'val':General.digit_formater(float(genDiscont))})))
+                    await client.send_str('update_item:'+(json.dumps({'item_id':item_id, 'type':'gen_summa', 'val':General.digit_formater(float(genSumma))})))
+                    await client.send_str('update_item:'+(json.dumps({'item_id':item_id, 'type':'brutto', 'val':General.digit_formater(float((genSumma+(gen_tax1+gen_tax2))))})))               
+            # if (type == 'addtaxColapse')|(type == 'taxP')|(type == 'taxPDub'):
+            #     await Project.toTablesSumms(item_id, send, ws_clients)
+
+            # update = json.dumps({'table_id':table_id, 'toSumm':toSumm, 'altSumm':altSumm, 'toDiscont':toDiscont})
+            # for client in ws_clients:
+            #     await client.send_str('update_part_parametrs:'+update)
         return ''
 
+    @classmethod
+    async def checnge_count_percent(cls, unitPercent, dir, row_id, table_id, ws_clients):
+        async with database.query() as Q:
+            unitPercents = str(unitPercent).split(',')
+            if dir=='true':
+                newObjs = 'in'+str(row_id)
+                if unitPercents[-1]=="":
+                    unitPercents.append(newObjs)
+                    newObjs = (','.join(unitPercents))[1:]
+                else:
+                    unitPercents.append(newObjs)
+                    newObjs = (','.join(unitPercents))
+            else:
+                # print(unitPercents)
+                unitPercents.remove('in'+str(row_id))
+                newObjs = (','.join(unitPercents))
+            await (Q()
+                .tables(T.tables)
+                .where(T.tables.id == table_id)
+                .update({
+                    T.tables.obj: newObjs
+                }))
+            for client in ws_clients:
+                await client.send_str('checnge_count_percent:'+str(table_id))
+        return ''
+    
     @classmethod
     async def updateNameDevice(cls, device_name, id):
         async with database.query() as Q:
@@ -2461,11 +2924,24 @@ class Project:
         return ''
 
     @classmethod
-    async def del_part(cls, id):
+    async def table_delete(cls, id, item_id, ws_clients):
         async with database.query() as Q:
-                await (Q(T.tables)
+            await (Q(T.tables)
                     .where(T.tables.id == id)
                     .delete())
+            
+            await (Q(T.rows_for_table)
+                .where(T.rows_for_table.table_id == id)
+                .delete())
+            
+            for client in ws_clients:
+                await client.send_str('table_delete:'+str(id))
+            
+            await Project.toTablesSumms(item_id, True, ws_clients)
+
+            
+            
+            # await Projects.del_row_from_table(id, ws_clients)
         return ''
 
     @classmethod
@@ -2496,16 +2972,60 @@ class Project:
         return ''
 
     @classmethod
-    async def update_item(cls, val, type, id):
+    async def update_item(cls, val, type, id, ws_clients):
         async with database.query() as Q:
-                 await (Q()
+            await (Q()
                      .tables(T.items)
                      .where(T.items.id == id)
                      .update({
                          T.items[type]: val
                      }))
-        return ''
-    
+            if (type == 'gen_summa')|(type == 'gen_discont')|(type == 'tax')|(type == 'taxDub')|(type == 'brutto'):
+                val = General.digit_formater(float(val))
+            update = json.dumps({'item_id':id, 'type':type, 'val':val})
+
+            # print(update)
+            for client in ws_clients:
+                await client.send_str('update_item:'+(update))
+            if (type == 'addtaxColapse')|(type == 'taxP')|(type == 'taxPDub'):
+                await Project.toTablesSumms(id, True, ws_clients)
+
+    @classmethod
+    async def update_discont(cls, val, type, id, ws_clients):
+        async with database.query() as Q:
+            await (Q()
+                     .tables(T.items)
+                     .where(T.items.id == id)
+                     .update({
+                         T.items[type]: val
+                     }))
+            update = json.dumps({'item_id':id, 'type':type, 'val':val})
+
+            for client in ws_clients:
+                await client.send_str('update_item:'+(update))
+                
+            tables = (await Projects.get_tables_in_edit(id))
+            for table in tables:
+                rows = (await (Q()
+                .tables(T.rows_for_table)
+                .fields(
+                    T.rows_for_table.id,
+                    T.rows_for_table.count
+                ).where(T.rows_for_table.table_id == table['id'])
+                .selectall()))
+                for index, row in enumerate(rows):
+                    if (val=='P')|(val=='0'):
+                        await Project.update_table_data(table['id'], row['id'], 'without', None, index, False, ws_clients)
+                    result = await Project.update_for_summ(table['id'], row['id'], 'count', row['count'], index, id, False, ws_clients)
+                    for client in ws_clients:
+                        await client.send_str('updateFild:'+(result.split('|')[1]))
+                for client in ws_clients:
+                    await client.send_str('update_part_parametrs:'+(result.split('|')[0]))
+            for client in ws_clients:
+                await client.send_str('project_detail_new_f')
+            #update item! все суммы изменились
+
+
     @classmethod
     async def updatefilename(cls, val, type, id):
         async with database.query() as Q:
@@ -2850,7 +3370,10 @@ class Projects:
                     T.items.dateInspect,
                     T.items.ExamWorker,
                     T.items.comment,
-                    T.items.add_number
+                    T.items.add_number,
+                    T.items.gen_summa,
+                    T.items.gen_discont,
+                    T.items.brutto,
                 )
                 .where(T.items.project_id == id)
                 .selectall()))
@@ -2863,19 +3386,24 @@ class Projects:
                 )
                 .selectall()))
 
-            balance = ( await (Q()
-                .tables(T.rows_for_balance)
-                .fields(
-                    T.rows_for_balance.id,
-                    T.rows_for_balance.type,
-                    T.rows_for_balance.value,
-                    T.rows_for_balance.date,
-                    T.rows_for_balance.invoice_id
-                )
-                .selectall()))
+            # balance = ( await (Q()
+            #     .tables(T.rows_for_balance)
+            #     .fields(
+            #         T.rows_for_balance.id,
+            #         T.rows_for_balance.type,
+            #         T.rows_for_balance.value,
+            #         T.rows_for_balance.date,
+            #         T.rows_for_balance.invoice_id
+            #     )
+            #     .selectall()))
 
             for item in result:
-                
+                item['gen_summa'] = General.digit_formater(float(item['gen_summa']))
+                item['gen_discont'] = General.digit_formater(float(item['gen_discont']))
+                item['tax'] = General.digit_formater(float(item['tax']))
+                item['taxDub'] = General.digit_formater(float(item['taxDub']))
+                item['brutto'] = General.digit_formater(float(item['brutto']))
+
                 if (item['type'] == 'Damage Description'):
                    # print(item['type'])
                    result.remove(item)
@@ -2887,123 +3415,122 @@ class Projects:
                         if int(id[1]) == number['id']: 
                             item['contract_number']=number['number']
 
-            for item in result:
-                ops=[]
-                for bal in balance:
-                    if int(item['id']) == int(bal['invoice_id']): 
-                        ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
-                item['op'] = ops
+            # for item in result:
+            #     ops=[]
+            #     for bal in balance:
+            #         if int(item['id']) == int(bal['invoice_id']): 
+            #             ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
+            #     item['op'] = ops
  
-            cOffer=0
-            cCounract=0
+            # cOffer=0
+            # cCounract=0
             cDamage=0
 
             for item in result:    
-                if item['tax']==None:
-                    item['tax']='0,0'
-                if item['taxDub']==None:
-                    item['taxDub']='0,0'
-                if item['taxP']==None:
-                    item['taxP']='0,0'
-                if item['taxPDub']==None:
-                    item['taxPDub']='0,0'
-                if item['disc']==None:
-                    item['disc']='0,0'
-                if item['discP']==None:
-                    item['discP']='0,0'
-                if item['butDiscPerc']==None:
-                    item['butDiscPerc']='%'
-                if item['addtaxColapse']==None:
-                    item['addtaxColapse']='false'
+                # if item['tax']==None:
+                #     item['tax']='0,0'
+                # if item['taxDub']==None:
+                #     item['taxDub']='0,0'
+                # if item['taxP']==None:
+                #     item['taxP']='0,0'
+                # if item['taxPDub']==None:
+                #     item['taxPDub']='0,0'
+                # if item['disc']==None:
+                #     item['disc']='0,0'
+                # if item['discP']==None:
+                #     item['discP']='0,0'
+                # if item['butDiscPerc']==None:
+                #     item['butDiscPerc']='%'
+                # if item['addtaxColapse']==None:
+                #     item['addtaxColapse']='false'
 
-                tax=(item['tax'].replace(',', '.'))
-                taxDub=(item['taxDub'].replace(',', '.'))
-                taxP=(item['taxP'].replace(',', '.'))
-                taxPDub=(item['taxPDub'].replace(',', '.'))
-                disc=(item['disc'].replace(',', '.'))
-                discP=(item['discP'].replace(',', '.'))
-                butDiscPerc=item['butDiscPerc']
-                addtaxColapse=item['addtaxColapse']
+                # tax=(item['tax'].replace(',', '.'))
+                # taxDub=(item['taxDub'].replace(',', '.'))
+                # taxP=(item['taxP'].replace(',', '.'))
+                # taxPDub=(item['taxPDub'].replace(',', '.'))
+                # disc=(item['disc'].replace(',', '.'))
+                # discP=(item['discP'].replace(',', '.'))
+                # butDiscPerc=item['butDiscPerc']
+                # addtaxColapse=item['addtaxColapse']
 
-                netto = 0
-                addt = 0
-                addt2 = 0
-                tables =(await (Q()
-                        .tables(T.tables)
-                        .fields(
-                            T.tables.id,
-                            T.tables.name,
-                            T.tables.obj,
-                            T.tables.selected
-                        )
-                        .where(T.tables.item_id == item['id'])
-                        .selectall()))
-                add = 0
+                # netto = 0
+                # addt = 0
+                # addt2 = 0
+                # tables =(await (Q()
+                #         .tables(T.tables)
+                #         .fields(
+                #             T.tables.id,
+                #             T.tables.name,
+                #             T.tables.obj
+                #         )
+                #         .where(T.tables.item_id == item['id'])
+                #         .selectall()))
+                # add = 0
 
-                for subIndex, val in enumerate(tables):
-                    rows =(await (Q()
-                                .tables(T.rows_for_table)
-                                .fields(
-                                    T.rows_for_table.count,
-                                    T.rows_for_table.price,
-                                    T.rows_for_table.summa,
-                                    T.rows_for_table.status,
-                                    T.rows_for_table.alttax,
-                                    T.rows_for_table.without,
-                                    T.rows_for_table.unit
-                                )
-                                .where(T.rows_for_table.table_id == val['id'])
-                                .selectall()))
+                # for subIndex, val in enumerate(tables):
+                    # rows =(await (Q()
+                    #             .tables(T.rows_for_table)
+                    #             .fields(
+                    #                 T.rows_for_table.count,
+                    #                 T.rows_for_table.price,
+                    #                 T.rows_for_table.summa,
+                    #                 T.rows_for_table.status,
+                    #                 T.rows_for_table.alttax,
+                    #                 T.rows_for_table.without,
+                    #                 T.rows_for_table.unit
+                    #             )
+                    #             .where(T.rows_for_table.table_id == val['id'])
+                    #             .selectall()))
 
-                    for row in rows:
-                        if row['count']==None:
-                            row['count'] = '0'
-                        if row['price']==None:
-                            row['price'] = '0'
+                    # for row in rows:
+                    #     if row['count']==None:
+                    #         row['count'] = '0'
+                    #     if row['price']==None:
+                    #         row['price'] = '0'
 
-                        if row['unit']=='%':
+                    #     if row['unit']=='%':
                             # if row['count']==None:
                             #     row['count']=1
                             # if row['count']=='0':
                             #     row['count']=1
-                            row['price']=0
-                            summax = 0
+                            # row['price']=0
+                            # summax = 0
 
-                            for obj in val['obj'].split(','):
-                                selected = ['']
-                                if not '|' in val["selected"]:
-                                    if val["selected"]!='':
-                                        selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
-                                        if ('temp' + str(subIndex + 1)) in selected[obj]:
+                            # for obj in val['obj'].split(','):
+                                # selected = ['']
+                                # if not '|' in val["selected"]:
+                                #     if val["selected"]!='':
+                                #         selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
+                                #         if ('temp' + str(subIndex + 1)) in selected[obj]:
 
-                                            for val in selected[obj].split(','):
+                                #             for val in selected[obj].split(','):
 
-                                                val = val.split('temp')
-                                                val[1]=int(val[1])-1
+                                #                 val = val.split('temp')
+                                #                 val[1]=int(val[1])-1
 
-                                                countx = 0
-                                                pricex = 0
+                                #                 countx = 0
+                                #                 pricex = 0
                                                 
-                                                countx = rows[val[1]]['count'] 
-                                                pricex = rows[val[1]]['price']
+                                #                 countx = rows[val[1]]['count'] 
+                                #                 pricex = rows[val[1]]['price']
 
-                                                summax += float(countx) * float(pricex)
+                                #                 summax += float(countx) * float(pricex)
                                
-                            row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
+                            # row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
                             # print(persent_from_summa)
                             # print(persent_from_summa / float(rows[(subIndex)]['count']))
                                 
                             # print(rows[(subIndex)]['price'])
                             
-                            row['count']=1
-                        if row['status']=='yes':
+                        #     row['count']=1
+                        # if row['status']=='yes':
                             
-                            try:
-                               a = float(row['price'])
-                            except ValueError:
-                               row['price'] = 0
+                        #     try:
+                        #        a = float(row['price'])
+                        #     except ValueError:
+                        #        row['price'] = 0
 
-                            netto += (float(row['count'])*float(row['price']))
+                        #     netto += (float(row['count'])*float(row['price']))
 
 
 
@@ -3013,38 +3540,38 @@ class Projects:
                             # print(str(row['count'])+'*'+str(row['unit'])+'*'+str(row['price'])+'='+str(float(row['count'])+'*'+str(row['unit'])+'*'+float(row['price'])))
 
 
-                            if row['without']=='true':
-                                add += (float(row['count'])*float(row['price']) / 100) * float(discP)
+                            # if row['without']=='true':
+                            #     add += (float(row['count'])*float(row['price']) / 100) * float(discP)
 
-                            # print(row['alttax'])
-                            if row['alttax']!='true':
-                                addt += (float(row['count'])*float(row['price']))
-                            else:
-                                addt2 += (float(row['count'])*float(row['price']))
+                            # # print(row['alttax'])
+                            # if row['alttax']!='true':
+                            #     addt += (float(row['count'])*float(row['price']))
+                            # else:
+                            #     addt2 += (float(row['count'])*float(row['price']))
 
 
 
            
-                if netto==0:
-                    netto=1
-                if butDiscPerc=='%':
-                    # print(netto, add)
-                    # netto = netto + add
+                # if netto==0:
+                #     netto=1
+                # if butDiscPerc=='%':
+                #     # print(netto, add)
+                #     # netto = netto + add
 
-                    item['netto']=str(netto-(netto/100*float(discP)))
-                    # print(item['netto'])
-                    item['netto']=float(item['netto'])+add
-                    # print(item['netto'], add)
+                #     item['netto']=str(netto-(netto/100*float(discP)))
+                #     # print(item['netto'])
+                #     item['netto']=float(item['netto'])+add
+                #     # print(item['netto'], add)
 
-                    addt = addt-(addt/100)*float(discP)
-                    addt2 = addt2-(addt2/100)*float(discP)
+                #     addt = addt-(addt/100)*float(discP)
+                #     addt2 = addt2-(addt2/100)*float(discP)
                 
-                else:
+                # else:
 
-                    item['netto']=str(netto-float(discP))
+                #     item['netto']=str(netto-float(discP))
                     
-                    addt = addt-(addt/100)*float(discP)*100/netto
-                    addt2 = addt2-(addt2/100)*float(discP)*100/netto
+                #     addt = addt-(addt/100)*float(discP)*100/netto
+                #     addt2 = addt2-(addt2/100)*float(discP)*100/netto
                 
                 #addt = addt2 = 0
                 # item['netto']=0
@@ -3052,7 +3579,7 @@ class Projects:
                 #tmpTax = (addt * (float(taxP) / 100))
                 #tmpTax2= (addt2 * (float(taxPDub) / 100))
     
-                item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
+                # item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
                 
 
 
@@ -3097,11 +3624,32 @@ class Projects:
             return result
 
     @classmethod
-    async def del_row_from_table(cls, id):
+    async def del_row_from_table(cls, table_id, index, id, item_id, ws_clients):
         async with database.query() as Q:
-            return await (Q(T.rows_for_table)
-                    .where(T.rows_for_table.id == id)
-                    .delete())
+            rows_for_summa = (await (Q()
+                    .tables(T.rows_for_table)
+                    .fields(
+                        T.rows_for_table.id,
+                        T.rows_for_table.unit,
+                        T.rows_for_table.summa_without_discont,
+                        T.rows_for_table.status,
+                        T.rows_for_table.summa,
+                        T.rows_for_table.without,
+                    ).where(T.rows_for_table.table_id == table_id)
+                    .selectall()))
+              
+            if (rows_for_summa[int(index)]['unit']=='%'):
+                await Project.checnge_count_percent('in'+str(rows_for_summa[int(index)]['id']), 'else', id, table_id, ws_clients)
+                await Project.chenge_unit_type(table_id, id, '-', index, item_id, ws_clients)
+            else:
+                await Project.update_for_summ(table_id, id, 'count', 0, index, item_id, True, ws_clients)
+            
+            await (Q(T.rows_for_table)
+                .where(T.rows_for_table.id == id)
+                .delete())
+            
+            for client in ws_clients:
+                await client.send_str('del_row:'+str(table_id))
 
     classmethod #first function on python
     async def change(old, new):
@@ -3131,8 +3679,7 @@ class Projects:
                     .tables(T.tables)
                     .fields(
                         T.tables.id,
-                        T.tables.obj,
-                        T.tables.selected
+                        T.tables.obj
                     )
                     .where((T.tables.id == newPart))
                     .selectone()))
@@ -3169,21 +3716,21 @@ class Projects:
 
                     selected_group_new = selected_group_new + ',temp'+str(new_select_index)
                 
-                if index == 0:
-                    add = ''
-                else:
-                    add = '|'
+                # if index == 0:
+                #     add = ''
+                # else:
+                #     add = '|'
 
-                after_selected = after_selected + add +'in' + str(index) + ':' + str(selected_group_new)
-                after_selected = after_selected.replace(':,', ':')
-                after_selected = after_selected.replace(':,', ':')
+                # after_selected = after_selected + add +'in' + str(index) + ':' + str(selected_group_new)
+                # after_selected = after_selected.replace(':,', ':')
+                # after_selected = after_selected.replace(':,', ':')
 
-            await (Q()
-                     .tables(T.tables)
-                     .where(T.tables.id == newPart)
-                     .update({
-                         T.tables.selected: after_selected
-                     }))
+            # await (Q()
+            #          .tables(T.tables)
+            #          .where(T.tables.id == newPart)
+            #          .update({
+            #              T.tables.selected: after_selected
+            #          }))
 
             oldrows =(await (Q()
                 .tables(T.rows_for_table)
@@ -3250,8 +3797,7 @@ class Projects:
                     .tables(T.tables)
                     .fields(
                         T.tables.id,
-                        T.tables.obj,
-                        T.tables.selected
+                        T.tables.obj
                     )
                     .where((T.tables.id == oldPart))
                     .selectone()))
@@ -3259,15 +3805,15 @@ class Projects:
             el = int(oldIndex)+1
             el = ',temp' + str(el)
             oldselected = str(table['selected'])
-            after_selected = oldselected.replace(el, '')
+            # after_selected = oldselected.replace(el, '')
             # print(after_selected)
 
-            await (Q()
-                     .tables(T.tables)
-                     .where(T.tables.id == oldPart)
-                     .update({
-                         T.tables.selected: after_selected
-                     }))
+            # await (Q()
+            #          .tables(T.tables)
+            #          .where(T.tables.id == oldPart)
+            #          .update({
+            #              T.tables.selected: after_selected
+            #          }))
 
             newrows =(await (Q()
                 .tables(T.rows_for_table)
@@ -3390,238 +3936,346 @@ class Projects:
                  }))
         return ''
 
+    # @classmethod
+    # async def get_tables(cls, id):
+    #     async with database.query() as Q:
+    #         item = (await (Q()
+    #         .tables(T.items)
+    #         .fields(
+    #                 T.items.tax,
+    #                 T.items.taxDub,
+    #                 T.items.taxP,
+    #                 T.items.taxPDub,
+    #                 T.items.disc,
+    #                 T.items.discP,
+    #                 T.items.butDiscPerc,
+    #                 T.items.addtaxColapse,
+    #                 T.items.comment
+
+    #             )
+    #         .where(T.items.id == id)
+    #         .selectone()))
+    #         if item==None:
+    #             item = {'tax':'0,0','taxDub':'0,0', 'taxP':'0,0', 'taxPDub':'0,0','disc':'0,0', 'discP':'0,0', 'butDiscPerc':'%', 'addtaxColapse':'false'}
+
+    #         if item['tax']==None:
+    #                 item['tax']='0,0'
+    #         if item['taxDub']==None:
+    #                 item['taxDub']='0,0'
+    #         if item['taxP']==None:
+    #                 item['taxP']='0,0'
+    #         if item['taxPDub']==None:
+    #                 item['taxPDub']='0,0'
+    #         if item['disc']==None:
+    #                 item['disc']='0,0'
+    #         if item['discP']==None:
+    #                 item['discP']='0,0'
+    #         if item['butDiscPerc']==None:
+    #                 item['butDiscPerc']='%'
+    #         if item['addtaxColapse']==None:
+    #                 item['addtaxColapse']='false'
+
+    #         tax=(item['tax'].replace(',', '.'))
+    #         taxDub=(item['taxDub'].replace(',', '.'))
+    #         taxP=(item['taxP'].replace(',', '.'))
+    #         taxPDub=(item['taxPDub'].replace(',', '.'))
+    #         disc=(item['disc'].replace(',', '.'))
+    #         discP=(item['discP'].replace(',', '.'))
+    #         butDiscPerc=item['butDiscPerc']
+    #         addtaxColapse=item['addtaxColapse']
+
+    #         partx = []
+    #         tables =(await (Q()
+    #                 .tables(T.tables)
+    #                 .fields(
+    #                     T.tables.id,
+    #                     T.tables.name,
+    #                     T.tables.device,
+    #                     T.tables.obj,
+    #                     T.tables.selected
+    #                 )
+    #                 .where(T.tables.item_id == id)
+    #                 .selectall()))
+             
+    #         for val in tables:                
+    #             rows =(await (Q()
+    #                         .tables(T.rows_for_table)
+    #                         .fields(
+    #                             T.rows_for_table.id,
+    #                             T.rows_for_table.table_id,
+    #                             T.rows_for_table.count,
+    #                             T.rows_for_table.status,
+    #                             T.rows_for_table.alttax,
+    #                             T.rows_for_table.summa,
+    #                             T.rows_for_table.unit,
+    #                             T.rows_for_table.without,
+    #                             T.rows_for_table.done,
+    #                             T.rows_for_table.description_head,
+    #                             T.rows_for_table.description_work,
+    #                             T.rows_for_table.description_from_price,
+    #                             T.rows_for_table.discount,
+    #                             T.rows_for_table.position_number,
+    #                             T.rows_for_table.description_from_price,
+    #                             T.rows_for_table.price,
+    #                             T.rows_for_table.id
+    #                         )
+    #                         .where(T.rows_for_table.table_id == val['id'])
+    #                         .selectall()))
+
+    #             rows_reports =(await (Q()
+    #                         .tables(T.rows_for_reports)
+    #                         .fields(
+    #                             T.rows_for_reports.id,
+    #                             T.rows_for_reports.table_id,
+    #                             T.rows_for_reports.pos_num,
+    #                             T.rows_for_reports.date,
+    #                             T.rows_for_reports.service,
+    #                             T.rows_for_reports.time,
+    #                             T.rows_for_reports.workers,
+    #                             T.rows_for_reports.id
+    #                         )
+    #                         .where(T.rows_for_reports.table_id == val['id'])
+    #                         .selectall()))
+
+    #             rows_devices =(await (Q()
+    #                         .tables(T.rows_for_devices)
+    #                         .fields(
+    #                             T.rows_for_devices.id,
+    #                             T.rows_for_devices.table_id,
+    #                             T.rows_for_devices.pos_num,
+    #                             T.rows_for_devices.designation,
+    #                             T.rows_for_devices.kilowatt,
+    #                             T.rows_for_devices.comment,
+    #                             T.rows_for_devices.time,
+    #                             T.rows_for_devices.manufacturer,
+    #                             T.rows_for_devices.serial,
+    #                             T.rows_for_devices.order,
+    #                             T.rows_for_devices.check_date,
+    #                             T.rows_for_devices.next_check_date,
+    #                             T.rows_for_devices.sdate,
+    #                             T.rows_for_devices.sworker,
+    #                             T.rows_for_devices.smReading,
+    #                             T.rows_for_devices.fdate,
+    #                             T.rows_for_devices.fworker,
+    #                             T.rows_for_devices.fmReading,
+    #                             T.rows_for_devices.location
+    #                         )
+    #                         .where(T.rows_for_devices.table_id == val['id'])
+    #                         .selectall()))
+
+    #             rows_measurement =(await (Q()
+    #                         .tables(T.measure_protocol)
+    #                         .fields(
+    #                             T.measure_protocol.id,
+    #                             T.measure_protocol.table_id,
+    #                             T.measure_protocol.room,
+    #                             T.measure_protocol.install_surface,
+    #                             T.measure_protocol.install_deep,
+    #                             T.measure_protocol.uninstall_surface,
+    #                             T.measure_protocol.uninstall_deep
+    #                         )
+    #                         .where(T.measure_protocol.table_id == val['id'])
+    #                         .selectall()))
+
+    #             rows_damage =(await (Q()
+    #                         .tables(T.damage)
+    #                         .fields(
+    #                             T.damage.id,
+    #                             T.damage.table_id,
+    #                             T.damage.imgId,
+    #                             T.damage.name,
+    #                             T.damage.desc,
+    #                             T.damage.schema
+    #                         )
+    #                         .where(T.damage.table_id == val['id'])
+    #                         .selectall()))
+
+    #             flavours={}
+    #             objNone={}
+    #             disable=[]
+    #             selResults={}
+    #             if val['obj'] is not None:
+                    
+    #                 for obj in val['obj'].split(','):
+    #                     count=0
+    #                     objs=[]
+
+    #                     for row in rows:
+    #                         row['upHere']=False
+    #                         count=count+1
+    #                         objs.append('temp'+str(count))
+
+    #                         if row['done']==None:
+    #                             row['done']=''
+    #                         if row['done']=='false':
+    #                             row['done']=''
+    #                         if row['alttax']=='true':
+    #                             row['alttax']=True
+    #                         if row['alttax']=='false':
+    #                             row['alttax']=False
+
+    #                         if row['without']=='true':
+    #                             row['without']=True
+    #                         else:
+    #                             row['without']=False
+                           
+    #                     flavours[obj]=objs
+    #                     objNone[obj]=False
+
+    #                 selResults={}
+    #                 for sel in val['selected'].split('|'):
+
+    #                     select = sel.split(':')
+    #                     if len(select)==2:
+    #                         if select[1]=='':
+    #                             select=''
+    #                         if len(select)>0:
+    #                             selResults[select[0]]=select[1].split(',')
+    #                             for dis in select[1].split(','):
+    #                                 disRow = dis.split('temp')[1]
+    #                                 disRow = select[0]+'-'+str(int(disRow)-1)
+    #                                 disable.append(disRow)
+
+    #                     else:
+    #                         flavours={}
+    #                         objNone={}
+    #             # print(disable)
+    #             # print(flavours)
+
+    #             for rowDev in rows_devices:
+    #                 rowDev['subEquel'] = (await (Q()
+    #                         .tables(T.measurement)
+    #                         .fields(
+    #                             T.measurement.id,
+    #                             T.measurement.date,
+    #                             T.measurement.worker,
+    #                             T.measurement.mReading,
+    #                         )
+    #                         .where(T.measurement.rows_for_devices == rowDev['id'])
+    #                         .selectall()))
+
+    #             partx.append({'parts':{'id': val['id'], 'part_name': val['name'], 'part_name_device': val['device'], 'toggle': False,
+    #                                     'checkbox_list':{
+    #                                         'disable':disable,
+    #                                         'flavours':flavours,
+    #                                         'selected':selResults,
+    #                                         'allSelected':objNone,
+    #                                         'indeterminate':objNone
+    #                                     },
+    #                                     'part_content':rows,'devices_content':rows_devices,'measure_protocol':rows_measurement,
+    #                                     'damage_content':rows_damage,'reports_content':rows_reports}})
+    #         #print(item['butDiscPerc'])
+    #         partx.append({'taxs' : item})
+    #         return partx
+        
     @classmethod
-    async def get_tables(cls, id):
+    async def get_tables_for_docs(cls, id):
         async with database.query() as Q:
-            item = (await (Q()
-            .tables(T.items)
-            .fields(
-                    T.items.tax,
-                    T.items.taxDub,
-                    T.items.taxP,
-                    T.items.taxPDub,
-                    T.items.disc,
-                    T.items.discP,
-                    T.items.butDiscPerc,
-                    T.items.addtaxColapse,
-                    T.items.comment
-
-                )
-            .where(T.items.id == id)
-            .selectone()))
-            if item==None:
-                item = {'tax':'0,0','taxDub':'0,0', 'taxP':'0,0', 'taxPDub':'0,0','disc':'0,0', 'discP':'0,0', 'butDiscPerc':'%', 'addtaxColapse':'false'}
-
-            if item['tax']==None:
-                    item['tax']='0,0'
-            if item['taxDub']==None:
-                    item['taxDub']='0,0'
-            if item['taxP']==None:
-                    item['taxP']='0,0'
-            if item['taxPDub']==None:
-                    item['taxPDub']='0,0'
-            if item['disc']==None:
-                    item['disc']='0,0'
-            if item['discP']==None:
-                    item['discP']='0,0'
-            if item['butDiscPerc']==None:
-                    item['butDiscPerc']='%'
-            if item['addtaxColapse']==None:
-                    item['addtaxColapse']='false'
-
-            tax=(item['tax'].replace(',', '.'))
-            taxDub=(item['taxDub'].replace(',', '.'))
-            taxP=(item['taxP'].replace(',', '.'))
-            taxPDub=(item['taxPDub'].replace(',', '.'))
-            disc=(item['disc'].replace(',', '.'))
-            discP=(item['discP'].replace(',', '.'))
-            butDiscPerc=item['butDiscPerc']
-            addtaxColapse=item['addtaxColapse']
-
             partx = []
             tables =(await (Q()
                     .tables(T.tables)
                     .fields(
                         T.tables.id,
                         T.tables.name,
-                        T.tables.device,
-                        T.tables.obj,
-                        T.tables.selected
                     )
                     .where(T.tables.item_id == id)
                     .selectall()))
-             
             for val in tables:                
-                rows =(await (Q()
-                            .tables(T.rows_for_table)
-                            .fields(
-                                T.rows_for_table.id,
-                                T.rows_for_table.table_id,
-                                T.rows_for_table.count,
-                                T.rows_for_table.status,
-                                T.rows_for_table.alttax,
-                                T.rows_for_table.summa,
-                                T.rows_for_table.unit,
-                                T.rows_for_table.without,
-                                T.rows_for_table.done,
-                                T.rows_for_table.description_head,
-                                T.rows_for_table.description_work,
-                                T.rows_for_table.description_from_price,
-                                T.rows_for_table.discount,
-                                T.rows_for_table.position_number,
-                                T.rows_for_table.description_from_price,
-                                T.rows_for_table.price,
-                                T.rows_for_table.id
-                            )
-                            .where(T.rows_for_table.table_id == val['id'])
-                            .selectall()))
-
-                rows_reports =(await (Q()
-                            .tables(T.rows_for_reports)
-                            .fields(
-                                T.rows_for_reports.id,
-                                T.rows_for_reports.table_id,
-                                T.rows_for_reports.pos_num,
-                                T.rows_for_reports.date,
-                                T.rows_for_reports.service,
-                                T.rows_for_reports.time,
-                                T.rows_for_reports.workers,
-                                T.rows_for_reports.id
-                            )
-                            .where(T.rows_for_reports.table_id == val['id'])
-                            .selectall()))
-
-                rows_devices =(await (Q()
-                            .tables(T.rows_for_devices)
-                            .fields(
-                                T.rows_for_devices.id,
-                                T.rows_for_devices.table_id,
-                                T.rows_for_devices.pos_num,
-                                T.rows_for_devices.designation,
-                                T.rows_for_devices.kilowatt,
-                                T.rows_for_devices.comment,
-                                T.rows_for_devices.time,
-                                T.rows_for_devices.manufacturer,
-                                T.rows_for_devices.serial,
-                                T.rows_for_devices.order,
-                                T.rows_for_devices.check_date,
-                                T.rows_for_devices.next_check_date,
-                                T.rows_for_devices.sdate,
-                                T.rows_for_devices.sworker,
-                                T.rows_for_devices.smReading,
-                                T.rows_for_devices.fdate,
-                                T.rows_for_devices.fworker,
-                                T.rows_for_devices.fmReading,
-                                T.rows_for_devices.location
-                            )
-                            .where(T.rows_for_devices.table_id == val['id'])
-                            .selectall()))
-
-                rows_measurement =(await (Q()
-                            .tables(T.measure_protocol)
-                            .fields(
-                                T.measure_protocol.id,
-                                T.measure_protocol.table_id,
-                                T.measure_protocol.room,
-                                T.measure_protocol.install_surface,
-                                T.measure_protocol.install_deep,
-                                T.measure_protocol.uninstall_surface,
-                                T.measure_protocol.uninstall_deep
-                            )
-                            .where(T.measure_protocol.table_id == val['id'])
-                            .selectall()))
-
-                rows_damage =(await (Q()
-                            .tables(T.damage)
-                            .fields(
-                                T.damage.id,
-                                T.damage.table_id,
-                                T.damage.imgId,
-                                T.damage.name,
-                                T.damage.desc,
-                                T.damage.schema
-                            )
-                            .where(T.damage.table_id == val['id'])
-                            .selectall()))
-
-                flavours={}
-                objNone={}
-                disable=[]
-                selResults={}
-                if val['obj'] is not None:
-                    
-                    for obj in val['obj'].split(','):
-                        count=0
-                        objs=[]
-
-                        for row in rows:
-                            row['upHere']=False
-                            count=count+1
-                            objs.append('temp'+str(count))
-
-                            if row['done']==None:
-                                row['done']=''
-                            if row['done']=='false':
-                                row['done']=''
-                            if row['alttax']=='true':
-                                row['alttax']=True
-                            if row['alttax']=='false':
-                                row['alttax']=False
-
-                            if row['without']=='true':
-                                row['without']=True
-                            else:
-                                row['without']=False
-                           
-                        flavours[obj]=objs
-                        objNone[obj]=False
-
-                    selResults={}
-                    for sel in val['selected'].split('|'):
-
-                        select = sel.split(':')
-                        if len(select)==2:
-                            if select[1]=='':
-                                select=''
-                            if len(select)>0:
-                                selResults[select[0]]=select[1].split(',')
-                                for dis in select[1].split(','):
-                                    disRow = dis.split('temp')[1]
-                                    disRow = select[0]+'-'+str(int(disRow)-1)
-                                    disable.append(disRow)
-
-                        else:
-                            flavours={}
-                            objNone={}
-                # print(disable)
-                # print(flavours)
-
-                for rowDev in rows_devices:
-                    rowDev['subEquel'] = (await (Q()
-                            .tables(T.measurement)
-                            .fields(
-                                T.measurement.id,
-                                T.measurement.date,
-                                T.measurement.worker,
-                                T.measurement.mReading,
-                            )
-                            .where(T.measurement.rows_for_devices == rowDev['id'])
-                            .selectall()))
-
-                partx.append({'parts':{'id': val['id'], 'part_name': val['name'], 'part_name_device': val['device'], 'toggle': False,
-                                        'checkbox_list':{
-                                            'disable':disable,
-                                            'flavours':flavours,
-                                            'selected':selResults,
-                                            'allSelected':objNone,
-                                            'indeterminate':objNone
-                                        },
-                                        'part_content':rows,'devices_content':rows_devices,'measure_protocol':rows_measurement,
-                                        'damage_content':rows_damage,'reports_content':rows_reports}})
-            #print(item['butDiscPerc'])
-            partx.append({'taxs' : item})
+                partx.append({'parts':{'id': val['id'], 'part_name': val['name']}})
             return partx
+        
+    @classmethod
+    async def get_tables_in_edit(cls, id):
+        async with database.query() as Q:
+            tables = (await (Q()
+                    .tables(T.tables)
+                    .fields(
+                        T.tables.id,
+                        T.tables.name,
+                        T.tables.obj,
+                        T.tables.summa,
+                        T.tables.alt_summa,
+                        T.tables.discont
+                    )
+                    .where(T.tables.item_id == id)
+                    .selectall()))
+        
+            for row in tables:
+                row['summa'] = General.digit_formater(float(row['summa']))
+                row['alt_summa'] = General.digit_formater(float(row['alt_summa']))
+                row['discont'] = General.digit_formater(float(row['discont']))
+            return tables
+            # tables_with_unit_percent = []
+            # for val in tables:                
+            #     unitPercent={}
+            #     objNone={}
+            #     disable=[]
+            #     selResults={}
+            #     if val['obj'] is not None:
+            #         for obj in val['obj'].split(','):
+            #             count=0
+            #             objs=[]
+            #             unitPercent[obj]=objs
+            #             objNone[obj]=False
+            #         selResults={}
+            #         for sel in val['selected'].split('|'):
+            #             select = sel.split(':')
+            #             if len(select)==2:
+            #                 if select[1]=='':
+            #                     select=''
+            #                 if len(select)>0:
+            #                     selResults[select[0]]=select[1].split(',')
+            #                     for dis in select[1].split(','):
+            #                         disRow = dis.split('temp')[1]
+            #                         disRow = select[0]+'-'+str(int(disRow)-1)
+            #                         disable.append(disRow)
+            #             else:
+            #                 unitPercent={}
+            #                 objNone={}
+            #     tables_with_unit_percent.append({'id': val['id'], 'name':val['name'],
+            #         'checkbox_list':({
+            #             'disable':disable,
+            #             'unitPercent':unitPercent,
+            #             'selected':selResults,
+            #             'allSelected':objNone,
+            #             'indeterminate':objNone
+            #         })})
 
+            # return tables_with_unit_percent
+
+    @classmethod
+    async def get_rows_in_table(cls, id):
+        async with database.query() as Q:
+            rows_table =  (await (Q()
+                .tables(T.rows_for_table)
+                .fields(
+                    T.rows_for_table.id,
+                    T.rows_for_table.table_id,
+                    T.rows_for_table.count,
+                    T.rows_for_table.status,
+                    T.rows_for_table.alttax,
+                    T.rows_for_table.summa,
+                    T.rows_for_table.unit,
+                    T.rows_for_table.without,
+                    T.rows_for_table.done,
+                    T.rows_for_table.description_head,
+                    T.rows_for_table.description_work,
+                    T.rows_for_table.description_from_price,
+                    T.rows_for_table.position_number,
+                    T.rows_for_table.description_from_price,
+                    T.rows_for_table.price,
+                    T.rows_for_table.checked_for_percent,
+                    T.rows_for_table.id
+                )
+                .where(T.rows_for_table.table_id == id)
+                .selectall()))
+            for row in rows_table:
+                row['price'] = General.digit_formater(float(row['price']))
+                row['summa'] = General.digit_formater(float(row['summa']))
+                # row['count'] = General.digit_formater(float(row['count']))
+            return rows_table
+
+             
     @classmethod
     async def update_checkbox_table(cls, uid, fild, data):
 
@@ -4088,7 +4742,10 @@ class Projects:
                     T.items.dateInspect,
                     T.items.ExamWorker,
                     T.items.comment,
-                    T.items.insurname
+                    T.items.insurname,
+                    T.items.gen_summa,
+                    T.items.gen_discont,
+                    T.items.brutto
                 )
                 .where(T.items.id == id)
                 .selectone()))
@@ -4165,7 +4822,7 @@ class Projects:
                             new_offer_number = int(itmes_numbers[index]['add_number'])+1
                         except TypeError:
                             new_offer_number = 1
-
+            #начало копирования item
             await (Q()
                 .tables(T.items)
                 .insert({
@@ -4192,7 +4849,10 @@ class Projects:
                     T.items.ExamWorker:selected_for_item_copy['ExamWorker'],
                     T.items.comment:selected_for_item_copy['comment'],
                     T.items.insurname:selected_for_item_copy['insurname'],
-                    T.items.add_number:new_offer_number
+                    T.items.add_number:new_offer_number,
+                    T.items.gen_summa:selected_for_item_copy['gen_summa'],
+                    T.items.gen_discont:selected_for_item_copy['gen_discont'],
+                    T.items.brutto:selected_for_item_copy['brutto']
                 }))
             
             selected_for_table_copy = (await (Q()
@@ -4202,27 +4862,22 @@ class Projects:
                     T.tables.name,
                     T.tables.item_id,
                     T.tables.obj,
-                    T.tables.selected,
-                    T.tables.device
+                    T.tables.device,
+                    T.tables.summa,
+                    T.tables.alt_summa,
+                    T.tables.discont
                 )
                 .where(T.tables.item_id == id)
                 .selectall()))
+            #скопированны все таблицы item
+            
             for table in selected_for_table_copy:
                 new_table_id = None
                 new_table_id  = (await General.new_id(T.tables, 'id'))
-                await (Q()
-                    .tables(T.tables)
-                    .insert({
-                        T.tables.id:new_table_id,
-                        T.tables.name:table['name'],
-                        T.tables.item_id:new_item_id,
-                        T.tables.obj:table['obj'],
-                        T.tables.selected:table['selected'],
-                        T.tables.device:table['device']
-                    }))
                 selected_for_rows_copy = (await (Q()
                     .tables(T.rows_for_table)
                     .fields(
+                        T.rows_for_table.id,
                         T.rows_for_table.count,
                         T.rows_for_table.status,
                         T.rows_for_table.alttax,
@@ -4233,39 +4888,81 @@ class Projects:
                         T.rows_for_table.description_head,
                         T.rows_for_table.description_work,
                         T.rows_for_table.description_from_price,
-                        T.rows_for_table.discount,
                         T.rows_for_table.position_number,
                         T.rows_for_table.price,
-                        T.rows_for_table.table_id
+                        T.rows_for_table.checked_for_percent,
+                        T.rows_for_table.table_id,
+                        T.rows_for_table.summa_without_discont
                     )
                     .where(T.rows_for_table.table_id == table['id'])
                     .selectall()))
-                list_ids, lenItems = ((await General.new_list_ids(T.rows_for_table, 'id')))
+                
+
+                list_ids, lastIndex = ((await General.new_list_ids(T.rows_for_table, 'id')))
+                old_id_percent = []
+                new_id_percent = []
                 for index, row in enumerate(selected_for_rows_copy):
                     if (len(list_ids)-(index+1)) <= 0: 
-                        new_row_id = lenItems+index+2
+                        new_row_id = lastIndex+index
                     else:
                         new_row_id  = list_ids[index]
-                    await (Q()
-                        .tables(T.rows_for_table)
-                        .insert({
-                        T.rows_for_table.id:new_row_id,
-                        T.rows_for_table.count:row['count'],
-                        T.rows_for_table.status:row['status'],
-                        T.rows_for_table.alttax:row['alttax'],
-                        T.rows_for_table.summa:row['summa'],
-                        T.rows_for_table.unit:row['unit'],
-                        T.rows_for_table.without:row['without'],
-                        T.rows_for_table.done:row['done'],
-                        T.rows_for_table.description_head:row['description_head'],
-                        T.rows_for_table.description_work:row['description_work'],
-                        T.rows_for_table.description_from_price:row['description_from_price'],
-                        T.rows_for_table.discount:row['discount'],
-                        T.rows_for_table.position_number:row['position_number'],
-                        T.rows_for_table.price:row['price'],
-                        T.rows_for_table.table_id:new_table_id,
+                        
+                    if row['unit']=='%':#замена галочек при процентах
+                        old_id_percent.append(row['id'])
+                        new_id_percent.append(new_row_id)
+                objs = []
+                for index_obj, obj in enumerate(old_id_percent):
+                    objs.append('in'+str(new_id_percent[index_obj]))
+                table['obj'] = ','.join(objs) # замена идентификаторов процентов в таблице
+
+                for index, row in enumerate(selected_for_rows_copy):
+                    if (len(list_ids)-(index+1)) <= 0:
+                        new_row_id = lastIndex+index
+                    else:
+                        new_row_id  = list_ids[index]
+
+                    for index_obj, obj in enumerate(old_id_percent):
+                        if row['checked_for_percent'] == 'in'+str(obj):
+                            row['checked_for_percent']='in'+str(new_id_percent[index_obj])
+                    
+                    try:
+                        await (Q()
+                            .tables(T.rows_for_table)
+                            .insert({
+                            T.rows_for_table.id:new_row_id,
+                            T.rows_for_table.count:row['count'],
+                            T.rows_for_table.status:row['status'],
+                            T.rows_for_table.alttax:row['alttax'],
+                            T.rows_for_table.summa:row['summa'],
+                            T.rows_for_table.unit:row['unit'],
+                            T.rows_for_table.without:row['without'],
+                            T.rows_for_table.done:row['done'],
+                            T.rows_for_table.description_head:row['description_head'],
+                            T.rows_for_table.description_work:row['description_work'],
+                            T.rows_for_table.description_from_price:row['description_from_price'],
+                            T.rows_for_table.position_number:row['position_number'],
+                            T.rows_for_table.price:row['price'],
+                            T.rows_for_table.checked_for_percent:row['checked_for_percent'],
+                            T.rows_for_table.table_id:new_table_id,
+                            T.rows_for_table.summa_without_discont:row['summa_without_discont']
                         }))
-            return ''
+                    except:
+                        print('Duplicate entry Change_Type')
+
+
+                await (Q()
+                    .tables(T.tables)
+                    .insert({
+                        T.tables.id:new_table_id,
+                        T.tables.name:table['name'],
+                        T.tables.item_id:new_item_id,
+                        T.tables.obj:table['obj'],
+                        T.tables.device:table['device'],
+                        T.tables.summa:table['summa'],
+                        T.tables.alt_summa:table['alt_summa'],
+                        T.tables.discont:table['discont']
+                    }))
+
 
 
             
@@ -4575,13 +5272,13 @@ class Invoice:
             types = ( await (Q()
                 .tables(T.type_for_table)
                 .fields(
-                T.type_for_table.id 
+                    T.type_for_table.id 
                 )
                 .where(T.type_for_table.type == type)
                 .selectone())
             )
-            print('опредиление типов')         
-            print(types)
+            # print('опредиление типов')         
+            # print(types)
 
             result = ( await (Q()
                 .tables(T.items)
@@ -4604,11 +5301,14 @@ class Invoice:
                     T.items.disc,
                     T.items.discP,
                     T.items.butDiscPerc,
-                    T.items.addtaxColapse
-                    )
+                    T.items.addtaxColapse,
+                    T.items.gen_summa,
+                    T.items.gen_discont,
+                    T.items.brutto
+                ))
                 .where(T.items.id == id)
                 .selectone())
-             )
+
             if remove == 1:
                 newNuber = result['number'].split(' ')[1]
                 maskNumber = newNuber
@@ -4617,11 +5317,23 @@ class Invoice:
                 oldInvoiceNumber = maskNumber
             
             # autoText['content'] = labelForDelete+': '+oldInvoiceNumber+'<br><br><br>'+autoText['content']
-            print('Скопированный item')         
-            print(result)
+            # print('Скопированный item')         
+            # print(result)
             # number_documents = result['number']+' '+str(result['id'])
             number_documents = result['number'].split('-')[0]+'-'+datetime.datetime.now().strftime("%Y")+' '+str(result['id'])
-            
+            if remove == 1:
+                gen_summa  = '-'+result['gen_summa']
+                gen_discont  = '-'+result['gen_discont']
+                brutto  = '-'+result['brutto']
+                tax  = '-'+result['tax']
+                taxDub  = '-'+result['taxDub']
+
+            if remove == 0:
+                gen_summa  = result['gen_summa']
+                gen_discont  = result['gen_discont']
+                brutto  = result['brutto']
+                tax  = result['tax']
+                taxDub  = result['taxDub']
 
             await (Q()
                      .tables(T.items)
@@ -4636,19 +5348,22 @@ class Invoice:
                        T.items.insurname : result['insurname'],
                        T.items.work : result['work'],
                        T.items.type: types['id'],
-                       T.items.tax: result['tax'],
-                       T.items.taxDub: result['taxDub'],
+                       T.items.tax: tax,
+                       T.items.taxDub: taxDub,
                        T.items.taxP: result['taxP'],
                        T.items.taxPDub: result['taxPDub'],
                        T.items.disc: result['disc'],
                        T.items.discP: result['discP'],
                        T.items.butDiscPerc: result['butDiscPerc'],
                        T.items.addtaxColapse: result['addtaxColapse'],
-                       T.items.comment: autoText['content']
+                       T.items.comment: autoText['content'],
+                       T.items.gen_summa: gen_summa,
+                       T.items.gen_discont: gen_discont,
+                       T.items.brutto: brutto
                        # T.items.year: datetime.datetime.now().strftime("%Y"),
                     }))
             
-            print('вставка item')         
+            # print('вставка item')         
             invoiceIdx = ( await (Q()
                 .tables(T.items)
                 .fields(
@@ -4659,8 +5374,8 @@ class Invoice:
              )
 
             invoiceId = invoiceIdx[len(invoiceIdx)-1]
-            print('Наверно это будующий id')         
-            print(invoiceIdx)
+            # print('Наверно это будующий id')         
+            # print(invoiceIdx)
 
             if type=='Invoices':
                 if (newRange=='true'):
@@ -4669,7 +5384,7 @@ class Invoice:
                         .where(T.number_for_invoice.id != 0)
                         .delete())
                         
-                print('Если новый круг счетов')         
+                # print('Если новый круг счетов')         
                 # print('delete')
 
                 await (Q()
@@ -4680,7 +5395,7 @@ class Invoice:
                         }))
 
                 # print(6)         
-                print('вставка нового номера счета')
+                # print('вставка нового номера счета')
 
                 numberInvoice = ( await (Q()
                     .tables(T.number_for_invoice)
@@ -4690,8 +5405,8 @@ class Invoice:
                     .where(T.number_for_invoice.item_id == invoiceId['id'])
                     .selectone())
                 )
-                print('выбран новый идентификатора номера')         
-                print(numberInvoice)
+                # print('выбран новый идентификатора номера')         
+                # print(numberInvoice)
 
 
                 await (Q()
@@ -4702,7 +5417,7 @@ class Invoice:
                         }))
 
                 # print(8)
-                print('Обновление информации о номере счета')
+                # print('Обновление информации о номере счета')
 
             if type=='SUB':
                 await (Q()
@@ -4729,14 +5444,110 @@ class Invoice:
                         T.tables.name,
                         T.tables.item_id,
                         T.tables.obj,
-                        T.tables.selected,
-                        T.tables.device
+                        T.tables.device,
+                        T.tables.summa,
+                        T.tables.alt_summa,
+                        T.tables.discont
                     )
                     .where(T.tables.item_id == id)
                     .selectall()))
             for table in selected_for_table_copy:
+                if remove == 1:
+                    table_summa = '-'+table['summa']
+                    alt_summa = '-'+table['alt_summa']
+                    discont = '-'+table['discont']
+                if remove == 0:
+                    table_summa = table['summa']
+                    alt_summa = table['alt_summa']
+                    discont = table['discont']
                 new_table_id = None
                 new_table_id  = (await General.new_id(T.tables, 'id'))
+
+                selected_for_rows_copy = (await (Q()
+                    .tables(T.rows_for_table)
+                    .fields(
+                        T.rows_for_table.id,
+                        T.rows_for_table.count,
+                        T.rows_for_table.status,
+                        T.rows_for_table.alttax,
+                        T.rows_for_table.summa,
+                        T.rows_for_table.summa_without_discont,
+                        T.rows_for_table.unit,
+                        T.rows_for_table.without,
+                        T.rows_for_table.done,
+                        T.rows_for_table.description_head,
+                        T.rows_for_table.description_work,
+                        T.rows_for_table.description_from_price,
+                        T.rows_for_table.position_number,
+                        T.rows_for_table.price,
+                        T.rows_for_table.checked_for_percent,
+                        T.rows_for_table.table_id
+                    )
+                    .where(T.rows_for_table.table_id == table['id'])
+                    .selectall()))
+                
+                list_ids, lastIndex = ((await General.new_list_ids(T.rows_for_table, 'id')))
+                old_id_percent = []
+                new_id_percent = []
+                for index, row in enumerate(selected_for_rows_copy):
+                    if (len(list_ids)-(index+1)) <= 0: 
+                        new_row_id = lastIndex+index
+                    else:
+                        new_row_id  = list_ids[index]
+                        
+                    if row['unit']=='%':#замена галочек при процентах
+                        old_id_percent.append(row['id'])
+                        new_id_percent.append(new_row_id)
+                objs = []
+                for index_obj, obj in enumerate(old_id_percent):
+                    objs.append('in'+str(new_id_percent[index_obj]))
+                table['obj'] = ','.join(objs) # замена идентификаторов процентов в таблице
+
+                for index, row in enumerate(selected_for_rows_copy):
+                    if remove == 1:
+                        count = '-'+row['count']
+                        if row['unit'] == '%':
+                            count = row['count']
+                            price = '-'+row['price']
+                        summa = '-'+row['summa']
+                        summa_without_discont  = '-'+row['summa_without_discont']
+                    if remove == 0:
+                        price = row['price']
+                        count = row['count']
+                        summa = row['summa']
+                        summa_without_discont  = row['summa_without_discont']
+
+                    if (len(list_ids)-(index+1)) <= 0: 
+                        new_row_id = lastIndex+index
+                    else:
+                        new_row_id  = list_ids[index]
+
+                    for index_obj, obj in enumerate(old_id_percent):
+                        if row['checked_for_percent'] == 'in'+str(obj):
+                            row['checked_for_percent']='in'+str(new_id_percent[index_obj])
+                    try:
+                        await (Q()
+                            .tables(T.rows_for_table)
+                            .insert({
+                            T.rows_for_table.id:new_row_id,
+                            T.rows_for_table.count:count,
+                            T.rows_for_table.status:row['status'],
+                            T.rows_for_table.alttax:row['alttax'],
+                            T.rows_for_table.summa:summa,
+                            T.rows_for_table.unit:row['unit'],
+                            T.rows_for_table.without:row['without'],
+                            T.rows_for_table.done:row['done'],
+                            T.rows_for_table.description_head:row['description_head'],
+                            T.rows_for_table.description_work:row['description_work'],
+                            T.rows_for_table.description_from_price:row['description_from_price'],
+                            T.rows_for_table.position_number:row['position_number'],
+                            T.rows_for_table.price:price,
+                            T.rows_for_table.checked_for_percent:row['checked_for_percent'],
+                            T.rows_for_table.table_id:new_table_id,
+                            T.rows_for_table.summa_without_discont:summa_without_discont
+                        }))
+                    except:
+                        print('Duplicate entry Add_invoice')
                 await (Q()
                     .tables(T.tables)
                     .insert({
@@ -4744,69 +5555,11 @@ class Invoice:
                         T.tables.name:table['name'],
                         T.tables.item_id:invoiceId['id'],
                         T.tables.obj:table['obj'],
-                        T.tables.selected:table['selected'],
-                        T.tables.device:table['device']
+                        T.tables.device:table['device'],
+                        T.tables.summa:table_summa,
+                        T.tables.alt_summa:alt_summa,
+                        T.tables.discont:discont
                     }))
-                selected_for_rows_copy = (await (Q()
-                    .tables(T.rows_for_table)
-                    .fields(
-                        T.rows_for_table.count,
-                        T.rows_for_table.status,
-                        T.rows_for_table.alttax,
-                        T.rows_for_table.summa,
-                        T.rows_for_table.unit,
-                        T.rows_for_table.without,
-                        T.rows_for_table.done,
-                        T.rows_for_table.description_head,
-                        T.rows_for_table.description_work,
-                        T.rows_for_table.description_from_price,
-                        T.rows_for_table.discount,
-                        T.rows_for_table.position_number,
-                        T.rows_for_table.price,
-                        T.rows_for_table.table_id
-                    )
-                    .where(T.rows_for_table.table_id == table['id'])
-                    .selectall()))
-                list_ids, lenItems = ((await General.new_list_ids(T.rows_for_table, 'id')))
-                for index, row in enumerate(selected_for_rows_copy):
-                    if remove == 1:
-                        count = '-'+row['count']
-                    if remove == 0:
-                        count = row['count']
-
-                    if (len(list_ids)-(index+1)) <= 0: 
-                        new_row_id = lenItems+index+2
-                    else:
-                        new_row_id  = list_ids[index]
-                    await (Q()
-                        .tables(T.rows_for_table)
-                        .insert({
-                        T.rows_for_table.id:new_row_id,
-                        T.rows_for_table.count:count,
-                        T.rows_for_table.status:row['status'],
-                        T.rows_for_table.alttax:row['alttax'],
-                        T.rows_for_table.summa:row['summa'],
-                        T.rows_for_table.unit:row['unit'],
-                        T.rows_for_table.without:row['without'],
-                        T.rows_for_table.done:row['done'],
-                        T.rows_for_table.description_head:row['description_head'],
-                        T.rows_for_table.description_work:row['description_work'],
-                        T.rows_for_table.description_from_price:row['description_from_price'],
-                        T.rows_for_table.discount:row['discount'],
-                        T.rows_for_table.position_number:row['position_number'],
-                        T.rows_for_table.price:row['price'],
-                        T.rows_for_table.table_id:new_table_id,
-                        }))
-            return ''
-
-           
-
-
-    
-
-
-
-    
 
     @classmethod
     async def select_invoices(cls, id):
@@ -4872,6 +5625,10 @@ class add_same:
                         T.items.taxDub:0.0,
                         T.items.tax:0.00,
                         T.items.taxPDub:0,
+                        T.items.gen_summa:0,
+                        T.items.gen_discont:0,
+                        T.items.brutto:0,
+                        T.items.butDiscPerc:'%',
                         T.items.work: add_work,
                         T.items.place: add_place,
                         T.items.insurance_number:add_insurance_number,
@@ -4885,7 +5642,7 @@ class add_same:
                     }))
 class Del_offer:
     @classmethod
-    async def del_item(cls, id):
+    async def del_item(cls, id, ws_clients):
         async with database.query() as Q:
             tables = (
                 await (Q(T.tables)
@@ -4894,7 +5651,6 @@ class Del_offer:
                     .where(T.tables.item_id == id)
                     .selectall())
                     )
-
             for table in tables:
                 rows = (await (Q(T.rows_for_table)
                 .fields(
@@ -4906,27 +5662,27 @@ class Del_offer:
                     await (Q(T.rows_for_table)
                         .where(T.rows_for_table.id == row['id'])
                         .delete())
-
+                    
             await (Q(T.tables)
                 .where(T.tables.item_id == id)
                 .delete())
-
+            
             number_invoice = (await (Q(T.items)
-                    .fields(T.items.id)
-                    .where(T.items.id == id)
-                    .selectone())
-                )
-           
-            await (Q(T.number_for_invoice)
-                .where(T.number_for_invoice.item_id == number_invoice['id'])
-                .delete())
-                
+                .fields(T.items.id)
+                .where(T.items.id == id)
+                .selectone())
+            )
+            if number_invoice['id']!=None:
+                await (Q(T.number_for_invoice)
+                    .where(T.number_for_invoice.item_id == number_invoice['id'])
+                    .delete())
             
             await (Q(T.items)
                 .where(T.items.id == id)
                 .delete())
-
-
+            
+            for client in ws_clients:
+                await client.send_str('project_detail_new_f')
 
 class Offers:
     @classmethod
@@ -6374,8 +7130,7 @@ class Docs:
                         .fields(
                             T.tables.id,
                             T.tables.name,
-                            T.tables.obj,
-                            T.tables.selected
+                            T.tables.obj
                         )
                         .where(T.tables.item_id == itemContent['id'])
                         .selectall()))
@@ -6866,8 +7621,7 @@ class Docs:
                                         .fields(
                                             T.tables.id,
                                             T.tables.name,
-                                            T.tables.obj,
-                                            T.tables.selected
+                                            T.tables.obj
                                         )
                                         .where(T.tables.item_id == itemContent['id'])
                                         .selectall()))
@@ -7656,7 +8410,7 @@ class Prices:
             return ''
 
     @classmethod
-    async def send_price(cls, ids, names):
+    async def send_price(cls, ids, names, ws_clients):
         #print(type, ids, names, item_id)
         # arr=[]
         # for v in ids.split(","):
@@ -7671,11 +8425,12 @@ class Prices:
                                 T.price.desc,
                                 T.price.unit,
                                 T.price.price,
-                                T.price.without,
                                 T.price.percent
                             )
                             .where(T.price.id.in_(ids.split(",")))
                             .selectall()))
+            if ids=='':
+                items=[{'pos_num': '', 'name': '', 'desc' : '', 'unit': '—', 'price' : '', 'without' : 'false'}]
 
             for item in items:
                 if item['price'] == None:
@@ -7706,16 +8461,19 @@ class Prices:
                                     T.rows_for_table.description_from_price: '',
                                     T.rows_for_table.unit: item['unit'],
                                     T.rows_for_table.price: newPrice,
-                                    T.rows_for_table.without: item['without'],
-                                    T.rows_for_table.discount: item['percent'],
+                                    T.rows_for_table.without: 'false',
                                     T.rows_for_table.table_id: v,
                                     T.rows_for_table.status: 'yes',
+                                    T.rows_for_table.summa: 0,
+                                    T.rows_for_table.summa_without_discont: 0,
                                     # T.rows_for_table.alttax: ,
                                     T.rows_for_table.description_work: item['desc'],
                                     T.rows_for_table.count: item['count'],
                                     T.rows_for_table.done: ''
                             }))
-        return ''
+                for client in ws_clients:
+                    await client.send_str('send_price:'+str(names))
+
 
 
 
@@ -7789,8 +8547,7 @@ class Damage:
                     .tables(T.tables)
                     .fields(
                         T.tables.id,
-                        T.tables.obj,
-                        T.tables.selected
+                        T.tables.obj
                     )
                     .where((T.tables.id == oldPart))
                     .selectone()))
@@ -9036,8 +9793,7 @@ class Balance:
                         .fields(
                             T.tables.id,
                             T.tables.name,
-                            T.tables.obj,
-                            T.tables.selected
+                            T.tables.obj
                         )
                         .where(T.tables.item_id == item['id'])
                         .selectall()))

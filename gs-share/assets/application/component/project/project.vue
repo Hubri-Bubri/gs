@@ -13,9 +13,9 @@
           @focus.native="changeDisable('f', 'project-start-date', id)"
           @blur.native="changeDisable('b', 'project-start-date', id)" :id="'project-start-date'+id"/>
         </b-form-group>
-        <b-tooltip triggers="none" :show="disablefild('pdata', id)" :target="'pdata'+id">
+        <!-- <b-tooltip triggers="none" :show="disablefild('pdata', id)" :target="'pdata'+id">
           {{disablefildUser('pdata', id)}}
-        </b-tooltip>
+        </b-tooltip> -->
       </b-col>
       <b-col lg="6" sm="12">
 
@@ -78,27 +78,27 @@
        
           </b-input-group>
         </b-form-group>
-        <b-tooltip triggers="none" :show="disablefild('pcountry', id)" :target="'pcountry'+id">
+        <!-- <b-tooltip triggers="none" :show="disablefild('pcountry', id)" :target="'pcountry'+id">
           {{disablefildUser('pcountry', id)}}
-        </b-tooltip>
-        <b-tooltip triggers="none" :show="disablefild('pzip', id)" :target="'pzip'+id">
+        </b-tooltip> -->
+        <!-- <b-tooltip triggers="none" :show="disablefild('pzip', id)" :target="'pzip'+id">
           {{disablefildUser('pzip', id)}}
-        </b-tooltip>
+        </b-tooltip> -->
         <b-form-group :label="$t('projects.area')+':'" label-cols="3" label-size="sm">
           <b-form-input type="text" @change="updateProject('area', $event)" :value="project.area" :placeholder="$t('projects.earea')" size="sm" :name="nohash"
           :disabled="disablefild('parea', id)" @focus.native="changeDisable('f', 'parea', id)" @blur.native="changeDisable('b', 'parea', id)" :id="'parea'+id"  />
         </b-form-group>
-        <b-tooltip triggers="none" :show="disablefild('parea', id)" :target="'parea'+id">
+        <!-- <b-tooltip triggers="none" :show="disablefild('parea', id)" :target="'parea'+id">
           {{disablefildUser('parea', id)}}
-        </b-tooltip>
+        </b-tooltip> -->
         <b-form-group :label="$t('customerDetail.city')+':'" label-cols="3" label-size="sm">
           <b-form-input  type="text" @change="updateProject('city1', $event)" :value="project.city1" size="sm" :name="nohash"
           :placeholder="$t('projects.ecity')" :disabled="disablefild('pcity1', id)" @focus.native="changeDisable('f', 'pcity', id)"
           @blur.native="changeDisable('b', 'pcity1', id)" :id="'pcity1'+id"  />
         </b-form-group>
-        <b-tooltip triggers="none" :show="disablefild('pcity', id)" :target="'pcity'+id">
+        <!-- <b-tooltip triggers="none" :show="disablefild('pcity', id)" :target="'pcity'+id">
           {{disablefildUser('pcity', id)}}
-        </b-tooltip>
+        </b-tooltip> -->
         <b-form-group :label="$t('customerDetail.street')+':'" label-cols="3" label-size="sm">
           <b-input-group>
             <b-form-input type="text" @change="updateProject('street1', $event)" :value="project.street1"
@@ -107,9 +107,9 @@
               <template #append><b-icon icon="pin-map" aria-hidden="true" @click="$emit('openmap')" class="m-1" /></template>
           </b-input-group>
         </b-form-group>
-        <b-tooltip triggers="none" :show="disablefild('pstreet', id)" :target="'pstreet'+id">
+        <!-- <b-tooltip triggers="none" :show="disablefild('pstreet', id)" :target="'pstreet'+id">
           {{disablefildUser('pstreet', id)}}
-        </b-tooltip>
+        </b-tooltip> -->
       </b-col>
     </b-row>
     <b-alert
@@ -575,9 +575,9 @@ export default {
     },
     summFromRow(row, brutto){ 
       var result = 0
-      row.op.forEach((v)=>{
-        result = parseFloat(result) + parseFloat(v.value)
-      })
+      // row.op.forEach((v)=>{
+      //   result = parseFloat(result) + parseFloat(v.value)
+      // })
       if (result>brutto){
         result = brutto
       }

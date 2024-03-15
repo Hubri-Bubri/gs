@@ -1,5 +1,6 @@
 <template>
    <div>
+
     <!-- <b-modal size="lg" centered id="reports" ref="reports" :title="$t('calcTableGroup.reports')" body-class="workerHeight">
       <b-table class="tableProject" striped hover :fields="fieldsTableD" :items="raports" @row-clicked="inItemGetData" />        
             <template slot="modal-footer">
@@ -22,7 +23,8 @@
             <div v-else class="text-center">
             {{$t('calcTableGroup.newRange')}}
 
-            <b-form-checkbox-group buttons  style="width:100%" checked="[1]" @change.native="selectedId=$event"
+            <b-form-checkbox-group buttons  style="width:100%" :checked="[1]"
+            @change.native="selectedId=$event"
              stacked :options="[1]" />
             </div>
             <template slot="modal-footer">
@@ -43,45 +45,44 @@
          <b-modal size="md" centered ref="shpart" :title="$t('calcTableGroup.addPart')">
           <b-container>
             <b-col cols="12" v-for="(nameofpart, index) in nameofparts"  :key="nameofpart.id">
-            <b-row align-v="center">
-              <b-col cols="1" align-self="center">
-                <b-checkbox plain checked="true" disabled></b-checkbox>
-              </b-col>
-              <b-col cols="4" align-self="center">
-                {{$t('calcTableGroup.nameOfPart')}}
-              </b-col>
-              <b-col cols="7" align-self="center">
-                <b-form-input :value="nameofpart.nameofpart" @input="nameofpart.folderInImages=nameofpart.folderInDocuments=nameofpart.nameofpart=$event" required :state="null" type="text" placeholder="Enter name of table" />
-              </b-col>
-            </b-row>
-            <b-row align-v="center">
-              <b-col cols="1" align-self="center">
-                <b-checkbox plain v-model="nameofpart.folderInDocumentsCheck" :id="'folderInDocuments-'+index"></b-checkbox>
-              </b-col>
-              <b-col cols="4" align-self="center">
-                <label :for="'folderInDocuments-'+index">{{$t('calcTableGroup.folderInDocuments')}}</label>
-              </b-col>
-              <b-col cols="7" align-self="center">
-                <b-form-input :disabled="!nameofpart.folderInDocumentsCheck" :value="nameofpart.folderInDocumentsCheck?nameofpart.folderInDocuments:''" @change="nameofpart.folderInDocuments=$event" required :state="null" type="text" placeholder="Enter name of folder in documents" />
-              </b-col>
-            </b-row>
-            <b-row align-v="center">
-              <b-col cols="1" align-self="center">
-                <b-checkbox plain v-model="nameofpart.folderInImagesCheck" :id="'folderInImages-'+index"></b-checkbox>
-              </b-col>
-              <b-col cols="4" align-self="center">
-                <label :for="'folderInImages-'+index">{{$t('calcTableGroup.folderInImages')}}</label>
-              </b-col>
-              <b-col cols="7" align-self="center">
-                <b-form-input :disabled="!nameofpart.folderInImagesCheck" :value="nameofpart.folderInImagesCheck?nameofpart.folderInImages:''" @change="nameofpart.folderInImages=$event" required :state="null" type="text" placeholder="Enter name of folder in images" />
-              </b-col>
-            </b-row>
-            <b-row align-h="between" class="pt-2">
-              <b-col cols="1"><b-button size="sm" :disabled="(nameofparts.length==1)" variant="danger" @click="nameofparts.splice((index), 1)">-</b-button></b-col>
-              <b-col cols="1"><b-button size="sm" variant="outline-primary" @click="nameofparts.push({'nameofpart':null, 'folderInDocumentsCheck':true, 'folderInDocuments':null, 'folderInImagesCheck':true, 'folderInImages':null})">+</b-button></b-col>
-            </b-row>
+              <b-row align-v="center">
+                <b-col cols="1" align-self="center">
+                  <b-checkbox plain checked="true" disabled></b-checkbox>
+                </b-col>
+                <b-col cols="4" align-self="center">
+                  {{$t('calcTableGroup.nameOfPart')}}
+                </b-col>
+                <b-col cols="7" align-self="center">
+                  <b-form-input :value="nameofpart.nameofpart" @input="nameofpart.folderInImages=nameofpart.folderInDocuments=nameofpart.nameofpart=$event" required :state="null" type="text" placeholder="Enter name of table" />
+                </b-col>
+              </b-row>
+              <b-row align-v="center">
+                <b-col cols="1" align-self="center">
+                  <b-checkbox plain v-model="nameofpart.folderInDocumentsCheck" :id="'folderInDocuments-'+index"></b-checkbox>
+                </b-col>
+                <b-col cols="4" align-self="center">
+                  <label :for="'folderInDocuments-'+index">{{$t('calcTableGroup.folderInDocuments')}}</label>
+                </b-col>
+                <b-col cols="7" align-self="center">
+                  <b-form-input :disabled="!nameofpart.folderInDocumentsCheck" :value="nameofpart.folderInDocumentsCheck?nameofpart.folderInDocuments:''" @change="nameofpart.folderInDocuments=$event" required :state="null" type="text" placeholder="Enter name of folder in documents" />
+                </b-col>
+              </b-row>
+              <b-row align-v="center">
+                <b-col cols="1" align-self="center">
+                  <b-checkbox plain v-model="nameofpart.folderInImagesCheck" :id="'folderInImages-'+index"></b-checkbox>
+                </b-col>
+                <b-col cols="4" align-self="center">
+                  <label :for="'folderInImages-'+index">{{$t('calcTableGroup.folderInImages')}}</label>
+                </b-col>
+                <b-col cols="7" align-self="center">
+                  <b-form-input :disabled="!nameofpart.folderInImagesCheck" :value="nameofpart.folderInImagesCheck?nameofpart.folderInImages:''" @change="nameofpart.folderInImages=$event" required :state="null" type="text" placeholder="Enter name of folder in images" />
+                </b-col>
+              </b-row>
+              <b-row align-h="between" class="pt-2">
+                <b-col cols="1"><b-button size="sm" :disabled="(nameofparts.length==1)" variant="danger" @click="nameofparts.splice((index), 1)">-</b-button></b-col>
+                <b-col cols="1"><b-button size="sm" variant="outline-primary" @click="nameofparts.push({'nameofpart':null, 'folderInDocumentsCheck':false, 'folderInDocuments':null, 'folderInImagesCheck':false, 'folderInImages':null})">+</b-button></b-col>
+              </b-row>
             </b-col>
-
           </b-container>
 
             <template slot="modal-footer">
@@ -107,13 +108,13 @@
       :project="project" :tmp="tmp"
 
       :account="account" :id="pid"
-      :disc='disc' :discP='discP'
-      :tax='tax' :taxDub='taxDub'
-      :taxP='taxP' :taxPDub='taxPDub'
-      :netto='netto' :brutto='brutto'
-      :butDiscPerc='butDiscPerc'
-      :partx='value' :head="tmp.typeOfHead"
-      :addtaxColapsel="addtaxColapse"
+      :disc='tmp.disc' :discP='tmp.discP'
+      :tax='tmp.tax' :taxDub='tmp.taxDub'
+      :taxP='tmp.taxP' :taxPDub='tmp.taxPDub'
+      :netto='tmp.netto' :brutto='tmp.brutto'
+      :butDiscPerc='tmp.butDiscPerc'
+      :partx='tables' :head="tmp.typeOfHead"
+      :addtaxColapsel="tmp.addtaxColapse"
       :workers="workers" :comments="comments"
       :customer="customer"
       :person="person"
@@ -138,10 +139,23 @@
                        Move
                     </b-button> -->
           <b-col>
-          <b-button size="sm" @click="(nameofparts=[{nameofpart:null, folderInDocumentsCheck:true, folderInDocuments:null, folderInImagesCheck:true, folderInImages:null}]);($refs['shpart'].show());">
+          <b-button size="sm" @click="(nameofparts=[{nameofpart:null, folderInDocumentsCheck:false, folderInDocuments:null, folderInImagesCheck:false, folderInImages:null}]);($refs['shpart'].show());">
               {{$t('calcTableGroup.addPart')}}
           </b-button>
-          <b-button  size="sm"  @click="getSubCustomers()"  v-if="(type=='Orders')">
+          <!-- <b-button  size="sm" @click="addRow()" v-show="selectedTables.length > 0">
+              {{$t('projectDetail.plusRow')}}
+          </b-button> -->
+
+
+          <b-dropdown  size="sm" :text="$t('projectDetail.plusRow')"  class="text-center maxHeight" v-show="selectedTables.length > 0">
+            <b-dropdown-item-button :key="count_row" v-for="count_row in 10"
+            @click="addRow(count_row)" >
+            {{count_row}} {{$t('projectDetail.plusRow')}}
+            </b-dropdown-item-button>
+          </b-dropdown>
+
+
+          <b-button  size="sm"  @click="getSubCustomers()"  v-if="(tmp.type=='Orders')">
               {{$t('calcTableGroup.addSub')}}
           </b-button>
 <!--           <b-button  class="customButton col-12 col-lg-1" @click="addInvoice('Damage Description')"  style="min-width:55px;" v-if="(type=='Orders')"> 
@@ -150,12 +164,12 @@
 <!--           <b-button  size="sm"  @click="reports" >
               {{$t('calcTableGroup.reports')}}
           </b-button> -->
-          <b-button  size="sm" @click="worker" v-if="(type!='StandingOrder')">
+          <b-button  size="sm" @click="worker" v-if="(tmp.type!='StandingOrder')">
             {{$t('calcTableGroup.workers')}}
           </b-button>
 
           <b-button  size="sm" @click="$emit('sendMail', availableMails)"
-          v-if="(type=='StandingOrder')">
+          v-if="(tmp.type=='StandingOrder')">
             {{$t('calcTableGroup.timetableInvoice')}}
           </b-button>
 
@@ -165,20 +179,20 @@
           </b-button>
 
 
-          <b-button size="sm"  @click="addInvoice('SInvoices')" v-if="(type=='SUB')" :disabled="addSInvoiceLoad">
+          <b-button size="sm"  @click="addInvoice('SInvoices')" v-if="(tmp.type=='SUB')" :disabled="addSInvoiceLoad">
             {{addSInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.subInvoice')}}
             <b-iconstack font-scale="1" v-if="addSInvoiceLoad">
               <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
             </b-iconstack>
           </b-button>
 
-          <b-button @click="addInvoice('Invoices')"  size="sm"  v-if="((type=='Orders') || (type=='StandingOrder'))" :disabled="addInvoiceLoad">
+          <b-button @click="addInvoice('Invoices')"  size="sm"  v-if="((tmp.type=='Orders') || (tmp.type=='StandingOrder'))" :disabled="addInvoiceLoad">
             {{addInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.toInovice')}}
             <b-iconstack font-scale="1" v-if="addInvoiceLoad">
               <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
             </b-iconstack>
           </b-button>
-          <b-button @click="addInvoice('removeInvoices')"  size="sm"  v-if="(type=='Invoices')" :disabled="addInvoiceLoad" variant="danger">
+          <b-button @click="addInvoice('removeInvoices')"  size="sm"  v-if="(tmp.type=='Invoices')" :disabled="addInvoiceLoad" variant="danger">
             {{addInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.removeInovice')}}
             <b-iconstack font-scale="1" v-if="addInvoiceLoad">
               <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
@@ -192,12 +206,26 @@
           <!-- <label>{{$t('calcTableGroup.work')}}:&nbsp;&nbsp;</label> -->
           <!-- <b-select :value="tmp.work" :options="works" @change="updateItem($event, 'work', tmp.id)"  size="sm"/> -->
         <b-col cols="12" lg="2">
-        <b-select v-if="(type!='SUB'&&type!='Invoices')" :value="$t('oneCountAlret.'+type)" size="sm"
-        @change="offerChangeType(id, $event)" :options="getOpt()" />
+        <!-- <b-select v-if="(type!='SUB'&&type!='Invoices')" :value="$t('oneCountAlret.'+type)" size="sm"
+        @change="offerChangeType(id, $event)" :options="getOpt()" /> -->
+        <b-dropdown  size="sm" :text="$t('oneCountAlret.'+tmp.type)"  class="text-center maxHeight" v-if="(tmp.type!='SUB'&&tmp.type!='Invoices')">
+          <b-dropdown-item-button :key="opt" v-for="opt in getOpt()"
+          @click="offerChangeType(tmp.id, opt)" >
+            {{opt}} {{($t('oneCountAlret.'+tmp.type) == opt)?'('+$t('company.copy')+')':''}}
+          </b-dropdown-item-button>
+        </b-dropdown>
       </b-col>
       <b-col cols="12" lg="2">
-        <b-select :value="detectOfWork()"
-        :options="works" size="sm" @change="updateItem($event, 'work', tmp.id)" />
+        <b-dropdown  size="sm" :text="detectOfWork()"  class="text-center maxHeight">
+          <b-dropdown-item-button :key="index" v-for="(opt, index) in works"
+          @click="updateItem(opt.value, 'work', tmp.id)" >
+            {{opt.text}}
+          </b-dropdown-item-button>
+        </b-dropdown>
+
+
+        <!-- <b-select :value="detectOfWork()"
+        :options="works" size="sm" @change="updateItem($event, 'work', tmp.id)" /> -->
       </b-col>
 
 <!-- this.$t('calcTableGroup.work') -->
@@ -214,56 +242,35 @@
     </div>
 
 
-  <draggable :value="value" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
-         :no-transition-on-drag="true" @start="drag=true" @end="checkMove($event)">
-         <div v-for="(part, index) in value" :key="part.id">
-          <calc-table :nowTableId="value" :value="sort(value[index])" :addtaxColapse="addtaxColapse" :tableId="index" :butDiscPerc="butDiscPerc" :unitType="unitType" :looks="looks"
-            :color="color" :selectedWorkers="selectedWorkers" :toggle="value[index].parts.toggle" :type="type" :funcStop="funcStop"  v-on:changeSum="discOfPercent()"  :discP="discP">
-            <!-- :class="{ 'table-dark' : value[index].parts.toggle,' handleTitle':type!='Invoices'}"    -->
-            <b-checkbox plain name="partx" slot-scope="table" class="withoutbox"
-                :class="{' handleTitle':type!='Invoices'}"
-                v-model="value[index].parts.toggle" slot="tableHead" @change="$emit('seltable')"> 
+  <!-- <draggable :value="tables" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
+         :no-transition-on-drag="true" @start="drag=true" @end="checkMove($event)"> -->
+      
+         <div v-for="table in tables" :key="table.id">
+          
+          <!-- <calc-table :nowTableId="tables" :value="table" :addtaxColapse="addtaxColapse" :tableId="table.id" :butDiscPerc="butDiscPerc" :unitType="unitType" :looks="looks"
+            :color="color" :selectedWorkers="selectedWorkers"  :type="type" v-on:changeSum="discOfPercent()"  :discP="discP"> -->
 
-                    <b-link style="width:100%" @click="toog(value[index].parts.id)">
-                     <span :id="'p'+value[index].parts.id" style="display:none;vertical-align: middle;padding-right: 3px;" >
+            <calc-table
+            :ref="'table'+table.id"
+            :table="table"
+            :unitPercent="((table.obj!='')&&(table.obj!=null))?table.obj.split(','):[]"
+            :selectedWorkers="selectedWorkers"
+            :butDiscPerc="tmp.butDiscPerc"
 
-                      <b-icon icon="arrow-down" font-scale="1"></b-icon>
+            :discP="tmp.discP"
+            :addtaxColapse="tmp.addtaxColapse=='true'"
 
- {{total(value[index].parts.part_content) | thousandSeparator }} € </span>
-                     <span :id="'m'+value[index].parts.id" style="vertical-align: middle;">
+            :unitType="unitType"
+            :item_id="tmp.id"
 
-                      <b-icon icon="arrow-up" font-scale="1"></b-icon>
-                    
-                    </span>
-                    </b-link>
-                    <span class="forFinger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-
-                    <!-- <b-icon icon="circle-fill" aria-hidden="true"></b-icon> -->
-                    <b-icon :icon="(value[index].parts.toggle)?'chat-square-text-fill':'chat-square-text'" font-scale="1.5" aria-hidden="true" :variant="(value[index].parts.toggle)?'success':''"></b-icon>
-                    
-                    <span class="forFinger">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <!-- <i class="fas fa-dot-circle" style="font-size:12px"></i>  -->
-                    <span :contenteditable="type!='Invoices'" class="diveditable" @blur="toModel($event, value[index].parts.id, value[index].parts.part_name)" @click.prevent.self>
-                        {{value[index].parts.part_name}}
-                    </span>
-                       <!-- <span v-for="file in responseFiles" v-if="file.id==value[index].parts.id"> -->
-                         
-                        <!-- <span v-viewer :class="'im'+value[index].parts.id" style="display:none">
-                        <template v-for="image in file.gallery">
-                              <img :src="image" class="image" :key="image" height="200px">
-                        </template>
-                        </span>  -->
-                        <!-- <b-link class="butMore" style="padding-left:0px;" @click="showImages('im'+value[index].parts.id)">Images</b-link>  -->
-                      <!-- </span> -->
-                      
-                      <b-icon icon="trash" aria-hidden="true"  @click="partDel(value[index].parts.id)"></b-icon>
-                     
-                    <!-- <b-link class="fas fa-trash  butMore" style="padding-left: 0px; font-size:12px;" @click="partDel(value[index].parts.id)"/> -->
-                </b-checkbox>
+            @chengeCountPresents="chengeCountPresents"
+            @seltable="seltable"
+            @tableDelete="tableDelete">
+           
             </calc-table>
-            <hr style="padding:0;margin:5px;display:none;" :id="'hr'+value[index].parts.id"/>
+            <hr style="padding:0;margin:5px;display:none;" :id="'hr'+table.id"/>
         </div>
-      </draggable>
+      <!-- </draggable> -->
 
    </div>
 </template>
@@ -275,11 +282,32 @@ export default {
     components: {
         draggable,
     },
-    props: ['value', 'tmp', 'addtaxColapse', 'workers', 'toggle', 'responseFiles', 'type', 'id', 'funcStop', 'opt', 'butDiscPerc', 'looks', 'availableMails', 'plan',
+    props: ['tmp', 'workers', 'availableMails', 'plan',
     'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList','selectedCornty', 'project',  'account', 'pid', 'person', 'customer', 'selectCustomer', 'selectPerson', 'windowPrint',
-    'disc', 'discP', 'tax', 'taxDub', 'taxP', 'taxPDub', 'netto', 'brutto', 'comments', 'loadDamages', 'works', 'selectedWorkers', 'rowsBusy', 'rowsLoading', 'wwidth'],
+     'comments','works', 'selectedWorkers', 'wwidth', 'opt'],
     data() {
         return {
+
+            // head:null,
+            // id:null,
+            // type:null,
+            // disc:null,
+            // discP:null,
+            // tax:null,
+            // taxDub:null,
+            // taxP:null,
+            // taxPDub:null,
+            // netto:null,
+            // brutto:null,
+            // butDiscPerc:null,
+            // addtaxColapse:null,
+
+
+            selectedTables:[],
+            checked:false,
+            tables:null,
+            rowsBusy:true,
+            rowsLoading:true,
             lastButton: false,
             addInvoiceLoad:false,
             addSInvoiceLoad:false,
@@ -355,19 +383,107 @@ computed: {
 
   },
 mounted(){
-this.head = this.tmp.typeOfHead
-this.id = this.tmp.id
-this.type = this.tmp.type
-  setTimeout(() => {
+// this.head = this.tmp.typeOfHead
+// this.id = this.tmp.id
+// this.type = this.tmp.type
+// this.disc = this.tmp.disc
+// this.discP = this.tmp.discP
+// this.tax = this.tmp.tax
+// this.taxDub = this.tmp.taxDub
+// this.taxP = this.tmp.taxP
+// this.taxPDub = this.tmp.taxPDub
+// this.netto = this.tmp.netto
+// this.brutto = this.tmp.brutto
+// this.butDiscPerc = this.tmp.butDiscPerc
+// this.addtaxColapse = this.tmp.addtaxColapse
+
     axios.get('/get_units').then(response => {
     this.unitType = response.data.sort();
     });
-  },1000);
+    this.getTablesInItem(this.tmp.id);
+    this.$options.sockets.onmessage = (data) => {
+      var delimetr = data.data.split(':')
+      if (delimetr[0] == 'add_part') {
+        if (delimetr[1] == this.tmp.id) this.getTablesInItem(this.tmp.id);
+      }
+      if ((delimetr[0] == 'update_part') || (delimetr[0] == 'table_delete' || delimetr[0] == 'checnge_count_percent')) {
+        this.tables.filter((v)=>{
+          if (v.id == delimetr[1]) {
+            this.getTablesInItem(this.tmp.id)
+          };
+        })
+      }
+      if ((delimetr[0] == 'send_price') || (delimetr[0] == 'del_row')) {
+        delimetr[1].split(',').forEach((tableForReload)=>{
+          this.$refs['table'+tableForReload][0].getRowsInTable(tableForReload)
+          this.selectedTables=[]
+        })
+      }
+      if (delimetr[0] == 'updateFild') {
+        var updateFild = (JSON.parse(data.data.split('updateFild:')[1]))
+        this.$refs['table'+updateFild.table_id][0].getFild(updateFild)
+      }
+
+      if (delimetr[0] == 'update_part_parametrs') {
+        var update_part_parametrs = (JSON.parse(data.data.split('update_part_parametrs:')[1]))
+        this.$refs['table'+update_part_parametrs.table_id][0].update_part_parametrs(update_part_parametrs)
+      }
+
+    }
+
 
 
 
 },
 methods: {
+  getTablesInItem(id) {
+			axios.get('/get_tables_in_edit', {
+				params: {
+					id: id
+				}
+			}).then(response => {
+        // console.log(response.data)
+				this.tables = response.data;
+        this.rowsLoading = false;
+        this.rowsBusy = (response.data.length > 0) ? false : true;
+			})
+		},
+
+
+	seltable(id, e) {
+    // console.log(this.selectedTables)
+      if (e){
+        this.selectedTables.push(id)
+      } else{
+        this.selectedTables = this.selectedTables.filter( el => el !== id)
+      }
+      // console.log(this.selectedTables)
+      this.$emit('seltable', this.selectedTables)
+  },
+  addRow(count_row){
+    for (var i = 0; i <= (count_row-1); i++) {
+      axios.get('/send_price', {
+				params: {
+					ids: [].join(),
+					names: this.selectedTables.join()
+				}
+			})
+		}
+    this.selectedTables = []
+    this.$emit('seltable', this.selectedTables)
+  },
+  chengeCountPresents(unitPercent, dir, row_id, table_id){
+    axios.get('/checnge_count_percent', {
+      params: {
+        dir: dir,
+        unitPercent:unitPercent.join(),
+        row_id: row_id,
+        table_id: table_id
+        }
+    })
+    // console.log(id, dir, index)
+  },
+
 exec(id){
   if (confirm(this.$t('alert.sure'))){
     axios.get('/plan_exec', {
@@ -420,12 +536,12 @@ detectOfWork(){
     return this.tmp.work;
   }
 },
-toog(val){
-  document.getElementById('m'+val).style.display = document.getElementById('partx'+val).style.display = (document.getElementById('partx'+val).style.display=='none') ? '' : 'none'
-  document.getElementById('p'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
-  document.getElementById('hr'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
+// toog(val){
+//   document.getElementById('m'+val).style.display = document.getElementById('partx'+val).style.display = (document.getElementById('partx'+val).style.display=='none') ? '' : 'none'
+//   document.getElementById('p'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
+//   document.getElementById('hr'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
 
-},
+// },
 
 detectNewRound(id_list){
 var year = 2020
@@ -489,9 +605,9 @@ axios.get('/customer_sub').then(response => {
       // }
     },
 
-      sort(val){
-        return val
-      },
+      // sort(val){
+      //   return val
+      // },
     discOfPercent(){
       this.$emit('changeSum'); 
     },
@@ -505,36 +621,36 @@ axios.get('/customer_sub').then(response => {
                   })
     },
 
-inItemGetData(item, index) {
-  this.tmp.typeOfHead = 'Damage Description',
-  this.tmp.number = item.number,
-  this.tmp.date = item.date,
-  this.tmp.place = item.place,
-  this.tmp.insurance = item.insurance_number,
-  this.tmp.work = item.work,
-  this.tmp.other = item.other,
-  this.tmp.type='Damage Description',
-  this.tmp.id=item.id,
-  this.tmp.dateEvent = item.dateEvent,
-  this.tmp.dateInspect = item.dateInspect,
-  this.tmp.worker = item.ExamWorker,
-  this.partx=[],
+// inItemGetData(item, index) {
+//   this.tmp.typeOfHead = 'Damage Description',
+//   this.tmp.number = item.number,
+//   this.tmp.date = item.date,
+//   this.tmp.place = item.place,
+//   this.tmp.insurance = item.insurance_number,
+//   this.tmp.work = item.work,
+//   this.tmp.other = item.other,
+//   this.tmp.type='Damage Description',
+//   this.tmp.id=item.id,
+//   this.tmp.dateEvent = item.dateEvent,
+//   this.tmp.dateInspect = item.dateInspect,
+//   this.tmp.worker = item.ExamWorker,
+//   this.partx=[],
  
- this.$socket.send('getProjectDetail')
-},
+//  this.$socket.send('getProjectDetail')
+// },
 
 
 
-      reports(){
-      axios.get('/get_reports', {
-        params: {
-          id: this.id
-        }
-      }).then(response => {
-        this.raports = response.data
-      })
-        this.$refs.reports.show()
-      },
+      // reports(){
+      // axios.get('/get_reports', {
+      //   params: {
+      //     id: this.id
+      //   }
+      // }).then(response => {
+      //   this.raports = response.data
+      // })
+      //   this.$refs.reports.show()
+      // },
       getOpt(){
        var opts = []
        this.opt.forEach((v)=>{
@@ -559,7 +675,7 @@ inItemGetData(item, index) {
         // console.log(this.color)
         axios.get('/add_invoice', {
             params: {
-                id: this.id,
+                id: this.tmp.id,
                 type: val,
                 number:this.color.join(),
                 labelForDelete:''
@@ -575,7 +691,7 @@ inItemGetData(item, index) {
         this.$refs.ids.hide(),
         axios.get('/add_invoice', {
             params: {
-                id: this.id,
+                id: this.tmp.id,
                 type: (this.tmp.type!="Invoices")?'Invoices':'removeInvoices',
                 number: ((typeof(this.selectedId)=='object')?this.selectedId.target.value:this.selectedId),
                 newRange: newRange,
@@ -591,7 +707,7 @@ inItemGetData(item, index) {
         this.$refs.ids_sub.hide(),
         axios.get('/add_invoice_sub', {
             params: {
-                id: this.id,
+                id: this.tmp.id,
                 type: 'Sub Invoices',
                 number: ((typeof(this.selectedId)=='object')?this.selectedId.target.value:this.selectedId).split(' ').join('_'),
                 newRange: false,
@@ -605,7 +721,7 @@ inItemGetData(item, index) {
         this.$refs.addSub.hide(),
        axios.get('/add_invoice', {
             params: {
-                id: this.id,
+                id: this.tmp.id,
                 type: 'SUB',
                 number: this.numberforsub.split(' ').join('_'),
                 newRange: false,
@@ -631,21 +747,12 @@ inItemGetData(item, index) {
         //   const viewer = this.$el.querySelector('.'+classId).$viewer
         //   viewer.show()
         // },
-        toModel(newVal, id, partName) {
-            // partName = newVal.target.innerText
-            if(newVal.target.innerText != partName){
-                axios.get('/update_part', {
-                  params: {
-                    part_name: newVal.target.innerText.replace(/[\s]{2,}/, ''),
-                    id: id
-                  }
-                })
-            }
-        }, 
+ 
         onItems($event){
           { this.$emit('input', $event) }
         },
         nameOfPart(nameofparts) {
+          // console.log(nameofparts)
             var tmpArrValue = []
             this.shpart = true,
             this.$refs.shpart.hide(),
@@ -664,92 +771,93 @@ inItemGetData(item, index) {
              axios.get('/add_part', {
                           params: {
                               parts_names:  JSON.stringify(nameofparts), 
-                              item_id: this.id,
+                              item_id: this.tmp.id,
                               pid:this.pid
                            }
                       })
             // this.$emit('input', tmpArrValue.concat(this.value))
         },
-        okMoveToCopy() {
-            this.$refs.move.hide()
-        },
-        move() {
-            if (this.color.length != 0) {
-                this.counter = -1
-                this.moveToCopy = []
-                this.oldPartx = []
-                this.$refs.move.show()
-            } else {
-                alert('no selected rows')
-            }
-        },
-        moveToCopySelect(event, radio) {
-            var nowPartx = JSON.parse(JSON.stringify(this.value))
-            var tmpArr = this.tmpArr = []
-            this.oldColor.push(JSON.parse(JSON.stringify(this.color)))
-            this.oldPartx.push(JSON.parse(JSON.stringify(this.value)))
-            var tmpArrCp = JSON.parse(JSON.stringify(this.value))
-            var newColor = []
-            this.color.forEach((clolorRow) => {
-                var partIndex = clolorRow.split('-')
-                nowPartx.forEach(function(part, index) {
-                    var temRow = ''
-                    var other = ''
-                    if (part.parts.part_name == partIndex[0]) {
-                        temRow = part.parts.part_content[partIndex[1]]
-                        other = tmpArrCp[index].parts.part_content[partIndex[1]]
-                        tmpArr.splice(0, 0, other)
-                        if (radio == 'Move') {
-                            part.parts.part_content.splice(temRow, 1)
-                        }
-                    }
-                })
-            })
+        // okMoveToCopy() {
+        //     this.$refs.move.hide()
+        // },
+        // move() {
+        //     if (this.color.length != 0) {
+        //         this.counter = -1
+        //         this.moveToCopy = []
+        //         this.oldPartx = []
+        //         this.$refs.move.show()
+        //     } else {
+        //         alert('no selected rows')
+        //     }
+        // },
+        // moveToCopySelect(event, radio) {
+        //     var nowPartx = JSON.parse(JSON.stringify(this.value))
+        //     var tmpArr = this.tmpArr = []
+        //     this.oldColor.push(JSON.parse(JSON.stringify(this.color)))
+        //     this.oldPartx.push(JSON.parse(JSON.stringify(this.value)))
+        //     var tmpArrCp = JSON.parse(JSON.stringify(this.value))
+        //     var newColor = []
+        //     this.color.forEach((clolorRow) => {
+        //         var partIndex = clolorRow.split('-')
+        //         nowPartx.forEach(function(part, index) {
+        //             var temRow = ''
+        //             var other = ''
+        //             if (part.parts.part_name == partIndex[0]) {
+        //                 temRow = part.parts.part_content[partIndex[1]]
+        //                 other = tmpArrCp[index].parts.part_content[partIndex[1]]
+        //                 tmpArr.splice(0, 0, other)
+        //                 if (radio == 'Move') {
+        //                     part.parts.part_content.splice(temRow, 1)
+        //                 }
+        //             }
+        //         })
+        //     })
 
-            event.forEach((eve)=> {
-                nowPartx.forEach((part)=>{
-                    if (part.parts.part_name == eve) {
-                        this.tmpArr.forEach(function(val, index) {
-                            newColor.push(part.parts.part_name + '-' + index)
-                            part.parts.part_content.unshift(val)
-                        })
-                    }
-                })
-            })
-            this.color = []
-            this.color = newColor.slice()
-            this.counter = this.counter + 1
-            this.$emit('input', nowPartx)
-        },
-        partDel(part) {
+        //     event.forEach((eve)=> {
+        //         nowPartx.forEach((part)=>{
+        //             if (part.parts.part_name == eve) {
+        //                 this.tmpArr.forEach(function(val, index) {
+        //                     newColor.push(part.parts.part_name + '-' + index)
+        //                     part.parts.part_content.unshift(val)
+        //                 })
+        //             }
+        //         })
+        //     })
+        //     this.color = []
+        //     this.color = newColor.slice()
+        //     this.counter = this.counter + 1
+        //     this.$emit('input', nowPartx)
+        // },
+        tableDelete(id, item_id) {
             // console.log(del_id);
             if (confirm(this.$t('alert.sure'))){
             // var deltable=this.value.filter(function(val){return (val!=part)})
             // this.$emit('input', deltable)
 
-            axios.get('/del_part', {
+            axios.get('/table_delete', {
                 params: {
-                  id: part
+                  id: id,
+                  item_id
                 }
             })
 
             }
 
         },
-        cancelPartx(indexButton) {
-            var tmpArrValue = []
-            this.color = []
-            this.moveToCopy = []
-            this.oldPartx[indexButton].forEach((val)=> {
-                tmpArrValue.push(val)
-            })
-            this.$emit('input', tmpArrValue)
-            this.color = JSON.parse(JSON.stringify(this.oldColor[indexButton]))
-            this.counter = this.counter - 1
-        },
-        okMoveToCopy() {
-            this.$refs.move.hide()
-        },
+        // cancelPartx(indexButton) {
+        //     var tmpArrValue = []
+        //     this.color = []
+        //     this.moveToCopy = []
+        //     this.oldPartx[indexButton].forEach((val)=> {
+        //         tmpArrValue.push(val)
+        //     })
+        //     this.$emit('input', tmpArrValue)
+        //     this.color = JSON.parse(JSON.stringify(this.oldColor[indexButton]))
+        //     this.counter = this.counter - 1
+        // },
+        // okMoveToCopy() {
+        //     this.$refs.move.hide()
+        // },
         worker() {
           this.$emit('worker')
         },

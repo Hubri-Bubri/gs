@@ -155,10 +155,18 @@
         "linkForWorkers":"Ссылка для рабочих"
     },
     "calcTableGroup" : {
-        "yes":"Да",
-        "no":"Нет",
-        "etc":"Другое",
-        "alternative": "Алтернативно",
+        "yes" : {
+            "short":"Да", "long":"Да"
+        },
+        "no" : {
+            "short":"Нет", "long":"Нет"
+        },
+        "etc" : {
+            "short":"Др", "long":"Другое"
+        },
+        "alternative" : {
+            "short":"Альт", "long":"Алтернативно"
+        },
         "reports": "Отчеты",
         "numberOfInvoice" : "Номер счета",
         "newRange" : "Будет новый диапазон счетов.",

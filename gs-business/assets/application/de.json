@@ -155,10 +155,18 @@
         "linkForWorkers":"Link für Mitarbeiter"
     },
     "calcTableGroup" : {
-        "yes":"Ja",
-        "no":"Nien",
-        "etc":"Eventuell",
-        "alternative": "Alternative",
+        "yes" : {
+            "short":"Ja", "long":"Ja"
+        },
+        "no" : {
+            "short":"Nein", "long":"Nein"
+        },
+        "etc" : {
+            "short":"Evtl", "long":"Eventuell"
+        },
+        "alternative" : {
+            "short":"Altn", "long":"Alternative"
+        },
         "reports": "Berichte",
         "numberOfInvoice" : "Anzahl der Rechnungen",
         "newRange" : "Es wird einen neuen Kontobereich geben.",

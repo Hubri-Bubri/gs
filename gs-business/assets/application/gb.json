@@ -155,10 +155,18 @@
         "linkForWorkers":"Link For Workers"
     },
     "calcTableGroup" : {
-        "yes":"Yes",
-        "no":"No",
-        "etc":"Etc",
-        "alternative": "Alternative",
+        "yes" : {
+            "short":"Yes", "long":"Yes"
+        },
+        "no" : {
+            "short":"No", "long":"No"
+        },
+        "etc" : {
+            "short":"Etc", "long":"Et cetera"
+        },
+        "alternative" : {
+            "short":"Altn", "long":"Alternative"
+        },
         "reports": "Reports",
         "numberOfInvoice" : "Number Of Invoice",
         "newRange" : "There will be a new account range.",

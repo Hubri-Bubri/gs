@@ -333,16 +333,26 @@ async def method (request):
 async def method (request):
     return web.json_response(await Projects.select_project_new(request.query['id']))
 
-@routes.get('/get_tables')
+# @routes.get('/get_tables')
+# async def method (request):
+#     return web.json_response(await Projects.get_tables(request.query['id']))
+
+@routes.get('/get_tables_for_docs')
 async def method (request):
-    return web.json_response(await Projects.get_tables(request.query['id']))
+    return web.json_response(await Projects.get_tables_for_docs(request.query['id']))
+
+@routes.get('/get_tables_in_edit')
+async def method (request):
+    return web.json_response(await Projects.get_tables_in_edit(request.query['id']))
+
+@routes.get('/get_rows_in_table')
+async def method (request):
+    return web.json_response(await Projects.get_rows_in_table(request.query['id']))
 
 @routes.get('/del_row_from_table')
 async def method (request):
-    result =  web.json_response(await Projects.del_row_from_table(request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
+    await Projects.del_row_from_table(request.query['table_id'], request.query['index'], request.query['id'], request.query['item_id'], ws_clients)
+    return web.json_response('')
 
 @routes.get('/del_row_from_devices')
 async def method (request):
@@ -458,7 +468,7 @@ async def method (request):
 
 @routes.get('/update_id_in_one_table')
 async def method (request):
-    result =  web.json_response(await Projects.update_id_in_one_table(request.query['newIndex'], request.query['oldIndex'], request.query['newPart']))
+    await Projects.update_id_in_one_table(request.query['newIndex'], request.query['oldIndex'], request.query['newPart'])
     for client in ws_clients:
         await client.send_str('getProjectDetail')
     return result
@@ -472,14 +482,14 @@ async def method (request):
 
 @routes.get('/update_id_in_one_damage')
 async def method (request):
-    web.json_response(await Damage.update_id_in_one_damage(request.query['newIndex'], request.query['oldIndex'], request.query['newPart']))
+    await Damage.update_id_in_one_damage(request.query['newIndex'], request.query['oldIndex'], request.query['newPart'])
     # for client in ws_clients:
     #     await client.send_str('getProjectDetail')
     return web.json_response('')
 
 @routes.get('/update_id_damage')
 async def method (request):
-    result =  web.json_response(await Damage.update_id_damage(request.query['newIndex'], request.query['newPart'], request.query['oldIndex'], request.query['oldPart']))
+    await Damage.update_id_damage(request.query['newIndex'], request.query['newPart'], request.query['oldIndex'], request.query['oldPart'])
     # for client in ws_clients:
     #     await client.send_str('getProjectDetail')
     return web.json_response('')
@@ -493,12 +503,12 @@ async def method (request):
 
 @routes.get('/update_id_reports')
 async def method (request):
-    result =  web.json_response(await Reports.update_id_reports(request.query['newIndex'], request.query['newPart'], request.query['oldIndex'], request.query['oldPart']))
+    await Reports.update_id_reports(request.query['newIndex'], request.query['newPart'], request.query['oldIndex'], request.query['oldPart'])
     return web.json_response('')
 
 @routes.get('/update_id_in_prise')
 async def method (request):
-    web.json_response(await Project.update_id_in_prise(request.query['newid'], request.query['oldid']))
+    await Project.update_id_in_prise(request.query['newid'], request.query['oldid'])
     return web.json_response('')
 
 @routes.get('/update_id_table')
@@ -522,8 +532,8 @@ async def method (request):
 @routes.get('/changeDisableTable')
 async def method (request):
     # print(ws_clients)
-    web.json_response(await Projects.changeDisableTable(
-        request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients))
+    await Projects.changeDisableTable(
+        request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients)
 
     for client in ws_clients:
         await client.send_str('getLoocks')
@@ -708,12 +718,37 @@ async def method (request):
 
 @routes.get('/update_table_data')
 async def method (request):
-    result = web.json_response(await Project.update_table_data(request.query['id'], request.query['fild'], request.query['data']))
-    # print(request.query['data'])
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
-    
+    await Project.update_table_data(request.query['table_id'], request.query['id'], request.query['fild'], request.query['data'], request.query['index'], True, ws_clients)
+    return web.json_response('')
+
+@routes.get('/chenge_unit_type')
+async def method (request):
+    await Project.chenge_unit_type(request.query['table_id'], request.query['id'], request.query['data'], request.query['index'], request.query['item_id'], ws_clients)
+    return web.json_response('')
+
+@routes.get('/checked_for_percent')
+async def method (request):
+    await Project.checked_for_percent(request.query['table_id'], request.query['id'], request.query['event'], request.query['index'],
+                                      request.query['part_percent'], request.query['old'], request.query['item_id'], True, ws_clients)
+    return web.json_response('')
+
+@routes.get('/update_for_summ')
+async def method (request):
+    await Project.update_for_summ(request.query['table_id'], request.query['id'], request.query['fild'], request.query['data'], request.query['index'], request.query['item_id'], True, ws_clients)
+    return web.json_response('')
+
+@routes.get('/send_discont')
+async def method (request):
+    await Project.send_discont(request.query['table_id'], request.query['id'], request.query['data'], request.query['index'], request.query['item_id'], ws_clients)
+    return web.json_response('')
+@routes.get('/send_mode_calc')
+async def method (request):
+    await Project.send_mode_calc(request.query['table_id'], request.query['id'], request.query['data'], request.query['index'], request.query['item_id'], ws_clients)
+    return web.json_response('')
+@routes.get('/chenge_tax')
+async def method (request):
+    await Project.chenge_tax(request.query['table_id'], request.query['id'], request.query['data'], request.query['index'], request.query['item_id'], ws_clients)
+    return web.json_response('')
 @routes.get('/update_table_data_editor')
 async def method (request):
     return web.json_response(await Project.update_table_data(request.query['id'], request.query['fild'], request.query['data']))
@@ -786,14 +821,25 @@ async def method (request):
 
 @routes.get('/add_part')
 async def method (request):
-    return web.json_response(await Project.add_part(request.query['parts_names'], request.query['item_id'], request.query['pid'], ws_clients))
+    await Project.add_part(request.query['parts_names'], request.query['item_id'], request.query['pid'], ws_clients)
+    return web.json_response('')
 
 @routes.get('/update_part')
 async def method (request):
-    result= web.json_response(await Project.update_part(request.query['part_name'], request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
+    await Project.update_part(request.query['part_name'], request.query['id'], ws_clients)
+    return web.json_response('')
+
+@routes.get('/checnge_count_percent')
+async def method (request):
+    await Project.checnge_count_percent(request.query['unitPercent'], request.query['dir'], request.query['row_id'], request.query['table_id'], ws_clients)
+    return web.json_response('')
+
+@routes.get('/table_delete')
+async def method (request):
+    await Project.table_delete(request.query['id'], request.query['item_id'], ws_clients)
+    return web.json_response('')
+
+
 
 @routes.get('/updateNameDevice')
 async def method (request):
@@ -809,12 +855,7 @@ async def method (request):
         await client.send_str('getProjectDetail')
     return result
 
-@routes.get('/del_part')
-async def method (request):
-    result= web.json_response(await Project.del_part(request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
+
 
 @routes.get('/delImageFromPart')
 async def method (request):
@@ -1005,11 +1046,10 @@ async def method (request):
     
 @routes.get('/del_item')
 async def method (request):
-    result = web.json_response(await Del_offer.del_item(request.query['id']))
-    for client in ws_clients:
-        await client.send_str('project_detail_new_f')
-    return result
-
+    await Del_offer.del_item(request.query['id'], ws_clients)
+    return web.json_response('')
+    
+    
 # @routes.get('/offers')
 # async def method (request):
 #     return web.json_response(await Offers.select_offers(request.query['id']))
@@ -1564,10 +1604,8 @@ async def method (request):
 
 @routes.get('/send_price')
 async def method (request):
-    result = web.json_response(await Prices.send_price(request.query['ids'], request.query['names']))
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
+    await Prices.send_price(request.query['ids'], request.query['names'], ws_clients)
+    return web.json_response('')
 
 @routes.get('/send_devices')
 async def method (request):
@@ -1583,20 +1621,15 @@ async def method (request):
         await client.send_str('getProjectDetail')
     return result
 
-
-@routes.post('/update_item_from_project')
+@routes.get('/update_item_from_project')
 async def method (request):
+    await Project.update_item(request.query['val'], request.query['type'], request.query['id'], ws_clients)
+    return web.json_response('')
 
-    form = await request.json()
-    formval = form['val']
-    formtype = form['type']
-    formid = form['id']
-
-    result = web.json_response(await Project.update_item(formval, formtype, formid))
-    for client in ws_clients:
-        await client.send_str('getProjects')
-        await client.send_str('getProjectDetail')
-    return result
+@routes.get('/update_item_discont')
+async def method (request):
+    await Project.update_discont(request.query['val'], request.query['type'], request.query['id'], ws_clients)
+    return web.json_response('')
 
 @routes.get('/updatefilename')
 async def method (request):
@@ -1630,7 +1663,7 @@ async def method (request):
 @routes.get('/updatefilenames')
 async def method (request):
     for oneid in request.query['id'].split(','):
-        web.json_response(await Project.updatefilename(request.query['val'], request.query['type'], int(oneid)))
+        await Project.updatefilename(request.query['val'], request.query['type'], int(oneid))
     for client in ws_clients:
         await client.send_str('getDocs')
                 # await client.send_str('getProjectDetail')
@@ -1901,8 +1934,8 @@ async def method (request):
 @routes.get('/changeDisableTableSub')
 async def method (request):
     # print(ws_clients)
-    web.json_response(await Sub.changeDisableTable(
-        request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients))
+    await Sub.changeDisableTable(
+        request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients)
 
     for client in ws_clients:
         await client.send_str('getLoocksSub')
@@ -1997,12 +2030,12 @@ async def method (request):
         request.query['type'],
         ))
     
-@routes.get('/del_item_sub')
-async def method (request):
-    result = web.json_response(await Del_offer_sub.del_item(request.query['id']))
-    for client in ws_clients:
-        await client.send_str('sub_detail_new_f')
-    return result
+# @routes.get('/del_item_sub')
+# async def method (request):
+#     result = web.json_response(await Del_offer_sub.del_item(request.query['id']))
+#     for client in ws_clients:
+#         await client.send_str('sub_detail_new_f')
+#     return result
 
 @routes.get('/offers_sub')
 async def method (request):
