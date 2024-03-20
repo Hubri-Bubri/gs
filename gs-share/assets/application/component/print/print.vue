@@ -1,15 +1,10 @@
 <template>
-   <div>
-    <hr />
-    <b-row align-h="between" class="pr-2">
-        <slot></slot>
-        <b-button size="sm" @click="printOffer()" class="printForMobile"
-        v-if="!(((tmp.typeOfHead=='Invoices')&&(tmp.number.split(' ').length==5))||(tmp.typeOfHead=='StandingOrder'))">
-          <b-icon icon="printer" aria-hidden="true"></b-icon>
-        </b-button>
-    </b-row>
-    <br/>
-      <b-modal size="lg" centered ok-only no-close-on-esc no-close-on-backdrop hide-header-close  :visible="windowPrint" v-if="makemodalpdf">
+
+
+        
+          
+          
+          <b-modal size="lg" centered ok-only no-close-on-esc no-close-on-backdrop hide-header-close  :visible="windowPrint" v-if="makemodalpdf">
          <div slot="modal-title" class="w-100">
             <div>{{$t('print.print')}}</div>
          </div>
@@ -156,7 +151,10 @@
             </b-row>
          </div>
       </b-modal>
-   </div>
+
+
+     
+
 </template>
 <script>
 import axios from 'axios';
@@ -319,15 +317,16 @@ export default {
             }}
         },
         alltotal: function() {
-            var summa = 0
-            this.partx.forEach(function(val) {
-                val.parts.part_content.forEach(function(val1) {
-                    if (val1.status == 'yes') {
-                        summa += val1.count * val1.price
-                    }
-                })
-            })
-            return summa;
+            // var summa = 0
+            // this.partx.forEach(function(val) {
+            //     val.parts.part_content.forEach(function(val1) {
+            //         if (val1.status == 'yes') {
+            //             summa += val1.count * val1.price
+            //         }
+            //     })
+            // })
+            // return summa;
+            return []
         },
     },
     mounted(){

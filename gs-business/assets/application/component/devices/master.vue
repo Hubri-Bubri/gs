@@ -98,7 +98,6 @@
                   <div hidden>{{ selected }}</div>
                 </b-col>
               </b-row>
-            </b-container>
           </container-body>
         </container>
         <b-card-footer>

@@ -70,7 +70,7 @@
 
 
         <b-nav-item-dropdown :text="username+' ('+leftTime+')'">
-          <b-dropdown-item v-for="companyOpt in companyAvailable" :key="companyOpt.id"  style="white-space: nowrap;" :href="companyOpt.link" >
+          <b-dropdown-item v-for="companyOpt in companyAvailable" :key="companyOpt.id"  style="white-space: nowrap;" :href="companyOpt.link" :disabled="(company == 'development')">
             {{companyOpt.name}}
           </b-dropdown-item>
           <!-- <b-dropdown-item>{{$t('topMenu.profile')}}</b-dropdown-item> -->
@@ -159,8 +159,9 @@ export default {
 
    // setTimeout(() => {
    this.username = this.$security.account['first_name']+' '+this.$security.account['second_name'],
-     console.log(this.$security)
-   this.company = this.$security.table['selected-company']['name']
+    //  console.log(this.$security)
+  
+   this.company = (this.$security.table['selected-company']==null)?'development':this.$security.table['selected-company']['name']
    this.companyAvailable = this.$security.table['available-companies']
    this.variables();
         // },1);

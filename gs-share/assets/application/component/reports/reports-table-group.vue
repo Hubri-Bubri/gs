@@ -1,18 +1,19 @@
 <template>
   <b-container>
-
+    <b-row>
+      <b-col cols="11">
+      <b-button  size="sm" @click="worker" >
+            {{$t('calcTableGroup.workers')}}
+          </b-button>
+        </b-col>
+      <b-col cols="1" class="text-right">
     <print v-if="tmp.typeOfHead == 'Reports'"
     :windowPrint="windowPrint"
     :selectedCornty="selectedCornty"
     :project="project" :tmp="tmp"
     :account="account" :id="pid"
-    :disc='disc' :discP='discP'
-    :tax='tax' :taxDub='taxDub'
-    :taxP='taxP' :taxPDub='taxPDub'
-    :netto='netto' :brutto='brutto'
-    :butDiscPerc='butDiscPerc'
-    :partx='showTable()' :head="tmp.typeOfHead"
-    :addtaxColapsel="addtaxColapse"
+
+    :partx='[]' :head="tmp.typeOfHead"
     :workers="workers" :comments="comments"
     :customer="customer"
     :person="person"
@@ -23,7 +24,6 @@
     :makemodalpdf="makemodalpdf"
     :typeDocsList="typeDocsList"
     
-
     @selectedDocs="selectedDocs"
     @addPdf="addPdf"
     @addPdfSep="addPdfSep"
@@ -32,36 +32,19 @@
     @printOffer="printOffer"
     @hideWindowPrint="hideWindowPrint"
     ref="print"
-    >
+    ></print>
+    </b-col>
+  </b-row>
 
-    
-    <b-col><b-button  size="sm" @click="worker" >
-            {{$t('calcTableGroup.workers')}}
-          </b-button></b-col>
 
-      <!-- <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Type"></b-col>
-      <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Work"></b-col> -->
-    </print>
-    
 
-    <div v-for="(part, index) in showTable()" :key="part.id">
+    <div v-for="(table, index) in tables" :key="table.id">
       <reports-table
-      :value="part"
-      :tableId="index"
+      :table="table"
       :workers="workers"
-      :looks="looks"
       :selectedWorkers="selectedWorkers" 
+      :ref="'report'+table.id"
       >
-
-        <div slot-scope="table" slot="tableHead">
-          <b-link style="width:100%" @click="toog(part.parts.id)">
-            <span :id="'dp'+part.parts.id" style="display:none">+</span>
-            <span :id="'dm'+part.parts.id">-</span>
-          </b-link>
-          <span :contenteditable="true" @blur="updateNameReport($event, part.parts.id, part.parts.part_name_report)" @click.prevent.self>
-            {{part.parts.part_name_report?part.parts.part_name_report:part.parts.part_name}}
-          </span>
-        </div>
       </reports-table>
 
       <br>
@@ -72,7 +55,7 @@
 import axios from 'axios';
 export default {
   props: [
-    'value',
+    'selectedWorkers',
     'workers',
     'selectedDocsList',
     'addPdfs',
@@ -84,32 +67,21 @@ export default {
     'project',
     'tmp',
     'comments',
-    'loadDamages',
     'account',
-    'disc',
-    'discP',
-    'tax',
-    'taxDub',
-    'taxP',
-    'taxPDub',
-    'netto',
-    'brutto',
-    'butDiscPerc',
     'head',
-    'addtaxColapse',
     'id',
     'customer',
     'person',
     'selectCustomer',
-    'selectPerson',
-    'looks',
-    'selectedWorkers'
+    'selectPerson'
     ],
-  methods: {
-    toog(val){
-      document.getElementById('dm'+val).style.display = document.getElementById('dev'+val).style.display = (document.getElementById('dev'+val).style.display=='none') ? '' : 'none'
-      document.getElementById('dp'+val).style.display = (document.getElementById('dm'+val).style.display=='none') ? '' : 'none'
+    data() {
+      return {
+        tables:[]
+      }
     },
+  methods: {
+   
     toogMeas(val){
       document.getElementById('measurementProtocolOpen'+val).style.display = document.getElementById('mestable'+val).style.display = (document.getElementById('mestable'+val).style.display=='none') ? '' : 'none'
       document.getElementById('measurementProtocolClose'+val).style.display = (document.getElementById('measurementProtocolOpen'+val).style.display=='none') ? '' : 'none'
@@ -138,26 +110,62 @@ export default {
     openWindowPrint(){
       this.$emit('openWindowPrint')
     },
-    updateNameReport(newVal, id, partName) {
-      if(newVal.target.innerText != partName){
-        axios.get('/updateNameReport', {
-          params: {
-            nameReport: newVal.target.innerText.replace(/[\s]{2,}/, ''),
-            id: id
-          }
-        })
-      }
-    }, 
-    showTable(){
-      return this.value.filter((v)=>{
-        if(v.parts.reports_content.length>0){
-          return v
-        }
-      })
-    },
+
+    // showTable(){
+    //   return this.value.filter((v)=>{
+    //     if(v.parts.reports_content.length>0){
+    //       return v
+    //     }
+    //   })
+    // },
         worker() {
           this.$emit('worker')
-        }
+        },
+        getTablesInReports(id) {
+        axios.get('/get_tables_in_reports', {
+          params: {
+            id: id
+          }
+        }).then(response => {
+          this.tables = response.data;
+          if(response.data.length==0){
+        this.$emit('switchReports', false)
+      } 
+        })
+      },
+
+},
+
+    
+    mounted(){
+      this.$options.sockets.onmessage = (data) => {
+      var delimetr = data.data.split(':')
+
+      if (delimetr[0] == 'update_part_report') {
+        this.tables.filter((v)=>{
+          if (v.id == delimetr[1]) {
+            this.getTablesInReports(this.tmp.id)
+          };
+        })
+      }
+
+      if ((delimetr[0] == 'del_rows_for_report')) {
+        delimetr[1].split(',').forEach((tableForReload)=>{
+          this.$refs['report'+tableForReload][0].getRowsInReports(tableForReload)
+          this.selectedTables=[]
+        })
+      }
+
+      if (delimetr[0] == 'updateFildReport') {
+        var updateFild = (JSON.parse(data.data.split('updateFildReport:')[1]))
+        this.$refs['report'+updateFild.table_id][0].getFild(updateFild)
+      }
+
+   }
+
+
+
   }
+
 }
 </script>

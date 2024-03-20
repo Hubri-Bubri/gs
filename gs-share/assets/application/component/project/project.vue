@@ -9,9 +9,9 @@
         <b-form-group  :label="$t('project.startDate')+':'" label-cols="3" label-size="sm">
           <b-form-input size="sm" type="date"
           @change="updateProject('date', $event)" :value="project.date" placeholder="Enter date" 
-          :disabled="disablefild('project-start-date', id)"
-          @focus.native="changeDisable('f', 'project-start-date', id)"
-          @blur.native="changeDisable('b', 'project-start-date', id)" :id="'project-start-date'+id"/>
+
+
+          :id="'project-start-date'+id"/>
         </b-form-group>
         <!-- <b-tooltip triggers="none" :show="disablefild('pdata', id)" :target="'pdata'+id">
           {{disablefildUser('pdata', id)}}
@@ -29,9 +29,8 @@
           @change="updateProject('edate', $event)"
           :value="project.edate"
           placeholder="Enter date"
-          :disabled="disablefild('project-end-date', id)"
-          @focus.native="changeDisable('f', 'project-end-date', id)"
-          @blur.native="changeDisable('b', 'project-end-date', id)"
+     
+          
           :id="'project-end-date'+id" />
         </b-form-group>
       </b-col>
@@ -71,7 +70,7 @@
         <b-form-group :label="$t('customerDetail.zip')+':'" label-cols="3" label-size="sm">
           <b-input-group>
             <b-form-input type="text" @change="searchZip($event)" :value="project.zip1" :placeholder="$t('projects.ezip')" size="sm" :name="nohash"
-              :disabled="disablefild('pzip1', id)" @focus.native="changeDisable('f', 'pzip1', id)" @blur.native="changeDisable('b', 'pzip1', id)" :id="'pzip1'+id"  />
+              :id="'pzip1'+id"  />
              
                 <b-form-select value-field="code" text-field="name" size="sm" :name="nohash"
               :value="selectedCornty.code" :options="countries" @change="updateProject('country', $event)"/>
@@ -86,15 +85,15 @@
         </b-tooltip> -->
         <b-form-group :label="$t('projects.area')+':'" label-cols="3" label-size="sm">
           <b-form-input type="text" @change="updateProject('area', $event)" :value="project.area" :placeholder="$t('projects.earea')" size="sm" :name="nohash"
-          :disabled="disablefild('parea', id)" @focus.native="changeDisable('f', 'parea', id)" @blur.native="changeDisable('b', 'parea', id)" :id="'parea'+id"  />
+           :id="'parea'+id"  />
         </b-form-group>
         <!-- <b-tooltip triggers="none" :show="disablefild('parea', id)" :target="'parea'+id">
           {{disablefildUser('parea', id)}}
         </b-tooltip> -->
         <b-form-group :label="$t('customerDetail.city')+':'" label-cols="3" label-size="sm">
           <b-form-input  type="text" @change="updateProject('city1', $event)" :value="project.city1" size="sm" :name="nohash"
-          :placeholder="$t('projects.ecity')" :disabled="disablefild('pcity1', id)" @focus.native="changeDisable('f', 'pcity', id)"
-          @blur.native="changeDisable('b', 'pcity1', id)" :id="'pcity1'+id"  />
+          :placeholder="$t('projects.ecity')"
+          :id="'pcity1'+id"  />
         </b-form-group>
         <!-- <b-tooltip triggers="none" :show="disablefild('pcity', id)" :target="'pcity'+id">
           {{disablefildUser('pcity', id)}}
@@ -102,8 +101,8 @@
         <b-form-group :label="$t('customerDetail.street')+':'" label-cols="3" label-size="sm">
           <b-input-group>
             <b-form-input type="text" @change="updateProject('street1', $event)" :value="project.street1"
-            :placeholder="$t('projects.estreet')" :disabled="disablefild('pstreet1', id)" size="sm" :name="nohash"
-            @focus.native="changeDisable('f', 'pstreet1', id)" @blur.native="changeDisable('b', 'pstreet1', id)" :id="'pstreet1'+id" />
+            :placeholder="$t('projects.estreet')"  size="sm" :name="nohash"
+             :id="'pstreet1'+id" />
               <template #append><b-icon icon="pin-map" aria-hidden="true" @click="$emit('openmap')" class="m-1" /></template>
           </b-input-group>
         </b-form-group>
@@ -152,20 +151,16 @@
     </div> -->
 
     <div class="text-center" v-show="tablesBusy">
-      
-            
             <strong v-if="tableLoading" class="text-info">
               <b-spinner class="align-middle" ></b-spinner>
               {{$t('projects.loading')}}...
             </strong>
             <div v-else class="text-center">{{$t('projects.empty')}}</div>
           </div>
-
     <div v-for="name in typesForTables" v-if="getItems(name.type)!=''">
         {{$t('alert.'+name.type)}}
       <b-table :items="getItems(name.type)" hover  small :tbody-tr-class="rowClass" stacked="lg"
       :fields="fieldsTable" @row-clicked="inItemGetData">
-
         <template #cell(number)="it">
           <div v-if="name.type=='Invoices'" class="text-container">
             <span v-if="it.item.number.split(' ').length==5"  class="text-content">
@@ -198,21 +193,19 @@
             <span  class="text-content">{{ it.item.number.split(' ')[0] }}</span>
           </div>
         </template>
-
         <template #cell(delete)="it">
             <b-link @click.stop="offerDel(it.item.id)">
               <b-icon icon="trash" aria-hidden="true"></b-icon>
             </b-link>
         </template>
         <template #cell(status_set)="it">
-            <line-chart :datas="dataCharts(it.item)" :height="50" style="max-width:200px;" v-if="name.type=='Invoices'"/>
+            <line-chart :datas="dataCharts(it.item, (it.item.number.substr(0, 1)=='0')?'i':'s')" :height="50" style="max-width:200px;" v-if="name.type=='Invoices'"/>
             <b-form-select v-else  size="sm" v-model="it.item.status_set" @change="updateItem($event, 'status_set', it.item.id)"
             :style="computeStyleOffer(it.item.status_set)">
               <option v-for="opt in options" :style="computeStyleOffer(opt.text)">
                 {{opt.text}}
               </option>
             </b-form-select>
-    
         </template>
         <template #cell(brutto)="data">
           <div class="text-container">
@@ -253,8 +246,7 @@ export default {
   'id', 'tmp', 'itemsTable', 'showsubarr',
    'availablePersons', 'responseFiles', 'selrow',
   'area', 'typesForTables', 'availablePhons', 
-  'availableMails', 'countries', 'selectedCornty', 
-  'looks', 'workersForSend', 'selectCustomer', 
+  'availableMails', 'countries', 'selectedCornty', 'workersForSend', 'selectCustomer', 
   'selectPerson', 'selectMail', 'selectPhone'],
     data() {
       return {
@@ -293,7 +285,7 @@ export default {
           sortable: true
         },
         {
-          key: 'netto',
+          key: 'gen_summa',
           label: this.$t('edit.netto'),
           sortable: true
           // class: 'text-lg-right'
@@ -431,30 +423,30 @@ export default {
     showCommetnts(){
       this.$emit('showCommetnts')
     },
-    disablefild(fild, id){
-      var result = false
-      this.looks.forEach((val)=>{
-        if (val.rows_id == id) {
-          if (val.fild == fild) {
-            result = true
-          }
-        }
-      })
-      if (this.stopDis==true) result = false
-      if (this.type=='Invoices') result = true
-      return result
-    },
-    disablefildUser(fild, id){
-      var result = (this.type=='Invoices') ? '' : 'you'
-      this.looks.forEach((val)=>{
-        if (val.rows_id == id) {
-          if (val.fild == fild) {
-            result = val.user
-          }
-        }
-      })
-      return result
-    },
+    // disablefild(fild, id){
+    //   var result = false
+    //   this.looks.forEach((val)=>{
+    //     if (val.rows_id == id) {
+    //       if (val.fild == fild) {
+    //         result = true
+    //       }
+    //     }
+    //   })
+    //   if (this.stopDis==true) result = false
+    //   if (this.type=='Invoices') result = true
+    //   return result
+    // },
+    // disablefildUser(fild, id){
+    //   var result = (this.type=='Invoices') ? '' : 'you'
+    //   this.looks.forEach((val)=>{
+    //     if (val.rows_id == id) {
+    //       if (val.fild == fild) {
+    //         result = val.user
+    //       }
+    //     }
+    //   })
+    //   return result
+    // },
     getItems(type){
       if (type != 'Orders'){
         if (type != 'SUB'){
@@ -556,28 +548,28 @@ export default {
       }
       return val
     },
-    dataCharts(val){
-      if(val.brutto.substr(0, 1)=='-'){
-        var brutto=val.brutto.slice(1)
-        brutto=brutto.replace('.', '')
-        brutto=parseFloat(brutto.replace(',', '.'))
-        var pay = this.summFromRow(val, brutto)*100/brutto
-        var withOut =100-(this.summFromRow(val, brutto)*100/brutto)
-        var t='s'
-      } else {
+    dataCharts(val, t){
+      // if(val.brutto.substr(0, 1)=='-'){
+      //   var brutto=val.brutto.slice(1)
+      //   brutto=brutto.replace('.', '')
+      //   brutto=parseFloat(brutto.replace(',', '.'))
+      //   var pay = this.summFromRow(val, brutto)*100/brutto
+      //   var withOut =100-(this.summFromRow(val, brutto)*100/brutto)
+      //   var t='s'
+      // } else {
         var brutto=val.brutto.replace('.', '')
         brutto=parseFloat(brutto.replace(',', '.'))
         var pay = this.summFromRow(val, brutto)*100/brutto
         var withOut =100-(this.summFromRow(val, brutto)*100/brutto)
-        var t='i'
-      }
+        var t=t
+      // }
       return [pay, withOut, t]
     },
     summFromRow(row, brutto){ 
       var result = 0
-      // row.op.forEach((v)=>{
-      //   result = parseFloat(result) + parseFloat(v.value)
-      // })
+      row.op.forEach((v)=>{
+        result = parseFloat(result) + parseFloat(v.value)
+      })
       if (result>brutto){
         result = brutto
       }

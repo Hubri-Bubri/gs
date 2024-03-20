@@ -1,13 +1,44 @@
 <template>
   <b-container>
-    <slot name="tableHead" :tableId="tableId" ></slot>
-     <div visible :id="'dev'+value.parts.id">
+  
+      <b-row align-v="center">
+      <b-link style="text-decoration: none" @click="toog(table.id)">
+        <div
+          :id="'dp'+table.id"
+          style="display: none; vertical-align: middle; padding-right: 10px">
+          <b-icon icon="arrow-down" font-scale="1" />
+        </div>
+        <div :id="'dm'+table.id" style="vertical-align: middle; padding-right: 10px">
+          <b-icon icon="arrow-up" font-scale="1" />
+        </div>
+      </b-link>
+  
+      <div :id="'s'+table.id" style="display: none;">
+        <span v-show="table.summa!='0,00'" align-self="end" class="text-right">{{$t('projectDetail.total')}} {{table.summa}} €</span>
+        <span v-show="table.alt_summa!='0,00'" align-self="end" class="text-right" > {{$t('projectDetail.totalAlternative')}} {{table.alt_summa}} €</span>
+        &nbsp;|&nbsp;
+      </div>
+
+      <div
+        contenteditable
+        class="diveditable"
+        @click.prevent.self
+        @blur="tableRename($event.target.innerText, table.id, table.device)"
+        v-html="table.device"></div>
+
+      <!-- <b-icon
+        icon="trash"
+        aria-hidden="true"
+        @click="$emit('tableDelete', table.id, item_id)"
+        style="cursor: pointer" /> -->
+    </b-row>
+     <div visible :id="'dev'+table.id">
         <b-table-simple>
         <b-tr>
           <b-th class="text-center">#</b-th>
           <b-th class="text-center" style="">{{$t('measurement.location')}}</b-th>
-          <b-th class="text-center"  style="white-space:nowrap;">{{$t('measurement.type')}}</b-th>
-          <b-th class="text-center"  style="white-space:nowrap;">{{$t('measurement.number')}}</b-th>
+          <b-th class="text-center" style="white-space:nowrap;">{{$t('measurement.type')}}</b-th>
+          <b-th class="text-center" style="white-space:nowrap;">{{$t('measurement.number')}}</b-th>
           <b-th class="text-right" style="white-space:nowrap;">{{$t('measurement.useInHour')}} [KW]</b-th>
           <b-th class="text-right" style="white-space:nowrap;" colspan="2">{{$t('measurement.timeUsed')}}</b-th>
           <b-th class="text-right" style="white-space:nowrap;">{{$t('measurement.target')}} [h]</b-th>
@@ -17,10 +48,10 @@
           <b-th class="text-right" style="white-space:nowrap;">i</b-th>
           <b-th class="text-right" style="white-space:nowrap;">X</b-th>
         </b-tr>
-        <template v-for="(content, subIndex) in value.parts.devices_content">
-         <b-tr :key="'1tr-'+subIndex">
+        <template v-for="(content, subIndex) in device_list">
+         <b-tr>
             <b-td style="background:#e9ecef;white-space:nowrap;">{{(subIndex+1)}}</b-td>
-            <b-td><b-input :value="content.location" class="cForm-input"  @change="updateDeviceList($event, 'location', content.id)"></b-input></b-td>
+            <b-td><b-input :value="content.location" class="cForm-input"  @change="updateDeviceList(subIndex, $event, 'location', content.id, content.location)"></b-input></b-td>
             <b-td style="background:#e9ecef;white-space:nowrap;">{{content.designation}}</b-td>
             <b-td style="background:#e9ecef;white-space:nowrap;">{{content.serial}}</b-td>
             <b-td style="background:#e9ecef;white-space:nowrap;" class="text-right">{{(content.kilowatt.replace(',','.')/1000).toFixed(2).replace('.',',')}}</b-td>
@@ -35,10 +66,10 @@
               </b-link>
             </b-td>
             <b-td class="text-right">
-              <b-icon icon="trash" aria-hidden="true" @click="subPartDel(content.id, subIndex);"></b-icon>
+              <b-icon icon="trash" aria-hidden="true" style="cursor: pointer;" @click="subPartDel(content.id, subIndex);"></b-icon>
             </b-td>
           </b-tr>
-          <b-tr v-show="showRowFunc(content.id)" :key="'2tr-'+subIndex">
+          <b-tr v-show="showRowFunc(content.id)" >
             <b-th colspan="1" class="text-center"></b-th>
             <b-th colspan="2" class="text-center" style="padding-top: 5px;">{{$t('measurement.measurement')}}</b-th>
             <b-th colspan="2" class="text-center">{{$t('customerDetail.date')}}</b-th>
@@ -47,61 +78,63 @@
             <b-th colspan="2"></b-th>
           </b-tr>
 
-            <b-tr v-show="showRowFunc(content.id)" :key="'3tr-'+subIndex">
+            <b-tr v-show="showRowFunc(content.id)" >
                 <b-td colspan="1" class="text-center">1</b-td>
                 <b-td colspan="2" class="text-center" style="padding-top: 5px;">{{$t('measurement.installation')}}</b-td>
                 <b-td colspan="2" class="text-center">
                   <VueCtkDateTimePicker format="YYYY-MM-DD H:mm" no-label noClearButton  minute-interval="10"
-                  v-model="content.sdate"  @input="updateDeviceList($event, 'sdate', content.id)"/>
+                  v-model="content.sdate" @input="updateDeviceList(subIndex, $event, 'sdate', content.id, -1)"/>
                 </b-td>
                 <b-td colspan="4" class="text-center">
-                  <b-form-select class="text-center" :value="content.sworker" :options="workers"  @change="updateDeviceList($event, 'sworker', content.id)"/>
+                  <b-form-select class="text-center" :value="content.sworker" :options="workers"  @change="updateDeviceList(subIndex, $event, 'sworker', content.id, content.sworker)"/>
                 </b-td>
-                <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.smReading.replace('.',',')"  @change="updateDeviceList($event.replace(',','.'), 'smReading', content.id)"/></b-td>
+                <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.smReading.replace('.',',')"
+                  @change="updateDeviceList(subIndex, $event.replace(',','.'), 'smReading', content.id, content.smReading.replace('.',','))"/></b-td>
                 <b-td colspan="2"></b-td>
             </b-tr>
-         <b-tr v-for="(row, index) in content.subEquel"  v-show="showRowFunc(content.id)" :key="'4tr-'+index">
+         <b-tr v-for="(row, index) in content.subEquel"  v-show="showRowFunc(content.id)" :key="row.id">
                 <b-td colspan="1" class="text-center">{{(index+2)}}</b-td>
                 <b-td colspan="2" class="text-center" style="padding-top: 5px;">{{$t('measurement.intermediate')}}</b-td>
                 <b-td colspan="2" class="text-center">
                   <VueCtkDateTimePicker format="YYYY-MM-DD H:mm" no-label noClearButton minute-interval="10"
                   :min-date="(content.subEquel[index-1]!=undefined)?content.subEquel[index-1].date:content.sdate"
-                  v-model="row.date" @input="updateDeviceIntern($event, 'date', row.id)"/>
+                  v-model="row.date" @input="updateDeviceIntern(subIndex, index, $event, 'date', row.id, -1)"/>
                 </b-td>
                 <b-td colspan="4" class="text-center">
-                  <b-form-select  class="text-center" :value="row.worker" :options="workers" @change="updateDeviceIntern($event, 'worker', row.id)"/>
+                  <b-form-select  class="text-center" :value="row.worker" :options="workers" @change="updateDeviceIntern(subIndex, index, $event, 'worker', row.id, row.worker)"/>
                 </b-td>
-                <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input :value="row.mReading.replace('.',',')"  @change="updateDeviceIntern($event.replace(',','.'), 'mReading', row.id)" style="text-align: center"/></b-td>
+                <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input :value="row.mReading.replace('.',',')"
+                  @change="updateDeviceIntern(subIndex, index, $event.replace(',','.'), 'mReading', row.id ,row.mReading.replace('.',','))" style="text-align: center"/></b-td>
                 <b-td colspan="2" class="text-right">
-                  <b-icon icon="trash" aria-hidden="true"  @click="delmeasrow(row.id)"></b-icon>
+                  <b-icon icon="trash" aria-hidden="true" style="cursor: pointer;" @click="delmeasrow(row.id)"></b-icon>
                 </b-td>
             </b-tr>
-            <b-tr v-show="showRowFunc(content.id)" :key="'5tr-'+subIndex">
+            <b-tr v-show="showRowFunc(content.id)">
                 <b-td colspan="1" class="text-center">{{content.subEquel.length+2}}</b-td>
                 <b-td colspan="2" class="text-center" style="padding-top: 5px;">{{$t('measurement.dismounting')}}</b-td>
                 <b-td colspan="2" class="text-center">
                   <VueCtkDateTimePicker format="YYYY-MM-DD H:mm" no-label noClearButton  minute-interval="10"
                   :min-date="(content.subEquel[content.subEquel.length-1]!=undefined)?content.subEquel[content.subEquel.length-1].date:content.sdate"
-                  v-model="content.fdate" @input="updateDeviceList($event, 'fdate', content.id)"/>
+                  v-model="content.fdate" @input="updateDeviceList(subIndex, $event, 'fdate', content.id, -1)"/>
                 </b-td>
                 <b-td colspan="4" class="text-center">
-                  <b-form-select class="text-center" :value="content.fworker" :options="workers" @change="updateDeviceList($event, 'fworker', content.id)"/>
+                  <b-form-select class="text-center" :value="content.fworker" :options="workers" @change="updateDeviceList(subIndex, $event, 'fworker', content.id, content.fworker)"/>
                 </b-td>
-                <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.fmReading.replace('.',',')" @change="updateDeviceList($event.replace(',','.'), 'fmReading', content.id)"/></b-td>
+                <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.fmReading.replace('.',',')" @change="updateDeviceList(subIndex, $event.replace(',','.'), 'fmReading', content.id, content.fmReading.replace('.',','))"/></b-td>
                 <b-td colspan="2"></b-td>
             </b-tr>
-          <b-tr v-show="showRowFunc(content.id)" :key="'6tr-'+subIndex">
+          <b-tr v-show="showRowFunc(content.id)">
             <b-td class="text-center" style="border:0px;"><b-link @click="addmeasrow(content.id)" style="text-decoration: none !important;">+</b-link><br><br></b-td>
             <b-td colspan="12"></b-td>
           </b-tr>
         </template>
          <b-tr>
-            <b-td colspan="6" class="text-center"><b>{{$t('measurement.period')}} {{fromTo(value.parts.devices_content)}}</b></b-td>
+            <b-td colspan="6" class="text-center"><b>{{$t('measurement.period')}} {{fromTo(device_list)}}</b></b-td>
             <b-td class="text-right"><b>{{$t('topMenu.general')}}</b></b-td>
-            <b-td class="text-right"><b>{{sumTH(value.parts.devices_content)}}</b></b-td>
-            <b-td class="text-right"><b>{{sumAH(value.parts.devices_content)}}</b></b-td>
-            <b-td class="text-right"><b>{{sumTKW(value.parts.devices_content)}}</b></b-td>
-            <b-td class="text-right"><b>{{sumAKW(value.parts.devices_content)}}</b></b-td>
+            <b-td class="text-right"><b>{{sumTH(device_list)}}</b></b-td>
+            <b-td class="text-right"><b>{{sumAH(device_list)}}</b></b-td>
+            <b-td class="text-right"><b>{{sumTKW(device_list)}}</b></b-td>
+            <b-td class="text-right"><b>{{sumAKW(device_list)}}</b></b-td>
             <b-td colspan="2"></b-td>
           </b-tr>
       </b-table-simple>
@@ -115,15 +148,23 @@ import moment from 'moment';
 import axios from 'axios';
 export default {
   components: { VueCtkDateTimePicker },
-  props: ['value', 'tableId', 'workers'],
+  props: ['table', 'workers'],
     data() {
       return {
         showRows:[],
+        device_list:[]
       }
     },
   methods: {
+    toog(val){
+      document.getElementById('dm'+val).style.display = document.getElementById('dev'+val).style.display = (document.getElementById('dev'+val).style.display=='none') ? '' : 'none'
+      document.getElementById('dp'+val).style.display = (document.getElementById('dm'+val).style.display=='none') ? '' : 'none'
+    },
+
 fromTo(val){
+  
   function formatDate(date) {
+  if (date!=undefined){
   let dd = date.getDate();
   dd < 10 ? dd = '0' + dd : '';
 
@@ -132,7 +173,7 @@ fromTo(val){
 
   let yy = date.getFullYear();
   return  dd+'.'+mm+'.'+yy;
-  }
+  }}
   
   var from = [];
   var to =[];
@@ -203,33 +244,48 @@ return result
     var diffrent = moment(fend,"YYYY-MM-DD HH:mm").diff(moment(start,"YYYY-MM-DD HH:mm"), t)
     return diffrent
   },
-  updateDeviceIntern(newData, fild, id){
-    axios.get('/updateDeviceIntern', {params: {
-      newData: newData,
-      fild: fild,
-      id: id
-    }})
+
+  updateDeviceIntern(subIndex, index, newData, fild, id, old){
+    if (old!=newData){
+      axios.get('/updateDeviceIntern', {params: {
+        subIndex:subIndex,
+        index:index,
+        tableId: this.table.id,
+        newData: newData,
+        fild: fild,
+        id: id
+      }})
+    }
   },
-  updateDeviceList(newData, fild, id){
-    axios.get('/updateDeviceList', {params: {
-      newData: newData,
-      fild: fild,
-      id: id
-    }})
+
+  updateDeviceList(index, newData, fild, id, old){
+     if (old!=newData){
+      axios.get('/updateDeviceList', {
+        params: {
+          tableId: this.table.id,
+          index:index,
+          newData: newData,
+          fild: fild,
+          id: id
+      }
+    })
+   }
   },
   delmeasrow(id){
       if (confirm("Are you sure?")) {
         axios.get('/delmeasrow', {
           params: {
-            id: id
+            id: id,
+            tableId: this.table.id
           }
         })
       }
     },
     addmeasrow(id){
-      axios.get('/addmeasrow', {
+      axios.get('/addMeasrow', {
         params: {
-          id: id
+          id: id,
+          tableId: this.table.id
         }
       })
     },
@@ -246,24 +302,41 @@ return result
       if (confirm("Are you sure?")) {
         axios.get('/del_row_from_devices', {
           params: {
-            id: subDel_id
+            id: subDel_id,
+            tableId: this.table.id
           }
         })
       }
     },
-    sendDataTable(id, fild, data){
-      this.value.parts.devices_content.forEach((v)=>{
-        if(v.id==id){
-          axios.get('/update_table_data', {
-                        params: {
-                          id: id,
-                          fild: fild,
-                          data: data
-                        }
-          })         
-        }
-      })
-    },
+    tableRename(newVal, id, partName) {
+            if(newVal!= partName){
+                axios.get('/update_part_device', {
+                  params: {
+                    part_name: newVal,
+                    id: id
+                  }
+                })
+            }
+        },
+    getRowsInDevice(id) {
+         axios.get('/get_device_list', {
+            params: {
+               id: id
+            }
+         }).then(response => {
+            this.device_list = response.data;
+         })
+      },
+      getFild(updateFild) {
+        this.device_list[updateFild.index][updateFild.fild] = updateFild.value;
+      },
+      getFildMeasurement(updateFild) {
+        this.device_list[updateFild.subIndex].subEquel[updateFild.index][updateFild.fild] = updateFild.value;
+      },
   },
+  mounted() {
+    // unitPercent=((this.table.obj!='')&&(this.table.obj!=null))?this.table.obj.split(','):[];
+    this.getRowsInDevice(this.table.id);
+   }
 }
 </script>

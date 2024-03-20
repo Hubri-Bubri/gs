@@ -46,7 +46,7 @@ import images from '@share/component/project/images';
 
 import DamagesTableGroup from '@share/component/damages/damages-table-group';
 import DamagesTable from '@share/component/damages/damages-table';
-import damage from '@share/component/project/damage';
+// import damage from '@share/component/project/damage';
 
 import DevicesTableGroup from '@share/component/devices/devices-table-group';
 import DevicesTable from '@share/component/devices/devices-table';
@@ -56,8 +56,8 @@ import ReportsTableGroup from '@share/component/reports/reports-table-group';
 import ReportsTable from '@share/component/reports/reports-table';
 
 import edit from '@share/component/project/edit';
-import edevices from '@share/component/project/edevices';
-import ereports from '@share/component/project/ereports';
+// import edevices from '@share/component/project/edevices';
+// import ereports from '@share/component/project/ereports';
 
 import price from '@share/component/price/price';
 import devices from '@share/component/devices/devices';
@@ -163,10 +163,10 @@ Vue.component('project', project);
 Vue.component('docs', docs);
 Vue.component('images', images);
 Vue.component('edit', edit);
-Vue.component('edevices', edevices);
-Vue.component('ereports', ereports);
+// Vue.component('edevices', edevices);
+// Vue.component('ereports', ereports);
 
-Vue.component('damage', damage);
+// Vue.component('damage', damage);
 
 Vue.component('damages-table-group', DamagesTableGroup);
 Vue.component('damages-table', DamagesTable);

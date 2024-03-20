@@ -113,7 +113,7 @@
       <b-td @click="rowSelected(tr)" class="handle"> {{ index + 1 }}  </b-td>
       <b-td>
       <div
-        contenteditable="true" @click.prevent.self 
+        contenteditable="true"
         class="diveditable"
         @click.prevent.self
         @blur="updateDate($event.target.innerHTML, 'pos_num', tr.id)"
@@ -168,7 +168,7 @@
 
       <b-td>
             <div
-        contenteditable="true" @click.prevent.self 
+        contenteditable="true"
         class="diveditable"
         @click.prevent.self
         @blur="updateDate($event.target.innerHTML, 'unit', tr.id)"

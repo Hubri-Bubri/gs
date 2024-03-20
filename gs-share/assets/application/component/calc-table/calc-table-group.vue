@@ -1,21 +1,5 @@
 <template>
    <div>
-
-    <!-- <b-modal size="lg" centered id="reports" ref="reports" :title="$t('calcTableGroup.reports')" body-class="workerHeight">
-      <b-table class="tableProject" striped hover :fields="fieldsTableD" :items="raports" @row-clicked="inItemGetData" />        
-            <template slot="modal-footer">
-              <button type="button" left class="btn btn-secondary" @click="addInvoice('Damage Description')">{{$t('projectDetail.add')}}</button>
-           </template>
-        </b-modal> -->
-
-<!--     <b-modal size="sm" centered id="worker" ref="worker" title="Select Workers" body-class="workerHeight">
-        <b-form-input type="text" v-model="searchWorker"  style="margin-bottom: 4px !important;"/>
-            <b-form-checkbox-group buttons  button-variant="light" style="width:100%" v-model="selectedWorkers" stacked :options="workers_list"/>
-            <template slot="modal-footer">
-              <button type="button" left class="btn btn-secondary" @click="selectedWorkers=[]">Clear</button>
-           </template>
-        </b-modal>  -->
-
     <b-modal size="sm" centered id="ids" ref="ids" :title="$t('calcTableGroup.numberOfInvoice')" body-class="workerHeight" >
             <b-form-checkbox-group buttons  button-variant="light" style="width:100%" :checked="[selectedId]"  @change.native="selectedId=$event;"
             text-field="lastNumber" value-field="lastNumber" stacked :options="id_list" v-if="detectNewRound(id_list)" />
@@ -41,7 +25,7 @@
               <button type="button" left class="btn btn-secondary" @click="addSInvoiceLoad=true;okInvoiceSub();">OK</button>
            </template>
         </b-modal>
-      <!-- <b-form @submit.prevent="nameOfPart(nameofpart)"> -->
+
          <b-modal size="md" centered ref="shpart" :title="$t('calcTableGroup.addPart')">
           <b-container>
             <b-col cols="12" v-for="(nameofpart, index) in nameofparts"  :key="nameofpart.id">
@@ -89,63 +73,22 @@
                <b-button type="submit" variant="primary" data-toggle="addPart" @click="nameOfPart(nameofparts)">OK</b-button>
             </template>
          </b-modal>
-      <!-- </b-form> -->
+
       <b-modal size="md" centered id="addSub" ref="addSub" :title="$t('calcTableGroup.sub')">
         <b-form-group horizontal :label-cols="4" :label="$t('calcTableGroup.sub')+':'" style="padding: 5px;">
-          <!-- <b-form-input class="cForm-input" v-model="numberforsub"
-              type="text" placeholder="Enter name for SUB:" />
-          </b-form-group> -->
+
           <b-select label="name" v-model="numberforsub"  value-field="name" text-field="name" :options="customer_sub" />
            </b-form-group> 
           <template slot="modal-footer">
             <b-button type="submit" variant="primary"  @click="okcontractsub">OK</b-button>
           </template>
       </b-modal>
-
-      <print v-if="tmp.typeOfHead != 'Devices' & tmp.typeOfHead != 'Damage' & tmp.typeOfHead != 'Reports'" 
-      :windowPrint="windowPrint"
-      :selectedCornty="selectedCornty"
-      :project="project" :tmp="tmp"
-
-      :account="account" :id="pid"
-      :disc='tmp.disc' :discP='tmp.discP'
-      :tax='tmp.tax' :taxDub='tmp.taxDub'
-      :taxP='tmp.taxP' :taxPDub='tmp.taxPDub'
-      :netto='tmp.netto' :brutto='tmp.brutto'
-      :butDiscPerc='tmp.butDiscPerc'
-      :partx='tables' :head="tmp.typeOfHead"
-      :addtaxColapsel="tmp.addtaxColapse"
-      :workers="workers" :comments="comments"
-      :customer="customer"
-      :person="person"
-      :selectCustomer="selectCustomer"
-      :selectPerson="selectPerson"
-  
-      :selectedDocsList="selectedDocsList"
-      :addPdfs="addPdfs"
-      :makemodalpdf="makemodalpdf"
-      :typeDocsList="typeDocsList"
-
-      @selectedDocs="selectedDocs"
-      @addPdf="addPdf"
-      @printPdf="printPdf"
-      @preview="preview"
-      @printOffer="printOffer"
-      @hideWindowPrint="hideWindowPrint"
-      ref="print"
-      >
-
-        <!--             <b-button class="customButton" @click="move">
-                       Move
-                    </b-button> -->
-          <b-col>
+<hr>
+<b-row align-h="between">
+<b-col>
           <b-button size="sm" @click="(nameofparts=[{nameofpart:null, folderInDocumentsCheck:false, folderInDocuments:null, folderInImagesCheck:false, folderInImages:null}]);($refs['shpart'].show());">
               {{$t('calcTableGroup.addPart')}}
           </b-button>
-          <!-- <b-button  size="sm" @click="addRow()" v-show="selectedTables.length > 0">
-              {{$t('projectDetail.plusRow')}}
-          </b-button> -->
-
 
           <b-dropdown  size="sm" :text="$t('projectDetail.plusRow')"  class="text-center maxHeight" v-show="selectedTables.length > 0">
             <b-dropdown-item-button :key="count_row" v-for="count_row in 10"
@@ -154,16 +97,10 @@
             </b-dropdown-item-button>
           </b-dropdown>
 
-
           <b-button  size="sm"  @click="getSubCustomers()"  v-if="(tmp.type=='Orders')">
               {{$t('calcTableGroup.addSub')}}
           </b-button>
-<!--           <b-button  class="customButton col-12 col-lg-1" @click="addInvoice('Damage Description')"  style="min-width:55px;" v-if="(type=='Orders')"> 
-              To Damage
-          </b-button> -->
-<!--           <b-button  size="sm"  @click="reports" >
-              {{$t('calcTableGroup.reports')}}
-          </b-button> -->
+
           <b-button  size="sm" @click="worker" v-if="(tmp.type!='StandingOrder')">
             {{$t('calcTableGroup.workers')}}
           </b-button>
@@ -178,7 +115,6 @@
             {{$t('calcTableGroup.timetableExec')}}
           </b-button>
 
-
           <b-button size="sm"  @click="addInvoice('SInvoices')" v-if="(tmp.type=='SUB')" :disabled="addSInvoiceLoad">
             {{addSInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.subInvoice')}}
             <b-iconstack font-scale="1" v-if="addSInvoiceLoad">
@@ -192,44 +128,35 @@
               <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
             </b-iconstack>
           </b-button>
-          <b-button @click="addInvoice('removeInvoices')"  size="sm"  v-if="(tmp.type=='Invoices')" :disabled="addInvoiceLoad" variant="danger">
+
+          <b-button @click="addInvoice('removeInvoices')"  size="sm"  v-if="(tmp.type=='Invoices')&&(tmp.number.substr(0, 1)=='0')" :disabled="addInvoiceLoad" variant="danger">
             {{addInvoiceLoad?$t('calcTableGroup.toInoviceInProgress'):$t('calcTableGroup.removeInovice')}}
             <b-iconstack font-scale="1" v-if="addInvoiceLoad">
               <b-icon stacked icon="circle-fill" animation="throb" variant="primary"></b-icon>
             </b-iconstack>
           </b-button>
-          </b-col>
-<!--           <label v-if="(type!='SUB'&&type!='Invoices')">{{$t('calcTableGroup.type')}}:&nbsp;&nbsp;</label>
-          <b-select v-if="(type!='SUB'&&type!='Invoices')" :value="$t('oneCountAlret.'+type)" @change="offerChangeType(id, $event)"
-          :options="getOpt()"  size="sm" />&nbsp;&nbsp;&nbsp; -->
-          
-          <!-- <label>{{$t('calcTableGroup.work')}}:&nbsp;&nbsp;</label> -->
-          <!-- <b-select :value="tmp.work" :options="works" @change="updateItem($event, 'work', tmp.id)"  size="sm"/> -->
-        <b-col cols="12" lg="2">
-        <!-- <b-select v-if="(type!='SUB'&&type!='Invoices')" :value="$t('oneCountAlret.'+type)" size="sm"
-        @change="offerChangeType(id, $event)" :options="getOpt()" /> -->
+        </b-col>
+        <b-col class="text-right">
         <b-dropdown  size="sm" :text="$t('oneCountAlret.'+tmp.type)"  class="text-center maxHeight" v-if="(tmp.type!='SUB'&&tmp.type!='Invoices')">
           <b-dropdown-item-button :key="opt" v-for="opt in getOpt()"
           @click="offerChangeType(tmp.id, opt)" >
             {{opt}} {{($t('oneCountAlret.'+tmp.type) == opt)?'('+$t('company.copy')+')':''}}
           </b-dropdown-item-button>
         </b-dropdown>
-      </b-col>
-      <b-col cols="12" lg="2">
+
         <b-dropdown  size="sm" :text="detectOfWork()"  class="text-center maxHeight">
           <b-dropdown-item-button :key="index" v-for="(opt, index) in works"
-          @click="updateItem(opt.value, 'work', tmp.id)" >
+          @click="updateItem(opt.value, 'work', tmp.id, tmp.work)" >
             {{opt.text}}
           </b-dropdown-item-button>
         </b-dropdown>
 
+        <b-button size="sm" @click="$emit('printOffer')">
+          <b-icon icon="printer" aria-hidden="true"></b-icon>
+        </b-button>
 
-        <!-- <b-select :value="detectOfWork()"
-        :options="works" size="sm" @change="updateItem($event, 'work', tmp.id)" /> -->
-      </b-col>
-
-<!-- this.$t('calcTableGroup.work') -->
-</print>
+</b-col>
+    </b-row><br />
 <!-- value.length==0 -->
 
 
@@ -282,9 +209,7 @@ export default {
     components: {
         draggable,
     },
-    props: ['tmp', 'workers', 'availableMails', 'plan',
-    'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList','selectedCornty', 'project',  'account', 'pid', 'person', 'customer', 'selectCustomer', 'selectPerson', 'windowPrint',
-     'comments','works', 'selectedWorkers', 'wwidth', 'opt'],
+    props: ['tmp', 'workers', 'availableMails', 'plan', 'works', 'selectedWorkers', 'opt', 'pid'],
     data() {
         return {
 
@@ -383,20 +308,6 @@ computed: {
 
   },
 mounted(){
-// this.head = this.tmp.typeOfHead
-// this.id = this.tmp.id
-// this.type = this.tmp.type
-// this.disc = this.tmp.disc
-// this.discP = this.tmp.discP
-// this.tax = this.tmp.tax
-// this.taxDub = this.tmp.taxDub
-// this.taxP = this.tmp.taxP
-// this.taxPDub = this.tmp.taxPDub
-// this.netto = this.tmp.netto
-// this.brutto = this.tmp.brutto
-// this.butDiscPerc = this.tmp.butDiscPerc
-// this.addtaxColapse = this.tmp.addtaxColapse
-
     axios.get('/get_units').then(response => {
     this.unitType = response.data.sort();
     });
@@ -536,12 +447,6 @@ detectOfWork(){
     return this.tmp.work;
   }
 },
-// toog(val){
-//   document.getElementById('m'+val).style.display = document.getElementById('partx'+val).style.display = (document.getElementById('partx'+val).style.display=='none') ? '' : 'none'
-//   document.getElementById('p'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
-//   document.getElementById('hr'+val).style.display = (document.getElementById('m'+val).style.display=='none') ? '' : 'none'
-
-// },
 
 detectNewRound(id_list){
 var year = 2020
@@ -555,59 +460,48 @@ if (id_list[id_list.length-1]){
 }
 return (year == nowYear)
 },
-          selectedDocs(event){
-          this.$emit('selectedDocs', event)
-        },
-        addPdf() {
-          this.$emit('addPdf')
-        },
-        printPdf() {
-          this.$emit('printPdf')
-        },
-        preview() {
-          this.$emit('preview')
-        },
-        printOffer() {
-          this.$emit('printOffer')
-        },
-hideWindowPrint(){
-  this.$emit('hideWindowPrint')
-},
-openWindowPrint(){
-  this.$emit('openWindowPrint')
-},
+        //   selectedDocs(event){
+        //   this.$emit('selectedDocs', event)
+        // },
+        // addPdf() {
+        //   this.$emit('addPdf')
+        // },
+        // printPdf() {
+        //   this.$emit('printPdf')
+        // },
+        // preview() {
+        //   this.$emit('preview')
+        // },
+        // printOffer() {
+        //   this.$emit('printOffer')
+        // },
+// hideWindowPrint(){
+//   this.$emit('hideWindowPrint')
+// },
+// openWindowPrint(){
+//   this.$emit('openWindowPrint')
+// },
 getSubCustomers(){
 axios.get('/customer_sub').then(response => {
                this.customer_sub=response.data;
                 this.$refs.addSub.show();
-
-
-                 
-               // this.items1= response.data
-               // this.itemsFilter((this.show!='Show')?0:1)
   })
 
 
 },
 
-    updateItem(val, type, id){
-      // alert()
-      // if (this.updatePojectFunc==0){
-        axios.post('/update_item_from_project', {
-              
-                   val: val,
-                   type: type,
-                   id: id
-                 
-        }).then(response => {
-          // this.updatePojectFunc=1
+updateItem(val, type, id, old) {
+      if (old != val) {
+        axios.get('/update_item_from_project', {
+          params: {
+            val: val,
+            type: type,
+            id: id
+          }
         })
-      // }
-    },
+      }
+		},
 
-      // sort(val){
-      //   return val
-      // },
     discOfPercent(){
       this.$emit('changeSum'); 
     },
@@ -621,36 +515,6 @@ axios.get('/customer_sub').then(response => {
                   })
     },
 
-// inItemGetData(item, index) {
-//   this.tmp.typeOfHead = 'Damage Description',
-//   this.tmp.number = item.number,
-//   this.tmp.date = item.date,
-//   this.tmp.place = item.place,
-//   this.tmp.insurance = item.insurance_number,
-//   this.tmp.work = item.work,
-//   this.tmp.other = item.other,
-//   this.tmp.type='Damage Description',
-//   this.tmp.id=item.id,
-//   this.tmp.dateEvent = item.dateEvent,
-//   this.tmp.dateInspect = item.dateInspect,
-//   this.tmp.worker = item.ExamWorker,
-//   this.partx=[],
- 
-//  this.$socket.send('getProjectDetail')
-// },
-
-
-
-      // reports(){
-      // axios.get('/get_reports', {
-      //   params: {
-      //     id: this.id
-      //   }
-      // }).then(response => {
-      //   this.raports = response.data
-      // })
-      //   this.$refs.reports.show()
-      // },
       getOpt(){
        var opts = []
        this.opt.forEach((v)=>{
@@ -684,8 +548,6 @@ axios.get('/customer_sub').then(response => {
             })
 
         }
-
- 
         },
         okInvoice(newRange){
         this.$refs.ids.hide(),
@@ -700,8 +562,6 @@ axios.get('/customer_sub').then(response => {
             }).then(response => {
               this.addInvoiceLoad = false
             })
-
-        
         },
         okInvoiceSub(){
         this.$refs.ids_sub.hide(),
@@ -740,131 +600,39 @@ axios.get('/customer_sub').then(response => {
                     type: type
                 }
             })
-          // this.type = type
           }
         },
-        // showImages(classId){
-        //   const viewer = this.$el.querySelector('.'+classId).$viewer
-        //   viewer.show()
-        // },
- 
         onItems($event){
           { this.$emit('input', $event) }
         },
         nameOfPart(nameofparts) {
-          // console.log(nameofparts)
             var tmpArrValue = []
             this.shpart = true,
             this.$refs.shpart.hide(),
-            // tmpArrValue.push({
-            //          parts: {
-            //              checkbox_list: {
-            //                  flavours: {},
-            //                  selected: {},
-            //                  allSelected: {},
-            //                  indeterminate: {}
-            //              },
-            //              part_content: []
-            //          }
-            //      })
-
-             axios.get('/add_part', {
+            axios.get('/add_part', {
                           params: {
                               parts_names:  JSON.stringify(nameofparts), 
                               item_id: this.tmp.id,
                               pid:this.pid
                            }
                       })
-            // this.$emit('input', tmpArrValue.concat(this.value))
         },
-        // okMoveToCopy() {
-        //     this.$refs.move.hide()
-        // },
-        // move() {
-        //     if (this.color.length != 0) {
-        //         this.counter = -1
-        //         this.moveToCopy = []
-        //         this.oldPartx = []
-        //         this.$refs.move.show()
-        //     } else {
-        //         alert('no selected rows')
-        //     }
-        // },
-        // moveToCopySelect(event, radio) {
-        //     var nowPartx = JSON.parse(JSON.stringify(this.value))
-        //     var tmpArr = this.tmpArr = []
-        //     this.oldColor.push(JSON.parse(JSON.stringify(this.color)))
-        //     this.oldPartx.push(JSON.parse(JSON.stringify(this.value)))
-        //     var tmpArrCp = JSON.parse(JSON.stringify(this.value))
-        //     var newColor = []
-        //     this.color.forEach((clolorRow) => {
-        //         var partIndex = clolorRow.split('-')
-        //         nowPartx.forEach(function(part, index) {
-        //             var temRow = ''
-        //             var other = ''
-        //             if (part.parts.part_name == partIndex[0]) {
-        //                 temRow = part.parts.part_content[partIndex[1]]
-        //                 other = tmpArrCp[index].parts.part_content[partIndex[1]]
-        //                 tmpArr.splice(0, 0, other)
-        //                 if (radio == 'Move') {
-        //                     part.parts.part_content.splice(temRow, 1)
-        //                 }
-        //             }
-        //         })
-        //     })
-
-        //     event.forEach((eve)=> {
-        //         nowPartx.forEach((part)=>{
-        //             if (part.parts.part_name == eve) {
-        //                 this.tmpArr.forEach(function(val, index) {
-        //                     newColor.push(part.parts.part_name + '-' + index)
-        //                     part.parts.part_content.unshift(val)
-        //                 })
-        //             }
-        //         })
-        //     })
-        //     this.color = []
-        //     this.color = newColor.slice()
-        //     this.counter = this.counter + 1
-        //     this.$emit('input', nowPartx)
-        // },
         tableDelete(id, item_id) {
-            // console.log(del_id);
             if (confirm(this.$t('alert.sure'))){
-            // var deltable=this.value.filter(function(val){return (val!=part)})
-            // this.$emit('input', deltable)
-
             axios.get('/table_delete', {
                 params: {
                   id: id,
                   item_id
                 }
             })
-
             }
-
         },
-        // cancelPartx(indexButton) {
-        //     var tmpArrValue = []
-        //     this.color = []
-        //     this.moveToCopy = []
-        //     this.oldPartx[indexButton].forEach((val)=> {
-        //         tmpArrValue.push(val)
-        //     })
-        //     this.$emit('input', tmpArrValue)
-        //     this.color = JSON.parse(JSON.stringify(this.oldColor[indexButton]))
-        //     this.counter = this.counter - 1
-        // },
-        // okMoveToCopy() {
-        //     this.$refs.move.hide()
-        // },
         worker() {
           this.$emit('worker')
         },
         okWorker() {
             this.$refs.worker.hide()
         }
-
     }
 }
 </script>

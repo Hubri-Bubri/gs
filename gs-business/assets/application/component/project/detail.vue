@@ -1,6 +1,6 @@
 <template>
   <container>
-    <input
+    <!-- <input
       ref="unfocus"
       style="
         width: 0px;
@@ -11,8 +11,44 @@
         margin: 0;
         padding: 0;
         border: 0;
-      "
-    />
+      ":windowPrint="windowPrint"
+    /> -->
+    <print
+      
+      :selectedCornty="selectedCornty"
+      :project="project"
+      :tmp="tmp"
+      :disc='tmp.disc'
+      :discP='tmp.discP'
+      :tax='tmp.tax'
+      :taxDub='tmp.taxDub'
+      :taxP='tmp.taxP'
+      :taxPDub='tmp.taxPDub'
+      :netto='tmp.netto'
+      :brutto='tmp.brutto'
+      :butDiscPerc='tmp.butDiscPerc'
+      :partx='[]'
+      :head="tmp.typeOfHead"
+      :addtaxColapsel="tmp.addtaxColapse"
+      :workers="workers"
+      :comments="comments"
+      :customer="customer"
+      :person="person"
+      :selectCustomer="selectCustomer"
+      :selectPerson="selectPerson"
+      :selectedDocsList="selectedDocsList"
+      :addPdfs="addPdfs"
+      :makemodalpdf="makemodalpdf"
+      :typeDocsList="typeDocsList"
+      @selectedDocs="selectedDocs"
+      @addPdf="addPdf"
+      @printPdf="printPdf"
+      @preview="preview"
+      @printOffer="printOffer"
+      @hideWindowPrint="hideWindowPrint"
+      ref="print"
+      >
+</print>
     <b-modal size="md" centered ref="movedoc" :title="$t('projectDetail.move')">
       <b-form-select
         class=""
@@ -482,7 +518,7 @@
                       :availablePhons="availablePhons"
                       :availableMails="availableMails"
                       :countries="countries"
-                      :looks="looks"
+                      
                       :tmp="tmp"
                       :workersForSend="workersForSend"
                       :selectCustomer="selectCustomer"
@@ -508,6 +544,7 @@
                       @showCommetnts="showCommetnts()"
                     >
                     </project>
+                    <!-- :looks="looks" -->
                   </b-container>
                 </container-body>
               </container>
@@ -593,8 +630,7 @@
                     <b-button
                       @click="sendDevice"
                       :disabled="selectedTables.length<=0"
-                      >{{$t('projectDetail.send')}}</b-button
-                    >
+                      >{{$t('projectDetail.send')}}</b-button>
                     <b-button @click="$refs.devChild1.hidePosition()">
                       <b-icon icon="layout-three-columns" aria-hidden="true">
                       </b-icon>
@@ -624,7 +660,7 @@
                     @filedel="filedel"
                     @updatefilename="updatefilename"
                     @updatedocname="updatedocname"
-                    @changeDisable="changeDisable"
+                    
                     @loadDocToFrame="ploadDocToFrame"
                     :idNodeDoc="idNodeDoc"
                     :docsIds="docs_menu_ids"
@@ -638,6 +674,7 @@
                     @getDocs="getDocs()"
                   >
                   </docs>
+                  <!-- @changeDisable="changeDisable" -->
                 </container-body>
                 <container-footer style="z-index: 2">
                   <b-collapse v-model="dropDoc" id="dropDoc3">
@@ -822,44 +859,41 @@
                     ref="editList"
                     :tmp="tmp"
                     :project="project"
-                    :looks="looks"
                     :works="works"
                     :selectedCornty="selectedCornty"
                     :id="id"
                     :comments="comments"
-
                     :typesForTables="typesForTables"
                     :workers="workers"
                     :plan="plan"
-
                     :customer="customer"
                     :person="person"
                     :selectCustomer="selectCustomer"
                     :selectPerson="selectPerson"
                     :selectedWorkers="selectedWorkers"
-                    :windowPrint="windowPrint"
-                    :selectedDocsList="selectedDocsList"
-                    :addPdfs="addPdfs"
-                    :makemodalpdf="makemodalpdf"
-                    :typeDocsList="typeDocsList"
-                    
                     :availableMails="availableMails"
-
-                    @loded="loded"
                     @sendMail="sendTimeTableMail"
                     @seltable="seltable"
-                    @projectOther="projectOther"
-                    @selectedDocs="selectedDocs"
-                    @addPdf="addPdf"
+                    @countDigitals="countDigitals"
+                  ></edit>
+
+
+
+
+                  <!-- 
+                    :windowPrint="windowPrint"
+                  :selectedDocsList="selectedDocsList"
+                  :addPdfs="addPdfs"
+                  :makemodalpdf="makemodalpdf"
+                  :typeDocsList="typeDocsList"
+                   @loded="loded"
+                  @selectedDocs="selectedDocs"
+                  @addPdf="addPdf"
                     @printPdf="printPdf"
                     @preview="preview"
                     @printOffer="printOffer"
                     @worker="worker"
-                    @hideWindowPrint="hideWindowPrint"
-                    
-                    @countDigitals="countDigitals"
-                  >
-                  </edit>
+                    @hideWindowPrint="hideWindowPrint" -->
                   <!-- :funcStop="funcStop" -->
                   <!-- @tabletopartx="tabletopartx" -->
                   <!-- :rowsBusy="rowsBusy" -->
@@ -880,7 +914,7 @@
                     "
                     @mouseover="cloudHover=true"
                     @mouseleave="cloudHover=false"
-                    @click="updateItem($refs['refCommentOfTable'].quill.getHTML(), 'comment', tmp.id);tmp.comment=$refs['refCommentOfTable'].quill.getHTML();changeDisable('b', 'refCommentOfTable', tmp.id);cloudChange=false;cloudLoad=true;"
+                    @click="updateItem($refs['refCommentOfTable'].quill.getHTML(), 'comment', tmp.id);tmp.comment=$refs['refCommentOfTable'].quill.getHTML();cloudChange=false;cloudLoad=true;"
                     v-if="(openEditor==true)"
                   >
                     <b-icon
@@ -935,7 +969,7 @@
                     >
                     </b-icon>
                   </b-iconstack>
-                  <span
+                  <!-- <span
                     v-show="(disablefildUser('refCommentOfTable', tmp.id)!='you')"
                     style="
                       position: relative;
@@ -946,13 +980,13 @@
                     "
                     v-if="(openEditor==true)"
                     >{{disablefildUser('refCommentOfTable', tmp.id)}}</span
-                  >
+                  > -->
                   <vue-editor
                     :value="tmp.comment"
                     :editorToolbar="customToolbar"
                     v-if="(openEditor==true)"
-                    @focus="changeDisable('f', 'refCommentOfTable', tmp.id);cloudChange=true;"
-                    :disabled="disablefild('refCommentOfTable', tmp.id)?'disabled':false"
+                   
+                    
                     style="position: relative; top: 0px; z-index: 1"
                     class="text-right"
                     ref="refCommentOfTable"
@@ -980,17 +1014,16 @@
                 </container-footer>
               </container>
             </b-tab>
-            <b-tab v-if="devicesTab()" ref="devices">
+            <b-tab ref="devices" v-if="includeDevices">
               <template #title> {{$t('projectDetail.devices')}} </template>
               <container>
                 <container-body>
-                  <edevices
+                  <!-- <edevices
                     :tmp="tmp"
                     :project="project"
                     :selectedCornty="selectedCornty"
                     :id="id"
                     :workers="workers"
-                    :partx="partx"
                     :customer="customer"
                     :person="person"
                     :selectCustomer="selectCustomer"
@@ -1009,22 +1042,87 @@
                     @printOffer="printOffer"
                     @hideWindowPrint="hideWindowPrint"
                     ref="edeviceList"
-                  >
-                  </edevices>
+                    v-if="true"
+                  ></edevices> -->
+
+<!-- 
+
+                  'value',
+    'workers',
+    'selectedDocsList',
+    'addPdfs',
+    'makemodalpdf',
+    'typeDocsList',
+    'windowPrint',
+    'pid',
+    'selectedCornty',
+    'project',
+    'tmp',
+    'comments',
+    'account',
+    'disc',
+    'discP',
+    'tax',
+    'taxDub',
+    'taxP',
+    'taxPDub',
+    'netto',
+    'brutto',
+    'butDiscPerc',
+    'head',
+    'addtaxColapse',
+    'id',
+    'customer',
+    'person',
+    'selectCustomer',
+    'selectPerson' -->
+
+                  <devices-table-group
+                  
+                    :windowPrint="windowPrint"
+                    :works="works"
+                    :selectedCornty="selectedCornty"
+                    :project="project"
+                    :account="$security.table.account"
+                    :pid="id"
+                    :comments="comments"
+                    :tmp="tmp"
+                    :workers="workers"
+                    :customer="customer"
+                    :person="person"
+                    :selectCustomer="selectCustomer"
+                    :selectPerson="selectPerson"
+                    :selectedWorkers="selectedWorkers"
+                    :selectedDocsList="selectedDocsList"
+                    :addPdfs="addPdfs"
+                    :makemodalpdf="makemodalpdf"
+                    :typeDocsList="typeDocsList"
+                    @selectedDocs="selectedDocs"
+                    @addPdf="addPdf"
+                    @addPdfSep="addPdfSep"
+                    @printPdf="printPdf"
+                    @preview="preview"
+                    @printOffer="printOffer"
+                    @worker="worker"
+                    @hideWindowPrint="hideWindowPrint"
+
+                    @switchDevices="switchDevices"
+                    ref="edeviceList"
+                    ></devices-table-group>
                 </container-body>
               </container>
             </b-tab>
-            <b-tab v-if="damageTab()" ref="damage">
+            <b-tab ref="damage" v-if="includeDamages">
               <template #title> {{$t('projectDetail.damage')}} </template>
               <container>
                 <container-body>
-                  <damage
+                  <damages-table-group 
+                    
                     :tmp="tmp"
                     :project="project"
                     :selectedCornty="selectedCornty"
                     :id="id"
                     :workers="workers"
-                    :partx="partx"
                     :customer="customer"
                     :person="person"
                     :selectCustomer="selectCustomer"
@@ -1043,17 +1141,17 @@
                     @preview="preview"
                     @printOffer="printOffer"
                     @hideWindowPrint="hideWindowPrint"
-                    ref="damageList"
-                  >
-                  </damage>
+
+                    @switchDamages="switchDamages"
+                    ref="damageList"></damages-table-group>
                 </container-body>
               </container>
             </b-tab>
-            <b-tab v-if="reportsTab()" ref="reports">
+            <b-tab  ref="reports" v-if="includeReports">
               <template #title> {{$t('projectDetail.reports')}} </template>
               <container>
                 <container-body>
-                  <ereports
+                  <!-- <ereports
                     :tmp="tmp"
                     :project="project"
                     :selectedCornty="selectedCornty"
@@ -1080,8 +1178,39 @@
                     @printOffer="printOffer"
                     @hideWindowPrint="hideWindowPrint"
                     ref="ereportsList"
+                    v-if="false"
                   >
-                  </ereports>
+                  </ereports> -->
+
+                  <reports-table-group
+                  
+                    :tmp="tmp"
+                    :project="project"
+                    :selectedCornty="selectedCornty"
+                    :id="id"
+                    :workers="workers"
+                    :customer="customer"
+                    :person="person"
+                    :selectCustomer="selectCustomer"
+                    :selectPerson="selectPerson"
+                    :selectedWorkers="selectedWorkers"
+                    :selectedDocsList="selectedDocsList"
+                    :windowPrint="windowPrint"
+                    :addPdfs="addPdfs"
+                    :makemodalpdf="makemodalpdf"
+                    :typeDocsList="typeDocsList"
+                    :wwidth="wwidth"
+                    @worker="worker"
+                    @selectedDocs="selectedDocs"
+                    @addPdf="addPdf"
+                    @addPdfSep="addPdfSep"
+                    @printPdf="printPdf"
+                    @preview="preview"
+                    @printOffer="printOffer"
+                    @hideWindowPrint="hideWindowPrint"
+                    @switchReports="switchReports"
+                    ref="ereportsList"></reports-table-group>
+
                 </container-body>
               </container>
             </b-tab>
@@ -1348,7 +1477,10 @@ export default {
 			availablePersons: [],
 			availableMails: [],
 			availablePhons: [],
-			looks: []
+			// looks: [],
+      includeDevices:false,
+      includeDamages:false,
+      includeReports:false
 		}
 	},
 	computed: {
@@ -1572,6 +1704,7 @@ export default {
 			this.domageImages.forEach((v, i) => {
 				if (v._rowVariant != '') ids.push(v.id.split('image?id=')[1])
 			})
+      this.includeDamages = true;
 			axios.get('/send_damage', {
 				params: {
 					ids: ids.join(),
@@ -1579,37 +1712,41 @@ export default {
 				}
 			}).then(response => {
 				this.domageImages.forEach(v => {
-					v._rowVariant = ''
+					v._rowVariant = '';
+          this.$refs.damageList.getTablesInDamages(this.tmp.id);
 				})
 			})
 		},
-		reportsTab() {
-			var countDev = 0
-			this.partx.forEach((valuePart) => {
-				if (valuePart.parts.reports_content.length > 0) {
-					countDev = countDev + 1
-				}
-			})
-			return (countDev > 0)
+		// reportsTab() {
+		// 	var countDev = 0
+		// 	this.partx.forEach((valuePart) => {
+		// 		if (valuePart.parts.reports_content.length > 0) {
+		// 			countDev = countDev + 1
+		// 		}
+		// 	})
+		// 	return (countDev > 0)
+		// },
+		// damageTab() {
+		// 	var countDev = 0
+		// 	this.partx.forEach((valuePart) => {
+		// 		if (valuePart.parts.damage_content.length > 0) {
+		// 			countDev = countDev + 1
+		// 		}
+		// 	})
+		// 	return (countDev > 0)
+		// },
+    switchDevices(value) {
+   
+      this.includeDevices = value
 		},
-		damageTab() {
-			var countDev = 0
-			this.partx.forEach((valuePart) => {
-				if (valuePart.parts.damage_content.length > 0) {
-					countDev = countDev + 1
-				}
-			})
-			return (countDev > 0)
+    switchDamages(value) {
+      this.includeDamages = value
 		},
-		devicesTab() {
-			var countDev = 0
-			this.partx.forEach((valuePart) => {
-				if (valuePart.parts.devices_content.length > 0) {
-					countDev = countDev + 1
-				}
-			})
-			return (countDev > 0)
+		switchReports(value) {
+  
+      this.includeReports = value
 		},
+    
 		selectedDocs(event) {
 			this.selectedDocsList = []
 			this.selectedDocsList = event
@@ -1643,8 +1780,8 @@ export default {
 				}
 			}
 			if (this.$refs.edeviceList != undefined) {
-				if (this.$refs.edeviceList.$refs.deviceGroup.$refs.print != undefined) {
-					this.$refs.edeviceList.$refs.deviceGroup.$refs.print.previewPDFForm();
+				if (this.$refs.edeviceList.$refs.print != undefined) {
+					this.$refs.edeviceList.$refs.print.previewPDFForm();
 				}
 			}
 			if (this.$refs.ereportsList != undefined) {
@@ -1658,7 +1795,8 @@ export default {
 			this.makemodalpdf = true;
 			axios.get('/get_type_docs', {
 				params: {
-					type: this.tmp.typeOfHead
+					// type: this.tmp.typeOfHead
+          type: this.tmp.type
 				}
 			}).then(response => {
 				this.typeDocsList = response.data
@@ -2271,6 +2409,7 @@ export default {
 			this.selectedPriceDev.forEach((v, i) => {
 				ids.push(v.id)
 			})
+      this.includeDevices = true;
 			axios.get('/send_devices', {
 				params: {
 					ids: ids.join(),
@@ -2279,7 +2418,8 @@ export default {
 			}).then(response => {
 				this.selectedPriceDev = []
 				this.itemsPriceDev.forEach(v => {
-					v._rowVariant = ''
+					v._rowVariant = '';
+        this.$refs.edeviceList.getTablesInDevices(this.tmp.id);
 				})
 			})
 		},
@@ -2288,6 +2428,7 @@ export default {
 			this.selectedReport.forEach((v, i) => {
 				ids.push(v.id)
 			})
+      this.includeReports = true;
 			axios.get('/send_reports', {
 				params: {
 					ids: ids.join(),
@@ -2297,6 +2438,7 @@ export default {
 				this.selectedReport = []
 				this.itemsReport.forEach(v => {
 					v._rowVariant = ''
+          this.$refs.ereportsList.getTablesInReports(this.tmp.id);
 				})
 			})
 		},
@@ -2942,44 +3084,44 @@ export default {
 			viewer.index = index
 			viewer.show()
 		},
-		disablefild(fild, id) {
-			var result = false
-			this.looks.forEach((val) => {
-				if (val.rows_id == id) {
-					if (val.fild == fild) {
-						result = true
-					}
-				}
-			})
-			if (this.stopDis == true) result = false
-			if (this.type == 'Invoices') result = true
-			return result
-		},
-		disablefildUser(fild, id) {
-			var result
-			this.looks.forEach((val) => {
-				if (val.rows_id == id) {
-					if (val.fild == fild) {
-						result = val.user
-					}
-				}
-			})
-			return result
-		},
-		changeDisable(type_operation, fild, id) {
-			this.stopDis = (type_operation == 'f')
-			axios.get('/changeDisableTable', {
-				params: {
-					type_operation: type_operation,
-					fild: fild,
-					id: id,
-					'user': this.$security.account['first_name'] + '_' + this.$security.account['second_name']
-				}
-			})
-			if (type_operation == 'f') {
-				setTimeout(() => {}, 15000);
-			}
-		},
+		// disablefild(fild, id) {
+		// 	var result = false
+		// 	this.looks.forEach((val) => {
+		// 		if (val.rows_id == id) {
+		// 			if (val.fild == fild) {
+		// 				result = true
+		// 			}
+		// 		}
+		// 	})
+		// 	if (this.stopDis == true) result = false
+		// 	if (this.type == 'Invoices') result = true
+		// 	return result
+		// },
+		// disablefildUser(fild, id) {
+		// 	var result
+		// 	this.looks.forEach((val) => {
+		// 		if (val.rows_id == id) {
+		// 			if (val.fild == fild) {
+		// 				result = val.user
+		// 			}
+		// 		}
+		// 	})
+		// 	return result
+		// },
+		// changeDisable(type_operation, fild, id) {
+		// 	this.stopDis = (type_operation == 'f')
+		// 	axios.get('/changeDisableTable', {
+		// 		params: {
+		// 			type_operation: type_operation,
+		// 			fild: fild,
+		// 			id: id,
+		// 			'user': this.$security.account['first_name'] + '_' + this.$security.account['second_name']
+		// 		}
+		// 	})
+		// 	if (type_operation == 'f') {
+		// 		setTimeout(() => {}, 15000);
+		// 	}
+		// },
 		getdomageImages() {
 			axios.get('/domage_images', {
 				params: {
@@ -3029,9 +3171,7 @@ export default {
 			})
 		},
 		showCommetnts() {
-			this.tmp.number = null,
-				this.tmp.typeOfHead = null,
-				this.tmp.id = null,
+			this.tmp = { "number": null, "date": null, "place": null, "insurance": null, "insurname": null, "work": null, "other": null, "parts": null, "typeOfHead": null, "dateEvent": null, "dateInspect": null, "worker": null, "comment": "" } ,
 				this.generalComments = true
 			if (this.dubTabIndex == 0) {
 				setTimeout(() => {
@@ -3356,7 +3496,9 @@ export default {
 			this.offerDel(del_id)
 		},
 		inItemGetData(item, index) {
+      
 			if (item != undefined) {
+        this.includeDevices = this.includeDamages = this.includeReports = true;
 				axios.get('/get_plan', {
 					params: {
 						id: item.id
@@ -3368,7 +3510,7 @@ export default {
 						this.generalComments = false,
 						// this.tmp.typeOfHead = ((this.tmp.typeOfHead != 'Devices') & (this.tmp.typeOfHead != 'Damage') & (this.tmp.typeOfHead != 'Reports')) ? item.type : this.tmp.typeOfHead,
 						this.beforeTab = item.type,
-            this.tmp = item
+            this.tmp = item,
 						// this.tmp.number = item.number,
 						// this.tmp.date = item.date,
 						// this.tmp.place = item.place,
@@ -3383,7 +3525,20 @@ export default {
 						// this.tmp.worker = item.ExamWorker,
 						// this.tmp.comment = item.comment
             // console.log(item)
-				})
+            
+            this.$refs.edeviceList.getTablesInDevices(item.id),
+            this.$refs.damageList.getTablesInDamages(item.id),
+            this.$refs.ereportsList.getTablesInReports(item.id)
+
+		// setTimeout(() => {
+    //         this.$refs.edeviceList.getTablesInDevices(item.id);
+    //         this.$refs.damageList.getTablesInDamages(item.id);
+    //         this.$refs.ereportsList.getTablesInReports(item.id);
+		// 	}, 300)
+			
+
+				});
+
 			}
 			// setTimeout(() => {
 			// 	if (this.$refs.editList != undefined) {
@@ -3499,7 +3654,7 @@ export default {
         // console.log(this.itemsTable)
 				if (this.tmp.id != undefined) {
 					var item_list = this.itemsTable.filter((v) => {
-						if (v.type == 'Orders' || v.type == 'Offers'|| v.type == 'Invoices') {
+						if (v.type == 'Orders' || v.type == 'Offers'|| v.type == 'Invoices'|| v.type == 'StandingOrder'|| v.type == 'SUB' || v.type == 'Sub Invoices') {
 							if (v.id == this.tmp.id) {
 								return v
 							}
@@ -3509,12 +3664,12 @@ export default {
 				}
 			})
 		},
-		getLoocks() {
-			axios.get('/getLoocks').then(response => {
-				this.looks = []
-				this.looks = response.data
-			})
-		},
+		// getLoocks() {
+		// 	axios.get('/getLoocks').then(response => {
+		// 		this.looks = []
+		// 		this.looks = response.data
+		// 	})
+		// },
 		project_detail_f(old) {
 			axios.get('/project_detail', {
 				params: {
@@ -3715,18 +3870,18 @@ export default {
 .maxHeight .dropdown-menu{
   max-height: 300px;
   overflow-y: auto;
-},
+}
 .cheboxscorl {
     overflow-x: hidden;
     height: 200px;
     overflow-y: auto;
 }
-.raz { 
+/* .raz { 
   -moz-appearance: textfield;
 }
 .raz::-webkit-inner-spin-button { 
   display: none;
-}
+} */
 @media only screen and (min-width : 992px) {
   .b-table-sticky-header {
     overflow-y: auto;

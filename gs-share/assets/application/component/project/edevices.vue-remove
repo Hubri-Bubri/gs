@@ -1,5 +1,5 @@
 <template>
-  <devices-table-group 
+<devices-table-group 
 :windowPrint="windowPrint"
 :works="works"
 

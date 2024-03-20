@@ -2371,10 +2371,10 @@ class Project:
                 fild2=row_for_percent['price']
                 
                 if fild=='count':
-                    data = data.replace(',', '.')
+                    data = str(data).replace(',', '.')
                     fild1 = data
                 if fild=='price':
-                    data = data.replace(',', '.')
+                    data = str(data).replace(',', '.')
                     fild2 = data
 
                 if (row_for_percent['without']==None)|(row_for_percent['without']=='false'):
@@ -3378,24 +3378,24 @@ class Projects:
                 .where(T.items.project_id == id)
                 .selectall()))
 
-            result1 = ( await (Q()
-                .tables(T.items )
-                .fields(
-                    T.items.id,
-                    T.items.number
-                )
-                .selectall()))
-
-            # balance = ( await (Q()
-            #     .tables(T.rows_for_balance)
+            # result1 = ( await (Q()
+            #     .tables(T.items )
             #     .fields(
-            #         T.rows_for_balance.id,
-            #         T.rows_for_balance.type,
-            #         T.rows_for_balance.value,
-            #         T.rows_for_balance.date,
-            #         T.rows_for_balance.invoice_id
+            #         T.items.id,
+            #         T.items.number
             #     )
             #     .selectall()))
+
+            balance = ( await (Q()
+                .tables(T.rows_for_balance)
+                .fields(
+                    T.rows_for_balance.id,
+                    T.rows_for_balance.type,
+                    T.rows_for_balance.value,
+                    T.rows_for_balance.date,
+                    T.rows_for_balance.invoice_id
+                )
+                .selectall()))
 
             for item in result:
                 item['gen_summa'] = General.digit_formater(float(item['gen_summa']))
@@ -3403,28 +3403,29 @@ class Projects:
                 item['tax'] = General.digit_formater(float(item['tax']))
                 item['taxDub'] = General.digit_formater(float(item['taxDub']))
                 item['brutto'] = General.digit_formater(float(item['brutto']))
-
-                if (item['type'] == 'Damage Description'):
-                   # print(item['type'])
-                   result.remove(item)
-
-            for item in result:
-                id =  item['number'].split(' ')
-                if len(id)==2:
-                    for number in result1:
-                        if int(id[1]) == number['id']: 
-                            item['contract_number']=number['number']
+                
+                
+            #     if (item['type'] == 'Damage Description'):
+            #        # print(item['type'])
+            #        result.remove(item)
 
             # for item in result:
-            #     ops=[]
-            #     for bal in balance:
-            #         if int(item['id']) == int(bal['invoice_id']): 
-            #             ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
-            #     item['op'] = ops
+            #     id =  item['number'].split(' ')
+            #     if len(id)==2:
+            #         for number in result1:
+            #             if int(id[1]) == number['id']: 
+            #                 item['contract_number']=number['number']
+
+            for item in result:
+                ops=[]
+                for bal in balance:
+                    if int(item['id']) == int(bal['invoice_id']): 
+                        ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
+                item['op'] = ops
  
             # cOffer=0
-            # cCounract=0
-            cDamage=0
+            cCounract=0
+            # cDamage=0
 
             for item in result:    
                 # if item['tax']==None:
@@ -3603,19 +3604,19 @@ class Projects:
                         item['number'] = item['number'] + '-' +str(item['add_number'])
                     else:
                         item['number'] = item['number']
-                # if (item['type'] == 'Contracts'):
-                #     cCounract=cCounract+1
-                #     if(len(str(cCounract))<2):
-                #         nCounract = '0'+str(cCounract)
-                #     item['number'] = item['number'] + '-' + nCounract
+                if (item['type'] == 'Contracts'):
+                    cCounract=cCounract+1
+                    if(len(str(cCounract))<2):
+                        nCounract = '0'+str(cCounract)
+                    item['number'] = item['number'] + '-' + nCounract
 
                         
-                if (item['type'] == 'Damage Description'):
-                    cDamage=cDamage+1
-                    item['number']=item['number'].split(' ')[0]
-                    if(len(str(cDamage))<2):
-                        nDamage = '0'+str(cDamage)
-                    item['number'] = item['number'] + '-' + nDamage
+                # if (item['type'] == 'Damage Description'):
+                #     cDamage=cDamage+1
+                #     item['number']=item['number'].split(' ')[0]
+                #     if(len(str(cDamage))<2):
+                #         nDamage = '0'+str(cDamage)
+                #     item['number'] = item['number'] + '-' + nDamage
 
                 # print(item['type'])
                 # item['brutto']=str(item['brutto']).replace('.',',')
@@ -3637,7 +3638,6 @@ class Projects:
                         T.rows_for_table.without,
                     ).where(T.rows_for_table.table_id == table_id)
                     .selectall()))
-              
             if (rows_for_summa[int(index)]['unit']=='%'):
                 await Project.checnge_count_percent('in'+str(rows_for_summa[int(index)]['id']), 'else', id, table_id, ws_clients)
                 await Project.chenge_unit_type(table_id, id, '-', index, item_id, ws_clients)
@@ -3647,7 +3647,6 @@ class Projects:
             await (Q(T.rows_for_table)
                 .where(T.rows_for_table.id == id)
                 .delete())
-            
             for client in ws_clients:
                 await client.send_str('del_row:'+str(table_id))
 
@@ -4176,7 +4175,7 @@ class Projects:
                     .tables(T.tables)
                     .fields(
                         T.tables.id,
-                        T.tables.name,
+                        T.tables.name
                     )
                     .where(T.tables.item_id == id)
                     .selectall()))
@@ -4195,7 +4194,10 @@ class Projects:
                         T.tables.obj,
                         T.tables.summa,
                         T.tables.alt_summa,
-                        T.tables.discont
+                        T.tables.discont,
+                        T.tables.report,
+                        T.tables.device,
+
                     )
                     .where(T.tables.item_id == id)
                     .selectall()))
@@ -4862,7 +4864,7 @@ class Projects:
                     T.tables.name,
                     T.tables.item_id,
                     T.tables.obj,
-                    T.tables.device,
+                    # T.tables.device,
                     T.tables.summa,
                     T.tables.alt_summa,
                     T.tables.discont
@@ -4957,7 +4959,7 @@ class Projects:
                         T.tables.name:table['name'],
                         T.tables.item_id:new_item_id,
                         T.tables.obj:table['obj'],
-                        T.tables.device:table['device'],
+                        T.tables.device:None,
                         T.tables.summa:table['summa'],
                         T.tables.alt_summa:table['alt_summa'],
                         T.tables.discont:table['discont']
@@ -5425,7 +5427,12 @@ class Invoice:
                         .where(T.items.number == number_documents)
                         .update({
                             T.items.number:number+' '+str(result['id'])+' '+str(result['number']),
-                            T.items.status_set:'Open'
+                            T.items.status_set:'Open',
+                            T.items.gen_summa:0,
+                            T.items.gen_discont:0,
+                            T.items.brutto:0,
+                            T.items.tax:0,
+                            T.items.taxDub:0
                         }))
 
             if type=='Sub Invoices':
@@ -5444,7 +5451,7 @@ class Invoice:
                         T.tables.name,
                         T.tables.item_id,
                         T.tables.obj,
-                        T.tables.device,
+                        # T.tables.device,
                         T.tables.summa,
                         T.tables.alt_summa,
                         T.tables.discont
@@ -5555,7 +5562,7 @@ class Invoice:
                         T.tables.name:table['name'],
                         T.tables.item_id:invoiceId['id'],
                         T.tables.obj:table['obj'],
-                        T.tables.device:table['device'],
+                        T.tables.device:None,
                         T.tables.summa:table_summa,
                         T.tables.alt_summa:alt_summa,
                         T.tables.discont:discont
@@ -5652,6 +5659,18 @@ class Del_offer:
                     .selectall())
                     )
             for table in tables:
+                await (Q(T.rows_for_reports)
+                .where(T.rows_for_reports.table_id == table['id'])
+                .delete())
+
+                await (Q(T.rows_for_devices)
+                .where(T.rows_for_devices.table_id == table['id'])
+                .delete())
+
+                await (Q(T.damage)
+                .where(T.damage.table_id == table['id'])
+                .delete())
+
                 rows = (await (Q(T.rows_for_table)
                 .fields(
                     T.rows_for_table.id)
@@ -5662,7 +5681,7 @@ class Del_offer:
                     await (Q(T.rows_for_table)
                         .where(T.rows_for_table.id == row['id'])
                         .delete())
-                    
+                
             await (Q(T.tables)
                 .where(T.tables.item_id == id)
                 .delete())
@@ -8480,7 +8499,34 @@ class Prices:
 
 
 class Damage:
-    classmethod #first function on python
+    @classmethod
+    async def get_tables_in_damages(cls, id):
+        async with database.query() as Q:
+            return await (Q()
+                .tables(T.tables)
+                .fields(
+                    T.tables.id,
+                    T.tables.name
+                )
+                .where((T.tables.item_id == id))
+                .selectall())
+    @classmethod
+    async def get_damage_list(cls, id):
+        async with database.query() as Q:
+            return await (Q()
+                .tables(T.damage)
+                .fields(
+                    T.damage.id,
+                    T.damage.table_id,
+                    T.damage.imgId,
+                    T.damage.name,
+                    T.damage.desc,
+                    T.damage.schema
+                )
+                .where(T.damage.table_id == id)
+                .selectall())
+
+    @classmethod #first function on python
     async def change(old, new):
         async with database.query() as Q:
                 await (Q()
@@ -8619,7 +8665,7 @@ class Damage:
         return ''
 
     @classmethod
-    async def send_damage(cls, ids, names):
+    async def send_damage(cls, ids, names, ws_clients):
         #print(type, ids, names, item_id)
         # arr=[]
         # for v in ids.split(","):
@@ -8652,31 +8698,37 @@ class Damage:
                             T.damage.name: table_name['name'],
                             T.damage.content: item['content']
                         }))
-        return ''
+
+        for client in ws_clients:
+            await client.send_str('send_damage:'+str(names))
 
     @classmethod
-    async def delImageFromPart(cls, id):
+    async def delImageFromPart(cls, tableId, ws_clients):
         async with database.query() as Q:
-                await (Q(T.damage)
-                    .where(T.damage.table_id == id)
-                    .delete())
-        return ''
+            await (Q(T.damage)
+                .where(T.damage.table_id == tableId)
+                .delete())
+            for client in ws_clients:
+                await client.send_str('del_table_damage:'+str(tableId))
 
     @classmethod
-    async def updateDamage(cls, newDate, fild, id):
+    async def updateDamage(cls, tableId, index, newDate, fild, id, ws_clients):
         async with database.query() as Q:
-                 await (Q()
+            await (Q()
                      .tables(T.damage)
                      .where(T.damage.id == id)
                      .update({
                          T.damage[fild]: newDate
                      }))
-        return ''
+            update = json.dumps({'table_id':tableId, 'index':index, 'fild':fild, 'value':newDate})
+            for client in ws_clients:
+                await client.send_str('updateFildDamage:'+(update))
 
+    
     @classmethod
     async def updateImageDamage(cls, newImage, schema, id):
         async with database.query() as Q:
-            return await (Q(T.damage)
+            await (Q(T.damage)
                     .tables(T.damage)
                     .where(T.damage.id == id)
                     .update({
@@ -8685,16 +8737,17 @@ class Damage:
                     }))
 
     @classmethod
-    async def del_row_from_damage(cls, id):
+    async def del_row_from_damage(cls, id, tableId, ws_clients):
         async with database.query() as Q:
-            return await (Q(T.damage)
-                    .where(T.damage.id == id)
-                    .delete())
-
+            await (Q(T.damage)
+                .where(T.damage.id == id)
+                .delete())
+            for client in ws_clients:
+                await client.send_str('del_row_damage:'+str(tableId))
 
 class Devices:
     @classmethod
-    async def addmeasrow(cls, id):
+    async def addMeasrow(cls, id, tableId, ws_clients):
         async with database.query() as Q:
             fdate = (await (Q(T.rows_for_devices)
                 .fields(
@@ -8703,9 +8756,7 @@ class Devices:
                     T.rows_for_devices.fmReading
                     )
                 .where(T.rows_for_devices.id == id)
-                .selectone())
-            )
-
+                .selectone()))
             await (Q(T.measurement)
                 .tables(T.measurement)
                 .insert({
@@ -8714,7 +8765,6 @@ class Devices:
                     T.measurement.worker: fdate['fworker'],
                     T.measurement.rows_for_devices: id
                 }))
-
             await (Q()
                 .tables(T.rows_for_devices)
                 .where(T.rows_for_devices.id == id)
@@ -8723,13 +8773,13 @@ class Devices:
                     T.rows_for_devices.fdate: '',
                     T.rows_for_devices.fmReading: ''
             }))
-
-            return ''
+            for client in ws_clients:
+                await client.send_str('add_rows_for_devices:'+str(tableId))
 
     @classmethod
-    async def addMeasureProtocolrow(cls, id):
+    async def addMeasureProtocolrow(cls, id, tableId, ws_clients):
         async with database.query() as Q:
-            return await (Q(T.measure_protocol)
+            await (Q(T.measure_protocol)
                 .tables(T.measure_protocol)
                 .insert({
                     T.measure_protocol.room: '',
@@ -8739,22 +8789,40 @@ class Devices:
                     T.measure_protocol.uninstall_deep: '',
                     T.measure_protocol.table_id: id
                 }))
+            for client in ws_clients:
+                await client.send_str('add_rows_MeasureProtocol:'+str(tableId))
 
     @classmethod
-    async def delmeasrow(cls, id):
+    async def delmeasrow(cls, id, tableId, ws_clients):
         async with database.query() as Q:
-            return await (Q(T.measurement)
+            await (Q(T.measurement)
                 .tables(T.measurement)
                 .where(T.measurement.id == id)
                 .delete())
+            for client in ws_clients:
+                await client.send_str('del_row_device:'+str(tableId))
 
     @classmethod
-    async def measureProtocolDel(cls, id):
+    async def measureProtocolDel(cls, id, tableId, ws_clients):
         async with database.query() as Q:
-            return await (Q(T.measure_protocol)
+            await (Q(T.measure_protocol)
                 .tables(T.measure_protocol)
                 .where(T.measure_protocol.id == id)
                 .delete())
+            for client in ws_clients:
+                await client.send_str('del_rows_MeasureProtocol:'+str(tableId))
+
+    @classmethod
+    async def get_tables_in_devices(cls, id):
+        async with database.query() as Q:
+            return await (Q()
+                    .tables(T.tables)
+                    .fields(
+                        T.tables.id,
+                        T.tables.device
+                    )
+                    .where((T.tables.item_id == id)&(T.tables.device != None))
+                    .selectall())
 
     @classmethod
     async def select_devices(cls, id):
@@ -8774,6 +8842,65 @@ class Devices:
                     T.devices.id
                 )
                 .where(T.devices.item_id == id)
+                .selectall())
+        
+    @classmethod
+    async def get_device_list(cls, id):
+        async with database.query() as Q:
+            rows_devices = (await (Q()
+                .tables(T.rows_for_devices)
+                .fields(
+                    T.rows_for_devices.id,
+                    T.rows_for_devices.table_id,
+                    T.rows_for_devices.pos_num,
+                    T.rows_for_devices.designation,
+                    T.rows_for_devices.kilowatt,
+                    T.rows_for_devices.comment,
+                    T.rows_for_devices.time,
+                    T.rows_for_devices.manufacturer,
+                    T.rows_for_devices.serial,
+                    T.rows_for_devices.order,
+                    T.rows_for_devices.check_date,
+                    T.rows_for_devices.next_check_date,
+                    T.rows_for_devices.sdate,
+                    T.rows_for_devices.sworker,
+                    T.rows_for_devices.smReading,
+                    T.rows_for_devices.fdate,
+                    T.rows_for_devices.fworker,
+                    T.rows_for_devices.fmReading,
+                    T.rows_for_devices.location
+                    )
+                .where(T.rows_for_devices.table_id == id)
+                .selectall()))
+
+            for rowDev in rows_devices:
+                    rowDev['subEquel'] = (await (Q()
+                            .tables(T.measurement)
+                            .fields(
+                                T.measurement.id,
+                                T.measurement.date,
+                                T.measurement.worker,
+                                T.measurement.mReading,
+                            )
+                            .where(T.measurement.rows_for_devices == rowDev['id'])
+                            .selectall()))
+            return rows_devices
+
+    @classmethod
+    async def get_MeasureProtocol_list(cls, id):
+        async with database.query() as Q:
+            return await (Q()
+                .tables(T.measure_protocol)
+                .fields(
+                    T.measure_protocol.id,
+                    T.measure_protocol.table_id,
+                    T.measure_protocol.room,
+                    T.measure_protocol.install_surface,
+                    T.measure_protocol.install_deep,
+                    T.measure_protocol.uninstall_surface,
+                    T.measure_protocol.uninstall_deep
+                )
+                .where(T.measure_protocol.table_id == id)
                 .selectall())
 
     @classmethod
@@ -8894,8 +9021,8 @@ class Devices:
             return ''
 
     @classmethod
-    async def send_devices(cls, ids, names):
-        #print(type, ids, names, item_id)
+    async def send_devices(cls, ids, names, ws_clients):
+        # print(ids, names)
         # arr=[]
         # for v in ids.split(","):
         #    arr=arr+','+v
@@ -8964,50 +9091,115 @@ class Devices:
                                     T.rows_for_devices.fmReading: '0.00',
                                     T.rows_for_devices.location: 'Undefined'
                             }))
-        return ''
+        for client in ws_clients:
+            await client.send_str('send_device:'+str(names))
+
+
 
     @classmethod
-    async def updateDeviceList(cls, newDate, fild, id):
+    async def updateDeviceList(cls, tableId, index, newDate, fild, id, ws_clients):
         async with database.query() as Q:
-                 await (Q()
-                     .tables(T.rows_for_devices)
-                     .where(T.rows_for_devices.id == id)
+            await (Q()
+                .tables(T.rows_for_devices)
+                .where(T.rows_for_devices.id == id)
+                .update({
+                    T.rows_for_devices[fild]: newDate
+                }))
+            update = json.dumps({'table_id':tableId, 'index':index, 'fild':fild, 'value':newDate})
+            for client in ws_clients:
+                await client.send_str('updateFildDevice:'+(update))
+
+
+    @classmethod
+    async def updateDeviceIntern(cls, subIndex, index, tableId, newDate, fild, id, ws_clients):
+        async with database.query() as Q:
+            await (Q()
+                .tables(T.measurement)
+                .where(T.measurement.id == id)
+                .update({
+                    T.measurement[fild]: newDate
+                }))
+            update = json.dumps({'table_id':tableId, 'subIndex':subIndex, 'index':index, 'fild':fild, 'value':newDate})
+            for client in ws_clients:
+                await client.send_str('updateFildMeasurement:'+(update))
+
+    @classmethod
+    async def updateMeasureProtocol(cls, tableId, index, newDate, fild, id, ws_clients):
+        async with database.query() as Q:
+            await (Q()
+                .tables(T.measure_protocol)
+                .where(T.measure_protocol.id == id)
+                .update({
+                    T.measure_protocol[fild]: newDate
+                }))
+            update = json.dumps({'table_id':tableId, 'index':index, 'fild':fild, 'value':newDate})
+            for client in ws_clients:
+                await client.send_str('updateFildMeasureProtocol:'+(update))
+ 
+    @classmethod
+    async def update_part_device(cls, part_name, id, ws_clients):
+        async with database.query() as Q:
+                await (Q()
+                     .tables(T.tables)
+                     .where(T.tables.id == id)
                      .update({
-                         T.rows_for_devices[fild]: newDate
+                         T.tables.device: part_name
                      }))
-        return ''
+                for client in ws_clients:
+                    await client.send_str('update_part_device:'+str(id))
 
     @classmethod
-    async def updateDeviceIntern(cls, newDate, fild, id):
+    async def del_row_from_devices(cls, id, tableId, ws_clients):
         async with database.query() as Q:
-                 await (Q()
-                     .tables(T.measurement)
-                     .where(T.measurement.id == id)
-                     .update({
-                         T.measurement[fild]: newDate
-                     }))
-        return ''
-
-    @classmethod
-    async def updateMeasureProtocol(cls, newDate, fild, id):
-        async with database.query() as Q:
-                 await (Q()
-                     .tables(T.measure_protocol)
-                     .where(T.measure_protocol.id == id)
-                     .update({
-                         T.measure_protocol[fild]: newDate
-                     }))
-        return ''
-
-    @classmethod
-    async def del_row_from_devices(cls, id):
-        async with database.query() as Q:
-            return await (Q(T.rows_for_devices)
+            await (Q(T.rows_for_devices)
                     .where(T.rows_for_devices.id == id)
                     .delete())
-
+            for client in ws_clients:
+                await client.send_str('del_rows_for_devices:'+str(tableId))
 
 class Reports:
+    @classmethod
+    async def get_reports_list(cls, id):
+        async with database.query() as Q:
+            return await (Q()
+                .tables(T.rows_for_reports)
+                    .fields(
+                        T.rows_for_reports.id,
+                        T.rows_for_reports.table_id,
+                        T.rows_for_reports.pos_num,
+                        T.rows_for_reports.date,
+                        T.rows_for_reports.service,
+                        T.rows_for_reports.time,
+                        T.rows_for_reports.workers,
+                        T.rows_for_reports.id
+                )
+                .where(T.rows_for_reports.table_id == id)
+                .selectall())
+        
+    @classmethod
+    async def update_part_reports(cls, part_name, id, ws_clients):
+        async with database.query() as Q:
+                await (Q()
+                     .tables(T.tables)
+                     .where(T.tables.id == id)
+                     .update({
+                         T.tables.report: part_name
+                     }))
+                for client in ws_clients:
+                    await client.send_str('update_part_report:'+str(id))
+
+    @classmethod
+    async def get_tables_in_reports(cls, id):
+        async with database.query() as Q:
+            return await (Q()
+                    .tables(T.tables)
+                    .fields(
+                        T.tables.id,
+                        T.tables.report
+                    )
+                    .where((T.tables.item_id == id)&(T.tables.report != None))
+                    .selectall())
+
     @classmethod
     async def select_reports(cls, id):
         async with database.query() as Q:
@@ -9131,7 +9323,7 @@ class Reports:
             return ''
 
     @classmethod
-    async def send_reports(cls, ids, names):
+    async def send_reports(cls, ids, names, ws_clients):
         async with database.query() as Q:
             items = (await (Q()
                             .tables(T.reports)
@@ -9145,6 +9337,20 @@ class Reports:
 
             for item in items:
                 for v in names.split(","):
+                        peportName = (await (Q()
+                        .tables(T.tables)
+                        .fields(
+                            T.tables.name
+                        )
+                        .where(T.tables.id == v)
+                        .selectone()))
+
+                        await (Q()
+                        .tables(T.tables)
+                        .where(T.tables.id == v)
+                        .update({
+                              T.tables.report: peportName['name']
+                        }))
                         await (Q(T.rows_for_reports)
                             .tables(T.rows_for_reports)
                             .insert({
@@ -9154,18 +9360,22 @@ class Reports:
                                     T.rows_for_reports.date: 'date',
                                     T.rows_for_reports.table_id: v,
                             }))
-        return ''
+            for client in ws_clients:
+                await client.send_str('send_report:'+str(names))
+
 
     @classmethod
-    async def updateReportList(cls, newDate, fild, id):
+    async def updateReportList(cls, newDate, fild, id, index, tableId, ws_clients):
         async with database.query() as Q:
-                 await (Q()
+            await (Q()
                      .tables(T.rows_for_reports)
                      .where(T.rows_for_reports.id == id)
                      .update({
                          T.rows_for_reports[fild]: newDate
                      }))
-        return ''
+            update = json.dumps({'table_id':tableId, 'index':index, 'fild':fild, 'value':newDate})
+            for client in ws_clients:
+                await client.send_str('updateFildReport:'+(update))
     
     @classmethod
     async def updateNameReport(cls, report_name, id):
@@ -9179,11 +9389,13 @@ class Reports:
         return ''
 
     @classmethod
-    async def del_row_from_reports(cls, id):
+    async def del_row_from_reports(cls, id, tableId, ws_clients):
         async with database.query() as Q:
-            return await (Q(T.rows_for_reports)
+            await (Q(T.rows_for_reports)
                     .where(T.rows_for_reports.id == id)
                     .delete())
+            for client in ws_clients:
+                await client.send_str('del_rows_for_report:'+str(tableId))
 
 class Personals:
     @classmethod
@@ -9688,6 +9900,7 @@ class Personals:
 class Balance:
     @classmethod
     async def select_balances(cls, mode):
+        import time 
         async with database.query() as Q:
             unpaid_all = mode[0]
             me_sub = mode[1]
@@ -9721,14 +9934,16 @@ class Balance:
                     T.items.insurance_number,
                     T.items.work,
                     T.items.status_set,
-                    T.items.tax,
-                    T.items.taxDub,
-                    T.items.taxP,
-                    T.items.taxPDub,
-                    T.items.disc,
-                    T.items.discP,
-                    T.items.butDiscPerc,
-                    T.items.addtaxColapse,
+                    T.items.brutto,
+                    T.items.gen_summa,
+                    # T.items.tax,
+                    # T.items.taxDub,
+                    # T.items.taxP,
+                    # T.items.taxPDub,
+                    # T.items.disc,
+                    # T.items.discP,
+                    # T.items.butDiscPerc,
+                    # T.items.addtaxColapse,
                     T.items.comment,
                     T.items.project_id,
                     T.items.type,
@@ -9761,113 +9976,113 @@ class Balance:
                         if str(item['id'])==bal['invoice_id']: 
                             ops.append({'type':bal['type'], 'value':bal['value'], 'date':bal['date'], 'id':bal['id']})
                     item['op'] = ops
-                    if item['tax']==None:
-                        item['tax']='0,0'
-                    if item['taxDub']==None:
-                        item['taxDub']='0,0'
-                    if item['taxP']==None:
-                        item['taxP']='0,0'
-                    if item['taxPDub']==None:
-                        item['taxPDub']='0,0'
-                    if item['disc']==None:
-                        item['disc']='0,0'
-                    if item['discP']==None:
-                        item['discP']='0,0'
-                    if item['butDiscPerc']==None:
-                        item['butDiscPerc']='%'
-                    if item['addtaxColapse']==None:
-                        item['addtaxColapse']='false'
-                    tax=(item['tax'].replace(',', '.'))
-                    taxDub=(item['taxDub'].replace(',', '.'))
-                    taxP=(item['taxP'].replace(',', '.'))
-                    taxPDub=(item['taxPDub'].replace(',', '.'))
-                    disc=(item['disc'].replace(',', '.'))
-                    discP=(item['discP'].replace(',', '.'))
-                    butDiscPerc=item['butDiscPerc']
-                    addtaxColapse=item['addtaxColapse']
-                    netto = 0
-                    addt = 0
-                    addt2 = 0
-                    tables =(await (Q()
-                        .tables(T.tables)
-                        .fields(
-                            T.tables.id,
-                            T.tables.name,
-                            T.tables.obj
-                        )
-                        .where(T.tables.item_id == item['id'])
-                        .selectall()))
-                    add = 0
-                    for subIndex, val in enumerate(tables):
-                        rows =(await (Q()
-                                    .tables(T.rows_for_table)
-                                    .fields(
-                                        T.rows_for_table.count,
-                                        T.rows_for_table.price,
-                                        T.rows_for_table.summa,
-                                        T.rows_for_table.status,
-                                        T.rows_for_table.alttax,
-                                        T.rows_for_table.without,
-                                        T.rows_for_table.unit,
-                                        T.rows_for_table.done
-                                    )
-                                    .where(T.rows_for_table.table_id == val['id'])
-                                    .selectall()))
+                    # if item['tax']==None:
+                    #     item['tax']='0,0'
+                    # if item['taxDub']==None:
+                    #     item['taxDub']='0,0'
+                    # if item['taxP']==None:
+                    #     item['taxP']='0,0'
+                    # if item['taxPDub']==None:
+                    #     item['taxPDub']='0,0'
+                    # if item['disc']==None:
+                    #     item['disc']='0,0'
+                    # if item['discP']==None:
+                    #     item['discP']='0,0'
+                    # if item['butDiscPerc']==None:
+                    #     item['butDiscPerc']='%'
+                    # if item['addtaxColapse']==None:
+                    #     item['addtaxColapse']='false'
+                    # tax=(item['tax'].replace(',', '.'))
+                    # taxDub=(item['taxDub'].replace(',', '.'))
+                    # taxP=(item['taxP'].replace(',', '.'))
+                    # taxPDub=(item['taxPDub'].replace(',', '.'))
+                    # disc=(item['disc'].replace(',', '.'))
+                    # discP=(item['discP'].replace(',', '.'))
+                    # butDiscPerc=item['butDiscPerc']
+                    # addtaxColapse=item['addtaxColapse']
+                    # netto = 0
+                    # addt = 0
+                    # addt2 = 0
+                    # tables =(await (Q()
+                    #     .tables(T.tables)
+                    #     .fields(
+                    #         T.tables.id,
+                    #         T.tables.name,
+                    #         T.tables.obj
+                    #     )
+                    #     .where(T.tables.item_id == item['id'])
+                    #     .selectall()))
+                    # add = 0
+                    # for subIndex, val in enumerate(tables):
+                        # rows =(await (Q()
+                        #             .tables(T.rows_for_table)
+                        #             .fields(
+                        #                 T.rows_for_table.count,
+                        #                 T.rows_for_table.price,
+                        #                 T.rows_for_table.summa,
+                        #                 T.rows_for_table.status,
+                        #                 T.rows_for_table.alttax,
+                        #                 T.rows_for_table.without,
+                        #                 T.rows_for_table.unit,
+                        #                 T.rows_for_table.done
+                        #             )
+                        #             .where(T.rows_for_table.table_id == val['id'])
+                        #             .selectall()))
 
-                        for row in rows:
-                            if row['count']==None:
-                                row['count'] = '0'
-                            if row['price']==None:
-                                row['price'] = '0'
+                        # for row in rows:
+                        #     if row['count']==None:
+                        #         row['count'] = '0'
+                        #     if row['price']==None:
+                        #         row['price'] = '0'
 
-                            if row['unit']=='%':
-                                row['price']=0
-                                summax = 0
+                        #     if row['unit']=='%':
+                        #         row['price']=0
+                        #         summax = 0
 
-                                for obj in val['obj'].split(','):
-                                    selected = ['']
-                                    if not '|' in val["selected"]:
-                                        try:
-                                            selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
-                                            if ('temp' + str(subIndex + 1)) in selected[obj]:
-                                                for val in selected[obj].split(','):
-                                                    val = val.split('temp')
-                                                    val[1]=int(val[1])-1
+                        #         for obj in val['obj'].split(','):
+                        #             selected = ['']
+                                    # if not '|' in val["selected"]:
+                                    #     try:
+                                    #         selected = json.loads('{"'+val["selected"].replace(':', '":"')+'"}')
+                                    #         if ('temp' + str(subIndex + 1)) in selected[obj]:
+                                    #             for val in selected[obj].split(','):
+                                    #                 val = val.split('temp')
+                                    #                 val[1]=int(val[1])-1
 
-                                                    countx = 0
-                                                    pricex = 0
+                                    #                 countx = 0
+                                    #                 pricex = 0
                                                     
-                                                    countx = rows[val[1]]['count'] 
-                                                    pricex = rows[val[1]]['price']
+                                    #                 countx = rows[val[1]]['count'] 
+                                    #                 pricex = rows[val[1]]['price']
 
-                                                    summax += float(countx) * float(pricex)
-                                        except:
-                                            print('not have ":" in obj selected')
+                                    #                 summax += float(countx) * float(pricex)
+                                    #     except:
+                                    #         print('not have ":" in obj selected')
                                    
-                                row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
-                                row['count']=1
-                            if row['status']=='yes':
+                                # row['price']=persent_from_summa = (float(summax / 100) * float(row['count']))
+                                # row['count']=1
+                            # if row['status']=='yes':
                                 
 
-                                netto += (float(row['count'])*float(row['price']))
-                                if row['without']=='true':
-                                    add += (float(row['count'])*float(row['price']) / 100) * float(discP)
-                                if row['alttax']!='true':
-                                    addt += (float(row['count'])*float(row['price']))
-                                else:
-                                    addt2 += (float(row['count'])*float(row['price']))
+                                # netto += (float(row['count'])*float(row['price']))
+                                # if row['without']=='true':
+                                #     add += (float(row['count'])*float(row['price']) / 100) * float(discP)
+                                # if row['alttax']!='true':
+                                #     addt += (float(row['count'])*float(row['price']))
+                                # else:
+                                #     addt2 += (float(row['count'])*float(row['price']))
 
-                    if butDiscPerc=='%':
-                        item['netto']=str(netto-(netto/100*float(discP)))
-                        item['netto']=float(item['netto'])+add
-                        addt = addt-(addt/100)*float(discP)
-                        addt2 = addt2-(addt2/100)*float(discP)
-                    else:
-                        item['netto']=str(netto-float(discP))
-                        addt = addt-(addt/100)*float(discP)*100/netto
-                        addt2 = addt2-(addt2/100)*float(discP)*100/netto
+                    # if butDiscPerc=='%':
+                    #     item['netto']=str(netto-(netto/100*float(discP)))
+                    #     item['netto']=float(item['netto'])+add
+                    #     addt = addt-(addt/100)*float(discP)
+                    #     addt2 = addt2-(addt2/100)*float(discP)
+                    # else:
+                    #     item['netto']=str(netto-float(discP))
+                    #     addt = addt-(addt/100)*float(discP)*100/netto
+                    #     addt2 = addt2-(addt2/100)*float(discP)*100/netto
                     
-                    item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
+                    # item['brutto']=str(float(item['netto'])+(addt * (float(taxP) / 100))+(addt2 * (float(taxPDub) / 100)))
                     # print(item['brutto'])
 
                     vals = 0.0
@@ -9892,8 +10107,12 @@ class Balance:
                             if (val['type']=='CREDET')|(val['type']=='CREDIT'):
                                 vals = vals - round(float(transformValue), 2)
 
-                    if (item['brutto'] =='0.0'):
-                        item['brutto'] = 1.0
+                    # if (item['brutto'] =='0.0'):
+                    #     item['brutto'] = 1.0
+
+                    item['sorting_data']=(time.mktime(datetime.datetime.strptime(item['date'], "%Y-%m-%d").timetuple()))
+
+
 
                     if unpaid_all == '0':
                         if ((round(abs(float(vals)), 2)*100/round(abs(float(item['brutto'])), 2))<99): #unpaid
@@ -9902,7 +10121,7 @@ class Balance:
                     if unpaid_all == '1':
                         if ((round(abs(float(vals)), 2)*100/round(abs(float(item['brutto'])), 2))>99): #paid
                             n_result.append(item)
-                
+            # return result        
             return n_result               
 
 

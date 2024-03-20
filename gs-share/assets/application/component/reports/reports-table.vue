@@ -1,10 +1,28 @@
 <template>
   <div>
-    <slot name="tableHead" :tableId="tableId" @click.prevent.self></slot>
-    <input ref="unfocus" style="width: 0px; height: 0px; position: absolute; top: 0; left: 0; margin:0; padding:0; border: 0"></input>
-        <div>
-            <b-table hover :items="value.parts.reports_content" :fields="fields" small stacked="lg"
-        show-empty no-border-collapse :id="'partx'+value.parts.id">
+    <b-row align-v="center">
+      <b-link style="text-decoration: none" @click="toog(table.id)">
+        <div
+          :id="'rp'+table.id"
+          style="display: none; vertical-align: middle; padding-right: 10px">
+          <b-icon icon="arrow-down" font-scale="1" />
+        </div>
+        <div :id="'rm'+table.id" style="vertical-align: middle; padding-right: 10px">
+          <b-icon icon="arrow-up" font-scale="1" />
+        </div>
+      </b-link>
+  
+      <div
+        contenteditable
+        class="diveditable"
+        @click.prevent.self
+        @blur="tableRename($event.target.innerText, table.id, table.report)"
+        v-html="table.report"></div>
+    </b-row>
+
+        <div :id="'report'+table.id">
+            <b-table hover :items="reports_list" :fields="fields" small stacked="lg"
+        show-empty no-border-collapse >
           <template #cell(#)="data">
             <div @click.prevent.stop="rowSelected(data.item)" class="text-center w-100">
               {{ data.index + 1 }}
@@ -13,53 +31,30 @@
           <template #cell(date)="row">
             <b-form-input size="sm"
             type="date"
-            @change="sendDataTable(row.item.id, 'date', $event)"
+            @change="sendDataTable(row.item.id, 'date', $event, row.index, row.item.date)"
             :value="row.item.date"
             placeholder="Enter date"
-            :disabled="disablefild('date', row.item.id)"
-            @focus.native="changeDisable('f', 'date', row.item.id)"
-            @blur.native="changeDisable('b', 'date', row.item.id)"
             :id="'date'+row.item.id" />
           </template>
           <template #cell(service)="row">
 
-
-
-
-<div contenteditable="plaintext-only"
-style="width:100%;padding-left:4px;"
-  @click.prevent.self
-  @blur="sendDataTable(row.item.id, 'service', $event.target.innerText);changeDisable('b', 'service', row.item.id);"
-  @focus="changeDisable('f', 'service', row.item.id)"
-  :id="'service'+row.item.id" v-html="row.item.service" />
-
+          <div contenteditable="plaintext-only"
+          style="width:100%;padding-left:4px;"
+          @click.prevent.self
+          @blur="sendDataTable(row.item.id, 'service',
+          $event.target.innerText, row.index, row.item.service)"
+          :id="'service'+row.item.id"
+          v-html="row.item.service" />
 
           </template>
           <template #cell(time)="row">
-            <!-- <div
-            :contenteditable="!disablefild('time', row.item.id)"
-            class="diveditable"
-            @click.prevent.self 
-            @blur="toDigital($event.target.innerText, 'time', row.item.id);changeDisable('b', 'time', row.item.id);"
-            @focus="changeDisable('f', 'time', row.item.id)"
-            :id="'time'+row.item.id"  v-html="valueDigital(row.item.time)" /> -->
-
-
-
             <div
-            :contenteditable="!disablefild('time', row.item.id)"
+            contenteditable="plaintext-only"
             class="diveditable text-right"
             @click.prevent.stop="selectAll('time'+row.item.id)"
-            @blur="toDigital($event.target.innerText, 'time', row.item.id)"
-            @focus="changeDisable('f', 'time', row.item.id)"
+            @blur="toDigital($event.target.innerText, 'time', row.item.id, row.index, valueDigital(row.item.time))"
             :id="'time'+row.item.id" v-html="valueDigital(row.item.time)" />
-
-
            X {{(row.item.workers!=null)?(row.item.workers.split(',').length):1}}
-
-
-
-
           </template>
           <template #cell(workers)="row">
             <!-- <b-form-select class="text-center" :value="row.item.workers" :options="workers"
@@ -70,12 +65,9 @@ style="width:100%;padding-left:4px;"
               </div>
             </div>
             <b-link size="sm"
-            @click="sendDataTable(row.item.id, 'workers', selectedWorkers?selectedWorkers.join():'Null')">
+            @click="sendDataTable(row.item.id, 'workers', ((selectedWorkers!=null)||(selectedWorkers!=''))?selectedWorkers.join():'Null', row.index, -1)">
             {{$t('reports.workers')}}
           </b-link>
-           
-
-
           </template>
           <template #cell(delete)="row">
             <b-icon icon="trash" aria-hidden="true" @click.prevent.stop="delRow(row.item.id)"></b-icon>
@@ -83,7 +75,8 @@ style="width:100%;padding-left:4px;"
         </b-table>
         <b-row class="ttotalsumm">
                <b-col align-self="end" class="text-right" style="margin-right:22.6%">
-               {{$t('projectDetail.total')}} {{ total(value.parts.reports_content)  }}</b-col>
+               {{$t('projectDetail.total')}} {{ total(reports_list)  }}
+              </b-col>
             </b-row>
         </div>
   </div>
@@ -91,11 +84,11 @@ style="width:100%;padding-left:4px;"
 <script type="text/javascript">
 import axios from 'axios';
 export default {
-    props: ['value', 'tableId', 'workers',  'looks', 'selectedWorkers'],
+    props: ['table', 'workers', 'selectedWorkers'],
     
     data() {
         return {
-
+          reports_list:[],
 	  stopTimmer:false,
           oldarray: [],
           stopDis: false,
@@ -146,7 +139,6 @@ export default {
     
   },
     total: function() {
-      var vm = this;
       return function(value) {
         var summa = 0
         value.forEach(function(val) {
@@ -158,6 +150,31 @@ export default {
 
     },
     methods: {
+      tableRename(newVal, id, partName) {
+            if(newVal!= partName){
+                axios.get('/update_part_report', {
+                  params: {
+                    part_name: newVal,
+                    id: id
+                  }
+                })
+            }
+        },
+      toog(val){
+      document.getElementById('rm'+val).style.display = document.getElementById('report'+val).style.display = (document.getElementById('report'+val).style.display=='none') ? '' : 'none'
+      document.getElementById('rp'+val).style.display = (document.getElementById('rm'+val).style.display=='none') ? '' : 'none'
+    },
+      updateNameReport(newVal, id, partName) {
+      if(newVal.target.innerText != partName){
+        axios.get('/updateNameReport', {
+          params: {
+            nameReport: newVal.target.innerText.replace(/[\s]{2,}/, ''),
+            id: id
+          }
+        })
+      }
+    }, 
+
       selectAll(id){
     function selectElementContents(el) {
         var range = document.createRange();
@@ -190,72 +207,60 @@ export default {
       }
       return value
     },
-    toDigital(event, fild, id){
+    toDigital(event, fild, id, index, old){
       var value = event.toString().replace(',','.');
       value = parseFloat(value);
       value = (value.toString()=='NaN')?0:value;
       // console.log(value);
-      this.sendDataTable(id, fild, value.toString());
-      this.changeDisable('b', fild, id);
+      this.sendDataTable(id, fild, value.toString(), index, old);
+
     },
-      disablefild(fild, id){
-        var result = false
-              this.looks.forEach((val)=>{
-                    if (val.rows_id == id) {
-                      if (val.fild == fild) {
-                        result = true
-                      }
-                    }
-                })
-        if (this.stopDis==true) result = false
-        return result
-      },
-      changeDisable(type_operation, fild, id){
-        this.stopDis=(type_operation=='f')
-        axios.get('/changeDisableTable', {
-          params: {
-            type_operation: type_operation,
-            fild: fild,
-            id: id,
-            'user': this.$security.account['first_name']+'_'+this.$security.account['second_name']
-          }
-        })
-        if ((type_operation == 'f') & (this.stopTimmer==false)){
-          setTimeout(()=>{
 
 
-          }, 15000);
-        }
-      if (type_operation == 'b'){
-        this.stopTimmer=true
+      sendDataTable(id, fild, data, index, old){
+        if (old!=data){
+          data = (data=='')?'Null':data
+          // this.value.parts.reports_content.forEach((v)=>{
+              // if(v.id==id){
+                    axios.get('/updateReportsList', {
+                        params: {
+                          id: id,
+                          fild: fild,
+                          newData: data,
+                          index: index,
+                          tableId:this.table.id
+                        }
+                    })
+              // }
+          // })
       }
-
-      },
-      sendDataTable(id, fild, data){
-        
-        data = (data=='')?'Null':data
-        this.value.parts.reports_content.forEach((v)=>{
-             if(v.id==id){
-                  axios.get('/updateReportsList', {
-                      params: {
-                        id: id,
-                        fild: fild,
-                        newData: data
-                      }
-                  })
-             }
-        })
       },
       delRow(id) {
             if (confirm("Are you sure?")) {
                 axios.get('/del_row_from_report', {
                       params: {
-                        id: id
+                        id: id,
+                        tableId:this.table.id
                       }
                   })
                 }
-        }
-
-  }
+              },
+  getRowsInReports(id) {
+         axios.get('/get_reports_list', {
+            params: {
+               id: id
+            }
+         }).then(response => {
+            this.reports_list = response.data;
+         })
+      },
+      getFild(updateFild) {
+        this.reports_list[updateFild.index][updateFild.fild] = updateFild.value;
+      },
+  },
+  mounted() {
+    this.getRowsInReports(this.table.id);
+   
+   }
 }
 </script>

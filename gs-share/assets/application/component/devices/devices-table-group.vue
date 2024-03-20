@@ -1,17 +1,14 @@
 <template>
   <b-container>
+    <b-row align-h="end">
     <print v-if="tmp.typeOfHead == 'Devices'"
     :windowPrint="windowPrint"
     :selectedCornty="selectedCornty"
     :project="project" :tmp="tmp"
     :account="account" :id="pid"
-    :disc='disc' :discP='discP'
-    :tax='tax' :taxDub='taxDub'
-    :taxP='taxP' :taxPDub='taxPDub'
-    :netto='netto' :brutto='brutto'
-    :butDiscPerc='butDiscPerc'
-    :partx='showTable()' :head="tmp.typeOfHead"
-    :addtaxColapsel="addtaxColapse"
+
+    :partx="[]" :head="tmp.typeOfHead"
+    :addtaxColapsel="false"
     :workers="workers" :comments="comments"
     :customer="customer"
     :person="person"
@@ -28,40 +25,19 @@
     @preview="preview"
     @printOffer="printOffer"
     @hideWindowPrint="hideWindowPrint"
-    ref="print"
+    ref="print" 
     >
-    <b-col></b-col>
-
-      <!-- <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Type"></b-col>
-      <b-col class="cForm col-12 col-lg-3" style="padding:0px;" slot="Work"></b-col> -->
     </print>
-    
-    <div v-for="(part, index) in showTable()" :key="part.id">
+  </b-row>
+    <div v-for="table in tables" :key="table.id">
       <devices-table
-      :value="part"
-      :tableId="index"
-      :workers="workers">
-        <div slot-scope="table" slot="tableHead">
-          <b-link style="width:100%" @click="toog(part.parts.id)">
-            <span :id="'dp'+part.parts.id" style="display:none">+</span>
-            <span :id="'dm'+part.parts.id">-</span>
-          </b-link>
-          <span :contenteditable="true" @blur="updateNameDevice($event, part.parts.id, part.parts.part_name_device)" @click.prevent.self>
-            {{part.parts.part_name_device?part.parts.part_name_device:part.parts.part_name}}
-          </span>
-        </div>
+      :table="table"
+      :workers="workers"
+      :ref="'deviceTable'+table.id">
       </devices-table>
-
       <devices-measurement
-      :value="part"
-      :tableId="index"
-      :workers="workers">
-        <div slot-scope="table" slot="tableHead"> 
-          <b-link style="width:100%" @click="toogMeas(part.parts.id)">
-            <span :id="'measurementProtocolClose'+part.parts.id" style="display:none">+ {{$t('measurement.measurementProtocol')}}</span>
-            <span :id="'measurementProtocolOpen'+part.parts.id">- {{$t('measurement.measurementProtocol')}}</span>
-          </b-link>
-        </div>
+      :table="table"
+      :ref="'measurement'+table.id">
       </devices-measurement>
       <br>
     </div>
@@ -71,7 +47,6 @@
 import axios from 'axios';
 export default {
   props: [
-    'value',
     'workers',
     'selectedDocsList',
     'addPdfs',
@@ -83,34 +58,21 @@ export default {
     'project',
     'tmp',
     'comments',
-    'loadDamages',
     'account',
-    'disc',
-    'discP',
-    'tax',
-    'taxDub',
-    'taxP',
-    'taxPDub',
-    'netto',
-    'brutto',
-    'butDiscPerc',
     'head',
-    'addtaxColapse',
     'id',
     'customer',
     'person',
     'selectCustomer',
     'selectPerson'
-  ],
+    ],
+    data() {
+      return {
+        tables:[]
+      }
+    },
   methods: {
-    toog(val){
-      document.getElementById('dm'+val).style.display = document.getElementById('dev'+val).style.display = (document.getElementById('dev'+val).style.display=='none') ? '' : 'none'
-      document.getElementById('dp'+val).style.display = (document.getElementById('dm'+val).style.display=='none') ? '' : 'none'
-    },
-    toogMeas(val){
-      document.getElementById('measurementProtocolOpen'+val).style.display = document.getElementById('mestable'+val).style.display = (document.getElementById('mestable'+val).style.display=='none') ? '' : 'none'
-      document.getElementById('measurementProtocolClose'+val).style.display = (document.getElementById('measurementProtocolOpen'+val).style.display=='none') ? '' : 'none'
-    },
+
     selectedDocs(event){
       this.$emit('selectedDocs', event)
     },
@@ -145,13 +107,64 @@ export default {
         })
       }
     }, 
-    showTable(){
-      return this.value.filter((v)=>{
-        if(v.parts.devices_content.length>0){
-          return v
-        }
-      })
+    // showTable(){
+    //   return this.value.filter((v)=>{
+    //     if(this.tmp.device.length>0){
+    //       return v
+    //     }
+    //   })
+    // },
+
+getTablesInDevices(id) {
+  axios.get('/get_tables_in_devices', {
+    params: {
+      id: id
     }
+    }).then(response => {
+      this.tables = response.data;
+      if(response.data.length==0){
+        this.$emit('switchDevices', false)
+      } 
+    })
+}
+},
+mounted(){
+
+    this.$options.sockets.onmessage = (data) => {
+      var delimetr = data.data.split(':')
+
+      if (delimetr[0] == 'update_part_device') {
+        this.tables.filter((v)=>{
+          if (v.id == delimetr[1]) {
+            this.getTablesInDevices(this.tmp.id)
+          };
+        })
+      }
+      if ((delimetr[0] == 'send_device') || (delimetr[0] == 'del_row_device') || (delimetr[0] == 'add_rows_for_devices') || (delimetr[0] == 'del_rows_for_devices')) {
+        delimetr[1].split(',').forEach((tableForReload)=>{
+          this.$refs['deviceTable'+tableForReload][0].getRowsInDevice(tableForReload)
+          this.selectedTables=[]
+        })
+      }
+      if (delimetr[0] == 'updateFildDevice') {
+        var updateFild = (JSON.parse(data.data.split('updateFildDevice:')[1]))
+        this.$refs['deviceTable'+updateFild.table_id][0].getFild(updateFild)
+      }
+      if (delimetr[0] == 'updateFildMeasurement') {
+        var updateFild = (JSON.parse(data.data.split('updateFildMeasurement:')[1]))
+        this.$refs['deviceTable'+updateFild.table_id][0].getFildMeasurement(updateFild)
+      }
+      if ((delimetr[0] == 'add_rows_MeasureProtocol') || (delimetr[0] == 'del_rows_MeasureProtocol')) {
+        delimetr[1].split(',').forEach((tableForReload)=>{
+          this.$refs['measurement'+tableForReload][0].getRowsInMeasureProtocol(tableForReload)
+          this.selectedTables=[]
+        })
+      }
+      if (delimetr[0] == 'updateFildMeasureProtocol') {
+        var updateFild = (JSON.parse(data.data.split('updateFildMeasureProtocol:')[1]))
+        this.$refs['measurement'+updateFild.table_id][0].getFild(updateFild)
+      }
+   }
   }
 }
 </script>

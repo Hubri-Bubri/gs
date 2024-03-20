@@ -110,6 +110,15 @@
                   {{it.item.cnumber}}
                 </b-link>
               </template>
+              <template #cell(sorting_data)="it">
+                  {{it.item.date}}
+              </template>
+              <template #cell(brutto)="it">
+                  {{it.item.brutto | thousandSeparator}}
+              </template>
+              <template #cell(gen_summa)="it">
+                  {{it.item.gen_summa | thousandSeparator}}
+              </template>
               <template #empty>
                 <div class="text-center">{{$t('projects.empty')}}</div>
               </template>
@@ -142,7 +151,7 @@
                             = 
                           </b-col>
                           <b-col col>
-                            {{Math.abs((summ())*100/Math.abs(amount)).toFixed(2)|thousandSeparator}} %
+                            {{Math.abs((summ())*100/Math.abs(amount)).toFixed(0)}} %
                           </b-col>
                         </b-row>
                       </b-td>
@@ -175,7 +184,7 @@
                             =
                           </b-col>
                           <b-col col>
-                            {{((Math.abs(summ())-Math.abs(amount))*100/Math.abs(amount)).toFixed(2)|thousandSeparator}} %
+                            {{((Math.abs(summ())-Math.abs(amount))*100/Math.abs(amount)).toFixed(0)}} %
                           </b-col>
                         </b-row>
                       </b-td>
@@ -198,7 +207,7 @@
                             </b-badge>
                           </b-col>
                           <b-col col cols="2">
-                            <b-form-input type="text"  @change="updateBalance($event, operation, 'value')" 
+                            <b-form-input type="text"  @change="updateBalance($event.replace(',','.'), operation, 'value')" 
                             :value="operation.value|thousandSeparator" />
                           </b-col>
                           <b-col col cols="1">
@@ -356,7 +365,7 @@ export default {
         variant: 'default'
       },
       {
-        key: 'date',
+        key: 'sorting_data',
         label: this.$t('customerDetail.date'),
         sortable: true,
         variant: 'default'
@@ -374,7 +383,7 @@ export default {
         variant: 'default'
       },
       {
-        key: 'netto',
+        key: 'gen_summa',
         label: this.$t('edit.netto'),
         sortable: true,
         variant: 'default'
@@ -388,12 +397,14 @@ export default {
       {
         key: 'status_set',
         label: this.$t('fields.status'),
-        sortable: true,
+        // sortable: true,
         variant: 'default'
       },
       {
         key: 'days',
-        label: this.$t('fields.days')
+        label: this.$t('fields.days'),
+        sortable: true,
+        variant: 'default'
       }]
     }
   },
@@ -419,13 +430,13 @@ export default {
       this.getBalance(this.old_done+'|'+this.fd+'|'+this.td)
     },
     cancelPay(){
-      var newTrue = 0
-      this.items.filter((v)=>{
-        v.op.filter((v1)=>{
-          if (v1.new) newTrue = newTrue + 1
-        });
-      });
-      return newTrue
+      // var newTrue = 0
+      // this.items.filter((v)=>{
+      //   v.op.filter((v1)=>{
+      //     if (v1.new) newTrue = newTrue + 1
+      //   });
+      // });
+      // return newTrue
     },
     textLength(){
      if(this.rowId!=null){
@@ -448,15 +459,17 @@ export default {
     },
     filterFilds(val){
       return  val.filter((v)=>{
-        if ((v.key != 'days')&(v.key != 'status_set')) {
+        if ((v.key != 'days')&(v.key != 'status_set')&(v.key != 'sorting_data')) {
           return v;
         }
       })
     },
     dataCharts(val){
-      var valBruto = this.$options.filters.reThousandSeparator(val.brutto)
-      var pay=this.summFromRow(val, valBruto)*100/valBruto
-      var withOut=100-(this.summFromRow(val, valBruto)*100/valBruto)
+      // var valBruto = this.$options.filters.reThousandSeparator(val.brutto)
+      var valBruto = parseFloat(val.brutto)
+      var pay=this.summFromRow(val)*100/valBruto
+      var withOut=100-(this.summFromRow(val)*100/valBruto)
+      // console.log(valBruto, pay, withOut)
       var t = 'i'
 
       if (val.type=='CREDIT'){
@@ -482,14 +495,14 @@ export default {
           mode: mode
         }
       }).then(response => {
-        // console.log('1')
+        // console.log(response.data)
         var countSelect = 0
         this.items = response.data.filter((v)=>{
 
           // console.log('2')
           v.date = this.$options.filters.dateInverse(v.date)
           v.days = this.difdate(v.date)
-          v.status_set = (this.summFromRow(v, v.brutto)*66/v.brutto)+((34-(-this.difdate(v.date))*34/14)/2)
+          v.status_set = (this.summFromRow(v)*66/v.brutto)+((34-(-this.difdate(v.date))*34/14)/2)
             if (v.number.split(' ').length==3){
               v.cnumber = this.countDigitals(v.number.split(' ')[0])
               v.number = this.countDigitals(v.number.split(' ')[1])+'-'+v.number.split(' ')[0].split('-')[1]
@@ -501,19 +514,19 @@ export default {
           if (v.type==30){
             v.type = 'DEBET'
             if((v.number.split(' ').length==1)|(v.number.split(' ').length==3)|(v.number.split(' ').length==5)){
-              v.netto = this.$options.filters.thousandSeparator(v.netto)
-              v.brutto = this.$options.filters.thousandSeparator(v.brutto)
+              // v.netto = this.$options.filters.thousandSeparator(v.netto)
+              // v.brutto = this.$options.filters.thousandSeparator(v.brutto)
             }
           }
           if (v.type==60){
             // console.log('3')
-            v.type = 'CREDIT'
+            v.type = 'CREDIT' 
             // v.netto = -v.netto
             // console.log(v.brutto)
             // v.brutto = -v.brutto
             // console.log(v.brutto)
-            v.netto = '-'+this.$options.filters.thousandSeparator(v.netto)
-            v.brutto = '-'+this.$options.filters.thousandSeparator(v.brutto)
+            // v.netto = '-'+this.$options.filters.thousandSeparator(v.netto)
+            // v.brutto = '-'+this.$options.filters.thousandSeparator(v.brutto)
           }
           if (this.rowId!=null){
             this.items = this.items.filter((selected)=>{
@@ -540,12 +553,13 @@ export default {
         }
       })
     },
-    summFromRow(row, brutto){
-      var result = 0
+    summFromRow(row){
+      // console.log(row)
+      var result = 0.0
       row.op.forEach((v)=>{
-        result = result + parseFloat(v.value)
+        result = parseFloat(result) + parseFloat(v.value)
+        // console.log(result)
       })
-      // console.log(result)
       return result
     },
     difdate(val){
@@ -699,7 +713,7 @@ export default {
       if (item._rowVariant!='primary'){
         item._rowVariant ='success'
       }
-      this.amount=this.$options.filters.reThousandSeparator(item.brutto)
+      this.amount=parseFloat(item.brutto)
       this.op = item.op
       this.rowId = item.id
       this.valueType = item.type
@@ -707,6 +721,7 @@ export default {
       this.addPaymentState = true
     },
     addPayment(){
+      // console.log(Math.abs(this.amount),  Math.abs(this.summ()))
       var brutto = Math.abs(this.amount) - Math.abs(this.summ())
       var date = new Date();
       var getYear = date.toLocaleString("default", { year: "numeric" })
@@ -767,7 +782,7 @@ export default {
       }
     },
     summ(){
-      var brutto = 0
+      var brutto = 0.0
       this.items.filter((v)=>{
         if (v.id == this.rowId){
           v.op.filter((v1)=>{
@@ -781,20 +796,22 @@ export default {
     allbalance(){
       // console.log(this.filter)
       var brutto = parseFloat(0.00)
-      var netto = parseFloat(0.00)
+      var gen_summa = parseFloat(0.00)
+
       this.items.filter((v)=>{
-        v.brutto = v.brutto.replace('--', '-')
-        v.netto = v.netto.replace('--', '-')
-        brutto = brutto + this.$options.filters.reThousandSeparator(v.brutto)
-        netto = netto + this.$options.filters.reThousandSeparator(v.netto)
-        // console.log(brutto, netto)
+        // v.brutto = v.brutto.replace('--', '-')
+        // v.netto = v.netto.replace('--', '-')
+        brutto = brutto + parseFloat(v.brutto)
+        gen_summa = gen_summa + parseFloat(v.gen_summa)
+        // console.log(brutto, gen_summa)
       })
+     
       // if (
       //   (this.$security.account['id']==1) ||
       //   (this.$security.account['id']==3)
       // )
       // {
-        return 'Netto '+this.$options.filters.thousandSeparator(netto)+' €  Brutto '+this.$options.filters.thousandSeparator(brutto)+' €'
+        return 'Netto '+this.$options.filters.thousandSeparator(gen_summa)+' €  Brutto '+this.$options.filters.thousandSeparator(brutto)+' €'
       // }
     }
   },
