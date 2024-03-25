@@ -1222,7 +1222,7 @@ class Sub:
             # return web.json_response('')
             # ioloop.run_until_complete(wait_tasks)
             # ioloop.close()
-            return ''
+            # return ''
     # @classmethod
     # async def foo(cls):
     #     print('Running in foo')
@@ -1789,7 +1789,7 @@ class System:
                             .selectall()))
                         for row in rows:
                             have_rows.append(row['id'])
-            # print(have_items)
+            print('delete not used positions')
             for_del_items = (await (Q()
                     .tables(T.items)
                     .fields(T.items.id)
@@ -1810,48 +1810,17 @@ class System:
                 await (Q(T.items)
                 .where(T.items.id == del_item['id'])
                 .delete())
+                print('delete item #'+str(del_item['id']))
             for del_table in for_del_tables:
                 await (Q(T.tables)
                 .where(T.tables.id == del_table['id'])
                 .delete())
+                print('delete table #'+str(del_table['id']))
             for del_row in for_del_rows:
                 await (Q(T.rows_for_table)
                 .where(T.rows_for_table.id == del_row['id'])
                 .delete())
-
-
-
-
-                    
-
-    # @classmethod
-    # async def check_for_percent_fixed(cls):
-    #     async with database.query() as Q:
-    #         tables = (await (Q()
-    #             .tables(T.tables)
-    #             .fields(T.tables.id,
-    #                     T.tables.obj,
-    #                     T.tables.selected)
-    #             .where(T.tables.obj != '')
-    #             .selectall()))
-    #         for table in tables:
-    #             objs = table['obj'].split(',')
-    #             selects = table['selected'].split('|')
-    #             newObjs=[]
-    #             for i, obj in enumerate(objs):
-    #                 indexes_temp = selects[i].split(obj+':')[1].split(',')
-    #                 indexes=[]
-    #                 for check_box in indexes_temp:
-    #                     if check_box!='':
-    #                         indexes.append(int(check_box.split('temp')[1])-1)
-    #                 if len(indexes)!=0:
-    #                     newObjs.append(obj)
-    #             await (Q()
-    #             .tables(T.tables)
-    #             .where(T.tables.id == table['id'])
-    #             .update({T.tables.obj: (','.join(newObjs))}))
-
-
+                print('delete row #'+str(del_row['id']))
 
     @classmethod
     async def check_for_percent_transfer(cls):
@@ -1869,7 +1838,6 @@ class System:
                     with_obj = objs_in_select.split(':')
                     obj = with_obj[0]
                     indexes = with_obj[1].split(',')
-                    # print(obj, indexes)
 
                     rows = (await (Q()
                         .tables(T.rows_for_table)
@@ -1891,14 +1859,16 @@ class System:
                                             .tables(T.rows_for_table)
                                             .where(T.rows_for_table.id == row['id'])
                                             .update({T.rows_for_table.checked_for_percent: 'in'+str(percent_id)}))
+                                            print('transfer check box to row_id'+str(row['id']))
                     
                     objs_in_table = table['obj'].split(',')
                     for obj_in_table in objs_in_table:
                         if obj_in_table == obj:
-                             await (Q()
+                            await (Q()
                                 .tables(T.tables)
                                 .where(T.tables.id == table['id'])
                                 .update({T.tables.obj: table['obj'].replace(obj, 'in'+str(percent_id))}))
+                            print('transfer check box in table'+str(table['id']))
 
 
 
@@ -1946,8 +1916,12 @@ class System:
                         for index, row in enumerate(rows):
                             try:
                                await Project.update_for_summ(table['id'], row['id'], 'count', row['count'], index, item['id'], False, [])
+                               print('new calc for table '+str(table['id'])+' row '+str(row['id']))
                             except ValueError:
-                               print(row['id'], row['count'], row['price'])
+                                if row['price']=='':
+                                    await Project.update_table_data(table['id'], row['id'], 'price', 0, index, False, [])
+                                    await Project.update_for_summ(table['id'], row['id'], 'count', row['count'], index, item['id'], False, [])
+                                print(row['id'], row['count'], row['price'], table['id'], item['id'], 'FIXED')
                             
                     if len(rows)==0:
                         await (Q()
@@ -1958,29 +1932,7 @@ class System:
                             T.tables.alt_summa: 0,
                             T.tables.discont: 0
                         }))
- 
-    # @classmethod
-    # async def remove_empty_percent(cls):
-    #     async with database.query() as Q:
-    #         tables = (await (Q()
-    #             .tables(T.tables)
-    #             .fields(T.tables.id,
-    #                     T.tables.obj,
-    #                     T.tables.selected)
-    #             .where(T.tables.obj != '')
-    #             .selectall()))
-    #         for table in tables:
-    #             selects = table['selected'].split('|')
-    #             for objs_in_select in selects:
-    #                 with_obj = objs_in_select.split(':')
-    #                 obj = with_obj[0]
-    #                 indexes = with_obj[1]
-    #                 if indexes=='':
-    #                     print(obj, table['obj'], table['id'])
-    #                     await (Q()
-    #                         .tables(T.tables)
-    #                         .where(T.tables.id == table['id'])
-    #                         .update({T.tables.obj: table['obj'].replace(obj, '')}))
+
     @classmethod
     async def percents(cls):
         async with database.query() as Q:

@@ -68,7 +68,7 @@ class language:
             tables = (await Reports.get_tables_in_reports(itemId))
             for table in tables:
                 table['reports_content'] = (await Reports.get_reports_list(table['id']))
-
+      
         data={'dateInspect': item['dateInspect'],
                 'dateEvent': item['dateEvent'],
                 'customercontract': item['other'],
@@ -295,7 +295,7 @@ class language:
             # sixText='',
             summ=data['summ'],
             summ1=data['summ1'],
-            customercontract = data['customerСontract'],
+            customercontract = data['customercontract'],
             finishWork=data['finishWork'],
             discP=data['discP'],
             butDiscPerc=data['butDiscPerc'],
