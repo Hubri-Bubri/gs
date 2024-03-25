@@ -151,7 +151,7 @@
           </b-dropdown-item-button>
         </b-dropdown>
 
-        <b-button size="sm" @click="$emit('printOffer')">
+        <b-button size="sm" @click="$emit('openWindowPrint', tmp.type)">
           <b-icon icon="printer" aria-hidden="true"></b-icon>
         </b-button>
 
@@ -183,17 +183,13 @@
             :unitPercent="((table.obj!='')&&(table.obj!=null))?table.obj.split(','):[]"
             :selectedWorkers="selectedWorkers"
             :butDiscPerc="tmp.butDiscPerc"
-
             :discP="tmp.discP"
             :addtaxColapse="tmp.addtaxColapse=='true'"
-
             :unitType="unitType"
             :item_id="tmp.id"
-
             @chengeCountPresents="chengeCountPresents"
             @seltable="seltable"
             @tableDelete="tableDelete">
-           
             </calc-table>
             <hr style="padding:0;margin:5px;display:none;" :id="'hr'+table.id"/>
         </div>

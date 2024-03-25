@@ -71,7 +71,7 @@
             <div @click="rowSelected(data.item)" :title="data.item.user"> {{data.item.user.replace(/[^A-Z]/g, '')}} </div>
           </template>
           <template #cell(number)="data">
-            <div @click="rowSelected(data.item)" style="width:85px;"> {{data.item.number}} </div>
+            <div @click="rowSelected(data.item)" style="width:100px;"> {{data.item.number}} </div>
           </template>
         </b-table>
       </div>
@@ -82,7 +82,44 @@
 <script type="text/javascript">
 import axios from 'axios';
 export default {
-  props: ['responseFiles', 'fieldsDocs', 'idNodeDoc', 't', 'itemsDoc', 'itemsMenuDoc', 'oldIdDoc', 'selectedPriceDoc', 'menuDocsTree', 'docsIds'],
+  props: ['responseFiles', 'idNodeDoc', 't', 'itemsDoc', 'itemsMenuDoc', 'oldIdDoc', 'selectedPriceDoc', 'menuDocsTree', 'docsIds'],
+
+  computed: {
+
+fieldsDocs() {
+			return [{
+					key: 'type',
+					label: '§',
+					sortable: true
+				},
+				{
+					key: 'name',
+					label: this.$t('docs.name'),
+					class: 'w-100',
+					sortable: true
+				},
+				{
+					key: 'number',
+					label: '#'
+				},
+				{
+					key: 'added',
+					label: this.$t('docs.added'),
+					sortable: true
+				},
+				{
+					key: 'user',
+					label: '👤',
+					sortable: true
+				},
+				{
+					key: 'delete',
+					label: 'X'
+				}
+			]
+		}
+  },
+
   methods: {
     foldershowfiles(val){
       if (this.idNodeDoc != undefined){

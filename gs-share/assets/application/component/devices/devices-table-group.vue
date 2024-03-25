@@ -1,7 +1,10 @@
 <template>
   <b-container>
     <b-row align-h="end">
-    <print v-if="tmp.typeOfHead == 'Devices'"
+      <b-button size="sm" @click="$emit('openWindowPrint', 'Devices')">
+          <b-icon icon="printer" aria-hidden="true"></b-icon>
+        </b-button>
+    <!-- <print v-if="tmp.typeOfHead == 'Devices'"
     :windowPrint="windowPrint"
     :selectedCornty="selectedCornty"
     :project="project" :tmp="tmp"
@@ -27,7 +30,7 @@
     @hideWindowPrint="hideWindowPrint"
     ref="print" 
     >
-    </print>
+    </print> -->
   </b-row>
     <div v-for="table in tables" :key="table.id">
       <devices-table
@@ -48,23 +51,9 @@ import axios from 'axios';
 export default {
   props: [
     'workers',
-    'selectedDocsList',
-    'addPdfs',
-    'makemodalpdf',
-    'typeDocsList',
-    'windowPrint',
     'pid',
-    'selectedCornty',
     'project',
-    'tmp',
-    'comments',
-    'account',
-    'head',
-    'id',
-    'customer',
-    'person',
-    'selectCustomer',
-    'selectPerson'
+    'tmp'
     ],
     data() {
       return {
@@ -73,30 +62,30 @@ export default {
     },
   methods: {
 
-    selectedDocs(event){
-      this.$emit('selectedDocs', event)
-    },
-    addPdf(){
-      this.$emit('addPdf')
-    },
-    addPdfSep(){
-      this.$emit('addPdfSep')
-    },
-    printPdf(){
-      this.$emit('printPdf')
-    },
-    preview(){
-      this.$emit('preview')
-    },
-    printOffer(){
-      this.$emit('printOffer')
-    },
-    hideWindowPrint(){
-      this.$emit('hideWindowPrint')
-    },
-    openWindowPrint(){
-      this.$emit('openWindowPrint')
-    },
+    // selectedDocs(event){
+    //   this.$emit('selectedDocs', event)
+    // },
+    // addPdf(){
+    //   this.$emit('addPdf')
+    // },
+    // addPdfSep(){
+    //   this.$emit('addPdfSep')
+    // },
+    // printPdf(){
+    //   this.$emit('printPdf')
+    // },
+    // preview(){
+    //   this.$emit('preview')
+    // },
+    // printOffer(){
+    //   this.$emit('printOffer')
+    // },
+    // hideWindowPrint(){
+    //   this.$emit('hideWindowPrint')
+    // },
+    // openWindowPrint(){
+    //   this.$emit('openWindowPrint')
+    // },
     updateNameDevice(newVal, id, partName) {
       if(newVal.target.innerText != partName){
         axios.get('/updateNameDevice', {

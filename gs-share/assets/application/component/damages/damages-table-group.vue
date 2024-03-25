@@ -11,7 +11,11 @@
     <b-form-input v-show="showquality" v-model="quality" @change="showquality=false" type="range" min="0" max="100" size="sm" style="max-width: 240px;padding-top: 15px;"></b-form-input>
     </b-col>
     <b-col cols="1" class="text-right">
-    <print v-if="tmp.typeOfHead == 'Damage'"
+     
+      <b-button size="sm" @click="$emit('openWindowPrint', 'Damage')">
+          <b-icon icon="printer" aria-hidden="true"></b-icon>
+        </b-button>
+    <!-- <print v-if="tmp.typeOfHead == 'Damage'"
     :windowPrint="windowPrint"
     :selectedCornty="selectedCornty"
     :project="project" :tmp="tmp"
@@ -35,7 +39,7 @@
     @printOffer="printOffer"
     @hideWindowPrint="hideWindowPrint"
     ref="print" 
-    ></print>
+    ></print> -->
   </b-col>
   </b-input-group>
     <div v-for="(table, index) in tables" :key="table.id">
@@ -47,22 +51,7 @@
 <script type="text/javascript">
 import axios from 'axios';
 export default {
-    props: ['workers',
-    'selectedDocsList', 'addPdfs', 'makemodalpdf', 'typeDocsList',
-    'windowPrint', 'pid',
-    'selectedCornty',
-    'project',
-    'tmp',
-    'comments',
-    'loadDamages',
-    'account',
-    'head',
-    'addtaxColapse',
-    'id',
-    'customer',
-    'person',
-    'selectCustomer',
-    'selectPerson'],
+    props: ['workers', 'wwidth', 'project', 'id', 'tmp'],
 
     data() {
       return {
@@ -107,30 +96,30 @@ export default {
       //     id: id
       //   }})
       // },
-      selectedDocs(event){
-        this.$emit('selectedDocs', event)
-      },
-      addPdf() {
-        this.$emit('addPdf')
-      },
-      addPdfSep() {
-        this.$emit('addPdfSep')
-      },
-      printPdf() {
-        this.$emit('printPdf')
-      },
-      preview() {
-        this.$emit('preview')
-      },
-      printOffer() {
-        this.$emit('printOffer')
-      },
-      hideWindowPrint(){
-        this.$emit('hideWindowPrint')
-      },
-      openWindowPrint(){
-        this.$emit('openWindowPrint')
-      },     
+      // selectedDocs(event){
+      //   this.$emit('selectedDocs', event)
+      // },
+      // addPdf() {
+      //   this.$emit('addPdf')
+      // },
+      // addPdfSep() {
+      //   this.$emit('addPdfSep')
+      // },
+      // printPdf() {
+      //   this.$emit('printPdf')
+      // },
+      // preview() {
+      //   this.$emit('preview')
+      // },
+      // printOffer() {
+      //   this.$emit('printOffer')
+      // },
+      // hideWindowPrint(){
+      //   this.$emit('hideWindowPrint')
+      // },
+      // openWindowPrint(){
+      //   this.$emit('openWindowPrint')
+      // },     
       edit(content){
         this.$refs['zoneEditorModal'].show();
         this.initimage.url = '/image_edit?id='+content.imgId;

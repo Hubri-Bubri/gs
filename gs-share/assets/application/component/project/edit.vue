@@ -115,9 +115,7 @@
 				</b-col> 
 			</b-row>
 			<calc-table-group v-if="tmp.id"
-			
 			:works="works"
-			:selectedCornty="selectedCornty"
 			:pid="id"
       :key="tmp.id"
 			:tmp="tmp"
@@ -129,6 +127,7 @@
 			@seltable="seltable"
 			@sendMail="$emit('sendMail', availableMails)"
       @worker="worker"
+      @openWindowPrint="openWindowPrint"
 			ref="calcGroup"
 			></calc-table-group>
       <!-- 
@@ -148,7 +147,7 @@
 			@addPdf="addPdf"
 			@printPdf="printPdf"
 			@preview="preview"
-			@printOffer="printOffer"
+			
 			@worker="worker"
 			@hideWindowPrint="hideWindowPrint" -->
 		</b-container>
@@ -165,7 +164,7 @@ export default {
 	components: {
 		VueEditor,
 	},
-	props: ['tmp', 'project', 'works', 'availableMails', 'selectedCornty', 'id', 'selectedWorkers', 'typesForTables', 'workers', 'plan'],
+	props: ['tmp', 'project', 'works', 'availableMails', 'id', 'selectedWorkers', 'typesForTables', 'workers', 'plan'],
 	data() {
 		return {
 			timeSave: null,
@@ -200,6 +199,9 @@ export default {
 		}
 	},
 	methods: {
+    openWindowPrint(type){
+      this.$emit('openWindowPrint', type)
+    },
 save(){
   this.writecomet();
   this.cloudChange=false;

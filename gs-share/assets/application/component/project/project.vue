@@ -126,6 +126,21 @@
       height="4px"
       ></b-progress>
     </b-alert>
+    <b-alert
+      :show="wasMadedismissCountDown"
+      dismissible
+      variant="success"
+      @dismissed="wasMadedismissCountDown=0"
+      @dismiss-count-down="wasMadecountDownChanged"
+    >
+      <p>{{$t('projectDetail.wasMade')}}: {{wasMadeText}}</p>
+      <b-progress
+      variant="warning"
+      :max="wasMadedismissSecs"
+      :value="wasMadedismissCountDown"
+      height="4px"
+      ></b-progress>
+    </b-alert>
     <hr />
     <b-row>
       <b-col>
@@ -251,9 +266,13 @@ export default {
     data() {
       return {
         textOfSend:'',
+        wasMadeText:'',
         dismissSecs: 10,
         dismissCountDown: 0,
-        showDismissibleAlert: false
+        showDismissibleAlert: false,
+        wasMadedismissSecs: 10,
+        wasMadedismissCountDown: 0,
+        wasMadeshowDismissibleAlert: false
       }
     },
     computed: {
@@ -326,9 +345,16 @@ export default {
     countDownChanged(dismissCountDown) {
         this.dismissCountDown = dismissCountDown
     },
+    wasMadecountDownChanged(wasMadedismissCountDown) {
+        this.wasMadedismissCountDown = wasMadedismissCountDown
+    },
     showAlert(mail) {
         this.textOfSend = mail
         this.dismissCountDown = this.dismissSecs
+    },
+    wasMade(type, number) {
+        this.wasMadeText =  this.$t('oneCountAlret.'+type)+' '+number
+        this.wasMadedismissCountDown = this.wasMadedismissSecs
     },
     rowClass(item, type) {
         if (!item || type !== 'row') return

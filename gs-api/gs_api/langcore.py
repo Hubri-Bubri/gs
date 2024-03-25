@@ -17,14 +17,124 @@ from uuid import uuid4
 import re
 from PIL import Image
 from base64 import b64encode
-from gs_api.dictionary import Docs, Customer
+from gs_api.dictionary import Docs, Customer, Project, Projects, General, Devices, Damage, Reports
 ###
-import asyncio
+# import asyncio
 import nest_asyncio
 nest_asyncio.apply()
 class language:
     @classmethod
-    async def pdf(cls, request, data, ws_clients):
+    async def pdf(cls, request, addPdf, forPreview, pid, itemId, type, today, stworks, fworks, dateForInspect, byForInspect, selectedDocsList, ws_clients):
+        # print(pid, item)
+        project = await Project.select_project(pid)
+        item = await General.get_item_for_pdf(itemId)
+        
+        num=''
+        nuls = (int(4)-int(len(str(project['project_number']))))
+        for x in range(0, int(nuls)):
+            num = str(num)+'0'
+
+        pNumer = (str(num)+str(project['project_number'])+'-'+str(project['project_number_year']))
+
+        tables = []
+        imagesForPdf=[]
+        if((type=='Orders')|(type=='Offers')|(type=='Invoices')):
+            tables = (await Projects.get_tables_in_edit(itemId))
+            for table in tables:
+                table['content'] = (await Projects.get_rows_in_table(table['id']))
+        if((type=='Devices')):
+            tables = (await Devices.get_tables_in_devices(itemId))
+            for table in tables:
+                table['devices_content'] = (await Devices.get_device_list(table['id']))
+                table['measure_protocol'] = (await Devices.get_MeasureProtocol_list(table['id']))
+
+        if((type=='Damage')):
+            tables = (await Damage.get_tables_in_damages(itemId))
+            for table in tables:
+                table['damage_content'] = (await Damage.get_damage_list(table['id']))
+                for damage in table['damage_content']:
+                    image={}
+                    stream = io.BytesIO()
+                    image['content'] = await Docs.images_for_pdf(damage['imgId'])
+                    im = Image.open(io.BytesIO(image['content']))
+                    conv = im.convert('RGB')
+                    conv.save(stream, 'JPEG', quality=40)
+                    img_str = b64encode(stream.getvalue()).decode()
+                    image['content'] = img_str
+                    image['name'] = damage['name']
+                    image['desc'] = damage['desc']
+                    imagesForPdf.append(image)
+        if((type=='Reports')):
+            tables = (await Reports.get_tables_in_reports(itemId))
+            for table in tables:
+                table['reports_content'] = (await Reports.get_reports_list(table['id']))
+
+        data={'dateInspect': item['dateInspect'],
+                'dateEvent': item['dateEvent'],
+                'customercontract': item['other'],
+                # 'worker': '',
+                'customerСontract': '',
+                'getCustomer': project['name'],
+                'getPerson': project['appeal']+' '+project['names'],
+                'getCustomerAdress': project['street'],
+                'getCustomerAdress1': project['zip']+' '+project['city'],
+                'offerHead': type,
+                # 'subHead': '',
+                'editor': project['first_name']+' '+project['second_name'],
+                'userTel': project['userTel'],
+                'userFax': '',
+                'userMail': project['userMail'],
+                'number': item['number'],
+                'date': datetime.strptime(today, '%Y-%m-%d').strftime("%d.%m.%Y"),
+                'work': item['work'],
+                'pNumber': pNumer,
+                'street': project['street1'],
+                'zip': project['zip1'],
+                'contry': project['country'], 
+                'area': project['area'],
+                'city': project['city1'],
+                'dateProject': project['date'],
+                'insurance': item['insurance_number'],
+                'insurname': item['insurname'],
+                'place': item['place'],
+                'stworks': stworks,
+                'fworks': fworks,
+                'inspectedby': byForInspect,
+                # 'positions': '',
+                # 'comment': item['comment'],
+                'project_id': pid,
+                'selected_docs_list': selectedDocsList,
+                'tables': tables,
+                'summ': item['gen_summa'],
+                'summ1': item['gen_summa'],
+                'discP': item['discP'],
+                'butDiscPerc': item['butDiscPerc'],
+                'disc': item['gen_discont'],
+                'netto': item['gen_summa'],
+                'taxP': item['taxP'],
+                'tax': item['tax'],
+                'taxP2': item['taxPDub'],
+                'tax2': item['taxDub'],
+                'brutto': item['brutto'],
+                'addtaxColapse': item['addtaxColapse']}
+        if item['comment'] != None:
+            data['comment']= item['comment']
+        else:
+            data['comment']= ''
+
+        if ((dateForInspect != '')):
+            data['inspected'] = datetime.strptime(dateForInspect, '%Y-%m-%d').strftime("%d.%m.%Y")
+        else:
+            data['inspected'] = 'not set'
+
+        if fworks != 'null':
+            if stworks != 'null':
+                data['finishWork'] = 'Die Arbeit wurde ausgeführt: vom '+datetime.strptime(stworks, '%Y-%m-%d').strftime("%d.%m.%Y")+' bis '
+            else:
+                data['finishWork'] = 'Datum der Fertigstellung der Arbeiten: '+datetime.strptime(fworks, '%Y-%m-%d').strftime("%d.%m.%Y")
+        else:
+            data['finishWork'] = ''
+
         result =  (await Docs.select_template(data['selected_docs_list']))
 
         docs = ''.join(map(str, result))
@@ -33,23 +143,13 @@ class language:
    
         # objs = await Docs.select_image_damage_pdf(json.loads(data['loadDamages']))
         # images_for_pdf = await Docs.images_for_pdf(152)
+        
         # print(data['tables'])
-        tables=json.loads(data['tables'])
+        tables=(data['tables'])
+        # tables=json.loads(data['tables'])
+
         # print(tables)
-        imagesForPdf=[]
-        for table in tables:
-            for damage in table['parts']['damage_content']:
-                image={}
-                stream = io.BytesIO()
-                image['content'] = await Docs.images_for_pdf(damage['imgId'])
-                im = Image.open(io.BytesIO(image['content']))
-                conv = im.convert('RGB')
-                conv.save(stream, 'JPEG', quality=40)
-                img_str = b64encode(stream.getvalue()).decode()
-                image['content'] = img_str
-                image['name'] = damage['name']
-                image['desc'] = damage['desc']
-                imagesForPdf.append(image)
+  
 
 
         date_logo = await Docs.date_logo()
@@ -98,6 +198,7 @@ class language:
 
         @template_function
         def formDate(val):
+            # print(val)
             d = datetime.strptime(val, "%Y-%m-%d %H:%M")
             return d.strftime("%d.%m.%Y")
 
@@ -116,7 +217,8 @@ class language:
             if val != []:
                 sortedDate = []
                 for date in val:
-                    sortedDate.append(datetime.strptime(date.split(' ')[0], "%Y-%m-%d"))
+                    if (date.split(' ')[0])!='':
+                        sortedDate.append(datetime.strptime(date.split(' ')[0], "%Y-%m-%d"))
                 sortedDate.sort()
                 return sortedDate[0].strftime("%d.%m.%Y")
             else:
@@ -127,7 +229,8 @@ class language:
             if val != []:
                 sortedDate = []
                 for date in val:
-                    sortedDate.append(datetime.strptime(date.split(' ')[0], "%Y-%m-%d"))
+                    if (date.split(' ')[0])!='':
+                        sortedDate.append(datetime.strptime(date.split(' ')[0], "%Y-%m-%d"))
                 sortedDate.sort(reverse=True)
                 return sortedDate[0].strftime("%d.%m.%Y")
             else:
@@ -148,61 +251,13 @@ class language:
                 minutes = seconds // 60
                 seconds %= 60
                 return "%02i:%02i" % (hours, minutes)
-
-        # allhours = 0
-        # allhoursPrint=''
-        # for damage in objs:
-        #     hours= datetime(1, 1, 1, 0, 0)-datetime(1, 1, 1, 0, 0)
-        #     for task in damage['tasks']:
-        #         date = task['data_time_start'].split(' ')
-        #         y=int(date[0].split('-')[0])
-        #         m=int(date[0].split('-')[1])
-        #         d=int(date[0].split('-')[2])
-        #         h=int(date[1].split(':')[0])
-        #         mm=int(date[1].split(':')[1])
-
-        #         if 2 < len(date[1].split(':')):
-        #             s=int(date[1].split(':')[2])
-        #         else:
-        #             s=0
-        #         dts = datetime(y, m, d, h, m, s)
-
-        #         date = task['data_time_end'].split(' ')
-        #         y=int(date[0].split('-')[0])
-        #         m=int(date[0].split('-')[1])
-        #         d=int(date[0].split('-')[2])
-        #         h=int(date[1].split(':')[0])
-        #         mm=int(date[1].split(':')[1])
-
-        #         if 2 < len(date[1].split(':')):
-        #             s=int(date[1].split(':')[2])
-        #         else:
-        #             s=0
-        #         dtf = datetime(y, m, d, h, m, s)
-        #         result = (dtf-dts)
-        #         diftime = (dtf-dts)
-                
-        #         # result = str(round(result, 2))
-        #         cW=1
-        #         if not task['workers']==None:
-        #             cW = len(task['workers'].split(','))
-                
-        #         hours = hours + diftime * cW
-        #         task['data_time_end']=format_seconds_to_hhmmss(diftime.total_seconds())
-        #     damage['hours']= format_seconds_to_hhmmss(hours.total_seconds())
-        #     allhours=allhours+(hours.total_seconds())
-        #     allhoursPrint = format_seconds_to_hhmmss(allhours)
-        
         if '' == data['date']:
             skontodate = 'not set'
             date = 'not set'
         else:
+            # skontodate = (datetime.strptime(data['date'], '%Y-%m-%d') + timedelta(days=14)).strftime('%d.%m.%Y')
             skontodate = (datetime.strptime(data['date'], '%d.%m.%Y') + timedelta(days=14)).strftime('%d.%m.%Y')
             date = data['date']
-        
-        # print(data['stworks'])
-        # print(data['fworks'])
-        
         h=template.render(
             date=date,
             skontodate=skontodate,
@@ -234,10 +289,10 @@ class language:
             dateProject=data['dateProject'],
             inspected=data['inspected'],
             inspectedby=data['inspectedby'],
-            threText='',
-            fourText='',
-            fiveText='',
-            sixText='',
+            # threText='',
+            # fourText='',
+            # fiveText='',
+            # sixText='',
             summ=data['summ'],
             summ1=data['summ1'],
             customercontract = data['customerСontract'],
@@ -251,17 +306,16 @@ class language:
             tax2=data['tax2'],
             brutto=data['brutto'],
             netto=data['netto'],
-            tables=json.loads(data['tables']),
+            tables=(data['tables']),
+            # tables=json.loads(data['tables']),
             comment=data['comment'],
-            prices='',
+            # prices='',
             date_logo = date_logo['date_logo'],
             date_logo_head = date_logo['date_logo_head'],
             date_logo_address = date_logo['date_logo_address'],
             date_logo_image = date_logo['date_logo_image']
             )
-
-        # print(data['addPdf'])
-        if data['addPdf'] == 'true':
+        if addPdf == 'true':
             # print('true')
             date=data['date']
             offerHead=data['offerHead']
@@ -281,18 +335,22 @@ class language:
             pdf_file = io.BytesIO(file)
             read_pdf = PyPDF2.PdfFileReader(pdf_file)
             number_of_pages = read_pdf.getNumPages()
-            pages=data['number']
+            # pages=data['number']
             added=strftime("%d-%m-%Y %H:%M:%S", localtime())
             web.json_response(await Docs.add_pdf(h, date, offerHead, number, added, number_of_pages, project_id, user))
+            # print('getDocs:'+pid)
+            
             for client in ws_clients:
-                await client.send_str('getDocs')
+                await client.send_str('print:'+forPreview+':'+offerHead+':'+number)
+                await client.send_str('getDocs:'+pid)
 
-        if data['addPdf'] == 'separator':
+        if addPdf == 'separator':
             date=data['date']
             offerHead=data['offerHead']
             number=data['number']
             project_id=data['project_id']
             user=data['editor']
+            docs = ''
 
             resp = web.StreamResponse(headers={
                 'CONTENT-DISPOSITION': 'inline'
@@ -312,16 +370,15 @@ class language:
                     pdf_file = io.BytesIO(file)
                     read_pdf = PyPDF2.PdfFileReader(pdf_file)
                     number_of_pages = read_pdf.getNumPages()
-                    pages=data['number']
+                    # pages=data['number']
                     added=strftime("%d-%m-%Y %H:%M:%S", localtime())
-
-
-                    web.json_response(await Docs.add_pdf(part, date, offerHead, number, added, number_of_pages, project_id, user))
-
+                    web.json_response(await Docs.add_pdf(part, date, offerHead, number+'#'+str(index), added, number_of_pages, project_id, user))
+                    docs = docs + number+'#'+str(index)+' '
             for client in ws_clients:
-                await client.send_str('getDocs')
+                await client.send_str('print:'+forPreview+':'+offerHead+':'+docs)
+                await client.send_str('getDocs:'+pid)
 
-        if data['addPdf'] == 'false':
+        if addPdf == 'false':
             pdf = HTML(string=h).write_pdf()
             resp = web.StreamResponse(headers={
             'CONTENT-DISPOSITION': 'inline'
@@ -330,8 +387,9 @@ class language:
             await resp.prepare(request)
             await resp.write(pdf)
 
+        # print(forPreview)
             for client in ws_clients:
-                await client.send_str('preview')
+                await client.send_str('preview:'+forPreview)
 
                 # await client.send_str('getDocs')
                 # await client.send_str('getProjectDetail')

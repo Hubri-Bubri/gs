@@ -13,42 +13,12 @@
         border: 0;
       ":windowPrint="windowPrint"
     /> -->
-    <print
-      
-      :selectedCornty="selectedCornty"
-      :project="project"
-      :tmp="tmp"
-      :disc='tmp.disc'
-      :discP='tmp.discP'
-      :tax='tmp.tax'
-      :taxDub='tmp.taxDub'
-      :taxP='tmp.taxP'
-      :taxPDub='tmp.taxPDub'
-      :netto='tmp.netto'
-      :brutto='tmp.brutto'
-      :butDiscPerc='tmp.butDiscPerc'
-      :partx='[]'
-      :head="tmp.typeOfHead"
-      :addtaxColapsel="tmp.addtaxColapse"
-      :workers="workers"
-      :comments="comments"
-      :customer="customer"
-      :person="person"
-      :selectCustomer="selectCustomer"
-      :selectPerson="selectPerson"
-      :selectedDocsList="selectedDocsList"
-      :addPdfs="addPdfs"
-      :makemodalpdf="makemodalpdf"
-      :typeDocsList="typeDocsList"
-      @selectedDocs="selectedDocs"
-      @addPdf="addPdf"
-      @printPdf="printPdf"
-      @preview="preview"
-      @printOffer="printOffer"
-      @hideWindowPrint="hideWindowPrint"
-      ref="print"
-      >
-</print>
+    <print ref="print"
+    :tmp="tmp"
+    :pid="id"
+    :workers="workers"
+	@wasmade=wasmade
+    ></print>
     <b-modal size="md" centered ref="movedoc" :title="$t('projectDetail.move')">
       <b-form-select
         class=""
@@ -655,7 +625,6 @@
                     @loded="loded"
                     ref="docs2"
                     :responseFiles="responseFiles"
-                    :fieldsDocs="fieldsDocs"
                     :t="2"
                     @filedel="filedel"
                     @updatefilename="updatefilename"
@@ -860,27 +829,26 @@
                     :tmp="tmp"
                     :project="project"
                     :works="works"
-                    :selectedCornty="selectedCornty"
                     :id="id"
-                    :comments="comments"
                     :typesForTables="typesForTables"
                     :workers="workers"
                     :plan="plan"
-                    :customer="customer"
-                    :person="person"
-                    :selectCustomer="selectCustomer"
-                    :selectPerson="selectPerson"
                     :selectedWorkers="selectedWorkers"
                     :availableMails="availableMails"
                     @sendMail="sendTimeTableMail"
                     @seltable="seltable"
                     @countDigitals="countDigitals"
+                    @openWindowPrint="openWindowPrint"
+					@worker="worker"
                   ></edit>
 
-
-
-
                   <!-- 
+                    :selectedCornty="selectedCornty"
+                    :selectPerson="selectPerson"
+                    :selectCustomer="selectCustomer"
+                    :person="person"
+                    :customer="customer"
+                    :comments="comments"
                     :windowPrint="windowPrint"
                   :selectedDocsList="selectedDocsList"
                   :addPdfs="addPdfs"
@@ -914,7 +882,7 @@
                     "
                     @mouseover="cloudHover=true"
                     @mouseleave="cloudHover=false"
-                    @click="updateItem($refs['refCommentOfTable'].quill.getHTML(), 'comment', tmp.id);tmp.comment=$refs['refCommentOfTable'].quill.getHTML();cloudChange=false;cloudLoad=true;"
+                    @click="updateCommentInPorject($refs['refCommentOfTable'].quill.getHTML(), tmp.id);tmp.comment=$refs['refCommentOfTable'].quill.getHTML();cloudChange=false;cloudLoad=true;"
                     v-if="(openEditor==true)"
                   >
                     <b-icon
@@ -1076,39 +1044,37 @@
     'person',
     'selectCustomer',
     'selectPerson' -->
-
+ 
                   <devices-table-group
-                  
-                    :windowPrint="windowPrint"
-                    :works="works"
-                    :selectedCornty="selectedCornty"
                     :project="project"
-                    :account="$security.table.account"
                     :pid="id"
-                    :comments="comments"
                     :tmp="tmp"
                     :workers="workers"
+                    @openWindowPrint="openWindowPrint"
+                    @switchDevices="switchDevices"
+                    ref="edeviceList"
+                    ></devices-table-group>
+                    <!-- @worker="worker" -->
+                    <!-- :selectedCornty="selectedCornty"
+                    :works="works"
+                    :selectedWorkers="selectedWorkers" -->
+                    <!-- @printPdf="printPdf"
+                    @hideWindowPrint="hideWindowPrint"
                     :customer="customer"
                     :person="person"
                     :selectCustomer="selectCustomer"
                     :selectPerson="selectPerson"
-                    :selectedWorkers="selectedWorkers"
-                    :selectedDocsList="selectedDocsList"
-                    :addPdfs="addPdfs"
-                    :makemodalpdf="makemodalpdf"
-                    :typeDocsList="typeDocsList"
-                    @selectedDocs="selectedDocs"
-                    @addPdf="addPdf"
-                    @addPdfSep="addPdfSep"
-                    @printPdf="printPdf"
-                    @preview="preview"
-                    @printOffer="printOffer"
-                    @worker="worker"
-                    @hideWindowPrint="hideWindowPrint"
-
-                    @switchDevices="switchDevices"
-                    ref="edeviceList"
-                    ></devices-table-group>
+                    :comments="comments"
+                    :windowPrint="windowPrint"
+                    :account="$security.table.account" -->
+                    <!-- :makemodalpdf="makemodalpdf" -->
+                    <!-- @addPdf="addPdf" -->
+                    <!-- :addPdfs="addPdfs" -->
+                    <!-- @preview="preview" -->
+                    <!-- :typeDocsList="typeDocsList" -->
+                    <!-- :selectedDocsList="selectedDocsList" -->
+                    <!-- @selectedDocs="selectedDocs" -->
+                    <!-- @addPdfSep="addPdfSep" -->
                 </container-body>
               </container>
             </b-tab>
@@ -1117,33 +1083,32 @@
               <container>
                 <container-body>
                   <damages-table-group 
-                    
                     :tmp="tmp"
                     :project="project"
-                    :selectedCornty="selectedCornty"
                     :id="id"
                     :workers="workers"
+                    :wwidth="wwidth"
+                    @openWindowPrint="openWindowPrint"
+                    @switchDamages="switchDamages"
+                    ref="damageList"></damages-table-group>
+                    <!-- :selectedCornty="selectedCornty"
                     :customer="customer"
                     :person="person"
                     :selectCustomer="selectCustomer"
                     :selectPerson="selectPerson"
-                    :selectedWorkers="selectedWorkers"
-                    :selectedDocsList="selectedDocsList"
-                    :windowPrint="windowPrint"
-                    :addPdfs="addPdfs"
-                    :makemodalpdf="makemodalpdf"
-                    :typeDocsList="typeDocsList"
-                    :wwidth="wwidth"
-                    @selectedDocs="selectedDocs"
-                    @addPdf="addPdf"
+                    :selectedWorkers="selectedWorkers" -->
+                    <!-- :makemodalpdf="makemodalpdf"
                     @addPdfSep="addPdfSep"
                     @printPdf="printPdf"
-                    @preview="preview"
-                    @printOffer="printOffer"
-                    @hideWindowPrint="hideWindowPrint"
-
-                    @switchDamages="switchDamages"
-                    ref="damageList"></damages-table-group>
+                    @hideWindowPrint="hideWindowPrint" -->
+                    
+                    <!-- :windowPrint="windowPrint" -->
+                    <!-- @addPdf="addPdf" -->
+                    <!-- :addPdfs="addPdfs" -->
+                    <!-- @preview="preview" -->
+                    <!-- :typeDocsList="typeDocsList" -->
+                    <!-- :selectedDocsList="selectedDocsList" -->
+                    <!-- @selectedDocs="selectedDocs" -->
                 </container-body>
               </container>
             </b-tab>
@@ -1181,35 +1146,40 @@
                     v-if="false"
                   >
                   </ereports> -->
-
-                  <reports-table-group
-                  
-                    :tmp="tmp"
+                  <!-- :tmp="tmp"
                     :project="project"
-                    :selectedCornty="selectedCornty"
                     :id="id"
                     :workers="workers"
-                    :customer="customer"
-                    :person="person"
-                    :selectCustomer="selectCustomer"
-                    :selectPerson="selectPerson"
-                    :selectedWorkers="selectedWorkers"
-                    :selectedDocsList="selectedDocsList"
-                    :windowPrint="windowPrint"
-                    :addPdfs="addPdfs"
-                    :makemodalpdf="makemodalpdf"
-                    :typeDocsList="typeDocsList"
                     :wwidth="wwidth"
+                    @openWindowPrint="openWindowPrint"
+                    @switchDamages="switchDamages" -->
+                  <reports-table-group
+                    :tmp="tmp"
+                    :project="project"
+                    :id="id"
+                    :workers="workers"
+                    :selectedWorkers="selectedWorkers"
                     @worker="worker"
-                    @selectedDocs="selectedDocs"
-                    @addPdf="addPdf"
-                    @addPdfSep="addPdfSep"
-                    @printPdf="printPdf"
-                    @preview="preview"
-                    @printOffer="printOffer"
-                    @hideWindowPrint="hideWindowPrint"
+                    @openWindowPrint="openWindowPrint"
                     @switchReports="switchReports"
                     ref="ereportsList"></reports-table-group>
+                    <!-- :selectedCornty="selectedCornty"
+                    :wwidth="wwidth" -->
+                    <!-- :customer="customer"
+                    :person="person"
+                    :selectCustomer="selectCustomer"
+                    :selectPerson="selectPerson" -->
+                    <!-- :makemodalpdf="makemodalpdf" -->
+                    <!-- :addPdfs="addPdfs" -->
+                    <!-- @hideWindowPrint="hideWindowPrint"
+                    @addPdfSep="addPdfSep"
+                    @printPdf="printPdf" -->
+                    <!-- :windowPrint="windowPrint" -->
+                    <!-- @addPdf="addPdf" -->
+                    <!-- @preview="preview" -->
+                    <!-- :typeDocsList="typeDocsList" -->
+                    <!-- :selectedDocsList="selectedDocsList" -->
+                    <!-- @selectedDocs="selectedDocs" -->
 
                 </container-body>
               </container>
@@ -1279,10 +1249,10 @@ export default {
 			beforeTab: null,
 			tabIndex: null,
 			dubTabIndex: null,
-			makemodalpdf: false,
-			windowPrint: false,
-			selectedDocsList: [],
-			typeDocsList: [],
+			// makemodalpdf: false,
+			// windowPrint: false,
+			// selectedDocsList: [],
+			// typeDocsList: [],
 			docs_menu_ids: [],
 			images_menu_ids: [],
 			workerModal: false,
@@ -1510,38 +1480,6 @@ export default {
 				}
 			]
 		},
-		fieldsDocs() {
-			return [{
-					key: 'type',
-					label: '§',
-					sortable: true
-				},
-				{
-					key: 'name',
-					label: this.$t('docs.name'),
-					class: 'w-100',
-					sortable: true
-				},
-				{
-					key: 'number',
-					label: '#'
-				},
-				{
-					key: 'added',
-					label: this.$t('docs.added'),
-					sortable: true
-				},
-				{
-					key: 'user',
-					label: '👤',
-					sortable: true
-				},
-				{
-					key: 'delete',
-					label: 'X'
-				}
-			]
-		},
 		availableWorkers() {
 			if (this.searchWorker) {
 				return this.workers.filter(item => {
@@ -1560,6 +1498,10 @@ export default {
 		}
 	},
 	methods: {
+	wasmade(type, number){
+		console.log(number)
+		this.$refs.calProject.wasMade(type, number)
+	},
     update_item(update){
       this.itemsTable = this.itemsTable.filter((item)=>{
         if (item.id == update.item_id){
@@ -1689,7 +1631,7 @@ export default {
 					}
 				})
 			}
-			this.updateItem(valueHtml, 'comment', id)
+			this.updateCommentInPorject(valueHtml, id)
 			this.tmp.comment = valueHtml
 		},
 		butifsel() {
@@ -1747,84 +1689,63 @@ export default {
       this.includeReports = value
 		},
     
-		selectedDocs(event) {
-			this.selectedDocsList = []
-			this.selectedDocsList = event
-			this.preview()
-		},
-		addPdf() {
-			this.addPdfs = true;
-			this.preview()
-		},
-		addPdfSep() {
-			this.addPdfs = 'separator';
-			this.hideWindowPrint()
-			this.preview()
-		},
-		printPdf() {
-			this.preview()
-			setTimeout(function () {
-				window.frames["myIframe"].focus();
-				window.frames["myIframe"].print();
-			}, 2000);
-		},
-		preview() {
-			if (this.$refs.editList != undefined) {
-				if (this.$refs.editList.$refs.calcGroup.$refs.print != undefined) {
-					this.$refs.editList.$refs.calcGroup.$refs.print.previewPDFForm();
-				}
-			}
-			if (this.$refs.damageList != undefined) {
-				if (this.$refs.damageList.$refs.damageGroup.$refs.print != undefined) {
-					this.$refs.damageList.$refs.damageGroup.$refs.print.previewPDFForm();
-				}
-			}
-			if (this.$refs.edeviceList != undefined) {
-				if (this.$refs.edeviceList.$refs.print != undefined) {
-					this.$refs.edeviceList.$refs.print.previewPDFForm();
-				}
-			}
-			if (this.$refs.ereportsList != undefined) {
-				if (this.$refs.ereportsList.$refs.reportGroup.$refs.print != undefined) {
-					this.$refs.ereportsList.$refs.reportGroup.$refs.print.previewPDFForm();
-				}
-			}
-		},
-		printOffer() {
-			this.addPdfs = false;
-			this.makemodalpdf = true;
-			axios.get('/get_type_docs', {
-				params: {
-					// type: this.tmp.typeOfHead
-          type: this.tmp.type
-				}
-			}).then(response => {
-				this.typeDocsList = response.data
-				if (this.tmp.typeOfHead == 'Offers') {
-					this.selectedDocsList = ['31']
-				}
-				if (this.tmp.typeOfHead == 'Invoices') {
-					this.selectedDocsList = ['14']
-				}
-				if (this.tmp.typeOfHead == 'Orders') {
-					this.selectedDocsList = ['38']
-				}
-				if (this.tmp.typeOfHead == 'SUB') {
-					this.selectedDocsList = ['41']
-				}
-				if (this.tmp.typeOfHead == 'Devices') {
-					this.selectedDocsList = ['45']
-				}
-				if (this.tmp.typeOfHead == 'Damage') {
-					this.selectedDocsList = ['48']
-				}
-				if (this.tmp.typeOfHead == 'Reports') {
-					this.selectedDocsList = ['50']
-				}
-				this.openWindowPrint()
-				this.preview()
-			})
-		},
+		// selectedDocs(event) {
+		// 	this.selectedDocsList = []
+		// 	this.selectedDocsList = event
+		// 	this.preview()
+		// },
+		// addPdf() {
+		// 	// this.addPdfs = true;
+		// 	// this.preview()
+		// },
+		// addPdfSep() {
+		// 	this.addPdfs = 'separator';
+		// 	this.hideWindowPrint()
+		// 	// this.preview()
+		// },
+		// printPdf() {
+		// 	// this.preview()
+		// 	setTimeout(function () {
+		// 		window.frames["myIframe"].focus();
+		// 		window.frames["myIframe"].print();
+		// 	}, 2000);
+		// },
+		// preview() {
+      // this.$refs.print.previewPDFForm();
+  		// if (this.$refs.editList != undefined) {
+      //   console.log('editList 1')
+			// 	if (this.$refs.editList.$refs.print != undefined) {
+      //     console.log('editList 2')
+			// 		this.$refs.print.previewPDFForm();
+			// 	}
+			// }
+			// if (this.$refs.damageList != undefined) {
+			// 	if (this.$refs.damageList.$refs.print != undefined) {
+      //     console.log('damageList')
+			// 		this.$refs.print.previewPDFForm();
+			// 	}
+			// }
+			// if (this.$refs.edeviceList != undefined) {
+			// 	if (this.$refs.edeviceList.$refs.print != undefined) {
+      //     console.log('edeviceList')
+			// 		this.$refs.print.previewPDFForm();
+			// 	}
+			// }
+			// if (this.$refs.ereportsList != undefined) {
+			// 	if (this.$refs.ereportsList.$refs.print != undefined) {
+      //     console.log('ereportsList')
+			// 		this.$refs.print.previewPDFForm();
+			// 	}
+			// }
+		// },
+		// openPrint(type) {
+    //   console..log
+			// this.addPdfs = false;
+
+				// this.openWindowPrint(type)
+				// this.preview()
+
+		// },
 		addSameModal() {
 			this.add_offer.comment = null
 			this.add_offer.place = null
@@ -2192,13 +2113,15 @@ export default {
 			this.addSameModalWindow = false;
 			if (this.comtomodal != null) this.tabxmodal = true;
 		},
-		openWindowPrint() {
-			this.windowPrint = true;
+		openWindowPrint(type) {
+      // console.log(type)
+      this.$refs.print.previewPDFForm(type);
+			// this.windowPrint = true;
 		},
-		hideWindowPrint() {
-			this.windowPrint = false;
-			if (this.comtomodal != null) this.tabxmodal = true;
-		},
+		// hideWindowPrint() {
+			// this.windowPrint = false;
+			// if (this.comtomodal != null) this.tabxmodal = true;
+		// },
 		// tabletopartx(tables) {
 		// 	this.partx = [];
 		// 	this.partx = tables;
@@ -2808,7 +2731,7 @@ export default {
 					this.docs_menu_ids.push(valResp.id);
 					findLevel(this.itemsMenuDoc, valResp.parrent)
 				});
-				this.responseFiles = [];
+				// this.responseFiles = [];
 				this.docs2files();
 				axios.get('/images_menu', {
 					params: {
@@ -3143,10 +3066,9 @@ export default {
 			}
 			return val
 		},
-		updateItem(val, type, id) {
-			axios.post('/update_item_from_project', {
+		updateCommentInPorject(val, id) {
+			axios.post('/update_comment_in_project', {
 				val: val,
-				type: type,
 				id: id
 			}).then(response => {
 				this.cloudLoad = false;
@@ -3762,6 +3684,10 @@ export default {
 			}
 			this.project_detail_f(old)
 			this.project_id = this.id
+
+
+
+
 		}
 	},
 	watch: {
@@ -3838,11 +3764,11 @@ export default {
 			this.$options.sockets.onmessage = (data) => (data.data == 'project_detail_new_f') ? (this.project_detail_new_f()) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'get_workers_f') ? (this.get_workers_f()) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'get_type_works') ? (this.get_type_works()) : ''
-			this.$options.sockets.onmessage = (data) => (data.data == 'getLoocks') ? (this.getLoocks()) : ''
+			// this.$options.sockets.onmessage = (data) => (data.data == 'getLoocks') ? (this.getLoocks()) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'getPrices') ? this.getPrices() : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'getDevices') ? this.getDevices() : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'getReports') ? this.getReports() : ''
-
+	
 
       this.$options.sockets.onmessage = (data) => {
       var delimetr = data.data.split(':')
@@ -3851,7 +3777,11 @@ export default {
         var item = (JSON.parse(data.data.split('update_item:')[1]))
         this.update_item(item)
       }
-
+      if (delimetr[0] == 'getDocs') {
+        if (this.id == data.data.split('getDocs:')[1]){
+          this.getDocs()
+        }
+      }
     }
 
 

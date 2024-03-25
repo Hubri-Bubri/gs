@@ -86,7 +86,27 @@
                   v-model="content.sdate" @input="updateDeviceList(subIndex, $event, 'sdate', content.id, -1)"/>
                 </b-td>
                 <b-td colspan="4" class="text-center">
-                  <b-form-select class="text-center" :value="content.sworker" :options="workers"  @change="updateDeviceList(subIndex, $event, 'sworker', content.id, content.sworker)"/>
+              <b-dropdown
+                size="sm"
+                :text="((content.sworker=='')||(content.sworker==null))?'---':content.sworker"
+                variant="link"
+                no-caret
+                class="maxHeight outUnderline">
+                <b-dropdown-item-button
+                  @click="updateDeviceList(subIndex, '---', 'sworker', content.id, content.sworker);"
+                  >---</b-dropdown-item-button>
+                <b-dropdown-item-button
+                  :key="worker"
+                  v-for="worker in workers"
+                  @click="updateDeviceList(subIndex, worker, 'sworker', content.id, content.sworker);">
+                  {{worker}}
+                </b-dropdown-item-button>
+                
+              </b-dropdown>
+
+
+
+                  <!-- <b-form-select class="text-center" :value="content.sworker" :options="workers"  @change="updateDeviceList(subIndex, $event, 'sworker', content.id, content.sworker)"/> -->
                 </b-td>
                 <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.smReading.replace('.',',')"
                   @change="updateDeviceList(subIndex, $event.replace(',','.'), 'smReading', content.id, content.smReading.replace('.',','))"/></b-td>
@@ -101,7 +121,27 @@
                   v-model="row.date" @input="updateDeviceIntern(subIndex, index, $event, 'date', row.id, -1)"/>
                 </b-td>
                 <b-td colspan="4" class="text-center">
-                  <b-form-select  class="text-center" :value="row.worker" :options="workers" @change="updateDeviceIntern(subIndex, index, $event, 'worker', row.id, row.worker)"/>
+              <b-dropdown
+                size="sm"
+                :text="((row.worker=='')||(row.worker==null))?'---':row.worker"
+                variant="link"
+                no-caret
+                class="maxHeight outUnderline">
+                <b-dropdown-item-button
+                  @click="updateDeviceIntern(subIndex, index, '---', 'worker', row.id, row.worker);"
+                  >---</b-dropdown-item-button>
+                <b-dropdown-item-button
+                  :key="worker"
+                  v-for="worker in workers"
+                  @click="updateDeviceIntern(subIndex, index, worker, 'worker', row.id, row.worker);">
+                  {{worker}}
+                </b-dropdown-item-button>
+                
+              </b-dropdown>
+
+
+
+                  <!-- <b-form-select  class="text-center" :value="row.worker" :options="workers" @change="updateDeviceIntern(subIndex, index, $event, 'worker', row.id, row.worker)"/> -->
                 </b-td>
                 <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input :value="row.mReading.replace('.',',')"
                   @change="updateDeviceIntern(subIndex, index, $event.replace(',','.'), 'mReading', row.id ,row.mReading.replace('.',','))" style="text-align: center"/></b-td>
@@ -118,7 +158,25 @@
                   v-model="content.fdate" @input="updateDeviceList(subIndex, $event, 'fdate', content.id, -1)"/>
                 </b-td>
                 <b-td colspan="4" class="text-center">
-                  <b-form-select class="text-center" :value="content.fworker" :options="workers" @change="updateDeviceList(subIndex, $event, 'fworker', content.id, content.fworker)"/>
+              <b-dropdown
+                size="sm"
+                :text="((content.fworker=='')||(content.fworker==null))?'---':content.fworker"
+                variant="link"
+                no-caret
+                class="maxHeight outUnderline">
+                <b-dropdown-item-button
+                  @click="updateDeviceIntern(subIndex, '---', 'fworker', content.id, content.fworker);"
+                  >---</b-dropdown-item-button>
+                <b-dropdown-item-button
+                  :key="worker"
+                  v-for="worker in workers"
+                  @click="updateDeviceList(subIndex, worker, 'fworker', content.id, content.fworker);">
+                  {{worker}}
+                </b-dropdown-item-button>
+                
+              </b-dropdown>
+
+                  <!-- <b-form-select class="text-center" :value="content.fworker" :options="workers" @change="updateDeviceList(subIndex, $event, 'fworker', content.id, content.fworker)"/> -->
                 </b-td>
                 <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.fmReading.replace('.',',')" @change="updateDeviceList(subIndex, $event.replace(',','.'), 'fmReading', content.id, content.fmReading.replace('.',','))"/></b-td>
                 <b-td colspan="2"></b-td>

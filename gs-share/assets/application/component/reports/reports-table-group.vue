@@ -7,7 +7,10 @@
           </b-button>
         </b-col>
       <b-col cols="1" class="text-right">
-    <print v-if="tmp.typeOfHead == 'Reports'"
+        <b-button size="sm" @click="$emit('openWindowPrint', 'Reports')">
+          <b-icon icon="printer" aria-hidden="true"></b-icon>
+        </b-button>
+    <!-- <print v-if="tmp.typeOfHead == 'Reports'"
     :windowPrint="windowPrint"
     :selectedCornty="selectedCornty"
     :project="project" :tmp="tmp"
@@ -32,7 +35,7 @@
     @printOffer="printOffer"
     @hideWindowPrint="hideWindowPrint"
     ref="print"
-    ></print>
+    ></print> -->
     </b-col>
   </b-row>
 
@@ -57,23 +60,9 @@ export default {
   props: [
     'selectedWorkers',
     'workers',
-    'selectedDocsList',
-    'addPdfs',
-    'makemodalpdf',
-    'typeDocsList',
-    'windowPrint',
-    'pid',
-    'selectedCornty',
-    'project',
     'tmp',
-    'comments',
-    'account',
-    'head',
     'id',
-    'customer',
-    'person',
-    'selectCustomer',
-    'selectPerson'
+    'project'
     ],
     data() {
       return {

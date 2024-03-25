@@ -1749,7 +1749,339 @@ class Del_offer_sub:
 
 
 #####end Sub
+#####start System
+class System:
+    @classmethod
+    async def general(cls):
+        await System.clear()
+        await System.check_for_percent_transfer()
+        await System.fixed_items()
+
+    @classmethod
+    async def clear(cls):
+        async with database.query() as Q:
+            have_items=[]
+            have_tables=[]
+            have_rows=[]
+            projects = (await (Q()
+                .tables(T.project)
+                .fields(T.project.id)
+                .selectall()))
+            for project in projects:
+                items = (await (Q()
+                    .tables(T.items)
+                    .fields(T.items.id)
+                    .where((T.items.project_id == project['id']))
+                    .selectall()))
+                for item in items:
+                    have_items.append(item['id'])
+                    tables = (await (Q()
+                        .tables(T.tables)
+                        .fields(T.tables.id)
+                        .where(T.tables.item_id == item['id'])
+                        .selectall()))
+                    for table in tables:
+                        have_tables.append(table['id'])
+                        rows = (await (Q()
+                            .tables(T.rows_for_table)
+                            .fields(T.rows_for_table.id)
+                            .where(T.rows_for_table.table_id == table['id'])
+                            .selectall()))
+                        for row in rows:
+                            have_rows.append(row['id'])
+            # print(have_items)
+            for_del_items = (await (Q()
+                    .tables(T.items)
+                    .fields(T.items.id)
+                    .where((T.items.id != have_items)&(T.items.id != 0))
+                    .selectall()))
+            for_del_tables = (await (Q()
+                    .tables(T.tables)
+                    .fields(T.tables.id)
+                    .where((T.tables.id != have_tables)&(T.tables.id != 0))
+                    .selectall()))
+            for_del_rows = (await (Q()
+                    .tables(T.rows_for_table)
+                    .fields(T.rows_for_table.id)
+                    .where((T.rows_for_table.id != have_rows)&(T.rows_for_table.id != 0))
+                    .selectall()))
+            
+            for del_item in for_del_items:
+                await (Q(T.items)
+                .where(T.items.id == del_item['id'])
+                .delete())
+            for del_table in for_del_tables:
+                await (Q(T.tables)
+                .where(T.tables.id == del_table['id'])
+                .delete())
+            for del_row in for_del_rows:
+                await (Q(T.rows_for_table)
+                .where(T.rows_for_table.id == del_row['id'])
+                .delete())
+
+
+
+
+                    
+
+    # @classmethod
+    # async def check_for_percent_fixed(cls):
+    #     async with database.query() as Q:
+    #         tables = (await (Q()
+    #             .tables(T.tables)
+    #             .fields(T.tables.id,
+    #                     T.tables.obj,
+    #                     T.tables.selected)
+    #             .where(T.tables.obj != '')
+    #             .selectall()))
+    #         for table in tables:
+    #             objs = table['obj'].split(',')
+    #             selects = table['selected'].split('|')
+    #             newObjs=[]
+    #             for i, obj in enumerate(objs):
+    #                 indexes_temp = selects[i].split(obj+':')[1].split(',')
+    #                 indexes=[]
+    #                 for check_box in indexes_temp:
+    #                     if check_box!='':
+    #                         indexes.append(int(check_box.split('temp')[1])-1)
+    #                 if len(indexes)!=0:
+    #                     newObjs.append(obj)
+    #             await (Q()
+    #             .tables(T.tables)
+    #             .where(T.tables.id == table['id'])
+    #             .update({T.tables.obj: (','.join(newObjs))}))
+
+
+
+    @classmethod
+    async def check_for_percent_transfer(cls):
+        async with database.query() as Q:
+            tables = (await (Q()
+                .tables(T.tables)
+                .fields(T.tables.id,
+                        T.tables.obj,
+                        T.tables.selected)
+                .where(T.tables.obj != '')
+                .selectall()))
+            for table in tables:
+                selects = table['selected'].split('|')
+                for objs_in_select in selects:
+                    with_obj = objs_in_select.split(':')
+                    obj = with_obj[0]
+                    indexes = with_obj[1].split(',')
+                    # print(obj, indexes)
+
+                    rows = (await (Q()
+                        .tables(T.rows_for_table)
+                        .fields(T.rows_for_table.id,
+                                T.rows_for_table.unit
+                                )
+                        .where((T.rows_for_table.table_id == table['id']))
+                        .selectall()))
+                    
+                    percent_id=None
+                    for row_for_percent in rows:
+                        if row_for_percent['unit']=='%':
+                            percent_id=row_for_percent['id']
+                            for index_rows, row in enumerate(rows):
+                                if row['unit']!='%':
+                                    for index_obj in indexes:
+                                        if ((int(index_obj.split('temp')[1])-1)==index_rows):
+                                            await (Q()
+                                            .tables(T.rows_for_table)
+                                            .where(T.rows_for_table.id == row['id'])
+                                            .update({T.rows_for_table.checked_for_percent: 'in'+str(percent_id)}))
+                    
+                    objs_in_table = table['obj'].split(',')
+                    for obj_in_table in objs_in_table:
+                        if obj_in_table == obj:
+                             await (Q()
+                                .tables(T.tables)
+                                .where(T.tables.id == table['id'])
+                                .update({T.tables.obj: table['obj'].replace(obj, 'in'+str(percent_id))}))
+
+
+
+    @classmethod
+    async def fixed_items(cls):
+        async with database.query() as Q:
+            items = (await (Q()
+                .tables(T.items)
+                .fields(
+                    T.items.id,
+                    T.items.tax,
+                    T.items.taxDub
+                )
+                .selectall()))
+
+            for item in items:
+                item['tax'] = item['tax'].replace('.','')
+                item['taxDub'] = item['taxDub'].replace('.','')
+                item['tax'] = item['tax'].replace(',','.')
+                item['taxDub'] = item['taxDub'].replace(',','.')
+                await (Q()
+                .tables(T.items)
+                .where(T.items.id == item['id'])
+                .update({
+                    T.items.tax: item['tax'],
+                    T.items.taxDub: item['taxDub']
+                }))
+
+                tables = (await (Q()
+                        .tables(T.tables)
+                        .fields(T.tables.id)
+                        .where(T.tables.item_id == item['id'])
+                        .selectall()))
+                
+                for table in tables:
+                    rows = (await (Q()
+                        .tables(T.rows_for_table)
+                        .fields(T.rows_for_table.id,
+                                T.rows_for_table.count,
+                                T.rows_for_table.price,
+                                )
+                        .where(T.rows_for_table.table_id == table['id'])
+                        .selectall()))
+                    if len(rows)>0:
+                        for index, row in enumerate(rows):
+                            try:
+                               await Project.update_for_summ(table['id'], row['id'], 'count', row['count'], index, item['id'], False, [])
+                            except ValueError:
+                               print(row['id'], row['count'], row['price'])
+                            
+                    if len(rows)==0:
+                        await (Q()
+                        .tables(T.tables)
+                        .where(T.tables.id == table['id'])
+                        .update({
+                            T.tables.summa: 0,
+                            T.tables.alt_summa: 0,
+                            T.tables.discont: 0
+                        }))
+ 
+    # @classmethod
+    # async def remove_empty_percent(cls):
+    #     async with database.query() as Q:
+    #         tables = (await (Q()
+    #             .tables(T.tables)
+    #             .fields(T.tables.id,
+    #                     T.tables.obj,
+    #                     T.tables.selected)
+    #             .where(T.tables.obj != '')
+    #             .selectall()))
+    #         for table in tables:
+    #             selects = table['selected'].split('|')
+    #             for objs_in_select in selects:
+    #                 with_obj = objs_in_select.split(':')
+    #                 obj = with_obj[0]
+    #                 indexes = with_obj[1]
+    #                 if indexes=='':
+    #                     print(obj, table['obj'], table['id'])
+    #                     await (Q()
+    #                         .tables(T.tables)
+    #                         .where(T.tables.id == table['id'])
+    #                         .update({T.tables.obj: table['obj'].replace(obj, '')}))
+    @classmethod
+    async def percents(cls):
+        async with database.query() as Q:
+            have_percents = []
+            projects = (await (Q()
+                .tables(T.project)
+                .fields(T.project.id)
+                .selectall()))
+            for project in projects:
+                items = (await (Q()
+                    .tables(T.items)
+                    .fields(T.items.id)
+                    .where((T.items.project_id == project['id']))
+                    .selectall()))
+                for item in items:
+                    tables = (await (Q()
+                        .tables(T.tables)
+                        .fields(T.tables.id)
+                        .where(T.tables.item_id == item['id'])
+                        .selectall()))
+                    for table in tables:
+                        rows = (await (Q()
+                            .tables(T.rows_for_table)
+                            .fields(T.rows_for_table.id,
+                                    T.rows_for_table.unit)
+                            .where(T.rows_for_table.table_id == table['id'])
+                            .selectall()))
+                        for row in rows:
+                            if row['unit']=='%':
+                                have_percents.append(project['id'])
+                                break
+            print(have_percents)
+
+#####end System
 class General:
+    @classmethod
+    async def get_item_for_pdf(cls, id):
+        async with database.query() as Q:
+            item = (await (Q()
+                .tables(T.items & T.type_for_table).on(T.items.type == T.type_for_table.id)
+                .fields(
+                    T.items.id,
+                    T.items.number,
+                    T.items.date,
+                    T.items.other,
+                    T.items.place,
+                    T.items.insurance_number,
+                    T.items.insurname,
+                    T.items.work,
+                    T.items.status_set,
+                    T.type_for_table.type,
+                    T.items.tax,
+                    T.items.taxDub,
+                    T.items.taxP,
+                    T.items.taxPDub,
+                    T.items.disc,
+                    T.items.discP,
+                    T.items.butDiscPerc,
+                    T.items.addtaxColapse,
+                    T.items.dateEvent,
+                    T.items.dateInspect,
+                    T.items.ExamWorker,
+                    T.items.comment,
+                    T.items.add_number,
+                    T.items.gen_summa,
+                    T.items.gen_discont,
+                    T.items.brutto,
+                )
+                .where(T.items.id == id)
+                .selectone()))
+
+            item['gen_summa'] = General.digit_formater(float(item['gen_summa']))
+            item['gen_discont'] = General.digit_formater(float(item['gen_discont']))
+            item['tax'] = General.digit_formater(float(item['tax']))
+            item['taxDub'] = General.digit_formater(float(item['taxDub']))
+            item['brutto'] = General.digit_formater(float(item['brutto']))
+
+            if (item['type'] == 'Offers'):
+                if item['add_number']!=None:
+                    item['number'] = item['number'] + '-' +str(item['add_number'])
+                else:
+                    item['number'] = item['number']
+                
+            if (item['type'] == 'Orders'):
+                if item['add_number']!=None:
+                    item['number'] = item['number'] + '-' +str(item['add_number'])
+                else:
+                    item['number'] = item['number']
+
+            if (item['type'] == 'StandingOrder'):
+                if item['add_number']!=None:
+                    item['number'] = item['number'] + '-' +str(item['add_number'])
+                else:
+                    item['number'] = item['number']
+            if (item['type'] == 'Contracts'):
+                cCounract=cCounract+1
+                if(len(str(cCounract))<2):
+                    nCounract = '0'+str(cCounract)
+                item['number'] = item['number'] + '-' + nCounract
+        return item
+    
     @classmethod
     async def new_id(cls, table, id_name):
         async with database.query() as Q:
@@ -2047,7 +2379,8 @@ class Project:
                 .fields(
                     T.user.first_name,
                     T.user.second_name,
-                    T.user.mail
+                    T.user.mail,
+                    T.user.tel
                 ).where(T.user.id == project['user_id'])
                 .selectone()))
 
@@ -2102,6 +2435,7 @@ class Project:
                 'first_name':user['first_name'],
                 'second_name':user['second_name'],
                 'userMail': user['mail'],
+                'userTel': user['tel'],
                 'street': customer['street'],
                 'city': customer['city'],
                 'zip': customer['zip'],
@@ -5510,6 +5844,7 @@ class Invoice:
                     objs.append('in'+str(new_id_percent[index_obj]))
                 table['obj'] = ','.join(objs) # замена идентификаторов процентов в таблице
 
+                price=row['price']
                 for index, row in enumerate(selected_for_rows_copy):
                     if remove == 1:
                         count = '-'+row['count']
@@ -5554,6 +5889,26 @@ class Invoice:
                             T.rows_for_table.summa_without_discont:summa_without_discont
                         }))
                     except:
+                        # await (Q()
+                        #     .tables(T.rows_for_table)
+                        #     .insert({
+                        #     # T.rows_for_table.id:new_row_id,
+                        #     T.rows_for_table.count:count,
+                        #     T.rows_for_table.status:row['status'],
+                        #     T.rows_for_table.alttax:row['alttax'],
+                        #     T.rows_for_table.summa:summa,
+                        #     T.rows_for_table.unit:row['unit'],
+                        #     T.rows_for_table.without:row['without'],
+                        #     T.rows_for_table.done:row['done'],
+                        #     T.rows_for_table.description_head:row['description_head'],
+                        #     T.rows_for_table.description_work:row['description_work'],
+                        #     T.rows_for_table.description_from_price:row['description_from_price'],
+                        #     T.rows_for_table.position_number:row['position_number'],
+                        #     T.rows_for_table.price:price,
+                        #     T.rows_for_table.checked_for_percent:row['checked_for_percent'],
+                        #     T.rows_for_table.table_id:new_table_id,
+                        #     T.rows_for_table.summa_without_discont:summa_without_discont
+                        # }))
                         print('Duplicate entry Add_invoice')
                 await (Q()
                     .tables(T.tables)

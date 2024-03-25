@@ -37,6 +37,7 @@
         "estreet": "Enter Street"
     },
     "projectDetail": {
+        "wasMade": "Was created",
         "move" : "Move",
         "selectWorkers": "Select Workers",
         "clear" : "Clear",
@@ -293,6 +294,8 @@
         "Offers" : "Offer",
         "Orders" : "Order",
         "Invoices" : "Invoice",
+        "Reports" : "Report",
+        "Devices" : "Device",
         "labelForDelete" : "Corrected invoice number",
         "Damage" : "Damage",
         "SUB" : "SUB",

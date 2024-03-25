@@ -38,8 +38,10 @@ from aiohttp_session import get_session
 from uuid import uuid4
 from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
-from gs_api.dictionary import (Application, User, Project, Projects, Offer, Invoice, add_same, Del_offer, Offers, Docs, Customer, Prices, Devices,
-                               Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Del_offer_sub, Reports)
+# from gs_api.dictionary import (Application, User, Project, Projects, Offer, Invoice, add_same, Del_offer, Offers, Docs, Customer, Prices, Devices,
+#                                Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Del_offer_sub, Reports, System)
+from gs_api.dictionary import (User, Project, Projects, Offer, Invoice, add_same, Del_offer, Docs, Customer, Prices, Devices,
+                               Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Reports, System)
 from gs_api.langcore import language
 from asyncio import ensure_future, gather, shield
 
@@ -80,6 +82,35 @@ async def profile(request):
 async def method (request):
     return web.json_response('')
 
+@routes.get('/clear!')
+async def method (request):
+    await System.clear()
+    return web.json_response('')
+
+@routes.get('/fixed_items!')
+async def method (request):
+    await System.fixed_items()
+    return web.json_response('')
+
+@routes.get('/general!')
+async def method (request):
+    await System.general()
+    return web.json_response('')
+
+# @routes.get('/remove_empty_percent!')
+# async def method (request):
+#     await System.remove_empty_percent()
+#     return web.json_response('')
+
+@routes.get('/check_for_percent_transfer!')
+async def method (request):
+    await System.check_for_percent_transfer()
+    return web.json_response('')
+
+@routes.get('/percents!')
+async def method (request):
+    await System.percents()
+    return web.json_response('')
 
 @routes.post('/send_mail')
 async def method (request):
@@ -1629,6 +1660,12 @@ async def method (request):
     await Project.update_item(request.query['val'], request.query['type'], request.query['id'], ws_clients)
     return web.json_response('')
 
+@routes.post('/update_comment_in_project')
+async def method (request):
+    data = await request.json()
+    await Project.update_item(data['val'], 'comment', data['id'], ws_clients)
+    return web.json_response('')
+
 @routes.get('/update_item_discont')
 async def method (request):
     await Project.update_discont(request.query['val'], request.query['type'], request.query['id'], ws_clients)
@@ -3119,10 +3156,10 @@ async def method (request):
 async def method (request):
     return web.json_response(await Docs.get_type_docs(request.query['type']))
 
-@routes.post('/pdf')
+@routes.get('/pdf')
 async def method (request):
-    data = await request.post()
-    return await language.pdf(request, data, ws_clients)
+    return await language.pdf(request, request.query['addPdf'], request.query['forPreview'], request.query['pid'], request.query['itemId'], request.query['type'], request.query['today'], request.query['stworks'], request.query['fworks'],
+                              request.query['dateForInspect'], request.query['byForInspect'], request.query['selectedDocsList'], ws_clients)
  
 
 @routes.get('/ws')

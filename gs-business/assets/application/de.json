@@ -37,6 +37,7 @@
         "estreet": "Bitte Straße eingeben"
     },
     "projectDetail": {
+        "wasMade": "Wurde erstellt",
         "move" : "Verschieben",
         "selectWorkers": "Wählen Sie Arbeiter aus",
         "clear" : "Klar",
@@ -293,6 +294,8 @@
         "Offers" : "Angebot",
         "Orders" : "Auftrag",
         "Invoices" : "Rechnung",
+        "Reports" : "Raport",
+        "Devices" : "Geräte",
         "labelForDelete" : "Rechnungsnummer korrigiert",
         "Damage" : "Schaden",
         "SUB" : "SUB-Auftrag",
