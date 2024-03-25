@@ -40,8 +40,7 @@ from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
 # from gs_api.dictionary import (Application, User, Project, Projects, Offer, Invoice, add_same, Del_offer, Offers, Docs, Customer, Prices, Devices,
 #                                Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Del_offer_sub, Reports, System)
-from gs_api.dictionary import (User, Project, Projects, Offer, Invoice, add_same, Del_offer, Docs, Customer, Prices, Devices,
-                               Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Reports, System)
+from gs_api.dictionary import (User, Project, Projects, add_same, Del_offer, Docs, Customer, Prices, Devices, Damage, Personals, Balance, Reports, System, Invoice)
 from gs_api.langcore import language
 from asyncio import ensure_future, gather, shield
 
@@ -543,17 +542,17 @@ async def method (request):
 @routes.get('/changeDisableTable')
 async def method (request):
     # print(ws_clients)
-    await Projects.changeDisableTable(
-        request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients)
+    # await Projects.changeDisableTable(
+    #     request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients)
 
-    for client in ws_clients:
-        await client.send_str('getLoocks')
+    # for client in ws_clients:
+    #     await client.send_str('getLoocks')
     return web.json_response('')
 
 @routes.get('/getLoocks')
 async def method (request):
-     return web.json_response(await Projects.getLoocks())
-
+    #  return web.json_response(await Projects.getLoocks())
+     return web.json_response('')
 
 # @routes.get('/paypal')
 # async def method (request):

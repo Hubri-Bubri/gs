@@ -118,95 +118,95 @@ class Company:
 
 
 
-#####start Sub
-class Sub:
-    @classmethod
-    async def send_price(cls, ids, names):
-        #print(type, ids, names, item_id)
-        # arr=[]
-        # for v in ids.split(","):
-        #    arr=arr+','+v
+# #####start Sub
+# class Sub:
+#     @classmethod
+#     async def send_price(cls, ids, names):
+#         #print(type, ids, names, item_id)
+#         # arr=[]
+#         # for v in ids.split(","):
+#         #    arr=arr+','+v
  
-        async with database.query() as Q:
-            items = (await (Q()
-                            .tables(T.price)
-                            .fields(
-                                T.price.pos_num,
-                                T.price.name,
-                                T.price.desc,
-                                T.price.unit,
-                                T.price.price,
-                                T.price.without,
-                                T.price.percent
-                            )
-                            .where(T.price.id.in_(ids.split(",")))
-                            .selectall()))
+#         async with database.query() as Q:
+#             items = (await (Q()
+#                             .tables(T.price)
+#                             .fields(
+#                                 T.price.pos_num,
+#                                 T.price.name,
+#                                 T.price.desc,
+#                                 T.price.unit,
+#                                 T.price.price,
+#                                 T.price.without,
+#                                 T.price.percent
+#                             )
+#                             .where(T.price.id.in_(ids.split(",")))
+#                             .selectall()))
 
-            for item in items:
-                newPrice = item['price'].replace(',','.')
-                try:
-                    newPrice = float(newPrice)
-                except:
-                    newPrice = 0
+#             for item in items:
+#                 newPrice = item['price'].replace(',','.')
+#                 try:
+#                     newPrice = float(newPrice)
+#                 except:
+#                     newPrice = 0
 
-                if item['unit']=='%':
-                    item['unit'] = 'f-proc'
-                    item['count'] = '1'
-                else:
-                    item['count'] = '0'
+#                 if item['unit']=='%':
+#                     item['unit'] = 'f-proc'
+#                     item['count'] = '1'
+#                 else:
+#                     item['count'] = '0'
 
-                for v in names.split(","):
-                        await (Q(T.sub_rows_for_table)
-                            .tables(T.sub_rows_for_table)
-                            .insert({
-                                    T.sub_rows_for_table.position_number: item['pos_num'],
-                                    T.sub_rows_for_table.description_head: item['name'],
-                                    T.sub_rows_for_table.description_from_price: '',
-                                    T.sub_rows_for_table.unit: item['unit'],
-                                    T.sub_rows_for_table.price: newPrice,
-                                    T.sub_rows_for_table.without: item['without'],
-                                    T.sub_rows_for_table.discount: item['percent'],
-                                    T.sub_rows_for_table.table_id: v,
-                                    T.sub_rows_for_table.status: 'yes',
-                                    # T.rows_for_table.alttax: ,
-                                    T.sub_rows_for_table.description_work: item['desc'],
-                                    T.sub_rows_for_table.count: item['count'],
-                                    T.sub_rows_for_table.done: ''
-                            }))
-        return ''
+#                 for v in names.split(","):
+#                         await (Q(T.sub_rows_for_table)
+#                             .tables(T.sub_rows_for_table)
+#                             .insert({
+#                                     T.sub_rows_for_table.position_number: item['pos_num'],
+#                                     T.sub_rows_for_table.description_head: item['name'],
+#                                     T.sub_rows_for_table.description_from_price: '',
+#                                     T.sub_rows_for_table.unit: item['unit'],
+#                                     T.sub_rows_for_table.price: newPrice,
+#                                     T.sub_rows_for_table.without: item['without'],
+#                                     T.sub_rows_for_table.discount: item['percent'],
+#                                     T.sub_rows_for_table.table_id: v,
+#                                     T.sub_rows_for_table.status: 'yes',
+#                                     # T.rows_for_table.alttax: ,
+#                                     T.sub_rows_for_table.description_work: item['desc'],
+#                                     T.sub_rows_for_table.count: item['count'],
+#                                     T.sub_rows_for_table.done: ''
+#                             }))
+#         return ''
 
-    @classmethod
-    async def sub_order(cls):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.sub_items)
-                .fields(
-                    T.sub_items.id,
-                    T.sub_items.project_id,
-                    T.sub_items.status_set,
-                    T.sub_items.number,
-                    T.sub_items.date,
-                    T.sub_items.other,
-                    T.sub_items.place,
-                    T.sub_items.insurance_number,
-                    T.sub_items.work,
-                    T.sub_items.type,
-                    T.sub_items.tax,
-                    T.sub_items.taxDub,
-                    T.sub_items.taxP,
-                    T.sub_items.taxPDub,
-                    T.sub_items.disc,
-                    T.sub_items.discP,
-                    T.sub_items.butDiscPerc,
-                    T.sub_items.addtaxColapse,
-                    T.sub_items.dateEvent,
-                    T.sub_items.dateInspect,
-                    T.sub_items.ExamWorker,
-                    T.sub_items.comment,
-                    T.sub_items.order_id
-                )
-                # .where(T.sub_items.order_id == id)
-                .selectall())
+    # @classmethod
+    # async def sub_order(cls):
+    #     async with database.query() as Q:
+    #         return await (Q()
+    #             .tables(T.sub_items)
+    #             .fields(
+    #                 T.sub_items.id,
+    #                 T.sub_items.project_id,
+    #                 T.sub_items.status_set,
+    #                 T.sub_items.number,
+    #                 T.sub_items.date,
+    #                 T.sub_items.other,
+    #                 T.sub_items.place,
+    #                 T.sub_items.insurance_number,
+    #                 T.sub_items.work,
+    #                 T.sub_items.type,
+    #                 T.sub_items.tax,
+    #                 T.sub_items.taxDub,
+    #                 T.sub_items.taxP,
+    #                 T.sub_items.taxPDub,
+    #                 T.sub_items.disc,
+    #                 T.sub_items.discP,
+    #                 T.sub_items.butDiscPerc,
+    #                 T.sub_items.addtaxColapse,
+    #                 T.sub_items.dateEvent,
+    #                 T.sub_items.dateInspect,
+    #                 T.sub_items.ExamWorker,
+    #                 T.sub_items.comment,
+    #                 T.sub_items.order_id
+    #             )
+    #             # .where(T.sub_items.order_id == id)
+    #             .selectall())
 
     # @classmethod
     # async def add_part(cls, part_name, item_id):
@@ -288,43 +288,43 @@ class Sub:
 
 
 
-    @classmethod
-    async def update_table_data(cls, id, fild, data):
-        async with database.query() as Q:
-            # print(id, fild, data)
-            # if fild == 'without':
-            #     if data == true:
-            #         data
-            #     else:
-            if data=='Null':
-                data = ''
-            return await (Q()
-                .tables(T.sub_rows_for_table)
-                .where(T.sub_rows_for_table.id == id)
-                .update({
-                    T.sub_rows_for_table[fild]: data
-                }))
+    # @classmethod
+    # async def update_table_data(cls, id, fild, data):
+    #     async with database.query() as Q:
+    #         # print(id, fild, data)
+    #         # if fild == 'without':
+    #         #     if data == true:
+    #         #         data
+    #         #     else:
+    #         if data=='Null':
+    #             data = ''
+    #         return await (Q()
+    #             .tables(T.sub_rows_for_table)
+    #             .where(T.sub_rows_for_table.id == id)
+    #             .update({
+    #                 T.sub_rows_for_table[fild]: data
+    #             }))
 
-    @classmethod
-    async def update(cls, id, data, fild):
-        async with database.query() as Q:
-              return await (Q()
-                .tables(T.sub_project)
-                .where(T.sub_project.id == id)
-                .update({
-                    T.sub_project[fild]: data
-                }))
+    # @classmethod
+    # async def update(cls, id, data, fild):
+    #     async with database.query() as Q:
+    #           return await (Q()
+    #             .tables(T.sub_project)
+    #             .where(T.sub_project.id == id)
+    #             .update({
+    #                 T.sub_project[fild]: data
+    #             }))
 
-    @classmethod
-    async def update_item(cls, val, type, id):
-        async with database.query() as Q:
-                 await (Q()
-                     .tables(T.sub_items)
-                     .where(T.sub_items.id == id)
-                     .update({
-                         T.sub_items[type]: val
-                     }))
-        return ''
+    # @classmethod
+    # async def update_item(cls, val, type, id):
+    #     async with database.query() as Q:
+    #              await (Q()
+    #                  .tables(T.sub_items)
+    #                  .where(T.sub_items.id == id)
+    #                  .update({
+    #                      T.sub_items[type]: val
+    #                  }))
+    #     return ''
 
     # @classmethod
     # async def select_project_new(cls, id):
@@ -534,34 +534,34 @@ class Sub:
     #         return result
 
 
-    @classmethod
-    async def del_row_from_table(cls, id):
-        async with database.query() as Q:
-            return await (Q(T.sub_rows_for_table)
-                    .where(T.sub_rows_for_table.id == id)
-                    .delete())
+    # @classmethod
+    # async def del_row_from_table(cls, id):
+    #     async with database.query() as Q:
+    #         return await (Q(T.sub_rows_for_table)
+    #                 .where(T.sub_rows_for_table.id == id)
+    #                 .delete())
 
-    classmethod #first function on python
-    async def change(old, new):
-        async with database.query() as Q:
-                await (Q()
-                            .tables(T.sub_rows_for_table)
-                            .where(T.sub_rows_for_table.id == old)
-                            .update({
-                                T.sub_rows_for_table.id: 999999999
-                            }))
-                await (Q()
-                            .tables(T.sub_rows_for_table)
-                            .where(T.sub_rows_for_table.id == new)
-                            .update({
-                                T.sub_rows_for_table.id: old
-                            }))
-                await (Q()
-                            .tables(T.sub_rows_for_table)
-                            .where(T.sub_rows_for_table.id == 999999999)
-                            .update({
-                                T.sub_rows_for_table.id: new
-                            }))
+    # classmethod #first function on python
+    # async def change(old, new):
+    #     async with database.query() as Q:
+    #             await (Q()
+    #                         .tables(T.sub_rows_for_table)
+    #                         .where(T.sub_rows_for_table.id == old)
+    #                         .update({
+    #                             T.sub_rows_for_table.id: 999999999
+    #                         }))
+    #             await (Q()
+    #                         .tables(T.sub_rows_for_table)
+    #                         .where(T.sub_rows_for_table.id == new)
+    #                         .update({
+    #                             T.sub_rows_for_table.id: old
+    #                         }))
+    #             await (Q()
+    #                         .tables(T.sub_rows_for_table)
+    #                         .where(T.sub_rows_for_table.id == 999999999)
+    #                         .update({
+    #                             T.sub_rows_for_table.id: new
+    #                         }))
     # @classmethod
     # async def update_id_in_one_table(cls, newIndex, oldIndex, newPart):
     #     async with database.query() as Q:
@@ -774,59 +774,59 @@ class Sub:
     #     return ''
 
 
-    @classmethod
-    async def update_id_table(cls, newIndex, oldIndex, id):
-        async with database.query() as Q:
+    # @classmethod
+    # async def update_id_table(cls, newIndex, oldIndex, id):
+    #     async with database.query() as Q:
 
-            rows =(await (Q()
-                .tables(T.sub_tables)
-                .fields(
-                    T.sub_tables.id,
-                )
-                .where((T.sub_tables.item_id == id))
-                .selectall()))
-            # print(newIndex, oldIndex)
-            old = (rows[int(oldIndex)]['id'])
-            new = (rows[int(newIndex)]['id'])
+    #         rows =(await (Q()
+    #             .tables(T.sub_tables)
+    #             .fields(
+    #                 T.sub_tables.id,
+    #             )
+    #             .where((T.sub_tables.item_id == id))
+    #             .selectall()))
+    #         # print(newIndex, oldIndex)
+    #         old = (rows[int(oldIndex)]['id'])
+    #         new = (rows[int(newIndex)]['id'])
 
-            await (Q()
-                 .tables(T.sub_rows_for_table)
-                 .where(T.sub_rows_for_table.table_id == old)
-                 .update({
-                     T.sub_rows_for_table.table_id : 999999999
-                 }))
-            await (Q()
-                 .tables(T.sub_rows_for_table)
-                 .where(T.sub_rows_for_table.table_id == new)
-                 .update({
-                     T.sub_rows_for_table.table_id : old
-                 }))
-            await (Q()
-                 .tables(T.sub_rows_for_table)
-                 .where(T.sub_rows_for_table.table_id == 999999999)
-                 .update({
-                     T.sub_rows_for_table.table_id : new
-                 }))
+    #         await (Q()
+    #              .tables(T.sub_rows_for_table)
+    #              .where(T.sub_rows_for_table.table_id == old)
+    #              .update({
+    #                  T.sub_rows_for_table.table_id : 999999999
+    #              }))
+    #         await (Q()
+    #              .tables(T.sub_rows_for_table)
+    #              .where(T.sub_rows_for_table.table_id == new)
+    #              .update({
+    #                  T.sub_rows_for_table.table_id : old
+    #              }))
+    #         await (Q()
+    #              .tables(T.sub_rows_for_table)
+    #              .where(T.sub_rows_for_table.table_id == 999999999)
+    #              .update({
+    #                  T.sub_rows_for_table.table_id : new
+    #              }))
 
-            await (Q()
-                 .tables(T.sub_tables)
-                 .where(T.sub_tables.id == old)
-                 .update({
-                     T.sub_tables.id: 999999999
-                 }))
-            await (Q()
-                 .tables(T.sub_tables)
-                 .where(T.sub_tables.id == new)
-                 .update({
-                     T.sub_tables.id: old
-                 }))
-            await (Q()
-                 .tables(T.sub_tables)
-                 .where(T.sub_tables.id == 999999999)
-                 .update({
-                     T.sub_tables.id: new
-                 }))
-        return ''
+    #         await (Q()
+    #              .tables(T.sub_tables)
+    #              .where(T.sub_tables.id == old)
+    #              .update({
+    #                  T.sub_tables.id: 999999999
+    #              }))
+    #         await (Q()
+    #              .tables(T.sub_tables)
+    #              .where(T.sub_tables.id == new)
+    #              .update({
+    #                  T.sub_tables.id: old
+    #              }))
+    #         await (Q()
+    #              .tables(T.sub_tables)
+    #              .where(T.sub_tables.id == 999999999)
+    #              .update({
+    #                  T.sub_tables.id: new
+    #              }))
+    #     return ''
 
     # @classmethod
     # async def get_tables(cls, id):
@@ -1018,181 +1018,181 @@ class Sub:
         return ''
 
 
-    @classmethod
-    async def get_damage(cls, id):
-        async with database.query() as Q:
-                damages=(await (Q()
-                    .tables(T.sub_group_for_damages)
-                    .fields(
-                        T.sub_group_for_damages.id,
-                        T.sub_group_for_damages.name
-                    )
-                    .where(T.sub_group_for_damages.item_id == id)
-                    .selectall()))
+    # @classmethod
+    # async def get_damage(cls, id):
+    #     async with database.query() as Q:
+    #             damages=(await (Q()
+    #                 .tables(T.sub_group_for_damages)
+    #                 .fields(
+    #                     T.sub_group_for_damages.id,
+    #                     T.sub_group_for_damages.name
+    #                 )
+    #                 .where(T.sub_group_for_damages.item_id == id)
+    #                 .selectall()))
 
-                for val in damages:
-                    imamges = (await (Q()
-                    .tables(T.sub_group_for_damages)
-                    .fields(
-                        T.sub_group_for_damages.id,
-                        T.sub_group_for_damages.file_name,
-                        T.sub_group_for_damages.date,
-                        T.sub_group_for_damages.desc
-                    )
-                    .where(T.sub_group_for_damages.group_id == val['id'])
-                    .selectall()))
-                    tasks = (await (Q()
-                    .tables(T.sub_task_for_damages)
-                    .fields(
-                        T.sub_task_for_damages.id,
-                        T.sub_task_for_damages.name,
-                        T.sub_task_for_damages.data_time_start,
-                        T.sub_task_for_damages.data_time_end,
-                        T.sub_task_for_damages.workers
-                    )
-                    .where(T.sub_task_for_damages.table_id == val['id'])
-                    .selectall()))
-                    val['up']=False
-                    val['images']=imamges
-                    val['tasks']=tasks
+    #             for val in damages:
+    #                 imamges = (await (Q()
+    #                 .tables(T.sub_group_for_damages)
+    #                 .fields(
+    #                     T.sub_group_for_damages.id,
+    #                     T.sub_group_for_damages.file_name,
+    #                     T.sub_group_for_damages.date,
+    #                     T.sub_group_for_damages.desc
+    #                 )
+    #                 .where(T.sub_group_for_damages.group_id == val['id'])
+    #                 .selectall()))
+    #                 tasks = (await (Q()
+    #                 .tables(T.sub_task_for_damages)
+    #                 .fields(
+    #                     T.sub_task_for_damages.id,
+    #                     T.sub_task_for_damages.name,
+    #                     T.sub_task_for_damages.data_time_start,
+    #                     T.sub_task_for_damages.data_time_end,
+    #                     T.sub_task_for_damages.workers
+    #                 )
+    #                 .where(T.sub_task_for_damages.table_id == val['id'])
+    #                 .selectall()))
+    #                 val['up']=False
+    #                 val['images']=imamges
+    #                 val['tasks']=tasks
 
                 
-                return damages
+    #             return damages
 
-    @classmethod
-    async def get_damage_images(cls, id, project):
-        async with database.query() as Q:
-                items =  (await (Q()
-                    .tables(T.sub_items & T.sub_tables  & T.type_for_table).on((T.sub_items.id == T.sub_tables.item_id) & (T.sub_items.type == T.type_for_table.id))
-                    .fields(
-                        T.type_for_table.type,
-                        T.sub_tables.id,
-                        T.sub_tables.name
-                    )
-                    .where(T.sub_items.project_id == id)
-                    .selectall()))
+    # @classmethod
+    # async def get_damage_images(cls, id, project):
+    #     async with database.query() as Q:
+    #             items =  (await (Q()
+    #                 .tables(T.sub_items & T.sub_tables  & T.type_for_table).on((T.sub_items.id == T.sub_tables.item_id) & (T.sub_items.type == T.type_for_table.id))
+    #                 .fields(
+    #                     T.type_for_table.type,
+    #                     T.sub_tables.id,
+    #                     T.sub_tables.name
+    #                 )
+    #                 .where(T.sub_items.project_id == id)
+    #                 .selectall()))
 
-                # print(items)    
+    #             # print(items)    
 
-                result = list()              
-                files=(await (Q()
-                    .tables(T.files)
-                    .fields(
-                        T.files.id,
-                        T.files.name,
-                        # T.files.html,
-                        T.files.number,
-                        T.files.id,
-                        # T.files.pages,
-                        T.files.group,
-                        T.files.added,
-                        T.files.user
-                    )
-                    .where(T.files.number == project)
-                    .selectall()))
-                for val in files:
-                    # print(val)
-                    if val['name'].split('.')[1]!='pdf':
-                        fild_from='Project'
-                        fild_type={'id':0}
+    #             result = list()              
+    #             files=(await (Q()
+    #                 .tables(T.files)
+    #                 .fields(
+    #                     T.files.id,
+    #                     T.files.name,
+    #                     # T.files.html,
+    #                     T.files.number,
+    #                     T.files.id,
+    #                     # T.files.pages,
+    #                     T.files.group,
+    #                     T.files.added,
+    #                     T.files.user
+    #                 )
+    #                 .where(T.files.number == project)
+    #                 .selectall()))
+    #             for val in files:
+    #                 # print(val)
+    #                 if val['name'].split('.')[1]!='pdf':
+    #                     fild_from='Project'
+    #                     fild_type={'id':0}
 
-                        for it in items:
-                            if (str(it['id'])==str(val['group'])):
-                                fild_from=it['name']
-                                fild_type= it['type']
+    #                     for it in items:
+    #                         if (str(it['id'])==str(val['group'])):
+    #                             fild_from=it['name']
+    #                             fild_type= it['type']
                         
-                        if val['user']==None:
-                            user = 'Undefind'
-                        else:
-                            user =  val['user']
-                        img={'id':'/image?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'from':fild_from, 'type':fild_type, 'user':user}
-                        result.append(img)
-                # print(files, project)
+    #                     if val['user']==None:
+    #                         user = 'Undefind'
+    #                     else:
+    #                         user =  val['user']
+    #                     img={'id':'/image?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'from':fild_from, 'type':fild_type, 'user':user}
+    #                     result.append(img)
+    #             # print(files, project)
 
          
-                damages=(await (Q()
-                    .tables(T.sub_items)
-                    .fields(
-                        T.sub_items.id
-                    )
-                    .where((T.sub_items.project_id == id) & (T.sub_items.type == 4))
-                    .selectall()))
+    #             damages=(await (Q()
+    #                 .tables(T.sub_items)
+    #                 .fields(
+    #                     T.sub_items.id
+    #                 )
+    #                 .where((T.sub_items.project_id == id) & (T.sub_items.type == 4))
+    #                 .selectall()))
 
-                for val in damages:
-                    group=(await (Q()
-                    .tables(T.sub_group_for_damages)
-                    .fields(
-                        T.sub_group_for_damages.id,
-                        T.sub_group_for_damages.name
-                    )
-                    .where(T.sub_group_for_damages.item_id == val['id'])
-                    .selectall()))
+    #             for val in damages:
+    #                 group=(await (Q()
+    #                 .tables(T.sub_group_for_damages)
+    #                 .fields(
+    #                     T.sub_group_for_damages.id,
+    #                     T.sub_group_for_damages.name
+    #                 )
+    #                 .where(T.sub_group_for_damages.item_id == val['id'])
+    #                 .selectall()))
 
 
-                    for val in group:
-                        images=(await (Q()
-                        .tables(T.sub_group_for_damages)
-                        .fields(
-                            T.sub_group_for_damages.id,
-                            T.sub_group_for_damages.file_name,
-                            T.sub_group_for_damages.date,
-                            T.sub_group_for_damages.desc
-                        )
-                        .where(T.sub_group_for_damages.group_id == val['id'])
-                        .selectall()))
+    #                 for val in group:
+    #                     images=(await (Q()
+    #                     .tables(T.sub_group_for_damages)
+    #                     .fields(
+    #                         T.sub_group_for_damages.id,
+    #                         T.sub_group_for_damages.file_name,
+    #                         T.sub_group_for_damages.date,
+    #                         T.sub_group_for_damages.desc
+    #                     )
+    #                     .where(T.sub_group_for_damages.group_id == val['id'])
+    #                     .selectall()))
 
-                        for img in images:
-                            img['id'] = '/image_damage?id='+str(img['id'])
-                            img['from']=val['name']
-                            img['type']='Damage'
-                            # print(img)
-                            result.append(img)
+    #                     for img in images:
+    #                         img['id'] = '/image_damage?id='+str(img['id'])
+    #                         img['from']=val['name']
+    #                         img['type']='Damage'
+    #                         # print(img)
+    #                         result.append(img)
 
-                # result = list(filter(None, result))
-                # print(result)
-                return result
+    #             # result = list(filter(None, result))
+    #             # print(result)
+    #             return result
 
-    @classmethod
-    async def get_images(cls, id):
-        async with database.query() as Q:
-              return await (Q()
-                    .tables(T.sub_group_for_damages)
-                    .fields(
-                        T.sub_group_for_damages.id,
-                        T.sub_group_for_damages.file_name,
-                        T.sub_group_for_damages.date,
-                        T.sub_group_for_damages.desc
-                        # T.sub_group_for_damages.content
-                    )
-                    .where(T.sub_group_for_damages.group_id == id)
-                    .selectall())
+    # @classmethod
+    # async def get_images(cls, id):
+    #     async with database.query() as Q:
+    #           return await (Q()
+    #                 .tables(T.sub_group_for_damages)
+    #                 .fields(
+    #                     T.sub_group_for_damages.id,
+    #                     T.sub_group_for_damages.file_name,
+    #                     T.sub_group_for_damages.date,
+    #                     T.sub_group_for_damages.desc
+    #                     # T.sub_group_for_damages.content
+    #                 )
+    #                 .where(T.sub_group_for_damages.group_id == id)
+    #                 .selectall())
               
-    @classmethod
-    async def add_project(cls, year, date, country, area, city, street, zip):
-        async with database.query() as Q:
-              await (Q()
-                  .tables(T.sub_project)
-                  .insert({
-                  T.sub_project.project_number_year: year,
-                  T.sub_project.date: date,
-                  T.sub_project.user_id: '1', 
-                  T.sub_project.street: street,
-                  T.sub_project.country: country,
-                  T.sub_project.area: area,
-                  T.sub_project.city: city,
-                  T.sub_project.zip: zip,
-                  }))
-              return await (Q(T.sub_project)
-                .fields(
-                    T.sub_project.project_number_year,
-                    T.sub_project.date,
-                    T.sub_project.street,
-                    T.sub_project.city,
-                    T.sub_project.zip,
-                    T.sub_project.status_set,
-                    T.sub_project.id,
-                    T.sub_project.other
-                ).selectall())
+    # @classmethod
+    # async def add_project(cls, year, date, country, area, city, street, zip):
+    #     async with database.query() as Q:
+    #           await (Q()
+    #               .tables(T.sub_project)
+    #               .insert({
+    #               T.sub_project.project_number_year: year,
+    #               T.sub_project.date: date,
+    #               T.sub_project.user_id: '1', 
+    #               T.sub_project.street: street,
+    #               T.sub_project.country: country,
+    #               T.sub_project.area: area,
+    #               T.sub_project.city: city,
+    #               T.sub_project.zip: zip,
+    #               }))
+    #           return await (Q(T.sub_project)
+    #             .fields(
+    #                 T.sub_project.project_number_year,
+    #                 T.sub_project.date,
+    #                 T.sub_project.street,
+    #                 T.sub_project.city,
+    #                 T.sub_project.zip,
+    #                 T.sub_project.status_set,
+    #                 T.sub_project.id,
+    #                 T.sub_project.other
+    #             ).selectall())
 
     @classmethod
     async def get_workers(cls):
@@ -1209,15 +1209,15 @@ class Sub:
             )
             return result
 
-    @classmethod
-    async def changeDisableTableAfterDell(cls, timestam, ws_clients):
-        await asyncio.sleep(15)
-        async with database.query() as Q:
-            await (Q(T.changeDisableTableSub)
-                 .where((T.changeDisableTableSub.time == timestam))
-                 .delete())
-            for client in ws_clients:
-                await client.send_str('getLoocksSub')
+    # @classmethod
+    # async def changeDisableTableAfterDell(cls, timestam, ws_clients):
+    #     await asyncio.sleep(15)
+    #     async with database.query() as Q:
+    #         await (Q(T.changeDisableTableSub)
+    #              .where((T.changeDisableTableSub.time == timestam))
+    #              .delete())
+    #         for client in ws_clients:
+    #             await client.send_str('getLoocksSub')
 
             # return web.json_response('')
             # ioloop.run_until_complete(wait_tasks)
@@ -1235,52 +1235,52 @@ class Sub:
     #     await asyncio.sleep(0)
     #     print('Implicit context switch back to bar')
 
-    @classmethod
-    async def changeDisableTable(cls, type_operation, fild, id, user, ws_clients):
-        async with database.query() as Q:
-            timestam = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            if type_operation=='f':
-                await (Q()
-                     .tables(T.changeDisableTableSub)
-                     .insert({
-                       T.changeDisableTableSub.fild: fild,
-                       T.changeDisableTableSub.rows_id: id,
-                       T.changeDisableTableSub.user: user,
-                       T.changeDisableTableSub.time: timestam
-                }))
+    # @classmethod
+    # async def changeDisableTable(cls, type_operation, fild, id, user, ws_clients):
+    #     async with database.query() as Q:
+    #         timestam = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #         if type_operation=='f':
+    #             await (Q()
+    #                  .tables(T.changeDisableTableSub)
+    #                  .insert({
+    #                    T.changeDisableTableSub.fild: fild,
+    #                    T.changeDisableTableSub.rows_id: id,
+    #                    T.changeDisableTableSub.user: user,
+    #                    T.changeDisableTableSub.time: timestam
+    #             }))
 
 
-                ioloop = asyncio.get_event_loop()
-                tasks = [ioloop.create_task(Sub.changeDisableTableAfterDell(timestam, ws_clients))]
-                # wait_tasks = asyncio.wait(tasks)
-                # ioloop.run_until_complete(wait_tasks)
-                # ioloop.close()
+    #             ioloop = asyncio.get_event_loop()
+    #             tasks = [ioloop.create_task(Sub.changeDisableTableAfterDell(timestam, ws_clients))]
+    #             # wait_tasks = asyncio.wait(tasks)
+    #             # ioloop.run_until_complete(wait_tasks)
+    #             # ioloop.close()
 
-                # del_id = (await (Q()
-                # .tables(T.changeDisableTable)
-                # .fields(T.changeDisableTable.id)
-                # .where(T.changeDisableTable.time == timestam)
-                # .selectone()))
-
-
-
-                # await Projects.changeDisableTableAfterDell(timestam)
-             # 
-                # await Projects.say_after(30, 'world')
-            if type_operation=='b':
-                await (Q(T.changeDisableTableSub)
-                        .where((T.changeDisableTableSub.fild == fild) & (T.changeDisableTableSub.rows_id == id))
-                        .delete())
-        return ''
+    #             # del_id = (await (Q()
+    #             # .tables(T.changeDisableTable)
+    #             # .fields(T.changeDisableTable.id)
+    #             # .where(T.changeDisableTable.time == timestam)
+    #             # .selectone()))
 
 
-    @classmethod
-    async def getLoocks(cls):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.changeDisableTableSub)
-                .fields(T.changeDisableTableSub.id, T.changeDisableTableSub.fild, T.changeDisableTableSub.rows_id, T.changeDisableTableSub.user)
-                .selectall())
+
+    #             # await Projects.changeDisableTableAfterDell(timestam)
+    #          # 
+    #             # await Projects.say_after(30, 'world')
+    #         if type_operation=='b':
+    #             await (Q(T.changeDisableTableSub)
+    #                     .where((T.changeDisableTableSub.fild == fild) & (T.changeDisableTableSub.rows_id == id))
+    #                     .delete())
+    #     return ''
+
+
+    # @classmethod
+    # async def getLoocks(cls):
+    #     async with database.query() as Q:
+    #         return await (Q()
+    #             .tables(T.changeDisableTableSub)
+    #             .fields(T.changeDisableTableSub.id, T.changeDisableTableSub.fild, T.changeDisableTableSub.rows_id, T.changeDisableTableSub.user)
+    #             .selectall())
 
     # @classmethod
     # async def change_type(cls, id, type):
@@ -1325,31 +1325,31 @@ class Sub:
                 }))
 
 
-class SubOffer:
-    @classmethod
-    async def select_offer(cls, id):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.sub_offer)
-                .fields(T.sub_offer.offer_number, T.sub_offer.status_set, T.sub_offer.other)
-                .where(T.sub_offer.project_id == id)
-                .selectall())
+# class SubOffer:
+#     @classmethod
+#     async def select_offer(cls, id):
+#         async with database.query() as Q:
+#             return await (Q()
+#                 .tables(T.sub_offer)
+#                 .fields(T.sub_offer.offer_number, T.sub_offer.status_set, T.sub_offer.other)
+#                 .where(T.sub_offer.project_id == id)
+#                 .selectall())
 
-class SubInvoice:
-    @classmethod
-    async def select_invoice(cls, id):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.sub_invoice)
-                .fields(
-                    T.sub_invoice.invoice_number,
-                    T.sub_invoice.status_set,
-                    T.sub_invoice.other,
-                    T.sub_invoice.id,
-                    T.sub_invoice.year
-                    )
-                .where(T.sub_invoice.project_id == id)
-                .selectall())
+# class SubInvoice:
+#     @classmethod
+#     async def select_invoice(cls, id):
+#         async with database.query() as Q:
+#             return await (Q()
+#                 .tables(T.sub_invoice)
+#                 .fields(
+#                     T.sub_invoice.invoice_number,
+#                     T.sub_invoice.status_set,
+#                     T.sub_invoice.other,
+#                     T.sub_invoice.id,
+#                     T.sub_invoice.year
+#                     )
+#                 .where(T.sub_invoice.project_id == id)
+#                 .selectall())
 
     @classmethod
     async def detect_invoice(cls):
@@ -1652,100 +1652,100 @@ class SubInvoice:
 
     #     return ''
 
-    @classmethod
-    async def select_invoices(cls, id):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.sub_invoice)
-                .fields(
-                    T.sub_invoice.inoice_number,
-                    T.sub_invoice.date,
-                    T.sub_invoice.status_set,
-                    T.sub_invoice.other,
-                    T.sub_invoice.place,
-                    T.sub_invoice.insurance_number,
-                    T.sub_invoice.work,
-                    T.sub_invoice.offer_id,
-                    T.sub_invoice.id,
-                    T.sub_invoice.year
-                    )
-                .where(T.sub_invoice.project_id == id)
-                .selectall())
+    # @classmethod
+    # async def select_invoices(cls, id):
+    #     async with database.query() as Q:
+    #         return await (Q()
+    #             .tables(T.sub_invoice)
+    #             .fields(
+    #                 T.sub_invoice.inoice_number,
+    #                 T.sub_invoice.date,
+    #                 T.sub_invoice.status_set,
+    #                 T.sub_invoice.other,
+    #                 T.sub_invoice.place,
+    #                 T.sub_invoice.insurance_number,
+    #                 T.sub_invoice.work,
+    #                 T.sub_invoice.offer_id,
+    #                 T.sub_invoice.id,
+    #                 T.sub_invoice.year
+    #                 )
+    #             .where(T.sub_invoice.project_id == id)
+    #             .selectall())
 
 
-class add_same_sub:
-    @classmethod
-    async def add_same(cls, add_number, add_work, add_insurance_number, add_place, add_comment, add_project_id, order_id, type):
-            async with database.query() as Q:
-                type_id = (await (Q()
-                    .tables(T.type_for_table)
-                    .fields(
-                        T.type_for_table.id
-                        )
-                    .where(T.type_for_table.type == type)
-                    .selectone()))
-                return await (Q()
-                    .tables(T.sub_items)
-                    .insert({
-                        T.sub_items.discP:0,
-                        T.sub_items.disc:0,
-                        T.sub_items.taxP:19,
-                        T.sub_items.taxDub:0.0,
-                        T.sub_items.tax:0.00,
-                        T.sub_items.taxPDub:0,
-                        T.sub_items.work: add_work,
-                        T.sub_items.place: add_place,
-                        T.sub_items.insurance_number:add_insurance_number,
-                        T.sub_items.other: add_comment, 
-                        T.sub_items.number: add_number,
-                        T.sub_items.date: datetime.datetime.now().strftime("%Y-%m-%d"),
-                        T.sub_items.status_set: 'Open',
-                        T.sub_items.project_id: add_project_id,
-                        T.sub_items.order_id: order_id,
-                        T.sub_items.type: type_id['id']
-                    }))
-class Del_offer_sub:
-    @classmethod
-    async def del_item(cls, id):
-        async with database.query() as Q:
-            tables = (
-                await (Q(T.sub_tables)
-                    .fields(
-                        T.sub_tables.id)
-                    .where(T.sub_tables.item_id == id)
-                    .selectall())
-                    )
+# class add_same_sub:
+#     @classmethod
+#     async def add_same(cls, add_number, add_work, add_insurance_number, add_place, add_comment, add_project_id, order_id, type):
+#             async with database.query() as Q:
+#                 type_id = (await (Q()
+#                     .tables(T.type_for_table)
+#                     .fields(
+#                         T.type_for_table.id
+#                         )
+#                     .where(T.type_for_table.type == type)
+#                     .selectone()))
+#                 return await (Q()
+#                     .tables(T.sub_items)
+#                     .insert({
+#                         T.sub_items.discP:0,
+#                         T.sub_items.disc:0,
+#                         T.sub_items.taxP:19,
+#                         T.sub_items.taxDub:0.0,
+#                         T.sub_items.tax:0.00,
+#                         T.sub_items.taxPDub:0,
+#                         T.sub_items.work: add_work,
+#                         T.sub_items.place: add_place,
+#                         T.sub_items.insurance_number:add_insurance_number,
+#                         T.sub_items.other: add_comment, 
+#                         T.sub_items.number: add_number,
+#                         T.sub_items.date: datetime.datetime.now().strftime("%Y-%m-%d"),
+#                         T.sub_items.status_set: 'Open',
+#                         T.sub_items.project_id: add_project_id,
+#                         T.sub_items.order_id: order_id,
+#                         T.sub_items.type: type_id['id']
+#                     }))
+# class Del_offer_sub:
+#     @classmethod
+#     async def del_item(cls, id):
+#         async with database.query() as Q:
+#             tables = (
+#                 await (Q(T.sub_tables)
+#                     .fields(
+#                         T.sub_tables.id)
+#                     .where(T.sub_tables.item_id == id)
+#                     .selectall())
+#                     )
 
-            for table in tables:
-                rows = (await (Q(T.sub_rows_for_table)
-                .fields(
-                    T.sub_rows_for_table.id)
-                .where(T.sub_rows_for_table.table_id == table['id'])
-                .selectall())
-                )
-                for row in rows:
-                    await (Q(T.sub_rows_for_table)
-                        .where(T.sub_rows_for_table.id == row['id'])
-                        .delete())
+#             for table in tables:
+#                 rows = (await (Q(T.sub_rows_for_table)
+#                 .fields(
+#                     T.sub_rows_for_table.id)
+#                 .where(T.sub_rows_for_table.table_id == table['id'])
+#                 .selectall())
+#                 )
+#                 for row in rows:
+#                     await (Q(T.sub_rows_for_table)
+#                         .where(T.sub_rows_for_table.id == row['id'])
+#                         .delete())
 
-            await (Q(T.sub_tables)
-                .where(T.sub_tables.item_id == id)
-                .delete())
+#             await (Q(T.sub_tables)
+#                 .where(T.sub_tables.item_id == id)
+#                 .delete())
 
-            number_invoice = (await (Q(T.sub_items)
-                    .fields(T.sub_items.id)
-                    .where(T.sub_items.id == id)
-                    .selectone())
-                )
+#             number_invoice = (await (Q(T.sub_items)
+#                     .fields(T.sub_items.id)
+#                     .where(T.sub_items.id == id)
+#                     .selectone())
+#                 )
            
-            await (Q(T.number_for_invoice)
-                .where(T.number_for_invoice.item_id == number_invoice['id'])
-                .delete())
+#             await (Q(T.number_for_invoice)
+#                 .where(T.number_for_invoice.item_id == number_invoice['id'])
+#                 .delete())
                 
             
-            await (Q(T.sub_items)
-                .where(T.sub_items.id == id)
-                .delete())
+#             await (Q(T.sub_items)
+#                 .where(T.sub_items.id == id)
+#                 .delete())
 
 
 #####end Sub
@@ -2447,55 +2447,55 @@ class Project:
                     T.project[fild]: data
             }))
 
-    @classmethod
-    async def table_data(cls, id):
-        async with database.query() as Q:
-              return await (Q()
-                .tables(T.table_data)
-                .fields(
-                    T.table_data.part_name,
-                    T.table_data.count,
-                    T.table_data.status,
-                    T.table_data.alttax,
-                    T.table_data.summa,
-                    T.table_data.unit,
-                    T.table_data.done,
-                    T.table_data.description_head,
-                    T.table_data.description_work,
-                    T.table_data.description_from_price,
-                    T.table_data.discount,
-                    T.table_data.position_number,
-                    T.table_data.price,
-                    T.table_data.id,
-                    T.table_data.item_id
-                )
-                .where(T.table_data.item_id == id)
-                .selectall())
+    # @classmethod
+    # async def table_data(cls, id):
+    #     async with database.query() as Q:
+    #           return await (Q()
+    #             .tables(T.table_data)
+    #             .fields(
+    #                 T.table_data.part_name,
+    #                 T.table_data.count,
+    #                 T.table_data.status,
+    #                 T.table_data.alttax,
+    #                 T.table_data.summa,
+    #                 T.table_data.unit,
+    #                 T.table_data.done,
+    #                 T.table_data.description_head,
+    #                 T.table_data.description_work,
+    #                 T.table_data.description_from_price,
+    #                 T.table_data.discount,
+    #                 T.table_data.position_number,
+    #                 T.table_data.price,
+    #                 T.table_data.id,
+    #                 T.table_data.item_id
+    #             )
+    #             .where(T.table_data.item_id == id)
+    #             .selectall())
 
-    @classmethod
-    async def invoice_data_table(cls, id):
-        async with database.query() as Q:
-              return await (Q()
-                .tables(T.invoice_data_table)
-                .fields(
-                    T.invoice_data_table.part_name,
-                    T.invoice_data_table.count,
-                    T.invoice_data_table.status,
-                    T.invoice_data_table.alttax,
-                    T.invoice_data_table.summa,
-                    T.invoice_data_table.unit,
-                    T.invoice_data_table.done,
-                    T.invoice_data_table.description_head,
-                    T.invoice_data_table.description_work,
-                    T.invoice_data_table.description_from_price,
-                    T.invoice_data_table.discount,
-                    T.invoice_data_table.position_number,
-                    T.invoice_data_table.price,
-                    T.invoice_data_table.id,
-                    T.invoice_data_table.item_id
-                )
-                .where(T.invoice_data_table.item_id == id)
-                .selectall())
+    # @classmethod
+    # async def invoice_data_table(cls, id):
+    #     async with database.query() as Q:
+    #           return await (Q()
+    #             .tables(T.invoice_data_table)
+    #             .fields(
+    #                 T.invoice_data_table.part_name,
+    #                 T.invoice_data_table.count,
+    #                 T.invoice_data_table.status,
+    #                 T.invoice_data_table.alttax,
+    #                 T.invoice_data_table.summa,
+    #                 T.invoice_data_table.unit,
+    #                 T.invoice_data_table.done,
+    #                 T.invoice_data_table.description_head,
+    #                 T.invoice_data_table.description_work,
+    #                 T.invoice_data_table.description_from_price,
+    #                 T.invoice_data_table.discount,
+    #                 T.invoice_data_table.position_number,
+    #                 T.invoice_data_table.price,
+    #                 T.invoice_data_table.id,
+    #                 T.invoice_data_table.item_id
+    #             )
+    #             .where(T.invoice_data_table.item_id == id)
+    #             .selectall())
 
     @classmethod
     async def update_table_data(cls, table_id, id, fild, data, index, send, ws_clients):
@@ -3405,17 +3405,17 @@ class Project:
             )
             return result
 
-    @classmethod
-    async def workers_task(cls, workers, id):
-        if workers == 'Null':
-           workers = None
-        async with database.query() as Q:
-                 await (Q()
-                     .tables(T.task_for_damages)
-                     .where(T.task_for_damages.id == id)
-                     .update({
-                         T.task_for_damages.Workers: workers
-                     }))
+    # @classmethod
+    # async def workers_task(cls, workers, id):
+    #     if workers == 'Null':
+    #        workers = None
+    #     async with database.query() as Q:
+    #              await (Q()
+    #                  .tables(T.task_for_damages)
+    #                  .where(T.task_for_damages.id == id)
+    #                  .update({
+    #                      T.task_for_damages.Workers: workers
+    #                  }))
         return ''
     @classmethod
     async def get_type_works(cls):
@@ -5304,20 +5304,20 @@ class Projects:
                     T.project.other
                 ).selectall())
 
-    @classmethod
-    async def changeDisableTableAfterDell(cls, timestam, ws_clients):
-        await asyncio.sleep(15)
-        async with database.query() as Q:
-            await (Q(T.changeDisableTable)
-                 .where((T.changeDisableTable.time == timestam))
-                 .delete())
-            for client in ws_clients:
-                await client.send_str('getLoocks')
+    # @classmethod
+    # async def changeDisableTableAfterDell(cls, timestam, ws_clients):
+    #     await asyncio.sleep(15)
+    #     async with database.query() as Q:
+    #         await (Q(T.changeDisableTable)
+    #              .where((T.changeDisableTable.time == timestam))
+    #              .delete())
+    #         for client in ws_clients:
+    #             await client.send_str('getLoocks')
 
-            # return web.json_response('')
-            # ioloop.run_until_complete(wait_tasks)
-            # ioloop.close()
-            return ''
+    #         # return web.json_response('')
+    #         # ioloop.run_until_complete(wait_tasks)
+    #         # ioloop.close()
+    #         return ''
     # @classmethod
     # async def foo(cls):
     #     print('Running in foo')
@@ -5330,51 +5330,51 @@ class Projects:
     #     await asyncio.sleep(0)
     #     print('Implicit context switch back to bar')
 
-    @classmethod
-    async def changeDisableTable(cls, type_operation, fild, id, user, ws_clients):
-        async with database.query() as Q:
-            timestam = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            if type_operation=='f':
-                await (Q()
-                     .tables(T.changeDisableTable)
-                     .insert({
-                       T.changeDisableTable.fild: fild,
-                       T.changeDisableTable.rows_id: id,
-                       T.changeDisableTable.user: user,
-                       T.changeDisableTable.time: timestam
-                }))
+    # @classmethod
+    # async def changeDisableTable(cls, type_operation, fild, id, user, ws_clients):
+    #     async with database.query() as Q:
+    #         timestam = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #         if type_operation=='f':
+    #             await (Q()
+    #                  .tables(T.changeDisableTable)
+    #                  .insert({
+    #                    T.changeDisableTable.fild: fild,
+    #                    T.changeDisableTable.rows_id: id,
+    #                    T.changeDisableTable.user: user,
+    #                    T.changeDisableTable.time: timestam
+    #             }))
 
 
-                ioloop = asyncio.get_event_loop()
-                tasks = [ioloop.create_task(Projects.changeDisableTableAfterDell(timestam, ws_clients))]
-                # wait_tasks = asyncio.wait(tasks)
-                # ioloop.run_until_complete(wait_tasks)
-                # ioloop.close()
+    #             ioloop = asyncio.get_event_loop()
+    #             tasks = [ioloop.create_task(Projects.changeDisableTableAfterDell(timestam, ws_clients))]
+    #             # wait_tasks = asyncio.wait(tasks)
+    #             # ioloop.run_until_complete(wait_tasks)
+    #             # ioloop.close()
 
-                # del_id = (await (Q()
-                # .tables(T.changeDisableTable)
-                # .fields(T.changeDisableTable.id)
-                # .where(T.changeDisableTable.time == timestam)
-                # .selectone()))
+    #             # del_id = (await (Q()
+    #             # .tables(T.changeDisableTable)
+    #             # .fields(T.changeDisableTable.id)
+    #             # .where(T.changeDisableTable.time == timestam)
+    #             # .selectone()))
 
 
 
-                # await Projects.changeDisableTableAfterDell(timestam)
-             # 
-                # await Projects.say_after(30, 'world')
-            if type_operation=='b':
-                await (Q(T.changeDisableTable)
-                        .where((T.changeDisableTable.fild == fild) & (T.changeDisableTable.rows_id == id))
-                        .delete())
-        return ''
+    #             # await Projects.changeDisableTableAfterDell(timestam)
+    #          # 
+    #             # await Projects.say_after(30, 'world')
+    #         if type_operation=='b':
+    #             await (Q(T.changeDisableTable)
+    #                     .where((T.changeDisableTable.fild == fild) & (T.changeDisableTable.rows_id == id))
+    #                     .delete())
+    #     return ''
 
-    @classmethod
-    async def getLoocks(cls):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.changeDisableTable)
-                .fields(T.changeDisableTable.id, T.changeDisableTable.fild, T.changeDisableTable.rows_id, T.changeDisableTable.user)
-                .selectall())
+    # @classmethod
+    # async def getLoocks(cls):
+    #     async with database.query() as Q:
+    #         return await (Q()
+    #             .tables(T.changeDisableTable)
+    #             .fields(T.changeDisableTable.id, T.changeDisableTable.fild, T.changeDisableTable.rows_id, T.changeDisableTable.user)
+    #             .selectall())
 
     @classmethod
     async def select_part(cls, type, mode):
@@ -5431,31 +5431,31 @@ class Projects:
             return n_result
         
 
-class Offer:
-    @classmethod
-    async def select_offer(cls, id):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.offer)
-                .fields(T.offer.offer_number, T.offer.status_set, T.offer.other)
-                .where(T.offer.project_id == id)
-                .selectall())
+# class Offer:
+#     @classmethod
+#     async def select_offer(cls, id):
+#         async with database.query() as Q:
+#             return await (Q()
+#                 .tables(T.offer)
+#                 .fields(T.offer.offer_number, T.offer.status_set, T.offer.other)
+#                 .where(T.offer.project_id == id)
+#                 .selectall())
 
 class Invoice:
-    @classmethod
-    async def select_invoice(cls, id):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.invoice)
-                .fields(
-                    T.invoice.invoice_number,
-                    T.invoice.status_set,
-                    T.invoice.other,
-                    T.invoice.id,
-                    T.invoice.year
-                    )
-                .where(T.invoice.project_id == id)
-                .selectall())
+#     @classmethod
+#     async def select_invoice(cls, id):
+#         async with database.query() as Q:
+#             return await (Q()
+#                 .tables(T.invoice)
+#                 .fields(
+#                     T.invoice.invoice_number,
+#                     T.invoice.status_set,
+#                     T.invoice.other,
+#                     T.invoice.id,
+#                     T.invoice.year
+#                     )
+#                 .where(T.invoice.project_id == id)
+#                 .selectall())
 
     @classmethod
     async def detect_invoice(cls):
@@ -5875,25 +5875,25 @@ class Invoice:
                         T.tables.discont:discont
                     }))
 
-    @classmethod
-    async def select_invoices(cls, id):
-        async with database.query() as Q:
-            return await (Q()
-                .tables(T.invoice)
-                .fields(
-                    T.invoice.inoice_number,
-                    T.invoice.date,
-                    T.invoice.status_set,
-                    T.invoice.other,
-                    T.invoice.place,
-                    T.invoice.insurance_number,
-                    T.invoice.work,
-                    T.invoice.offer_id,
-                    T.invoice.id,
-                    T.invoice.year
-                    )
-                .where(T.invoice.project_id == id)
-                .selectall())
+    # @classmethod
+    # async def select_invoices(cls, id):
+    #     async with database.query() as Q:
+    #         return await (Q()
+    #             .tables(T.invoice)
+    #             .fields(
+    #                 T.invoice.inoice_number,
+    #                 T.invoice.date,
+    #                 T.invoice.status_set,
+    #                 T.invoice.other,
+    #                 T.invoice.place,
+    #                 T.invoice.insurance_number,
+    #                 T.invoice.work,
+    #                 T.invoice.offer_id,
+    #                 T.invoice.id,
+    #                 T.invoice.year
+    #                 )
+    #             .where(T.invoice.project_id == id)
+    #             .selectall())
 
 
 class add_same:
@@ -6010,24 +6010,24 @@ class Del_offer:
             for client in ws_clients:
                 await client.send_str('project_detail_new_f')
 
-class Offers:
-    @classmethod
-    async def select_offers(cls, id):
-        async with database.query() as Q:
-            return await (Q(T.offer)
-                .fields(
-                    T.offer.offer_number,
-                    T.offer.date,
-                    T.offer.work,
-                    T.offer.status_set,
-                    T.offer.place,
-                    T.offer.status_set,
-                    T.offer.insurance_number,
-                    T.offer.other,
-                    T.offer.type,
-                    T.offer.id)
-                .where(T.offer.project_id == id)
-                .selectall())
+# class Offers:
+#     @classmethod
+#     async def select_offers(cls, id):
+#         async with database.query() as Q:
+#             return await (Q(T.offer)
+#                 .fields(
+#                     T.offer.offer_number,
+#                     T.offer.date,
+#                     T.offer.work,
+#                     T.offer.status_set,
+#                     T.offer.place,
+#                     T.offer.status_set,
+#                     T.offer.insurance_number,
+#                     T.offer.other,
+#                     T.offer.type,
+#                     T.offer.id)
+#                 .where(T.offer.project_id == id)
+#                 .selectall())
 
 
 
@@ -7163,42 +7163,42 @@ class Docs:
                         T.files_to_sperson.folder_id: folder
                     }))
 
-    @classmethod
-    async def upload_img_for_damages(cls, file, filename, group_id, added):
+    # @classmethod
+    # async def upload_img_for_damages(cls, file, filename, group_id, added):
 
-            # file = base64.b64encode(file)
+    #         # file = base64.b64encode(file)
 
-            async with database.query() as Q:
-                for val in group_id.split(','):
-                    await (Q()
-                        .tables(T.images_for_group_damages)
-                        .insert({
-                            T.images_for_group_damages.group_id: val,
-                            T.images_for_group_damages.file_name: filename,
-                            T.images_for_group_damages.date: added,
-                            T.images_for_group_damages.content: file
-                        }))
+    #         async with database.query() as Q:
+    #             for val in group_id.split(','):
+    #                 await (Q()
+    #                     .tables(T.images_for_group_damages)
+    #                     .insert({
+    #                         T.images_for_group_damages.group_id: val,
+    #                         T.images_for_group_damages.file_name: filename,
+    #                         T.images_for_group_damages.date: added,
+    #                         T.images_for_group_damages.content: file
+    #                     }))
 
-    @classmethod
-    async def add_task(cls, name, id, start, end):
-            async with database.query() as Q:
-                if  (start=='null') | (end=='null'):
-                    return await (Q()
-                            .tables(T.task_for_damages)
-                            .insert({
-                                T.task_for_damages.name: name,
-                                T.task_for_damages.table_id: id,
-                                T.task_for_damages.data_time_start: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            }))
-                else:
-                    return await (Q()
-                            .tables(T.task_for_damages)
-                            .insert({
-                                T.task_for_damages.name: name,
-                                T.task_for_damages.table_id: id,
-                                T.task_for_damages.data_time_start: start,
-                                T.task_for_damages.data_time_end: end
-                            }))
+    # @classmethod
+    # async def add_task(cls, name, id, start, end):
+    #         async with database.query() as Q:
+    #             if  (start=='null') | (end=='null'):
+    #                 return await (Q()
+    #                         .tables(T.task_for_damages)
+    #                         .insert({
+    #                             T.task_for_damages.name: name,
+    #                             T.task_for_damages.table_id: id,
+    #                             T.task_for_damages.data_time_start: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #                         }))
+    #             else:
+    #                 return await (Q()
+    #                         .tables(T.task_for_damages)
+    #                         .insert({
+    #                             T.task_for_damages.name: name,
+    #                             T.task_for_damages.table_id: id,
+    #                             T.task_for_damages.data_time_start: start,
+    #                             T.task_for_damages.data_time_end: end
+    #                         }))
 
     @classmethod
     async def update_task(cls, data, fild, id):
@@ -10503,12 +10503,12 @@ class Balance:
                     .update({
                             T.items.comment: value
                     }))
-    @classmethod
-    async def update_comment_sub(cls, id, value):
-        async with database.query() as Q:
-           return await (Q(T.sub_items)
-                    .tables(T.sub_items)
-                    .where(T.sub_items.id == id)
-                    .update({
-                            T.sub_items.comment: value
-                    }))
+    # @classmethod
+    # async def update_comment_sub(cls, id, value):
+    #     async with database.query() as Q:
+    #        return await (Q(T.sub_items)
+    #                 .tables(T.sub_items)
+    #                 .where(T.sub_items.id == id)
+    #                 .update({
+    #                         T.sub_items.comment: value
+    #                 }))
