@@ -224,7 +224,6 @@
                   :menuDocsTree="menuDocsTree"
                   @filedel="filedelSub"
                   @updatefilename="updatefilenameSub"
-                  @changeDisable="changeDisable"
                   @loadDocToFrame="ploadDocToFrameSub"
                   @onClickOutsideDoc="menuDocsTree=false"
                   @curNodeClickedDoc="pcurNodeClickedDoc"
@@ -255,7 +254,6 @@
             <b-tab :title="$t('projectDetail.images')">
               <container>
                 <container-body  style="overflow: hidden;">
-                  <!-- <button @click="$refs.images1.loded()">this.$refs.images1.loded()</button> -->
                   <images
                   v-if="detect('images')"
                   :domageImages="responseImageSub"
@@ -421,7 +419,6 @@
                   :menuDocsTree="menuDocsSpersonTree"
                   @filedel="filedelSperson"
                   @updatefilename="updatefilenameSperson"
-                  @changeDisable="changeDisable"
                   @loadDocToFrame="ploadDocToFrameSperson"
                   @onClickOutsideDoc="menuDocsSpersonTree=false"
                   @curNodeClickedDoc="pcurNodeClickedSperson"
@@ -920,11 +917,9 @@ moveImagPerson(){
         }
     },
     loded(dir, elheight, add){
-       // console.log(dir, elheight, add)
       this.sm2lg(dir, elheight, add)
     },
       sm2lg(dir, val, add){
-        console.log(dir, val, add)
         var result 
         function changeSm2Lg(wwidth, height, add){
           if(wwidth<=768){
@@ -1155,20 +1150,6 @@ moveImagPerson(){
           id: id
         }
       })
-    },
-    changeDisable(type_operation, fild, id){
-      this.stopDis=(type_operation=='f')
-      axios.get('/changeDisableTable', {
-        params: {
-          type_operation: type_operation,
-          fild: fild,
-          id: id,
-          'user': this.$security.account['first_name']+'_'+this.$security.account['second_name']
-        }
-      })
-      if (type_operation == 'f'){
-        setTimeout(()=>{}, 15000);
-      }
     },
     getFilesFirma(id){
       axios.get('/get_files_firma', {
@@ -1472,9 +1453,7 @@ moveImagPerson(){
     })
 
     setTimeout(() => {
-      console.log('after')
         this.sm2lg('component', this.$refs['hsub'].clientHeight, 110)
-        // this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 56)
     }, 100);
   },
   getCustomerDetail(){
@@ -1496,7 +1475,6 @@ moveImagPerson(){
       this.tax = response.data.tax,
       this.web = response.data.web,
       this.zip = response.data.zip
-      // this.getSubFiles()
       this.getPersons()
       axios.get('/get_contactData', {
         params: {
@@ -1787,15 +1765,15 @@ moveImagPerson(){
     },
   },
   mounted(){
-    setTimeout(() => {
-      this.getCustomerDetail()
+    this.getCustomerDetail()
       this.getSubFiles()
+
       this.$options.sockets.onmessage = (data) => (data.data=='getSubFiles') ? this.getSubFiles(): ''
       this.$options.sockets.onmessage = (data) => (data.data=='getSubDetail') ? (this.getCustomerDetail()):''
       this.$options.sockets.onmessage = (data) => (data.data=='get_persons') ? (this.getPersons()):''
       this.$options.sockets.onmessage = (data) => (data.data=='getSubContact') ? (this.getContact(this.tmp.person)):''
       this.$options.sockets.onmessage = (data) => (data.data=='getSpersonFiles') ? (this.getFilesSperson(this.tmp.person)):''
-    },1000);
+
   },
     created: function() {
       const onResize = () => this.wwidth = window.innerWidth; //После определения ширина окна и  мобильного режима, должна примениться рассчитаная длина списка

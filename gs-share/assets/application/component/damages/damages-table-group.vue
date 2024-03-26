@@ -2,48 +2,23 @@
   <b-container>
     <ModalEditor :image="initimage" @change="changeImage($event)" ref="zoneEditorModal" id="popup">
     </ModalEditor>
-        
     <b-input-group class="pb-0 mb-0">
     <b-col cols="11" class="text-left p-2">
     <b-button @click="plus" size="sm"><b-icon icon="zoom-in"></b-icon></b-button>
     <b-button @click="minus" size="sm"><b-icon icon="zoom-out"></b-icon></b-button>
     <b-button  size="sm" @click="showquality=true" v-show="!showquality"><b-icon icon="image-fill"></b-icon></b-button>
-    <b-form-input v-show="showquality" v-model="quality" @change="showquality=false" type="range" min="0" max="100" size="sm" style="max-width: 240px;padding-top: 15px;"></b-form-input>
+    <b-form-input v-show="showquality" v-model="quality" @change="showquality=false" type="range"
+    min="0" max="100" size="sm" style="max-width: 240px;padding-top: 15px;"></b-form-input>
     </b-col>
     <b-col cols="1" class="text-right">
-     
       <b-button size="sm" @click="$emit('openWindowPrint', 'Damage')">
           <b-icon icon="printer" aria-hidden="true"></b-icon>
         </b-button>
-    <!-- <print v-if="tmp.typeOfHead == 'Damage'"
-    :windowPrint="windowPrint"
-    :selectedCornty="selectedCornty"
-    :project="project" :tmp="tmp"
-    :account="account" :id="pid"
-    :partx="[]" :head="tmp.typeOfHead"
-    :addtaxColapsel="false"
-    :workers="workers" :comments="comments"
-    :customer="customer"
-    :person="person"
-    :selectCustomer="selectCustomer"
-    :selectPerson="selectPerson"
-    :selectedDocsList="selectedDocsList"
-    :addPdfs="addPdfs"
-    :makemodalpdf="makemodalpdf"
-    :typeDocsList="typeDocsList"
-    @selectedDocs="selectedDocs"
-    @addPdf="addPdf"
-    @addPdfSep="addPdfSep"
-    @printPdf="printPdf"
-    @preview="preview"
-    @printOffer="printOffer"
-    @hideWindowPrint="hideWindowPrint"
-    ref="print" 
-    ></print> -->
   </b-col>
   </b-input-group>
     <div v-for="(table, index) in tables" :key="table.id">
-      <damages-table :table="table" :quality="quality" :size="size" @edit="edit" :ref="'damage'+table.id" :id="tmp.id" :index="index" @switchDamagesGroup="switchDamagesGroup"></damages-table>
+      <damages-table :table="table" :quality="quality" :size="size" @edit="edit" :ref="'damage'+table.id"
+      :id="tmp.id" :index="index" @switchDamagesGroup="switchDamagesGroup"></damages-table>
       <br />
     </div>
   </b-container>
@@ -70,17 +45,12 @@ export default {
       }
     },
     methods: {
-
       plus(){
       this.size=this.size+10;
-  
-    },
+      },
     minus(){
       this.size=this.size-10;
-   
-    },
-
-
+       },
       changeImage(e){
         axios.post('/updateImageDamage', {
           params: {
@@ -89,44 +59,12 @@ export default {
             id: this.cid
           }})
       },
-      // updateDamage(newData, fild, id){
-      //   axios.get('/updateDamage', {params: {
-      //     newData: newData,
-      //     fild: fild,
-      //     id: id
-      //   }})
-      // },
-      // selectedDocs(event){
-      //   this.$emit('selectedDocs', event)
-      // },
-      // addPdf() {
-      //   this.$emit('addPdf')
-      // },
-      // addPdfSep() {
-      //   this.$emit('addPdfSep')
-      // },
-      // printPdf() {
-      //   this.$emit('printPdf')
-      // },
-      // preview() {
-      //   this.$emit('preview')
-      // },
-      // printOffer() {
-      //   this.$emit('printOffer')
-      // },
-      // hideWindowPrint(){
-      //   this.$emit('hideWindowPrint')
-      // },
-      // openWindowPrint(){
-      //   this.$emit('openWindowPrint')
-      // },     
       edit(content){
         this.$refs['zoneEditorModal'].show();
         this.initimage.url = '/image_edit?id='+content.imgId;
         this.initimage.schema = JSON.parse(content.schema);
         this.cid=content.id;
       },
-
       getTablesInDamages(id) {
         axios.get('/get_tables_in_damages', {
           params: {
@@ -149,30 +87,20 @@ export default {
         }
       }
 },
-
-    
     mounted(){
-
-
       this.$options.sockets.onmessage = (data) => {
       var delimetr = data.data.split(':')
-
-
       if ((delimetr[0] == 'del_row_damage')||(delimetr[0] == 'del_table_damage')||(delimetr[0] == 'send_damage')) {
         delimetr[1].split(',').forEach((tableForReload)=>{
           this.$refs['damage'+tableForReload][0].getRowsInDamage(tableForReload)
           this.selectedTables=[]
         })
       }
-
       if (delimetr[0] == 'updateFildDamage') {
         var updateFild = (JSON.parse(data.data.split('updateFildDamage:')[1]))
         this.$refs['damage'+updateFild.table_id][0].getFild(updateFild)
       }
    }
-
-   
-
     this.heightImages='hi'+(Math.ceil(Math.random()*1000000))
     setTimeout(() => {
           if(this.wwidth<=768){
@@ -198,6 +126,5 @@ export default {
 
     }, 200);     
   }
-
 }
 </script>

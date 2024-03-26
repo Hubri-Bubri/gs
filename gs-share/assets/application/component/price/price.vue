@@ -25,11 +25,7 @@
         :idNode="idNode"
         :parId="parId"
         disableDBClick
-        @drag="dragHandler"
-        @drag-enter="dragEnterHandler"
         @current-node-clicked="curNodeClicked"
-        @drag-leave="dragLeaveHandler"
-        @drag-over="dragOverHandler"
         @drag-end="dragEndHandler"
         @drop="dropHandler">
         </vue-drag-tree>                              
@@ -90,16 +86,11 @@
           class="diveditable"
           @blur="updateDate($event.target.innerHTML, 'pos_num', row.item.id)"
           v-html="row.item.pos_num" />
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.pos_num" ></b-input> -->
           </template>
           <template #cell(name)="row">
-
           <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'" :title="(row.item.desc)?row.item.desc:'(You have not added an explanation for this item)'"
           contenteditable="true" @click.prevent.self v-html="row.item.name"
           @blur="updateDate($event.target.innerHTML, 'name', row.item.id)" />
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.name" ></b-input> -->
           </template>
           <template #cell(unit)="row">
           <div
@@ -107,19 +98,13 @@
           class="diveditable"
           @blur="updateDate($event.target.innerHTML, 'unit', row.item.id)"
           v-html="row.item.unit" />
-
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.unit" ></b-input> -->
           </template>
           <template #cell(price)="row">
-
           <div
           contenteditable="true" @click.prevent.self 
           class="diveditable"
           @blur="updateDate($event.target.innerHTML, 'price', row.item.id)"
           v-html="valueDigital(row.item.price)" />
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.price" ></b-input> -->
           </template>
           <template #cell(without)="row">
             <div
@@ -127,17 +112,13 @@
         class="diveditable"
         @blur="updateDate($event.target.innerHTML, 'without', row.item.id)"
         v-html="valueDigital(row.item.without)" />
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.without"></b-input> -->
           </template>
           <template #cell(percent)="row">
-
             <div
         contenteditable="true" @click.prevent.self 
         class="diveditable"
         @blur="updateDate($event.target.innerHTML, 'percent', row.item.id)"
         v-html="valueDigital(row.item.percent)" />
-
-            <!-- <b-input size="sm" :style="(row.item._rowVariant=='success')?rowColor:''" class="cForm-input" :value="row.item.percent" ></b-input> -->
           </template>
           <template #cell(show_details)="row">
             <b-link @click="row.toggleDetails"  style="text-decoration: none;font-weight: normal;">
@@ -146,8 +127,7 @@
           </template>
           <template #row-details="row">
             <div contenteditable="true" @blur="updateDate($event.target.innerHTML, 'desc', row.item.id)">{{row.item.desc}}</div>
-<!--             <div  :style="(row.item._rowVariant=='success')?rowColor:''" >{{row.item.desc}}</div>
- -->          </template>
+        </template>
         </b-table>
       </div>
       </b-col>
@@ -172,12 +152,6 @@ export default {
     }
   },
    computed: {
-    // newFields(){
-    //   return['#', this.$t('lists.position'), this.$t('customerDetail.name'), this.$t('lists.price')]
-    // },
-    // newFields1(){
-    //   return['#', this.$t('customerDetail.name'), 'i']
-    // },
     fields(){
       return[
       {
@@ -313,9 +287,6 @@ export default {
     hidePosition(){
       this.$refs.column.show()    
     },
-    // onClickOutside() {
-    //   this.$emit('onClickOutside')
-    // },
     loded(){
       setTimeout(() => {
         this.$emit('loded', 'component', this.$refs.heightTablePrice.clientHeight, 200)
@@ -363,20 +334,7 @@ export default {
         }
       })
     },
-     dragHandler(model, component, e) {
-    // console.log('dragHandler: ', model, component, e);
-     },
-     dragEnterHandler(model, component, e) {
-    //  console.log('dragEnterHandler: ', model, component, e);
-     },
-     dragLeaveHandler(model, component, e) {
-    // console.log('dragLeaveHandler: ', model, component, e);
-     },
-     dragOverHandler(model, component, e) {
-    // console.log('dragOverHandler: ', model, component, e);
-     },
     dragEndHandler(model, component, e) {
-    //console.log('dragEndHandler: ', model, component, e);
       this.drag1=model.id;
       axios.get('/change_parrent_menu', {
         params: {
@@ -389,7 +347,6 @@ export default {
       })
     },
     dropHandler(model, component, e) {
-    // console.log('dropHandler: ', model, component, e);
       this.drag2=model.id;
     }
   },

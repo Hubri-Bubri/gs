@@ -13,20 +13,12 @@ export default {
             backgroundColor: [color],
             borderWidth: 0,
             data: [this.datas[0]]
-            // data: [50]
         },
         {
             backgroundColor: ['yellow'],
             borderWidth: 0,
             data: [this.datas[1]]
-            // data: [50]
         }
-        //  { 
-        //     backgroundColor: ['yellow'],
-        //     borderWidth: 2,
-        //     data: [this.datas[2]]
-        //     // data: [50]
-        // }
         ]
     },{
     legend: { //hides the legend
@@ -35,15 +27,10 @@ export default {
        
 tooltips: {
       mode: false
-      // callbacks: {
-      //   title: function() {},
-      //   label: function() {}
-      // }
     },
   animation: {
           duration: 0
       },
-
       scales: {
          xAxes: [
                 {
@@ -89,20 +76,12 @@ tooltips: {
             backgroundColor: [color],
             borderWidth: 0,
             data: [this.datas[0]]
-            // data: [50]
         },
         {
             backgroundColor: ['yellow'],
             borderWidth: 0,
             data: [this.datas[1]]
-            // data: [50]
         }
-        //  { 
-        //     backgroundColor: ['yellow'],
-        //     borderWidth: 2,
-        //     data: [this.datas[2]]
-        //     // data: [50]
-        // }
         ]
     },{
     legend: { //hides the legend
@@ -110,10 +89,6 @@ tooltips: {
     },
 tooltips: {
       mode: false
-      // callbacks: {
-      //   title: function() {},
-      //   label: function() {}
-      // }
     },
   animation: {
           duration: 0

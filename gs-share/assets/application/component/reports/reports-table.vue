@@ -11,15 +11,13 @@
           <b-icon icon="arrow-up" font-scale="1" />
         </div>
       </b-link>
-  
-      <div
+        <div
         contenteditable
         class="diveditable"
         @click.prevent.self
         @blur="tableRename($event.target.innerText, table.id, table.report)"
         v-html="table.report"></div>
     </b-row>
-
         <div :id="'report'+table.id">
             <b-table hover :items="reports_list" :fields="fields" small stacked="lg"
         show-empty no-border-collapse >
@@ -37,7 +35,6 @@
             :id="'date'+row.item.id" />
           </template>
           <template #cell(service)="row">
-
           <div contenteditable="plaintext-only"
           style="width:100%;padding-left:4px;"
           @click.prevent.self
@@ -45,7 +42,6 @@
           $event.target.innerText, row.index, row.item.service)"
           :id="'service'+row.item.id"
           v-html="row.item.service" />
-
           </template>
           <template #cell(time)="row">
             <div
@@ -57,8 +53,6 @@
            X {{(row.item.workers!=null)?(row.item.workers.split(',').length):1}}
           </template>
           <template #cell(workers)="row">
-            <!-- <b-form-select class="text-center" :value="row.item.workers" :options="workers"
-            @change="sendDataTable(row.item.id, 'workers', $event)" /> -->
             <div v-if="(row.item.workers != 'Null')&row.item.workers != null">
               <div v-for="worker in row.item.workers.split(',')">
                 <span>{{worker}}</span><br>
@@ -85,15 +79,12 @@
 import axios from 'axios';
 export default {
     props: ['table', 'workers', 'selectedWorkers'],
-    
     data() {
         return {
           reports_list:[],
 	  stopTimmer:false,
           oldarray: [],
-          stopDis: false,
-          // window: {
-       
+          stopDis: false
         } //return
     }, //data
     computed: {
@@ -104,7 +95,6 @@ export default {
         label: '#',
         sortable: true,
         class:"cindex"
-        
       },
       {
         key: 'date',
@@ -136,7 +126,6 @@ export default {
         class:"cdel"
       }
     ]
-    
   },
     total: function() {
       return function(value) {
@@ -147,7 +136,6 @@ export default {
         return summa; //количество разрядов
       };
     },
-
     },
     methods: {
       tableRename(newVal, id, partName) {
@@ -174,7 +162,6 @@ export default {
         })
       }
     }, 
-
       selectAll(id){
     function selectElementContents(el) {
         var range = document.createRange();
@@ -193,17 +180,12 @@ export default {
       if (value == null){
         value = '0.0'
       }
-      // console.log(value)
-      // value = value.replace(',','.')
-      // console.log(1, value)
       var value = parseFloat(value)
-      // console.log(2, value)
       value = value.toString()
       value = value.replace('.',',')
       value = (value=='NaN')?0:value
       if (value.length < 3){
         value = '&nbsp;&nbsp;'+value
-        // console.log(4, value)
       }
       return value
     },
@@ -211,17 +193,11 @@ export default {
       var value = event.toString().replace(',','.');
       value = parseFloat(value);
       value = (value.toString()=='NaN')?0:value;
-      // console.log(value);
       this.sendDataTable(id, fild, value.toString(), index, old);
-
     },
-
-
       sendDataTable(id, fild, data, index, old){
         if (old!=data){
           data = (data=='')?'Null':data
-          // this.value.parts.reports_content.forEach((v)=>{
-              // if(v.id==id){
                     axios.get('/updateReportsList', {
                         params: {
                           id: id,
@@ -231,8 +207,6 @@ export default {
                           tableId:this.table.id
                         }
                     })
-              // }
-          // })
       }
       },
       delRow(id) {
@@ -260,7 +234,6 @@ export default {
   },
   mounted() {
     this.getRowsInReports(this.table.id);
-   
    }
 }
 </script>

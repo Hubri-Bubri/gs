@@ -67,46 +67,41 @@
             <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
             <b-table :items="items" :fields="getFields()" hover :filter="filter" :filter-included-fields="filterOn" stacked="lg"
             show-empty :busy="isBusy" @filtered="onFiltered" no-border-collapse  >
-
-              <!-- :busy="((items.length==0) && (selected.length!=0))" -->
               <template #cell(number)="it">
                 <b-link :to="'/project/detail/'+it.item.project_id" variant="primary">
                   {{it.item.number}}
                 </b-link>
               </template>
               <template #cell(insurance_number)="it">
-                <b-form-input disabled :state="null" type="text"  placeholder="Enter insurance name"
-                  @change="updateItem($event, 'insurance_number', it.item.id)"
-                  :disabled="disablefild('ofinsurance2', it.item.id)" :value="it.item.insurance_number"
-                  @focus.native="changeDisable('f', 'ofinsurance2', it.item.id)" size="sm"
-                  @blur.native="changeDisable('b', 'ofinsurance2', it.item.id)" :id="'ofinsurance2'+it.item.id"  />
+                <b-form-input  type="text"  placeholder="Enter insurance name"
+                  @change="updateItem($event, 'insurance_number', it.item.id, it.item.insurance_number)"
+                  :value="it.item.insurance_number"
+                   size="sm"
+                   :id="'ofinsurance2'+it.item.id"  />
               </template>
               <template #cell(date)="it">
-                <b-form-input disabled :disabled="disablefild('ofdate',  it.item.id)"
-                  type="date" @change="updateItem($event, 'date',  it.item.id)"
-                  :value="it.item.date" placeholder="Enter date"  
-                  @focus.native="changeDisable('f', 'ofdate',  it.item.id)"
-                  @blur.native="changeDisable('b', 'ofdate',  it.item.id)" :id="'ofdate'+ it.item.id" size="sm"/>
+                <b-form-input  
+                  type="date" @change="updateItem($event, 'date',  it.item.id, -1)"
+                  :value="it.item.date" placeholder="Enter date"                    
+                   :id="'ofdate'+ it.item.id" size="sm"/>
               </template>
               <template #cell(other)="it">
-                <b-form-input disabled :disabled="disablefild('ofother', it.item.id)" :state="null" type="text"
-                  @change="updateItem($event, 'other', it.item.id)"
+                <b-form-input  type="text"
+                  @change="updateItem($event, 'other', it.item.id, it.item.other)"
                   :value="it.item.other" placeholder="Enter number" size="sm"
-                  @focus.native="changeDisable('f', 'ofother', it.item.id)"
-                  @blur.native="changeDisable('b', 'ofother', it.item.id)" :id="'ofother'+it.item.id" />
+                   :id="'ofother'+it.item.id" />
               </template>
               <template #cell(place)="it">
-                <b-form-input disabled type="text"  :disabled="disablefild('ofplace', it.item.id)" 
-                  @change="updateItem($event, 'place', it.item.id)"
+                <b-form-input  type="text"  
+                  @change="updateItem($event, 'place', it.item.id, it.item.place)"
                   :value="it.item.place" placeholder="Enter place" 
-                  @focus.native="changeDisable('f', 'ofplace', it.item.id)"
-                  @blur.native="changeDisable('b', 'ofplace', it.item.id)" :id="'ofplace'+it.item.id" size="sm"/>
+                  :id="'ofplace'+it.item.id" size="sm"/>
               </template>
               <template #cell(work)="it">
-                <b-form-select size="sm" :value="detectOfWork(it.item.work)" :options="works"  @change="updateItem($event, 'work', it.item.id)" />
+                <b-form-select size="sm" :value="detectOfWork(it.item.work)" :options="works"  @change="updateItem($event, 'work', it.item.id, detectOfWork(it.item.work))" />
               </template>
               <template #cell(status_set)="it">
-                <b-form-select size="sm" v-model="it.item.status_set" @change="updateItem($event, 'status_set', it.item.id)"
+                <b-form-select size="sm" :value="it.item.status_set" @change="updateItem($event, 'status_set', it.item.id, it.item.status_set);it.item.status_set=$event"
                 :style="computeStyleOffer(it.item.status_set)">
                   <option v-for="opt in options" :style="computeStyleOffer(opt.text)">
                     {{opt.text}}
@@ -151,33 +146,6 @@ export default {
       rowId:null,
       amount:null,
       looks: [],
-
-      // options: [
-      // {
-      //   value: 'Open',
-      //   text: 'Open'
-      // },
-      // {
-      //   value: 'Done',
-      //   text: 'Done'
-      // },
-      // {
-      //   value: 'Invoice',
-      //   text: 'Invoice'
-      // },
-      // {
-      //   value: 'Desiccation',
-      //   text: 'Desiccation'
-      // },
-      // {
-      //   value: 'Leakage_Detection',
-      //   text: 'Leakage Detection'
-      // },
-      // {
-      //   value: 'Restoration',
-      //   text: 'Restoration'
-      // }
-      // ],
       totalRows: 1,
       filter: null,
       filterOn: []
@@ -211,23 +179,6 @@ export default {
       var currentDate = `${year}-${month}-${day}`;
       return currentDate
     },
-    // calendar(){
-    //   return {'de':{
-    //                       labelPrevDecade: this.$t('calendar.labelPrevDecade'),
-    //                       labelPrevYear: this.$t('calendar.labelPrevYear'),
-    //                       labelPrevMonth: this.$t('calendar.labelPrevMonth'),
-    //                       labelCurrentMonth: this.$t('calendar.labelCurrentMonth'),
-    //                       labelNextMonth: this.$t('calendar.labelNextMonth'),
-    //                       labelNextYear: this.$t('calendar.labelNextYear'),
-    //                       labelNextDecade: this.$t('calendar.labelNextDecade'),
-    //                       labelToday: this.$t('calendar.labelToday'),
-    //                       labelSelected: this.$t('calendar.labelSelected'),
-    //                       labelNoDateSelected: this.$t('calendar.labelNoDateSelected'),
-    //                       labelCalendar: this.$t('calendar.labelCalendar'),
-    //                       labelNav: this.$t('calendar.labelNav'),
-    //                       labelHelp: this.$t('calendar.labelHelp')}}
-            
-    // },
     typesForTablesOpt(){
       return [
         this.$t('states.done')
@@ -238,24 +189,13 @@ export default {
     },
     fieldsTable() {
       return [
-      // {
-      //   key: 'id',
-      //   label: this.$t('fields.id'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
       {
         key: 'number',
         label: this.$t('fields.contract'),
         sortable: true,
         variant: 'default'
       },
-      // {
-      //   key: 'number',
-      //   label: this.$t('fields.number'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
+
       {
         key: 'insurance_number',
         label: this.$t('edit.insurance'),
@@ -292,122 +232,10 @@ export default {
         sortable: true,
         variant: 'default'
       }
-      // {
-      //   key: 'type',
-      //   label: this.$t('fields.type'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'tax',
-      //   label: this.$t('fields.tax'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'taxDub',
-      //   label: this.$t('fields.taxDub'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'taxP',
-      //   label: this.$t('fields.taxP'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'taxPDub',
-      //   label: this.$t('fields.taxPDub'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'disc',
-      //   label: this.$t('fields.disc'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'discP',
-      //   label: this.$t('fields.discP'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'butDiscPerc',
-      //   label: this.$t('fields.butDiscPerc'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'addtaxColapse',
-      //   label: this.$t('fields.addtaxColapse'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'dateEvent',
-      //   label: this.$t('fields.dateEvent'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'dateInspect',
-      //   label: this.$t('fields.dateInspect'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'ExamWorker',
-      //   label: this.$t('fields.ExamWorker'),
-      //   sortable: true,
-      //   variant: 'default'
-      // },
-      // {
-      //   key: 'insurname',
-      //   label: this.$t('fields.insurname'),
-      //   sortable: true,
-      //   variant: 'default'
-      // }
       ]
     }
   },
   methods: {
-    changeDisable(type_operation, fild, id){
-      this.stopDis=(type_operation=='f')
-        axios.get('/changeDisableTable', {
-          params: {
-            type_operation: type_operation,
-            fild: fild,
-            id: id,
-            'user': this.$security.account['first_name']+'_'+this.$security.account['second_name']
-          }
-        })
-        if (type_operation == 'f'){
-          setTimeout(()=>{
-          }, 15000);
-        }
-    },
-    getLoocks(){
-       axios.get('/getLoocks').then(response => {
-          this.looks=[]
-          this.looks = response.data
-      })
-    },
-    disablefild(fild, id){
-      var result = false
-      this.looks.forEach((val)=>{
-        if (val.rows_id == id) {
-          if (val.fild == fild) {
-            result = true
-          }
-        }
-      })
-      if (this.stopDis==true) result = false
-      // if (this.type=='Invoices') result = true
-      return result
-    },
     get_type_works(){
       axios.get('/get_type_works', {
       }).then(response => {
@@ -434,15 +262,20 @@ export default {
           };
       }
     },
-    updateItem(val, type, id){
-      axios.post('/update_item_from_project', 
-        {
-          val: val,
-          type: type,
-          id: id
-        }
-      ).then(response => {})
-    },
+
+
+		updateItem(val, type, id, old) {
+      if (old != val) {
+        axios.get('/update_item_from_project', {
+          params: {
+            val: val,
+            type: type,
+            id: id
+          }
+        })
+      }
+		},
+
     countDigitals(val){
       var nuls=3-val.toString().length
       for (var i = 0; i <= nuls; i++) {
@@ -530,17 +363,9 @@ export default {
   },
   mounted(){
     this.totalRows = this.items.length
-    setTimeout(() => {
-      this.get_type_works()
-      this.$socket.send('getContracts')
-      this.$options.sockets.onmessage = (data) => (data.data=='getContracts') ? this.getContracts('1|0000-00-00|0000-00-00'): ''
-      this.$options.sockets.onmessage = (data) => (data.data=='getLoocks') ? (this.getLoocks()): ''
-    },1000);
+    this.get_type_works()
+    this.getContracts('1|0000-00-00|0000-00-00')
+    this.$options.sockets.onmessage = (data) => (data.data=='getContracts') ? this.getContracts('1|0000-00-00|0000-00-00'): ''
   }
 }
 </script>
-<style type="text/css">
-/*  .cardFooterBorder{
-    border-top: 1px solid #000!important;
-  }*/
-</style>

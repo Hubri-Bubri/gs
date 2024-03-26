@@ -25,11 +25,7 @@
         :idNode="idNodeDev"
         :parId="parIdDev"
         disableDBClick
-        @drag="dragHandler"
-        @drag-enter="dragEnterHandler"
         @current-node-clicked="curNodeClicked"
-        @drag-leave="dragLeaveHandler"
-        @drag-over="dragOverHandler"
         @drag-end="dragEndHandler"
         @drop="dropHandler">
         </vue-drag-tree>                              
@@ -297,9 +293,6 @@ export default {
     hidePosition(){
       this.$refs.column.show()    
     },
-    // onClickOutside() {
-    //   this.$emit('onClickOutsideDev')
-    // },
     loded(){
       setTimeout(() => {
         this.$emit('loded', 'component', this.$refs.heightTableDevice.clientHeight, 200)
@@ -307,19 +300,14 @@ export default {
     },
     allowDrag(model, component) {
       if (component.depth!=1){
-      // if (model.name === 'Node 0-1') {
-      // can't be dragged
         return true;
       }
-      // can be dragged
       return false;
     }, 
     allowDrop(model, component) {
       if (component.depth==1){
-        // can't be placed
         return true;
       }
-      // can be placed
       return false;
     },
     allowDragModal(model, component) {
@@ -352,20 +340,7 @@ export default {
         }
       })
     },
-    dragHandler(model, component, e) {
-    // console.log('dragHandler: ', model, component, e);
-    },
-    dragEnterHandler(model, component, e) {
-    //    //  console.log('dragEnterHandler: ', model, component, e);
-    },
-    dragLeaveHandler(model, component, e) {
-    // console.log('dragLeaveHandler: ', model, component, e);
-    },
-    dragOverHandler(model, component, e) {
-    // console.log('dragOverHandler: ', model, component, e);
-    },
     dragEndHandler(model, component, e) {
-    //console.log('dragEndHandler: ', model, component, e);
       this.drag1=model.id;
       axios.get('/change_parrent_menu_devices', {
         params: {
@@ -378,7 +353,6 @@ export default {
       })
     },
     dropHandler(model, component, e) {
-    // console.log('dropHandler: ', model, component, e);
       this.drag2=model.id;
     }
   },mounted(){

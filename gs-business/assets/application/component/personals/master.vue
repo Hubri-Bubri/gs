@@ -60,7 +60,6 @@
       </b-form-select>
       <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[$t('company.copy'), $t('company.move')]" />
       <template slot="modal-footer">
-<!--             <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>-->
         <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button> 
       </template>
     </b-modal>
@@ -84,11 +83,7 @@
                         :idNode="idNode"
                         :parId="parId"
                         disableDBClick
-                        @drag="dragHandler"
-                        @drag-enter="dragEnterHandler"
                         @current-node-clicked="curNodeClicked"
-                        @drag-leave="dragLeaveHandler"
-                        @drag-over="dragOverHandler"
                         @drag-end="dragEndHandler"
                         @drop="dropHandler">
                         </vue-drag-tree>  
@@ -242,7 +237,7 @@
 
 <b-container v-if="(addFactoryButton==false) && (details.id!=null)">
 <b-row fluid>
-{{test(details, optionsForFactory)}}
+
 <b-container :key="block.id" class="border-bottom" style="padding:7px;"
 v-for="(block, inc) in parseInt(details.content.length/optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds.length)">
  
@@ -365,25 +360,12 @@ details.id
                                 :menuDocsTree="menuDocsTree"
                                 @filedel="filedel"
                                 @updatefilename="updatefilename"
-                                @changeDisable="changeDisable"
                                 @loadDocToFrame="ploadDocToFrame"
                                 @onClickOutsideDoc="menuDocsTree=false"
                                 @curNodeClickedDoc="pcurNodeClickedDoc"
                                 @rowSelectedDoc="prowSelectedDoc"
                                 />
                                 </container-body>
-<!--                                 <b-container  fluid>
-                                    <b-collapse v-model="dropDoc" id="dropDoc3">
-                                        <vue-dropzone ref="myVueDropzone3" id="dz3" :options="dropzoneOptions" v-on:vdropzone-sending="sendingEvent" v-on:vdropzone-success="fsadd3">
-                                        </vue-dropzone>
-                                    </b-collapse>
-                                    <div style="background-color:#ced4da">
-                                        <b-link class="input-group-text lablelInInput" style="text-decoration: none;font-weight: normal; With:100%" @click="dropDoc=dropDoc?false:true">
-                                            <span class="when-closed"><i style="font-size:14px;color:#fecb53;" class="fa fa-folder" aria-hidden="true"></i></span>
-                                            <span class="when-opened"><i style="font-size:14px;color:#fecb53;" class="fa fa-folder-open" aria-hidden="true"></i></span>
-                                        </b-link>
-                                    </div>
-                                </b-container> -->
 
                 <container-footer style="z-index:2">
                   <b-collapse v-model="dropDoc" id="dropDoc3">
@@ -418,20 +400,6 @@ details.id
                           <container>
                             <container-body  style="overflow-x: hidden;" ref="images">
 
-<!--                              <images
-                             :domageImages="domageImages"
-                             :fieldsImages="fieldsImages"
-                             :selectedDamageImages="selectedDamageImages"
-                             :optImages="optImages"
-                             @resetFilds="presetFilds"
-                             @chvalueimages="pchvalueimages"
-
-                             @updatefilename="updatefilename"
-
-                             @showx="showx"
-                             @filedel="filedel"
-
-                             ></images> -->
 
                  <images
                   :domageImages="responseImages"
@@ -450,19 +418,7 @@ details.id
                   ></images>
 
                             </container-body>
-<!--                              <b-container fluid>
-                                    <b-collapse id="dropImage2"  v-model="dropImage" >
-                                        <vue-dropzone ref="myVueDropzone2" id="dz2" :options="dropzoneFiles" v-on:vdropzone-sending="sendingEvent" v-on:vdropzone-success="fsadd2">
-                                        </vue-dropzone>
-                                    </b-collapse>
-                             <b-input-group>
-                                        <b-link class="input-group-text form-control lablelInInput" style="border-radius:0px;text-decoration:none;font-weight:normal;background-color:#ced4da;" @click="dropImage=dropImage?false:true">
-                                            <span class="when-closed"><i style="font-size:14px;color:#fecb53;" class="fa fa-folder" aria-hidden="true"></i></span>
-                                            <span class="when-opened"><i style="font-size:14px;color:#fecb53;" class="fa fa-folder-open" aria-hidden="true"></i></span>
-                                        </b-link>
- 
-                               </b-input-group>
-                                </b-container> -->
+
 
 
               <container-footer style="z-index:2">
@@ -489,7 +445,6 @@ details.id
 </template>
 
 <script>
-// import io from 'socket.io-client';
 import axios from 'axios';
 import {
     VueEditor,
@@ -507,21 +462,10 @@ export default {
 
                       customToolbar: [
                       [{ list: "check" }],
-                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-                // ['blockquote', 'code-block'],
-                // [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-                // [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                // [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-                // [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-                // [{ 'direction': 'rtl' }],                         // text direction
-                // [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-                // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-                // [{ 'font': [] }],
+                ['bold', 'italic', 'underline', 'strike'],        
+                [{ 'color': [] }, { 'background': [] }],   
                 [{ 'align': [] }],
-                // ['clean']                                         // remove formatting button
               ], 
-
                 idNodeFile:-1,
                 docs_menu_ids:[],
                 itemsMenuDoc:[],
@@ -540,18 +484,10 @@ export default {
                 dropDoc:true,
                 selectedOptFactory:null,
                 optionsForFactory:[
-                    // {name:'Bank details', rows: ['Bank Code', 'Bank Name', 'Account Number', 'BIC', 'IBAN']},
-                    // {name:'type1', test2:'test2'},
-                    // {name:'type3', test3:'test3'}
+
                 ],
 
                 files:[],
-
-            // dropzoneOptions: {
-            //     url: '/loadFilesToCompany',
-            //     thumbnailWidth: 50,
-            //     parallelUploads: 20
-            // },
 
       dropzoneFiles: {
         url: '/loadFilesToCompany',
@@ -837,118 +773,7 @@ export default {
         }, 20);
       })                      
     },
-//         docs2files() {
-//             var retArr = []
-//             var retArrs = []
-//             var withOutGroup = []
-//             var addgroup = []
-//             var files1
-//             var files = []
-//             var retArr = []
-//             var uniqueArray 
-//             var gallery 
 
-
-//                     axios.get('/filesToCompany', {
-//                     params: {
-//                         id: '0016-2022'
-//                     }
-//                 }).then(response => {
-
-
-
-// var mergedArr=[{'id':52},{'id':56},{'id':60},{'id':88},{'id':97},{'id':148},{'id':149},{'id':157}]
-// this.files = (this.files != response.data)?response.data:this.files
-// var addFiles = []
-// mergedArr.forEach((item)=>{
-
-
-//           var filesarr = response.data
-
-//           //this.$delete(filesarr, filesarr.length-1)
-//                   files = this.files.filter(function(val) {
-//                   var ret
-//                   filesarr.forEach((v)=>{
-//                   ret = 1
-//                    if (val.name.split('.')[val.name.split('.').length-1] == 'pdf') {
-//                     if(v.parts!=undefined){
-//                       if (val.group.split(',').length>1){
-//                         ret = 0
-//                         var subval = []
-//                         val.group.split(',').forEach((valGroup)=>{
-//                           subval = JSON.parse(JSON.stringify(val))
-//                           subval.group = valGroup
-//                           if(subval.group==v.parts.id){
-//                             subval.group = v.parts.part_name + ' from ' + item.type
-//                             addFiles.push(subval)
-//                           }
-//                         })
-//                       } 
-//                       if(ret == 1) {
-//                         if(val.group==v.parts.id){
-//                           val.group = v.parts.part_name + ' from ' + item.type
-//                         }  
-//                       }
-                      
-//                     }
-//                   }
-//                   })
-//                  if (ret == 1) {return val.name.split('.')[val.name.split('.').length-1] == 'pdf'}
-//                   })
-//                   addgroup = []
-//                   if(addFiles.length!=0) files = files.concat(addFiles)
-//                   files1 = files.filter((file, i) => {
-                  
-//                   if (file.name.split('.')[file.name.split('.').length-1] != 'pdf') {
-//                     if (file.group) {
-//                         file.group.split(',').forEach((g) => {
-//                             addgroup.push(this.partx[g].parts.part_name)
-//                         })
-//                     }
-//                     if (addgroup.join(', ')) {
-//                         file.name = file.name + ': ' + addgroup.join(', ')
-//                     }
-//                   return file
-//                   }
-//                   })
-
-
-
-
-//                 if(this.responseFiles.length != files.length) //хотя лучше элименты сравнить, что бы не закрывался фрейм с пдф
-//                 {
-//                 this.responseFiles  = files
-//                 }
-
-                
-       
-
-
-            
-//                  })
-//         })
-
-
-//         },
-
-
-    // getFilesPersonal(id){
-    //     // console.log(id)
-    //    axios.get('/domage_images_company', {
-    //       params: {
-    //         id: id
-    //       }
-    //     }).then(response => {
-
-
-    //     this.responseFiles = response.data.filter(function (v){
-    //       if(v.name != undefined){
-    //         if((v.name.split('.')[v.name.split('.').length-1]) == 'pdf'){ return v}
-    //       }
-    //     })
-
-    //     })
-    //   },
 getFilesPersonal(id){
       axios.get('/docs_personal_menu', {
         params: {
@@ -986,7 +811,6 @@ getFilesPersonal(id){
             id: id
           }
         }).then(response => {
-          // console.log(id, response.data)
           this.responseFiles = response.data.filter(function (v){
             if(v.name != undefined){
               if((v.name.split('.')[v.name.split('.').length-1]) == 'pdf'){ return v}
@@ -1000,22 +824,6 @@ getFilesPersonal(id){
         })
       })
     },
-
-    // getdomageImages(id){
-    //    axios.get('/domage_images_company', {
-    //       params: {
-    //         id: id
-    //       }
-    //     }).then(response => {
-
-    //     this.domageImages = response.data.filter(function (v){
-    //       if(v.file_name != undefined){
-    //         if((v.file_name.split('.')[v.file_name.split('.').length-1]) != 'pdf'){ return v}
-    //       }
-    //     })
-
-    //     })
-    //   },
 
 
       butifsel(){
@@ -1049,11 +857,9 @@ pimageInTableSelected(item){
         this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].thClass=''
         this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].thClass=''
         this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].thClass=''
-        // this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'group')].thClass=''
         this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'date')].tdClass=''
         this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'file_name')].tdClass=''
         this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'user')].tdClass=''
-        // this.fieldsImages[this.fieldsImages.findIndex(x => x.key == 'group')].tdClass=''
         this.domageImages.forEach((v)=>{
           v._rowVariant=''
         })
@@ -1085,16 +891,6 @@ console.log(this.groupByFild(this.selectedDamageImages))
         },
         sendingEvent(file, xhr, formData) {
 
-            // var id
-            // if (this.idNode != null) {
-            //     id = this.idNode
-            //     if (this.details.id != null) {
-            //         if (this.details.id != null) {
-            //             id = 'personal-' + this.details.id
-            //         }
-            //     }
-            // }
-
 
       xhr.setRequestHeader('X-Number', this.details.id);
       xhr.setRequestHeader('X-Folder', this.idNodeFile);
@@ -1119,39 +915,8 @@ console.log(this.groupByFild(this.selectedDamageImages))
                  }
         })
     },
-    // updatedocname(val, type, id){
-    //     axios.get('/updatedocname', {
-    //           params: {
-    //                val: val,
-    //                type: type,
-    //                id: id
-    //              }
-    //     })
-    // },
- // updatefilenames(val, type, id){
- //        axios.get('/updatefilenames', {
- //              params: {
- //                   val: val,
- //                   type: type,
- //                   id: id
- //                 }
- //        })
- //    },
-      changeDisable(type_operation, fild, id){
-        this.stopDis=(type_operation=='f')
-        axios.get('/changeDisableTable', {
-          params: {
-            type_operation: type_operation,
-            fild: fild,
-            id: id,
-            'user': this.$security.account['first_name']+'_'+this.$security.account['second_name']
-          }
-        })
-        if (type_operation == 'f'){
-          setTimeout(()=>{
-          }, 15000);
-        }
-},
+
+
         ploadDocToFrame(row) {
             row.toggleDetails();
             var index = row.index;
@@ -1162,30 +927,21 @@ console.log(this.groupByFild(this.selectedDamageImages))
             }
         },
 
-test(details, optionsForFactory){
-// console.log(parseInt(details.content.length/optionsForFactory[optionsForFactory.findIndex(x => x.id == details.option)].filds.length))
-},
+
     blocks(arr, l, befor){
         befor = befor + 1
         var retArr=[]
 
         for (var i = (l*befor)-l; i < (l*befor); i++) {
-            // console.log(i, l, befor)
             retArr.push(arr[i])
         }
         return retArr
-            // if (index<l){
-
-            //     return(v)
-            // }
 
     },
     getDataTamplate(v, type, i){
 
     var x = i
-    // if(i, i>=v.length){
-    //     x = i%v.length
-    // }
+
         if (v[x]!=undefined){
             return v[x][type]
         }
@@ -1241,13 +997,7 @@ test(details, optionsForFactory){
             })
     },
 
-
-
-
-
-
     addContactInPerson(fild, action, index){
-        // console.log(fild, action, index)
         if (action=='+'){
             this.details[fild].push({[fild]:''})
         } else{
@@ -1264,7 +1014,6 @@ test(details, optionsForFactory){
         }
     },
     editContactInPerson(fild, value){
-        // delete this.$options.sockets.onmessage;
         var sendArr=[]
         value.forEach((v)=>{
             sendArr.push(v[fild])
@@ -1278,34 +1027,17 @@ test(details, optionsForFactory){
                 }
         })
     },
-        // updateCustomerAfter(){
-        //            this.$options.sockets.onmessage = (data) => (data.data=='getPersonal') ? this.getPersonal(): ''
-
-        // },
-
-
-
-
+    
        inItemGetData(item){
-        // console.log(item)
-            // this.addFactoryButton?'part':'factory'
+       
             this.details = item,
-            // axios.get('/files', {
-            // params: {
-            //     id: 'personal-'+this.details.id
-            // }
-            // }).then(response => {
-            //     this.filesPersonal = response.data
-            // })
-            // this.getdomageFiles('personal-'+this.details.id)
-            // this.getdomageImages('personal-'+this.details.id)
+          
             this.getFilesPersonal(this.details.id)
 
 
        },
        getPersonal(){
         this.items = [] 
-        // console.log(this.idNode);
         if (this.idNode!=null){
             axios.get('/personals', {
                 params: {
@@ -1313,14 +1045,10 @@ test(details, optionsForFactory){
                     type: this.addFactoryButton?'part':'factory'
                 }
             }).then(response => {
-              // console.log('start personals')
                 if (this.addFactoryButton==true){
                  
                 this.items = response.data.filter((v, i)=>{
-                  // console.log('personals', v)
-                    // if(this.items.length!=0){
-                    //     this.items[i].mail=['']
-                    // }
+                
                     v.mail =  (v.mail[0]==undefined)?[{mail:''}]:v.mail
                     v.phone =  (v.phone[0]==undefined)?[{phone:''}]:v.phone
                     v.fax =  (v.fax[0]==undefined)?[{fax:''}]:v.fax
@@ -1337,7 +1065,6 @@ test(details, optionsForFactory){
                 this.items = response.data
                 axios.get('/get_templates_for_factory')
                     .then(response=>{
-                      // console.log('addFactoryButton', response.data)
                         this.optionsForFactory=response.data
                     }
                 )
@@ -1350,23 +1077,8 @@ test(details, optionsForFactory){
                     })
                 }
             }
-            // console.log(response.data)
             })
-            // if (this.details!=null){
-            //         this.items.forEach((v)=>{
-            //         if(v.id == this.details.id){
-            //             this.details = v,
-            //             axios.get('/files', {
-            //             params: {
-            //                 id: 'personal-'+this.details.id
-            //             }
-            //             }).then(response => {
-            //                 this.filesPersonal = response.data
-            //             })
-            //         }
-            //     })
-                
-            // }
+         
         }
         axios.get('/personal_menu').then(response => {
             this.items_menu=[];
@@ -1404,31 +1116,21 @@ test(details, optionsForFactory){
                     }
                 }
             }
-            
-    // this.getdomageFiles(id)
-    // this.getdomageImages(id)
-
-
-
-          
+             
 
         },
     
     allowDrag(model, component) {
       if (model.name === 'Node 0-1') {
-        // can't be dragged
         return false;
       }
-      // can be dragged
       return true;
     },
     
     allowDrop(model, component) {
       if (model.name === 'Node 2-2') {
-        // can't be placed
         return false;
       }
-      // can be placed
       return true;
     },
      allowDragModal(model, component) {
@@ -1438,17 +1140,7 @@ test(details, optionsForFactory){
     allowDropModal(model, component) {
         return false;
     },   
-    // curNodeClicked(model, component) {
-    //     this.addFactoryButton = (model.type!='factory'),
-    //     this.nameNode = model.name,
-    //     this.idNode = model.id,
-
-
-    //     this.details.id=null
-    // },
-
-
-
+ 
 curNodeClicked(model, component) { 
     this.addFactoryButton = (model.type!='factory'),
         this.nameNode = model.name,
@@ -1458,31 +1150,16 @@ curNodeClicked(model, component) {
 
         this.getPersonal()
 
-        // this.getdomageFiles(model.id)
-        // this.getdomageImages(model.id)
-
-        // console.log(this.idNode == this.oldId)
-        // console.log(this.idNode, this.oldId)
-        // if(this.idNode == this.oldId){
-        //      if (this.items.length>0){
-        //         this.items=[]
-        //     } 
-        // }
-        // this.oldId = this.idNode
-        // if ((model.parrent == 0) && component.folder == false){
-        //     this.idNode = null
-        // }
+     
     },
 
     curNodeClickedModal(model, component){
-        // console.log('!!!'),
         this.idNodeModal=model.id
     },
     toModel(enterVal){
         function findLevel(obj, id) {
             obj.forEach((val)=>{
                 if (val.id==id){
-                    //val.name=enterVal
                     axios.get('/update_name_personal_menu', {
                         params: {
                             name: enterVal,
@@ -1603,7 +1280,6 @@ curNodeClicked(model, component) {
         }
     },
     updateDate(data, fild, id, type){
-// delete this.$options.sockets.onmessage;
         axios.get('/update_personal', {
             params: {
                 data: data,
@@ -1687,27 +1363,9 @@ curNodeClicked(model, component) {
              })
         }
     },
-     dragHandler(model, component, e) {
-    
-    //    // console.log('dragHandler: ', model, component, e);
-     },
-    
-     dragEnterHandler(model, component, e) {
-    //    //  console.log('dragEnterHandler: ', model, component, e);
-     },
-    
-     dragLeaveHandler(model, component, e) {
-    //    // console.log('dragLeaveHandler: ', model, component, e);
-     },
-    
-     dragOverHandler(model, component, e) {
-    //    // console.log('dragOverHandler: ', model, component, e);
-     },
-    
+     
     dragEndHandler(model, component, e) {
-        //console.log('dragEndHandler: ', model, component, e);
         this.drag1=model.id;
-        // console.log(this.drag1, this.drag2, this.items_menu);
         var type=[]
         function findLevel(obj, id, i) {
             obj.forEach((val)=>{
@@ -1742,7 +1400,6 @@ curNodeClicked(model, component) {
     },
     
     dropHandler(model, component, e) {
-       // console.log('dropHandler: ', model, component, e);
         this.drag2=model.id;
     }
   },
@@ -1750,11 +1407,10 @@ curNodeClicked(model, component) {
     
 
       mounted(){
-        setTimeout(() => {
-        this.$socket.send('getPersonal')
+        this.getPersonal()
         this.$options.sockets.onmessage = (data) => (data.data=='getPersonal') ? this.getPersonal(): ''
-        this.$options.sockets.onmessage = (data) => (data.data=='getPersonalFiles') ? (this.getFilesPersonal(this.details.id)):'';
-        },1000);
+        this.$options.sockets.onmessage = (data) => (data.data=='getPersonalFiles') ? (this.getFilesPersonal(this.details.id)):''
+
         }
 
     }

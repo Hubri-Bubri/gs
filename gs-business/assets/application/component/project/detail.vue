@@ -1,18 +1,5 @@
 <template>
   <container>
-    <!-- <input
-      ref="unfocus"
-      style="
-        width: 0px;
-        height: 0px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        margin: 0;
-        padding: 0;
-        border: 0;
-      ":windowPrint="windowPrint"
-    /> -->
     <print ref="print"
     :tmp="tmp"
     :pid="id"
@@ -514,7 +501,6 @@
                       @showCommetnts="showCommetnts()"
                     >
                     </project>
-                    <!-- :looks="looks" -->
                   </b-container>
                 </container-body>
               </container>
@@ -540,10 +526,6 @@
                 </container-body>
                 <container-footer style="overflow: hidden">
                   <b-input-group>
-                    <!-- <b-button
-                      @click="addPrice"
-                      >{{$t('projectDetail.plusPart')}}</b-button
-                    > -->
                     <b-button
                       @click="removePrice"
                       >{{$t('projectDetail.remove')}}</b-button
@@ -643,7 +625,6 @@
                     @getDocs="getDocs()"
                   >
                   </docs>
-                  <!-- @changeDisable="changeDisable" -->
                 </container-body>
                 <container-footer style="z-index: 2">
                   <b-collapse v-model="dropDoc" id="dropDoc3">
@@ -818,7 +799,6 @@
         <b-card no-body class="gs-container" :style="heightEditforSm">
           <b-tabs card v-model="dubTabIndex">
             <b-tab ref="Edit">
-              <!-- !{{tmp.typeOfHead}}! -->
               <template #title>
                 {{tmp.type?$t('oneCountAlret.'+tmp.type):$t('fields.other')}}
               </template>
@@ -841,32 +821,6 @@
                     @openWindowPrint="openWindowPrint"
 					@worker="worker"
                   ></edit>
-
-                  <!-- 
-                    :selectedCornty="selectedCornty"
-                    :selectPerson="selectPerson"
-                    :selectCustomer="selectCustomer"
-                    :person="person"
-                    :customer="customer"
-                    :comments="comments"
-                    :windowPrint="windowPrint"
-                  :selectedDocsList="selectedDocsList"
-                  :addPdfs="addPdfs"
-                  :makemodalpdf="makemodalpdf"
-                  :typeDocsList="typeDocsList"
-                   @loded="loded"
-                  @selectedDocs="selectedDocs"
-                  @addPdf="addPdf"
-                    @printPdf="printPdf"
-                    @preview="preview"
-                    @printOffer="printOffer"
-                    @worker="worker"
-                    @hideWindowPrint="hideWindowPrint" -->
-                  <!-- :funcStop="funcStop" -->
-                  <!-- @tabletopartx="tabletopartx" -->
-                  <!-- :rowsBusy="rowsBusy" -->
-                  <!-- :rowsLoading="rowsLoading" -->
-                  <!-- :partx="partx" -->
                 </container-body>
                 <container-footer
                   v-if="(generalComments==false)"
@@ -937,18 +891,6 @@
                     >
                     </b-icon>
                   </b-iconstack>
-                  <!-- <span
-                    v-show="(disablefildUser('refCommentOfTable', tmp.id)!='you')"
-                    style="
-                      position: relative;
-                      left: 30px;
-                      top: 36px;
-                      width: 18px;
-                      z-index: 2;
-                    "
-                    v-if="(openEditor==true)"
-                    >{{disablefildUser('refCommentOfTable', tmp.id)}}</span
-                  > -->
                   <vue-editor
                     :value="tmp.comment"
                     :editorToolbar="customToolbar"
@@ -986,65 +928,6 @@
               <template #title> {{$t('projectDetail.devices')}} </template>
               <container>
                 <container-body>
-                  <!-- <edevices
-                    :tmp="tmp"
-                    :project="project"
-                    :selectedCornty="selectedCornty"
-                    :id="id"
-                    :workers="workers"
-                    :customer="customer"
-                    :person="person"
-                    :selectCustomer="selectCustomer"
-                    :selectPerson="selectPerson"
-                    :selectedWorkers="selectedWorkers"
-                    :selectedDocsList="selectedDocsList"
-                    :windowPrint="windowPrint"
-                    :addPdfs="addPdfs"
-                    :makemodalpdf="makemodalpdf"
-                    :typeDocsList="typeDocsList"
-                    @selectedDocs="selectedDocs"
-                    @addPdf="addPdf"
-                    @addPdfSep="addPdfSep"
-                    @printPdf="printPdf"
-                    @preview="preview"
-                    @printOffer="printOffer"
-                    @hideWindowPrint="hideWindowPrint"
-                    ref="edeviceList"
-                    v-if="true"
-                  ></edevices> -->
-
-<!-- 
-
-                  'value',
-    'workers',
-    'selectedDocsList',
-    'addPdfs',
-    'makemodalpdf',
-    'typeDocsList',
-    'windowPrint',
-    'pid',
-    'selectedCornty',
-    'project',
-    'tmp',
-    'comments',
-    'account',
-    'disc',
-    'discP',
-    'tax',
-    'taxDub',
-    'taxP',
-    'taxPDub',
-    'netto',
-    'brutto',
-    'butDiscPerc',
-    'head',
-    'addtaxColapse',
-    'id',
-    'customer',
-    'person',
-    'selectCustomer',
-    'selectPerson' -->
- 
                   <devices-table-group
                     :project="project"
                     :pid="id"
@@ -1054,27 +937,6 @@
                     @switchDevices="switchDevices"
                     ref="edeviceList"
                     ></devices-table-group>
-                    <!-- @worker="worker" -->
-                    <!-- :selectedCornty="selectedCornty"
-                    :works="works"
-                    :selectedWorkers="selectedWorkers" -->
-                    <!-- @printPdf="printPdf"
-                    @hideWindowPrint="hideWindowPrint"
-                    :customer="customer"
-                    :person="person"
-                    :selectCustomer="selectCustomer"
-                    :selectPerson="selectPerson"
-                    :comments="comments"
-                    :windowPrint="windowPrint"
-                    :account="$security.table.account" -->
-                    <!-- :makemodalpdf="makemodalpdf" -->
-                    <!-- @addPdf="addPdf" -->
-                    <!-- :addPdfs="addPdfs" -->
-                    <!-- @preview="preview" -->
-                    <!-- :typeDocsList="typeDocsList" -->
-                    <!-- :selectedDocsList="selectedDocsList" -->
-                    <!-- @selectedDocs="selectedDocs" -->
-                    <!-- @addPdfSep="addPdfSep" -->
                 </container-body>
               </container>
             </b-tab>
@@ -1091,24 +953,6 @@
                     @openWindowPrint="openWindowPrint"
                     @switchDamages="switchDamages"
                     ref="damageList"></damages-table-group>
-                    <!-- :selectedCornty="selectedCornty"
-                    :customer="customer"
-                    :person="person"
-                    :selectCustomer="selectCustomer"
-                    :selectPerson="selectPerson"
-                    :selectedWorkers="selectedWorkers" -->
-                    <!-- :makemodalpdf="makemodalpdf"
-                    @addPdfSep="addPdfSep"
-                    @printPdf="printPdf"
-                    @hideWindowPrint="hideWindowPrint" -->
-                    
-                    <!-- :windowPrint="windowPrint" -->
-                    <!-- @addPdf="addPdf" -->
-                    <!-- :addPdfs="addPdfs" -->
-                    <!-- @preview="preview" -->
-                    <!-- :typeDocsList="typeDocsList" -->
-                    <!-- :selectedDocsList="selectedDocsList" -->
-                    <!-- @selectedDocs="selectedDocs" -->
                 </container-body>
               </container>
             </b-tab>
@@ -1116,43 +960,6 @@
               <template #title> {{$t('projectDetail.reports')}} </template>
               <container>
                 <container-body>
-                  <!-- <ereports
-                    :tmp="tmp"
-                    :project="project"
-                    :selectedCornty="selectedCornty"
-                    :id="id"
-                    :workers="workers"
-                    :partx="partx"
-                    :customer="customer"
-                    :person="person"
-                    :selectCustomer="selectCustomer"
-                    :selectPerson="selectPerson"
-                    :selectedDocsList="selectedDocsList"
-                    :windowPrint="windowPrint"
-                    :addPdfs="addPdfs"
-                    :makemodalpdf="makemodalpdf"
-                    :typeDocsList="typeDocsList"
-                    :looks="looks"
-                    @worker="worker"
-                    :selectedWorkers="selectedWorkers"
-                    @selectedDocs="selectedDocs"
-                    @addPdf="addPdf"
-                    @addPdfSep="addPdfSep"
-                    @printPdf="printPdf"
-                    @preview="preview"
-                    @printOffer="printOffer"
-                    @hideWindowPrint="hideWindowPrint"
-                    ref="ereportsList"
-                    v-if="false"
-                  >
-                  </ereports> -->
-                  <!-- :tmp="tmp"
-                    :project="project"
-                    :id="id"
-                    :workers="workers"
-                    :wwidth="wwidth"
-                    @openWindowPrint="openWindowPrint"
-                    @switchDamages="switchDamages" -->
                   <reports-table-group
                     :tmp="tmp"
                     :project="project"
@@ -1163,24 +970,6 @@
                     @openWindowPrint="openWindowPrint"
                     @switchReports="switchReports"
                     ref="ereportsList"></reports-table-group>
-                    <!-- :selectedCornty="selectedCornty"
-                    :wwidth="wwidth" -->
-                    <!-- :customer="customer"
-                    :person="person"
-                    :selectCustomer="selectCustomer"
-                    :selectPerson="selectPerson" -->
-                    <!-- :makemodalpdf="makemodalpdf" -->
-                    <!-- :addPdfs="addPdfs" -->
-                    <!-- @hideWindowPrint="hideWindowPrint"
-                    @addPdfSep="addPdfSep"
-                    @printPdf="printPdf" -->
-                    <!-- :windowPrint="windowPrint" -->
-                    <!-- @addPdf="addPdf" -->
-                    <!-- @preview="preview" -->
-                    <!-- :typeDocsList="typeDocsList" -->
-                    <!-- :selectedDocsList="selectedDocsList" -->
-                    <!-- @selectedDocs="selectedDocs" -->
-
                 </container-body>
               </container>
             </b-tab>
@@ -1214,8 +1003,6 @@ export default {
 	},
 	data() {
 		return {
-			// rowsBusy: true,
-			// rowsLoading: true,
 			tablesBusy: true,
 			tableLoading: true,
 			hideNumberOfYear: null,
@@ -1249,10 +1036,6 @@ export default {
 			beforeTab: null,
 			tabIndex: null,
 			dubTabIndex: null,
-			// makemodalpdf: false,
-			// windowPrint: false,
-			// selectedDocsList: [],
-			// typeDocsList: [],
 			docs_menu_ids: [],
 			images_menu_ids: [],
 			workerModal: false,
@@ -1447,7 +1230,6 @@ export default {
 			availablePersons: [],
 			availableMails: [],
 			availablePhons: [],
-			// looks: [],
       includeDevices:false,
       includeDamages:false,
       includeReports:false
@@ -1514,33 +1296,7 @@ export default {
 		linkForWorkers(user) {
 			var host = window.location.host
 			if (this.selectedTables.length > 0) {
-				this.partx.forEach((valuePart) => {
-					if (valuePart.parts.id == this.selectedTables[0]) {
-						var notHaveFoolder = 1
-						this.itemsMenuImag[0].children.forEach((folder) => {
-							if ((folder.name == valuePart.parts.part_name) & (notHaveFoolder == 1)) {
-								notHaveFoolder = 0
-								this.$clipboard('https://' + host + '/#/I/' + user + '/' + this.project.number + '/' + folder.name.replace(' ', '_'))
-							}
-						})
-						if (notHaveFoolder == 1) {
-							if (confirm('"' + valuePart.parts.part_name + '" ' + this.$t('projectDetail.notExist'))) {
-								axios.get('/add_images_menu', {
-									params: {
-										parent_id: '-1',
-										project: this.id,
-										newName: valuePart.parts.part_name
-									}
-								}).then(response => {
-									this.$clipboard('https://' + host + '/#/I/' + user + '/' + this.project.number + '/' + response.data.name.replace(' ', '_'))
-								})
-							}
-							else {
-								this.$clipboard('https://' + host + '/#/I/' + user + '/' + this.project.number + '/' + 'General+Folder')
-							}
-						}
-					}
-				})
+				this.$refs.editList.linkForWorkersToEdit(user, host, this.project.number, this.itemsMenuImag)
 			}
 			else {
 				this.$clipboard('https://' + host + '/#/I/' + user + '/' + this.project.number + '/' + 'General+Folder')
@@ -1548,7 +1304,6 @@ export default {
 		},
 		seltable(emitSelectedTables) {
       this.selectedTables = emitSelectedTables
-      // console.log(this.selectedTables)
     },
 		loded(dir, elheight, add) {
 			this.sm2lg(dir, elheight, add)
@@ -1659,24 +1414,6 @@ export default {
 				})
 			})
 		},
-		// reportsTab() {
-		// 	var countDev = 0
-		// 	this.partx.forEach((valuePart) => {
-		// 		if (valuePart.parts.reports_content.length > 0) {
-		// 			countDev = countDev + 1
-		// 		}
-		// 	})
-		// 	return (countDev > 0)
-		// },
-		// damageTab() {
-		// 	var countDev = 0
-		// 	this.partx.forEach((valuePart) => {
-		// 		if (valuePart.parts.damage_content.length > 0) {
-		// 			countDev = countDev + 1
-		// 		}
-		// 	})
-		// 	return (countDev > 0)
-		// },
     switchDevices(value) {
    
       this.includeDevices = value
@@ -1688,65 +1425,7 @@ export default {
   
       this.includeReports = value
 		},
-    
-		// selectedDocs(event) {
-		// 	this.selectedDocsList = []
-		// 	this.selectedDocsList = event
-		// 	this.preview()
-		// },
-		// addPdf() {
-		// 	// this.addPdfs = true;
-		// 	// this.preview()
-		// },
-		// addPdfSep() {
-		// 	this.addPdfs = 'separator';
-		// 	this.hideWindowPrint()
-		// 	// this.preview()
-		// },
-		// printPdf() {
-		// 	// this.preview()
-		// 	setTimeout(function () {
-		// 		window.frames["myIframe"].focus();
-		// 		window.frames["myIframe"].print();
-		// 	}, 2000);
-		// },
-		// preview() {
-      // this.$refs.print.previewPDFForm();
-  		// if (this.$refs.editList != undefined) {
-      //   console.log('editList 1')
-			// 	if (this.$refs.editList.$refs.print != undefined) {
-      //     console.log('editList 2')
-			// 		this.$refs.print.previewPDFForm();
-			// 	}
-			// }
-			// if (this.$refs.damageList != undefined) {
-			// 	if (this.$refs.damageList.$refs.print != undefined) {
-      //     console.log('damageList')
-			// 		this.$refs.print.previewPDFForm();
-			// 	}
-			// }
-			// if (this.$refs.edeviceList != undefined) {
-			// 	if (this.$refs.edeviceList.$refs.print != undefined) {
-      //     console.log('edeviceList')
-			// 		this.$refs.print.previewPDFForm();
-			// 	}
-			// }
-			// if (this.$refs.ereportsList != undefined) {
-			// 	if (this.$refs.ereportsList.$refs.print != undefined) {
-      //     console.log('ereportsList')
-			// 		this.$refs.print.previewPDFForm();
-			// 	}
-			// }
-		// },
-		// openPrint(type) {
-    //   console..log
-			// this.addPdfs = false;
-
-				// this.openWindowPrint(type)
-				// this.preview()
-
-		// },
-		addSameModal() {
+    	addSameModal() {
 			this.add_offer.comment = null
 			this.add_offer.place = null
 			this.add_offer.insurance_number = null
@@ -2114,25 +1793,8 @@ export default {
 			if (this.comtomodal != null) this.tabxmodal = true;
 		},
 		openWindowPrint(type) {
-      // console.log(type)
       this.$refs.print.previewPDFForm(type);
-			// this.windowPrint = true;
 		},
-		// hideWindowPrint() {
-			// this.windowPrint = false;
-			// if (this.comtomodal != null) this.tabxmodal = true;
-		// },
-		// tabletopartx(tables) {
-		// 	this.partx = [];
-		// 	this.partx = tables;
-		// 	this.rowsLoading = false;
-		// 	if (this.partx.length > 0) {
-		// 		this.rowsBusy = false;
-		// 	}
-		// 	else {
-		// 		this.rowsBusy = true;
-		// 	}
-		// },
 		ploadDocToFrame(row) {
 			row.toggleDetails();
 			var index = row.index;
@@ -2321,7 +1983,6 @@ export default {
 				}
 			}).then(response => {
 				this.selectedPrice = []
-				// this.selectedTables = []
 				this.itemsPrice.forEach(v => {
 					v._rowVariant = ''
 				})
@@ -3007,44 +2668,6 @@ export default {
 			viewer.index = index
 			viewer.show()
 		},
-		// disablefild(fild, id) {
-		// 	var result = false
-		// 	this.looks.forEach((val) => {
-		// 		if (val.rows_id == id) {
-		// 			if (val.fild == fild) {
-		// 				result = true
-		// 			}
-		// 		}
-		// 	})
-		// 	if (this.stopDis == true) result = false
-		// 	if (this.type == 'Invoices') result = true
-		// 	return result
-		// },
-		// disablefildUser(fild, id) {
-		// 	var result
-		// 	this.looks.forEach((val) => {
-		// 		if (val.rows_id == id) {
-		// 			if (val.fild == fild) {
-		// 				result = val.user
-		// 			}
-		// 		}
-		// 	})
-		// 	return result
-		// },
-		// changeDisable(type_operation, fild, id) {
-		// 	this.stopDis = (type_operation == 'f')
-		// 	axios.get('/changeDisableTable', {
-		// 		params: {
-		// 			type_operation: type_operation,
-		// 			fild: fild,
-		// 			id: id,
-		// 			'user': this.$security.account['first_name'] + '_' + this.$security.account['second_name']
-		// 		}
-		// 	})
-		// 	if (type_operation == 'f') {
-		// 		setTimeout(() => {}, 15000);
-		// 	}
-		// },
 		getdomageImages() {
 			axios.get('/domage_images', {
 				params: {
@@ -3247,41 +2870,6 @@ export default {
 			xhr.setRequestHeader('X-Group', selectTables);
 			xhr.setRequestHeader('X-User', this.$security.account['first_name'] + '_' + this.$security.account['second_name']);
 		},
-		// allSumms() {
-		// 	var allSumms = this.$t('projectDetail.general') + ': ' + this.$options.filters.thousandSeparator(this.alltotal(this.partx));
-		// 	var altSumms = this.$t('projectDetail.alternative') + ': ' + this.$options.filters.thousandSeparator(this.altalltotal(this.partx));
-		// 	var returnSumms = (this.altalltotal(this.partx) == 0) ? (allSumms) : (allSumms + ' I ' + altSumms);
-		// 	if (this.dubTabIndex == 0) {
-		// 		setTimeout(() => {
-		// 			if (this.weval != this.$refs.editList.$refs.editcomponet.clientHeight) {
-		// 				this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 82)
-		// 			}
-		// 		}, 300);
-		// 	}
-		// 	return returnSumms;
-		// },
-		// alltotal: function () {
-		// 	var summa = 0
-		// 	this.partx.forEach(function (val) {
-		// 		val.parts.part_content.forEach(function (val1) {
-		// 			if (val1.status == 'yes') {
-		// 				summa += val1.count * val1.price
-		// 			}
-		// 		})
-		// 	})
-		// 	return summa;
-		// },
-		// altalltotal: function () {
-		// 	var summa = 0
-		// 	this.partx.forEach(function (val) {
-		// 		val.parts.part_content.forEach(function (val1) {
-		// 			if (val1.status != 'yes') {
-		// 				summa += val1.count * val1.price
-		// 			}
-		// 		})
-		// 	})
-		// 	return summa;
-		// },
 		worker() {
 			this.workerModal = true
 		},
@@ -3430,46 +3018,15 @@ export default {
 					this.selrow = item.id,
 						item._rowVariant = (item.id == this.selrow) ? 'secondary' : '',
 						this.generalComments = false,
-						// this.tmp.typeOfHead = ((this.tmp.typeOfHead != 'Devices') & (this.tmp.typeOfHead != 'Damage') & (this.tmp.typeOfHead != 'Reports')) ? item.type : this.tmp.typeOfHead,
 						this.beforeTab = item.type,
             this.tmp = item,
-						// this.tmp.number = item.number,
-						// this.tmp.date = item.date,
-						// this.tmp.place = item.place,
-						// this.tmp.insurance = item.insurance_number,
-						// this.tmp.insurname = item.insurname,
-						// this.tmp.work = item.work,
-						// this.tmp.other = item.other,
-						// this.tmp.type = item.type,
-						// this.tmp.id = item.id,
-						// this.tmp.dateEvent = item.dateEvent,
-						// this.tmp.dateInspect = item.dateInspect,
-						// this.tmp.worker = item.ExamWorker,
-						// this.tmp.comment = item.comment
-            // console.log(item)
-            
+
             this.$refs.edeviceList.getTablesInDevices(item.id),
             this.$refs.damageList.getTablesInDamages(item.id),
             this.$refs.ereportsList.getTablesInReports(item.id)
-
-		// setTimeout(() => {
-    //         this.$refs.edeviceList.getTablesInDevices(item.id);
-    //         this.$refs.damageList.getTablesInDamages(item.id);
-    //         this.$refs.ereportsList.getTablesInReports(item.id);
-		// 	}, 300)
-			
-
 				});
 
 			}
-			// setTimeout(() => {
-			// 	if (this.$refs.editList != undefined) {
-			// 		if (item != undefined) {
-			// 			this.$refs.editList.remoteTax(item.id)
-			// 		}
-			// 	}
-			// }, 300)
-			// }
 		},
 		get_person(id, mnew) {
 			axios.get('/get_persons', {
@@ -3551,17 +3108,6 @@ export default {
 					id: this.id
 				}
 			}).then(response => {
-				// response.data.filter((v) => {
-				// 	if (v.number.split(' ').length != 5) {
-				// 		v.netto = this.$options.filters.thousandSeparator(parseFloat(v.netto));
-				// 		v.brutto = this.$options.filters.thousandSeparator(parseFloat(v.brutto));
-				// 	}
-				// 	else {
-				// 		v.netto = '-' + this.$options.filters.thousandSeparator(parseFloat(v.netto));
-				// 		v.brutto = '-' + this.$options.filters.thousandSeparator(parseFloat(v.brutto));
-				// 	}
-				// 	return v;
-				// })
 				this.itemsTable = response.data;
 				if (this.itemsTable.length > 0) {
 					this.tablesBusy = false;
@@ -3573,7 +3119,6 @@ export default {
 					this.sm2lg('component', this.$refs['hproject'].clientHeight, 110)
 					this.sm2lg('edit', this.$refs.editList.$refs.editcomponet.clientHeight, 56)
 				}, 10);
-        // console.log(this.itemsTable)
 				if (this.tmp.id != undefined) {
 					var item_list = this.itemsTable.filter((v) => {
 						if (v.type == 'Orders' || v.type == 'Offers'|| v.type == 'Invoices'|| v.type == 'StandingOrder'|| v.type == 'SUB' || v.type == 'Sub Invoices') {
@@ -3586,12 +3131,6 @@ export default {
 				}
 			})
 		},
-		// getLoocks() {
-		// 	axios.get('/getLoocks').then(response => {
-		// 		this.looks = []
-		// 		this.looks = response.data
-		// 	})
-		// },
 		project_detail_f(old) {
 			axios.get('/project_detail', {
 				params: {
@@ -3684,10 +3223,6 @@ export default {
 			}
 			this.project_detail_f(old)
 			this.project_id = this.id
-
-
-
-
 		}
 	},
 	watch: {
@@ -3752,19 +3287,19 @@ export default {
 			this.beforeMail = response.data[3].content
 			this.hideNumberOfYear = response.data[4].content
 		});
-		this.getProjectDetail(1);
-		this.get_type_works();
-		setTimeout(() => {
-			this.getPrices();
-			this.getDevices();
-			this.getDocs();
-			this.getReports();
+		this.getProjectDetail(1)
+		this.get_type_works()
+		this.getPrices()
+			this.getDevices()
+			this.getDocs()
+			this.getReports()
+	
+
 			this.$options.sockets.onmessage = (data) => (data.data == 'getProjectDetail') ? (this.getProjectDetail(1)) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'get_types_for_tables_f') ? (this.get_types_for_tables_f('socket')) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'project_detail_new_f') ? (this.project_detail_new_f()) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'get_workers_f') ? (this.get_workers_f()) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'get_type_works') ? (this.get_type_works()) : ''
-			// this.$options.sockets.onmessage = (data) => (data.data == 'getLoocks') ? (this.getLoocks()) : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'getPrices') ? this.getPrices() : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'getDevices') ? this.getDevices() : ''
 			this.$options.sockets.onmessage = (data) => (data.data == 'getReports') ? this.getReports() : ''
@@ -3785,8 +3320,6 @@ export default {
     }
 
 
-
-		}, 1000);
 	},
 	created: function () {
 		const onResize = () => this.wwidth = window.innerWidth; //После определения ширина окна и  мобильного режима, должна примениться рассчитаная длина списка
@@ -3806,12 +3339,7 @@ export default {
     height: 200px;
     overflow-y: auto;
 }
-/* .raz { 
-  -moz-appearance: textfield;
-}
-.raz::-webkit-inner-spin-button { 
-  display: none;
-} */
+
 @media only screen and (min-width : 992px) {
   .b-table-sticky-header {
     overflow-y: auto;
@@ -3863,9 +3391,7 @@ export default {
 .cindex{
   width: 10px;
 }
-/* .cservice{
-  
-} */
+
 .cdate{
   width: 100px;
 }

@@ -32,7 +32,6 @@
     size="sm" style="max-width: 240px;padding-top: 15px;"></b-form-input>
     </b-col>
   </b-input-group>
-  <!-- <b-col cols="12"> -->
 <b-card-group columns v-viewer class="images" :style="'column-count: '+size+';'">
   <b-card v-for="(row, index) in foldershowfiles(domageImages)" :key="row.id" :img-src="row.id+'&q='+quality"
   @click.stop="showx('images', index)" class="cardimg text-justify"
@@ -44,7 +43,6 @@
     </b-card-text>
   </b-card>
 </b-card-group>
-
                                 </b-col>
                             </b-row>
                         </container-body>
@@ -90,7 +88,6 @@ export default {
         itemsPriceImg:[],
         oldIdImg:0,
         itemsMenuImag:[],
-        // selectedPriceImg:[],
         menuImgsTree: false,
         docs_menu_ids:[],
         workerName:null ,
@@ -98,20 +95,14 @@ export default {
         itemsTable:[],
 dropzoneOptions: {
             url: 'loadFilesWorkers',
-            // thumbnailWidth: 50,
             parallelUploads:50,
               thumbnailWidth: 250,
               thumbnailHeight: 250,
-            // uploadMultiple: true,
-            // timeout:1,
             chunkSize:100,
-            // forceFallback:true,
             forceChunking:true,
             dictDefaultMessage: this.$t('alert.clickOrDrop'),
             acceptedFiles: 'image/*',
             accept: function(file, done) {
-                // this.$refs.myVueDropzone.removeFile(file)
-                // console.log("uploaded"); //debuging the upload
                 done();
             },
         },
@@ -175,7 +166,6 @@ dropzoneOptions: {
       }, 200);    
     },
     foldershowfiles(val){
-        // console.log(val)
       if (this.idNodeImg != undefined){
         return val.filter((itemImg)=>{
           if (this.idNodeImg!=-1){
@@ -194,19 +184,14 @@ dropzoneOptions: {
 
     allowDrag(model, component) {
       if (component.depth!=1){
-      // if (model.name === 'Node 0-1') {
-      // can't be dragged
         return true;
       }
-      // can be dragged
       return false;
     },
     allowDrop(model, component) {
       if (component.depth==1){
-      // can't be placed
         return true;
       }
-      // can be placed
       return false;
     },
     allowDragModal(model, component) {
@@ -215,26 +200,10 @@ dropzoneOptions: {
     allowDropModal(model, component) {
       return false;
     },   
-    // curNodeClicked(model, component) { 
-    //   this.$emit('pcurNodeClickedImg', model, component)  
-    // },
-    curNodeClickedModal(model, component){
+     curNodeClickedModal(model, component){
       this.idNodeModal=model.id
     },
-    dragHandler(model, component, e) {
-      // console.log('dragHandler: ', model, component, e);
-    },
-    dragEnterHandler(model, component, e) {
-      // console.log('dragEnterHandler: ', model, component, e);
-    },
-    dragLeaveHandler(model, component, e) {
-      // console.log('dragLeaveHandler: ', model, component, e);
-    },
-    dragOverHandler(model, component, e) {
-      // console.log('dragOverHandler: ', model, component, e);
-     },
-    dragEndHandler(model, component, e) {
-    // console.log('dragEndHandler: ', model, component, e);
+     dragEndHandler(model, component, e) {
       this.drag1=model.id;
       axios.get('/change_parrent_menu_devices', {
         params: {
@@ -247,34 +216,9 @@ dropzoneOptions: {
       })
     },
     dropHandler(model, component, e) {
-       // console.log('dropHandler: ', model, component, e);
       this.drag2=model.id;
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        filedel(val) {
+filedel(val) {
             if (confirm(this.$t('alert.sure'))) {
                 axios.get('/delfile', {
                     params: {
@@ -283,23 +227,8 @@ dropzoneOptions: {
                 }).then(response => {});
             }
         },
-        // prowSelectedImg(items) {
-        //     if(this.selectedPriceImg.indexOf(items)==-1){
-        //         this.selectedPriceImg = this.selectedPriceImg.filter((v)=>{
-        //             if (v.id != items.id){
-        //                 return v
-        //             }
-        //         });
-        //         this.selectedPriceImg.push(items);
-        //         items._rowVariant='success';
-        //     } else{
-        //         this.selectedPriceImg.splice(this.selectedPriceImg.indexOf(items), 1)
-        //         items._rowVariant=''
-        //     }
-        // },
+
         pcurNodeClickedImg(model, component) {
-        // console.log(model, component)
-            // this.nameNodeImag = model.name,
             this.idNodeImg=model.id
             if(this.idNodeImg == this.oldIdImg){
                  if (this.itemsPriceImg.length>0){
@@ -343,7 +272,6 @@ dropzoneOptions: {
 
         })
         }
-        // console.log((this.project.number==null)?'0001':this.project.number, this.domageImages )
       },
         getDocs(){
             if (this.projectId != null) {
@@ -388,23 +316,10 @@ dropzoneOptions: {
 
     },
     fsadd() {
-// this.items.forEach((n, i) => setTimeout(() => n.show = true, i * 1000));
-
-
 this.$refs.myVueDropzone.dropzone.getAcceptedFiles().forEach((file, i) => setTimeout(() => this.$refs.myVueDropzone.removeFile(file), i * 250));
-// {   
-//     this.$refs.myVueDropzone.removeFile(file);
-// });
-
-        // this.$refs.myVueDropzone.removeAllFiles()
     },
         sendingEventImage(file, xhr, formData) {
             var selectTables = []
-            // this.partx.forEach(function(val, index) {
-            //     if (val.parts.toggle) {
-            //         selectTables.push(val.parts.id)
-            //     }
-            // })
             xhr.setRequestHeader('X-Number', this.project.number);
             xhr.setRequestHeader('X-Folder', this.foolderId);
             xhr.setRequestHeader('X-id', this.projectId);
@@ -443,23 +358,15 @@ this.$refs.myVueDropzone.dropzone.getAcceptedFiles().forEach((file, i) => setTim
     },
     mounted(){
     this.getProjectDetail(1)
-    
-
+    this.$options.sockets.onmessage = (data) => (data.data=='getProjectDetail') ? (this.getProjectDetail(1)): ''
+    this.$options.sockets.onmessage = (data) => (data.data=='getDocs') ? this.getDocs(): ''
     setTimeout(() => {
-        // this.$socket.send('getProjectDetail')
-        this.$options.sockets.onmessage = (data) => (data.data=='getProjectDetail') ? (this.getProjectDetail(1)): ''
-        this.$options.sockets.onmessage = (data) => (data.data=='getDocs') ? this.getDocs(): ''
-
         this.itemsMenuImag[0].children.forEach((val)=>{
-
             if (val.name == this.foolder.replace('_', ' ')) {
-                // console.log(val, this.foolder.replace('_', ' '))
                 this.foolderId = val.id
             }
         })
             this.idNodeImg=parseInt(this.foolderId)
-
-
         if(this.wwidth<=768){
                 this.size = 2
               }else{

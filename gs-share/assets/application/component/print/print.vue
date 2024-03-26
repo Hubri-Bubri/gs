@@ -13,9 +13,9 @@
                     </b-col>
                 </b-row>
                 </b-container> 
-                
+
          <iframe type="iframe" style="width:100%;height:550px;" name="myIframe"  v-show="printBusy==false" :src="(src=='#')?null:src"></iframe>
-       
+
          <div slot="modal-footer" class="w-100">
             <b-row align-v="start">
                <b-col cols="6" align-self="end">
@@ -66,11 +66,8 @@
                   {{worker}}
                 </b-dropdown-item-button>
             </b-dropdown>
-
-
                      </b-col>
                   </b-form>
-
                   <b-button-group size="sm" style="padding-top: 15px !important;padding-left: 15px !important;">
                     <b-button variant="primary" @click="(printBusy=true);printModal=false;" >
                         {{$t('print.close')}} 
@@ -114,7 +111,6 @@ export default {
         printBusy:true,
         addDocument:false,
         forPreview:null,
-      //   addPdfs:false,
         today: (new Date().getFullYear() + '-' +
                     (((new Date().getFullYear() + '-' + (new Date().getMonth() + 1)).length == 6) ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1))) +
                 '-' +
@@ -127,20 +123,10 @@ export default {
     },
     methods: {
     makePdf(){
-      //   this.forPreview = Math.ceil(Math.random()*1000000);
-      //   this.printModal=true;
         this.src = '/pdf?addPdf=false&forPreview='+this.forPreview+'&pid='+this.pid+'&itemId='+this.tmp.id+'&type='+this.type+'&today='+this.today+'&stworks='+this.stworks+'&fworks='+this.fworks+
         '&dateForInspect='+this.dateForInspect+'&byForInspect='+this.byForInspect+'&selectedDocsList='+this.selectedDocsList.join();
     },
-      // loadFrame(){
-      //   if (this.addDocument)
-      //     {
-      //       // this.printModal=false;
-      //       // this.addPdfs=false;
-      //       this.addDocument=false;
-      //       this.selectedDocsList = [];
-      //     }
-      // },
+     
         previewPDFForm(type){
 
             var requestForType = (type=='StandingOrder')?'Orders':type
@@ -187,7 +173,6 @@ export default {
         },
 		addPdfSep() {
          this.src='#'
-			// this.addPdfs = 'separator'
          this.printModal=false
          axios.get('/pdf', {
 				params: {
@@ -204,21 +189,14 @@ export default {
                selectedDocsList:this.selectedDocsList.join()
 				}
 			})
-         // this.addDocument=true;
-         // this.makePdf();
 		},
 		printPdf() {
 				window.frames["myIframe"].focus();
 				window.frames["myIframe"].print();
 		},
       addPdf() {
-    
-         // this.addDocument=true;
          this.src='#'
-         // this.addPdfs=true
          this.printModal=false
-
-
          axios.get('/pdf', {
 				params: {
 					addPdf:'true',
@@ -234,7 +212,6 @@ export default {
                selectedDocsList:this.selectedDocsList.join()
 				}
 			})
-
      },
    },
     mounted(){

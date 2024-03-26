@@ -265,7 +265,6 @@ export default {
    props: ['checkbox_list', 'selectedWorkers', 'addtaxColapse', 'butDiscPerc', 'discP', 'unitType', 'item_id', 'table', 'unitPercent'],
    data() {
       return {
-        //  unitPercent:[],
          tablechecked: false,
          rows: [],
          rowsBusy: true,
@@ -501,7 +500,6 @@ export default {
       },
    },
    mounted() {
-    // unitPercent=((this.table.obj!='')&&(this.table.obj!=null))?this.table.obj.split(','):[];
     this.getRowsInTable(this.table.id);
    }
 }

@@ -25,11 +25,7 @@
         :idNode="idNode"
         :parId="parId"
         disableDBClick
-        @drag="dragHandler"
-        @drag-enter="dragEnterHandler"
         @current-node-clicked="curNodeClicked"
-        @drag-leave="dragLeaveHandler"
-        @drag-over="dragOverHandler"
         @drag-end="dragEndHandler"
         @drop="dropHandler">
         </vue-drag-tree>                              
@@ -56,7 +52,6 @@
           <div @click.prevent.stop="rowSelected(row.item)"
           v-html="row.item.time" />
           </template>
-          
           <template #cell(delete)="row">
             <b-icon icon="trash" aria-hidden="true" @click.prevent.stop="delRow(row.item.id)"></b-icon>
           </template>
@@ -94,8 +89,6 @@
           @blur="updateDate($event.target.innerHTML, 'time', row.item.id)"
           v-html="valueDigital(row.item.time)" />
           </template>
-
-
         </b-table>
       </div>
       </b-col>
@@ -221,9 +214,6 @@ export default {
     hidePosition(){
       this.$refs.column.show()    
     },
-    // onClickOutside() {
-    //   this.$emit('onClickOutside')
-    // },
     loded(){
       setTimeout(() => {
         this.$emit('loded', 'component', this.$refs.heightTablePrice.clientHeight, 200)
@@ -271,20 +261,7 @@ export default {
         }
       })
     },
-     dragHandler(model, component, e) {
-    // console.log('dragHandler: ', model, component, e);
-     },
-     dragEnterHandler(model, component, e) {
-    //  console.log('dragEnterHandler: ', model, component, e);
-     },
-     dragLeaveHandler(model, component, e) {
-    // console.log('dragLeaveHandler: ', model, component, e);
-     },
-     dragOverHandler(model, component, e) {
-    // console.log('dragOverHandler: ', model, component, e);
-     },
     dragEndHandler(model, component, e) {
-    //console.log('dragEndHandler: ', model, component, e);
       this.drag1=model.id;
       axios.get('/change_parrent_menu_reports', {
         params: {
@@ -297,7 +274,6 @@ export default {
       })
     },
     dropHandler(model, component, e) {
-    // console.log('dropHandler: ', model, component, e);
       this.drag2=model.id;
     }
   },
@@ -306,6 +282,5 @@ export default {
     this.updateWidth();
     this.$emit('loded', 'component', this.$refs.heightTableReports.clientHeight, 200)
   }
-
 }
 </script>

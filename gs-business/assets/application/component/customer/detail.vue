@@ -224,12 +224,12 @@
                   :menuDocsTree="menuDocsTree"
                   @filedel="filedelSub"
                   @updatefilename="updatefilenameSub"
-                  @changeDisable="changeDisable"
                   @loadDocToFrame="ploadDocToFrameSub"
                   @onClickOutsideDoc="menuDocsTree=false"
                   @curNodeClickedDoc="pcurNodeClickedDoc"
                   @rowSelectedDoc="prowSelectedDoc"
                   />
+                  <!-- @changeDisable="changeDisable" -->
                 </container-body>
                 <container-footer style="z-index:2">
                   <b-collapse v-model="dropDoc" id="dropDoc3">
@@ -420,12 +420,12 @@
                   :menuDocsTree="menuDocsSpersonTree"
                   @filedel="filedelSperson"
                   @updatefilename="updatefilenameSperson"
-                  @changeDisable="changeDisable"
                   @loadDocToFrame="ploadDocToFrameSperson"
                   @onClickOutsideDoc="menuDocsSpersonTree=false"
                   @curNodeClickedDoc="pcurNodeClickedSperson"
                   @rowSelectedDoc="prowSelectedSperson"
                   />
+                  <!-- @changeDisable="changeDisable" -->
                 </container-body>
                 <container-footer style="z-index:2">
                   <b-collapse v-model="dropSperson" id="dropDoc3">
@@ -1153,20 +1153,20 @@ moveImagPerson(){
         }
       })
     },
-    changeDisable(type_operation, fild, id){
-      this.stopDis=(type_operation=='f')
-      axios.get('/changeDisableTable', {
-        params: {
-          type_operation: type_operation,
-          fild: fild,
-          id: id,
-          'user': this.$security.account['first_name']+'_'+this.$security.account['second_name']
-        }
-      })
-      if (type_operation == 'f'){
-        setTimeout(()=>{}, 15000);
-      }
-    },
+    // changeDisable(type_operation, fild, id){
+    //   this.stopDis=(type_operation=='f')
+    //   axios.get('/changeDisableTable', {
+    //     params: {
+    //       type_operation: type_operation,
+    //       fild: fild,
+    //       id: id,
+    //       'user': this.$security.account['first_name']+'_'+this.$security.account['second_name']
+    //     }
+    //   })
+    //   if (type_operation == 'f'){
+    //     setTimeout(()=>{}, 15000);
+    //   }
+    // },
     getFilesFirma(id){
       axios.get('/get_files_customer', {
         params: {
@@ -1785,15 +1785,16 @@ moveImagPerson(){
     },
   },
   mounted(){
-    setTimeout(() => {
-      this.getCustomerDetail()
+    this.getCustomerDetail()
       this.getSubFiles()
+
+
       this.$options.sockets.onmessage = (data) => (data.data=='getCustomerFiles') ? this.getSubFiles(): ''
       this.$options.sockets.onmessage = (data) => (data.data=='getSubDetail') ? (this.getCustomerDetail()):''
       this.$options.sockets.onmessage = (data) => (data.data=='get_persons') ? (this.getPersons()):''
       this.$options.sockets.onmessage = (data) => (data.data=='getSubContact') ? (this.getContact(this.tmp.person)):''
       this.$options.sockets.onmessage = (data) => (data.data=='getPersonFiles') ? (this.getFilesSperson(this.tmp.person)):''
-    },1000);
+
   }
 }
 </script>

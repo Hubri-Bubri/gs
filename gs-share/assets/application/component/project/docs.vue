@@ -8,11 +8,7 @@
         :allowDrop='allowDrop'
         :idNode="idNodeDoc"
         disableDBClick
-        @drag="dragHandler"
-        @drag-enter="dragEnterHandler"
         @current-node-clicked="curNodeClicked"
-        @drag-leave="dragLeaveHandler"
-        @drag-over="dragOverHandler"
         @drag-end="dragEndHandler"
         @drop="dropHandler">
         </vue-drag-tree>
@@ -25,20 +21,10 @@
         show-empty no-border-collapse
         >
           <template #cell(type)="row">
-         <!--    <b-col @click="rowSelected(row.item)" class="text-left"> -->
-
               <b-icon :icon="row.detailsShowing ?'file-earmark':'file-pdf'" aria-hidden="true" @click.stop="loadDocToFrame(row)"
               v-if="((row.item.name=='Orders') || (row.item.name=='Offers') || (row.item.name=='Invoices') || (row.item.name=='Damage Description'))"></b-icon>
                <b-icon :icon="row.detailsShowing ?'file-earmark':'file-pdf'" aria-hidden="true" v-else-if="row.item.name.includes('.pdf')" @click.stop="loadDocToFrame(row)"></b-icon>
                <b-icon :icon="row.detailsShowing ?'file-earmark':'file-pdf'" aria-hidden="true"  v-else @click.stop="loadDocToFrame(row)"></b-icon>
-<!-- 
-              <b-link size="sm" @click.stop="loadDocToFrame(row)" class="butMore">
-                <i style="font-size:14px" :class="row.detailsShowing ? 'far fa-file' : 'fa fa-file-alt'"
-                v-if="((row.item.name=='Orders') || (row.item.name=='Offers') || (row.item.name=='Invoices') || (row.item.name=='Damage Description'))"></i>
-                <i style="font-size:14px" :class="row.detailsShowing ? 'far fa-file' : 'fa fa-file-pdf'" v-else-if="row.item.name.includes('.pdf')"></i>
-                <i style="font-size:14px" :class="row.detailsShowing ? 'far fa-file' : 'fa fa-file-pdf'" v-else></i>
-              </b-link> -->
-            <!-- </b-col> -->
           </template>
           <template #cell(name)="row">
             <b-form-input  type="text" size="sm"
@@ -57,9 +43,6 @@
           </template>
           <template #cell(delete)="it">
              <b-icon icon="trash" aria-hidden="true" @click.stop="(detectUrl(it.item.html)!='/pdf1')?filedel(it.item.id):docdel(it.item.id)"  />
-<!--             <b-col @click="rowSelected(it.item)">
-              <b-link @click.stop="(detectUrl(it.item.html)!='/pdf1')?filedel(it.item.id):docdel(it.item.id)" class="fas fa-trash fa-w-16" style="padding-top:7px;" />
-            </b-col> -->
           </template>
           <template #cell(added)="data">
             <div @click="rowSelected(data.item)" style="white-space: nowrap;"
@@ -83,9 +66,7 @@
 import axios from 'axios';
 export default {
   props: ['responseFiles', 'idNodeDoc', 't', 'itemsDoc', 'itemsMenuDoc', 'oldIdDoc', 'selectedPriceDoc', 'menuDocsTree', 'docsIds'],
-
   computed: {
-
 fieldsDocs() {
 			return [{
 					key: 'type',
@@ -119,7 +100,6 @@ fieldsDocs() {
 			]
 		}
   },
-
   methods: {
     foldershowfiles(val){
       if (this.idNodeDoc != undefined){
@@ -137,10 +117,7 @@ fieldsDocs() {
         })
       }
     },
-    // onClickOutside() {
-    //   this.$emit('onClickOutsideDoc')
-    // },
-    rowSelected(items) {
+     rowSelected(items) {
       this.$emit('rowSelectedDoc', items)  
     },
     loded(){
@@ -150,19 +127,14 @@ fieldsDocs() {
     },
     allowDrag(model, component) {
       if (component.depth!=1){
-      // if (model.name === 'Node 0-1') {
-      // can't be dragged
         return true;
       }
-      // can be dragged
       return false;
     },
     allowDrop(model, component) {
       if (component.depth==1){
-      // can't be placed
         return true;
       }
-      // can be placed
       return false;
     },
     allowDragModal(model, component) {
@@ -177,20 +149,7 @@ fieldsDocs() {
     curNodeClickedModal(model, component){
       this.idNodeModal=model.id
     },
-    dragHandler(model, component, e) {
-      // console.log('dragHandler: ', model, component, e);
-    },
-    dragEnterHandler(model, component, e) {
-      // console.log('dragEnterHandler: ', model, component, e);
-    },
-    dragLeaveHandler(model, component, e) {
-      // console.log('dragLeaveHandler: ', model, component, e);
-    },
-    dragOverHandler(model, component, e) {
-      // console.log('dragOverHandler: ', model, component, e);
-     },
     dragEndHandler(model, component, e) {
-    // console.log('dragEndHandler: ', model, component, e);
       this.drag1=model.id;
       axios.get('/change_parrent_menu_devices', {
         params: {
@@ -203,7 +162,6 @@ fieldsDocs() {
       })
     },
     dropHandler(model, component, e) {
-       // console.log('dropHandler: ', model, component, e);
       this.drag2=model.id;
     },
     detectUrl(val){

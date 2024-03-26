@@ -9,16 +9,10 @@
         <b-form-group  :label="$t('project.startDate')+':'" label-cols="3" label-size="sm">
           <b-form-input size="sm" type="date"
           @change="updateProject('date', $event)" :value="project.date" placeholder="Enter date" 
-
-
           :id="'project-start-date'+id"/>
         </b-form-group>
-        <!-- <b-tooltip triggers="none" :show="disablefild('pdata', id)" :target="'pdata'+id">
-          {{disablefildUser('pdata', id)}}
-        </b-tooltip> -->
       </b-col>
       <b-col lg="6" sm="12">
-
         <b-form-group :label="$t('project.editor')+':'" label-cols="3" label-size="sm">
           {{project.editor}}
         </b-form-group>
@@ -29,15 +23,12 @@
           @change="updateProject('edate', $event)"
           :value="project.edate"
           placeholder="Enter date"
-     
-          
           :id="'project-end-date'+id" />
         </b-form-group>
       </b-col>
     </b-row>
     <hr />
     <b-row>
-
       <b-col lg="6" sm="12" >
         <b-form-group :label="$t('project.customer')+':'" label-cols="3" label-size="sm">
           <b-form-select
@@ -64,40 +55,25 @@
               <template #prepend><b-icon icon="inboxes" aria-hidden="true" @click="$emit('sendMail', availableMails)" class="m-1" /></template>
           </b-input-group>
         </b-form-group>
-
       </b-col>
       <b-col lg="6" sm="12">
         <b-form-group :label="$t('customerDetail.zip')+':'" label-cols="3" label-size="sm">
           <b-input-group>
             <b-form-input type="text" @change="searchZip($event)" :value="project.zip1" :placeholder="$t('projects.ezip')" size="sm" :name="nohash"
               :id="'pzip1'+id"  />
-             
-                <b-form-select value-field="code" text-field="name" size="sm" :name="nohash"
+              <b-form-select value-field="code" text-field="name" size="sm" :name="nohash"
               :value="selectedCornty.code" :options="countries" @change="updateProject('country', $event)"/>
-       
           </b-input-group>
         </b-form-group>
-        <!-- <b-tooltip triggers="none" :show="disablefild('pcountry', id)" :target="'pcountry'+id">
-          {{disablefildUser('pcountry', id)}}
-        </b-tooltip> -->
-        <!-- <b-tooltip triggers="none" :show="disablefild('pzip', id)" :target="'pzip'+id">
-          {{disablefildUser('pzip', id)}}
-        </b-tooltip> -->
         <b-form-group :label="$t('projects.area')+':'" label-cols="3" label-size="sm">
           <b-form-input type="text" @change="updateProject('area', $event)" :value="project.area" :placeholder="$t('projects.earea')" size="sm" :name="nohash"
            :id="'parea'+id"  />
         </b-form-group>
-        <!-- <b-tooltip triggers="none" :show="disablefild('parea', id)" :target="'parea'+id">
-          {{disablefildUser('parea', id)}}
-        </b-tooltip> -->
         <b-form-group :label="$t('customerDetail.city')+':'" label-cols="3" label-size="sm">
           <b-form-input  type="text" @change="updateProject('city1', $event)" :value="project.city1" size="sm" :name="nohash"
           :placeholder="$t('projects.ecity')"
           :id="'pcity1'+id"  />
         </b-form-group>
-        <!-- <b-tooltip triggers="none" :show="disablefild('pcity', id)" :target="'pcity'+id">
-          {{disablefildUser('pcity', id)}}
-        </b-tooltip> -->
         <b-form-group :label="$t('customerDetail.street')+':'" label-cols="3" label-size="sm">
           <b-input-group>
             <b-form-input type="text" @change="updateProject('street1', $event)" :value="project.street1"
@@ -106,9 +82,6 @@
               <template #append><b-icon icon="pin-map" aria-hidden="true" @click="$emit('openmap')" class="m-1" /></template>
           </b-input-group>
         </b-form-group>
-        <!-- <b-tooltip triggers="none" :show="disablefild('pstreet', id)" :target="'pstreet'+id">
-          {{disablefildUser('pstreet', id)}}
-        </b-tooltip> -->
       </b-col>
     </b-row>
     <b-alert
@@ -151,20 +124,13 @@
           {{$t('project.showComments')}}
         </b-button>
         <b-dropdown  :text="$t('project.linkForWorkers')" class="customDrop"  size="sm" :disabled="dislink">
-          <!-- <b-dropdown-item :disabled="dislink" v-for="item in workersForSend" :key="item.id" @click="$emit('linkForWorkers', item.value)" > -->
             <b-dropdown-item :disabled="dislink" v-for="item in workersForSend" :key="item.id" @click="$emit('linkForWorkers', item.value)" >
-            <!-- v-clipboard="'https://'+detecthost()+'/#/project/user/'+id+'/'+item.value+'/'+"  -->
             {{item.text}}
           </b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
     <br/>
-    <!-- start tables -->
-<!--     <div v-show="typesForTables.length==0">
-      <Spinner size="large" ></Spinner>
-    </div> -->
-
     <div class="text-center" v-show="tablesBusy">
             <strong v-if="tableLoading" class="text-info">
               <b-spinner class="align-middle" ></b-spinner>
@@ -285,13 +251,11 @@ export default {
           key: 'number',
           label: this.$t('fields.number'),
           sortable: true
-          // class: 'pn'
         },
         {
           key: 'date',
           label: this.$t('customerDetail.date'),
           sortable: true
-          // class: 'st'
         },
         {
           key: 'insurance_number',
@@ -307,28 +271,22 @@ export default {
           key: 'gen_summa',
           label: this.$t('edit.netto'),
           sortable: true
-          // class: 'text-lg-right'
         },
         {
           key: 'brutto',
           label: this.$t('edit.brutto'),
           sortable: true
-          // class: 'text-lg-right'
         },
         {
           key: 'status_set',
           label: this.$t('fields.status'),
           sortable: true
-          // class: 'status text-left'
         },
         {
           key: 'delete',
           label: 'X'
-          // class: 'delete'
-          // class: 'text-center'
         }
       ]},
-
       options(){ 
         return [{
         value: 'Open',
@@ -400,8 +358,6 @@ export default {
               var  region = results.address_components[i];
             }
           }
-          // this.project.city = city.long_name
-          // this.project.area = region.long_name
           this.updateProject('city1', city.long_name)
           this.updateProject('area', region.long_name)
         }
@@ -414,7 +370,6 @@ export default {
         date: newData,
         fild: fild
       }).then(response => {
-        // console.log(this.id, newData, fild)
         if (fild == 'other'){
           axios.post('/updateProject', {
             
@@ -431,48 +386,9 @@ export default {
         }
       })
     },
-    changeDisable(type_operation, fild, id){
-      this.stopDis=(type_operation=='f')
-      axios.get('/changeDisableTable', {
-        params: {
-          type_operation: type_operation,
-          fild: fild,
-          id: id,
-          'user': this.$security.account['first_name']+'_'+this.$security.account['second_name']
-        }
-      })
-      if (type_operation == 'f'){
-        setTimeout(()=>{
-        }, 15000);
-      }
-    },
     showCommetnts(){
       this.$emit('showCommetnts')
     },
-    // disablefild(fild, id){
-    //   var result = false
-    //   this.looks.forEach((val)=>{
-    //     if (val.rows_id == id) {
-    //       if (val.fild == fild) {
-    //         result = true
-    //       }
-    //     }
-    //   })
-    //   if (this.stopDis==true) result = false
-    //   if (this.type=='Invoices') result = true
-    //   return result
-    // },
-    // disablefildUser(fild, id){
-    //   var result = (this.type=='Invoices') ? '' : 'you'
-    //   this.looks.forEach((val)=>{
-    //     if (val.rows_id == id) {
-    //       if (val.fild == fild) {
-    //         result = val.user
-    //       }
-    //     }
-    //   })
-    //   return result
-    // },
     getItems(type){
       if (type != 'Orders'){
         if (type != 'SUB'){
@@ -516,7 +432,6 @@ export default {
             orderandsub = JSON.parse(JSON.stringify(orderandsub.concat(segmer)));
           }
         })
-        // console.log(orderandsub)
         return orderandsub
       }
       if (type == 'Invoices'){
@@ -575,20 +490,11 @@ export default {
       return val
     },
     dataCharts(val, t){
-      // if(val.brutto.substr(0, 1)=='-'){
-      //   var brutto=val.brutto.slice(1)
-      //   brutto=brutto.replace('.', '')
-      //   brutto=parseFloat(brutto.replace(',', '.'))
-      //   var pay = this.summFromRow(val, brutto)*100/brutto
-      //   var withOut =100-(this.summFromRow(val, brutto)*100/brutto)
-      //   var t='s'
-      // } else {
         var brutto=val.brutto.replace('.', '')
         brutto=parseFloat(brutto.replace(',', '.'))
         var pay = this.summFromRow(val, brutto)*100/brutto
         var withOut =100-(this.summFromRow(val, brutto)*100/brutto)
         var t=t
-      // }
       return [pay, withOut, t]
     },
     summFromRow(row, brutto){ 

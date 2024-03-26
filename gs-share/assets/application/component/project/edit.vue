@@ -130,26 +130,6 @@
       @openWindowPrint="openWindowPrint"
 			ref="calcGroup"
 			></calc-table-group>
-      <!-- 
-        :windowPrint="windowPrint"
-      :project="project"
-      :selectedDocsList="selectedDocsList"
-			:addPdfs="addPdfs"
-			:makemodalpdf="makemodalpdf"
-			:typeDocsList="typeDocsList"
-      :person="person"
-			:selectCustomer="selectCustomer"
-			:selectPerson="selectPerson"
-      :account="$security.table.account"
-      :comments="comments"
-      :customer="customer"
-      @selectedDocs="selectedDocs"
-			@addPdf="addPdf"
-			@printPdf="printPdf"
-			@preview="preview"
-			
-			@worker="worker"
-			@hideWindowPrint="hideWindowPrint" -->
 		</b-container>
   </div>
 </template>
@@ -199,6 +179,10 @@ export default {
 		}
 	},
 	methods: {
+		linkForWorkersToEdit(user, host, projectNumer, itemMenuImag){
+			console.log(user, host, projectNumer, itemMenuImag)
+		this.$refs.calcGroup.linkForWorkersToCalcGroup(user, host, projectNumer, itemMenuImag)
+	},
     openWindowPrint(type){
       this.$emit('openWindowPrint', type)
     },
@@ -207,7 +191,6 @@ save(){
   this.cloudChange=false;
   this.cloudLoad=true;
   this.timeSave = moment().format("DD.MM HH:mm")
-  // console.log(this.timeSave)
 },
 writecomet(){
 var newContent =  this.$refs['other'].quill.getHTML()
@@ -256,7 +239,6 @@ checkInEditor(tname){
             }
 
      this.updateProject('other', valueHtml)
-
 },
 updateProject(fild, newData){
         axios.post('/updateProject', {
@@ -286,30 +268,9 @@ updateProject(fild, newData){
     seltable(id, e){
       this.$emit('seltable', id, e)
     },
-		// selectedDocs(event) {
-		// 	this.$emit('selectedDocs', event)
-		// },
-		// addPdf() {
-		// 	this.$emit('addPdf')
-		// },
-		// printPdf() {
-		// 	this.$emit('printPdf')
-		// },
-		// preview() {
-		// 	this.$emit('preview')
-		// },
-		// printOffer() {
-		// 	this.$emit('printOffer')
-		// },
 		worker() {
 			this.$emit('worker')
 		},
-		// hideWindowPrint() {
-		// 	this.$emit('hideWindowPrint')
-		// },
-		// openWindowPrint() {
-		// 	this.$emit('openWindowPrint')
-		// },
 		countDigitals(val) {
 			var nuls = 3 - val.toString().length
 			for (var i = 0; i <= nuls; i++) {
@@ -317,7 +278,6 @@ updateProject(fild, newData){
 			}
 			return val
 		},
-
 		updateDiscont(val, type, id, old) {
       if (old != val) {
       axios.get('/update_item_discont', {
@@ -329,17 +289,16 @@ updateProject(fild, newData){
 			})
     }
 		},
-
 		updateItem(val, type, id, old) {
-      if (old != val) {
-        axios.get('/update_item_from_project', {
-          params: {
-            val: val,
-            type: type,
-            id: id
-          }
-        })
-      }
+      		if (old != val) {
+				axios.get('/update_item_from_project', {
+				params: {
+					val: val,
+					type: type,
+					id: id
+				}
+				})
+      		}
 		},
 	},
 }

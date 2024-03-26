@@ -5,13 +5,11 @@
     </container-header>
     <container-body>
       <b-modal size="md" centered id="move" ref="move" :title="$t('projectDetail.move')">
-        <!-- @change="moveToCopySelect($event, moveToCopyRadio)" v-model="moveToCopy" -->
         <b-form-select class="" id="move" v-model="selectedItems" :select-size="detectRowSise(items_menu)">
           <option v-for="item in detectItem(items_menu)" @click="selectedModal(item)">{{item.name}}</option>
         </b-form-select>
         <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[$t('company.copy'), $t('company.move')]" />
           <template slot="modal-footer">
-       <!-- <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>-->
             <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button> 
           </template>
       </b-modal>
@@ -32,25 +30,15 @@
                   @drag-leave="dragLeaveHandler"
                   @drag-over="dragOverHandler"
                   @drag-end="dragEndHandler"
-                  @drop="dropHandler"
-          
-
-                  >
-
-
-
-
+                  @drop="dropHandler">
                   </vue-drag-tree> 
               </b-col>
               <b-col cols="9" class="block-2">
                 <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
-                  
                   <b-table :items="items" :fields="fields" stacked="lg"
                   show-empty
                   no-border-collapse
-                  hover
-                  
-                  >
+                  hover>
                     <template #cell(#)="data">
                       <div @click="rowSelected(data.item)" class="text-center w-100">
                         {{ data.index + 1 }}
@@ -257,19 +245,14 @@ export default {
       },
       allowDrag(model, component) {
         if (component.depth!=1){
-        // if (model.name === 'Node 0-1') {
-        // can't be dragged
           return true;
         }
-        // can be dragged
         return false;
       },
       allowDrop(model, component) {
         if (component.depth==1){
-        // can't be placed
           return true;
         }
-        // can be placed
         return false;
       },
       allowDragModal(model, component) {
@@ -282,8 +265,6 @@ export default {
         this.nameNode = model.name,
         this.idNode=model.id,
         this.parId = model.parrent
-        // console.log(this.idNode == this.oldId)
-        // console.log(this.idNode, this.oldId)
         if(this.idNode == this.oldId){
           if (this.items.length>0){
             this.items=[]
@@ -381,7 +362,6 @@ export default {
             }
           })
         }
-      // location.href = "#finishList"
       },
       delRow(id){
         if (confirm(this.$t('alert.remove'))) {
@@ -508,11 +488,8 @@ export default {
       }
     },
     mounted(){
-      setTimeout(() => {
-        this.$socket.send('getDevices')
+      this.getDevices()
         this.$options.sockets.onmessage = (data) => (data.data=='getDevices') ? this.getDevices(): ''
-      },1000);
-
     }
   }
 </script>

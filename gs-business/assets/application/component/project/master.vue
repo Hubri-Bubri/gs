@@ -11,15 +11,12 @@
               <b-button @click="addProject" variant="primary" class="text-nowrap">{{$t('projects.addProject')}}</b-button>
             </b-col>
             <b-col col  xl="3" lg="3" md="8" sm="8" cols="6">
-
                 <b-form-input
                 class="w-100"
                 v-model="filter"
                 type="search"
                 :placeholder="$t('projects.search')">
                 </b-form-input>
-
-
             </b-col>
             <b-col col  xl="1" lg="1" md="2" sm="2" cols="3"> 
 <b-dropdown  variant="primary" dropright>
@@ -50,8 +47,6 @@
         <container>
           <container-body>
             <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
-              <!-- :busy="((items.length==0) && (selected.length!=0))" -->
-
             <b-table hover :items="items" :fields="getFields()" @row-clicked="inItemClick" 
               :filter="filter"
               :filter-included-fields="filterOn"
@@ -62,16 +57,12 @@
               :busy="isBusy"
              >
               <template #cell(status_set)="data" >
-
-
                     <b-icon v-for="plan in getPlans(data.item.subPlan)" v-if="(data.item.subPlan!=undefined)"
                     :icon="(plan.autosend==1)?'arrow-repeat':'gear'" aria-hidden="true" scale="2" :key="plan.id"
                     :variant="detectColorPlan(plan.lastsend)" style="margin:9px;" />
 
                     <b-icon icon="card-text" aria-hidden="true" v-if="(data.item.subPlan==undefined)||(data.item.subPlan.length==0)"
                      scale="1.5" />
-
-
               </template>
               <template #cell(other)="data">
                 <div class="text-container">
@@ -408,31 +399,6 @@ export default {
       }
     },
     getPlans(val){
-      // var autosend = 0
-      // var notautosend = 0
-      
-      // console.log(val)
-      // return val.filter((v)=>{
-      //   var lastsend = 0
-      //   if (v.autosend == 1){
-      //     if (autosend == 0){
-      //       autosend = 1
-      //       v.lastsend = 'not'
-      //       return v
-      //     }
-      //   }
-      //   if (v.autosend == 0){
-      //     if (v.lastsend == 'missed'){
-      //       lastsend = 'missed'
-      //     }
-      //     if (notautosend == 0){
-      //       notautosend = 1
-      //       v.lastsend = lastsend
-      //       return v
-      //     }
-      //   }
-      // });
-      // console.log(val)
       return val
     },
     getFields(){
@@ -454,7 +420,6 @@ export default {
       })
     },
     onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length
     },
     searchZip(val){
@@ -471,15 +436,12 @@ export default {
           for (var i=0; i<results.address_components.length; i++)
           {
             if (results.address_components[i].types[0] == "locality") {
-              //this is the object you are looking for City
               var  city = results.address_components[i];
             }
             if (results.address_components[i].types[0]=="postal_town"){
-              //this is the object you are looking for City for GB
               var  city = results.address_components[i];
             }
             if (results.address_components[i].types[0] == "administrative_area_level_1") {
-              //this is the object you are looking for State
               var  region = results.address_components[i];
             }
           }
@@ -492,7 +454,6 @@ export default {
       var done = '0'
       var notdone = '0'
       var auto = '0'
-
       e.forEach((v)=>{
         if(v==this.$t('states.done')){
           done='1'
@@ -537,13 +498,6 @@ export default {
         })
       }
     },
-    // updateWork(val, id){
-    //   axios.get('/updateProject', {params: {
-    //     id: id,
-    //     date: val,
-    //     fild: 'status_set'
-    //   }})
-    // },
     findRow(id, name){
       var intId=parseInt(id.split(' ')[1])
       var rows = this.getItems('Contracts').filter((v)=>{
@@ -708,20 +662,7 @@ export default {
         });
         this.isBusy = false;
       });
-
-      // this.$refs.sentInvoices.show();
-      // setInterval(this.changeColor, 2000);
     },
-    // changeColor(){
-    //   this.items.forEach(v=>{
-    //     if (v.subPlan!=undefined) {
-    //       // console.log(v)
-    //       if((v.subPlan.lastsend == 'missed')&(v.subPlan.autosend == '0')){
-    //         v._rowVariant=(v._rowVariant=='warning')?'danger':'warning'
-    //       }
-    //     }
-    //   })
-    // },
     computeStyle(value) {
       switch (value) {
         case 'Open':
@@ -778,10 +719,9 @@ export default {
       axios.get('/countries').then(response => {
         this.countries=response.data
       })
-    setTimeout(() => {
-       this.$socket.send('getProjects')
+      this.getProjects('011')
       this.$options.sockets.onmessage = (data) => (data.data=='getProjects') ? this.getProjects('011'): ''
-    },1000);
+
   }
 }
 </script>
@@ -801,33 +741,4 @@ export default {
   display: block;
   max-height: 3em;
 }
- 
-
-
-
-/*.block-1 {
-height: calc(87vh - 7rem);overflow-y: auto;
-}
-.block-2 {
-height: calc(87vh - 7rem);overflow-x: hidden;
-}*/
-/*@media only screen and (min-width : 768px) {
-.b-table-sticky-header {
-  overflow-y: auto;
-  max-height: 100%
-}
-
-  .b-table-sticky-header > .table.b-table > thead > tr > th {
-    position: sticky !important;
-    background-color: #fff;
-  }
-}
-@media only screen and (max-width : 767px) { 
-.b-table-sticky-header {
-  max-height: unset;
-}
-.sticky-header-lg{
-  overflow-x:hidden;
-}
-}*/
 </style>

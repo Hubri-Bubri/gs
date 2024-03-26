@@ -3,10 +3,8 @@
     <b-modal size="sm" centered id="ids" ref="ids" :title="$t('calcTableGroup.numberOfInvoice')" body-class="workerHeight" >
             <b-form-checkbox-group buttons  button-variant="light" style="width:100%" :checked="[selectedId]"  @change.native="selectedId=$event;"
             text-field="lastNumber" value-field="lastNumber" stacked :options="id_list" v-if="detectNewRound(id_list)" />
-
             <div v-else class="text-center">
             {{$t('calcTableGroup.newRange')}}
-
             <b-form-checkbox-group buttons  style="width:100%" :checked="[1]"
             @change.native="selectedId=$event"
              stacked :options="[1]" />
@@ -14,18 +12,13 @@
             <template slot="modal-footer">
               <button type="button" left class="btn btn-secondary" @click="addInvoiceLoad=true;okInvoice(!detectNewRound(id_list))">OK</button>
            </template>
-         
-           
         </b-modal>
-
     <b-modal size="sm" centered id="ids_sub" ref="ids_sub" :title="$t('calcTableGroup.numberOfSUBInvoice')" body-class="workerHeight"  >
-
             <b-input @change.native="selectedId=$event" />
             <template slot="modal-footer">
               <button type="button" left class="btn btn-secondary" @click="addSInvoiceLoad=true;okInvoiceSub();">OK</button>
            </template>
         </b-modal>
-
          <b-modal size="md" centered ref="shpart" :title="$t('calcTableGroup.addPart')">
           <b-container>
             <b-col cols="12" v-for="(nameofpart, index) in nameofparts"  :key="nameofpart.id">
@@ -68,12 +61,10 @@
               </b-row>
             </b-col>
           </b-container>
-
             <template slot="modal-footer">
                <b-button type="submit" variant="primary" data-toggle="addPart" @click="nameOfPart(nameofparts)">OK</b-button>
             </template>
          </b-modal>
-
       <b-modal size="md" centered id="addSub" ref="addSub" :title="$t('calcTableGroup.sub')">
         <b-form-group horizontal :label-cols="4" :label="$t('calcTableGroup.sub')+':'" style="padding: 5px;">
 
@@ -157,9 +148,6 @@
 
 </b-col>
     </b-row><br />
-<!-- value.length==0 -->
-
-
   <div class="text-center" v-show="rowsBusy">
     <strong v-if="rowsLoading" class="text-info">
         <b-spinner class="align-middle" ></b-spinner>
@@ -167,17 +155,8 @@
       </strong>
       <div v-else class="text-center">{{$t('projects.empty')}}</div>
     </div>
-
-
-  <!-- <draggable :value="tables" @input="onItems" :element="'div'" :options="{handle:'.handleTitle', group:'b', animation:150}"
-         :no-transition-on-drag="true" @start="drag=true" @end="checkMove($event)"> -->
-      
          <div v-for="table in tables" :key="table.id">
-          
-          <!-- <calc-table :nowTableId="tables" :value="table" :addtaxColapse="addtaxColapse" :tableId="table.id" :butDiscPerc="butDiscPerc" :unitType="unitType" :looks="looks"
-            :color="color" :selectedWorkers="selectedWorkers"  :type="type" v-on:changeSum="discOfPercent()"  :discP="discP"> -->
-
-            <calc-table
+             <calc-table
             :ref="'table'+table.id"
             :table="table"
             :unitPercent="((table.obj!='')&&(table.obj!=null))?table.obj.split(','):[]"
@@ -193,11 +172,8 @@
             </calc-table>
             <hr style="padding:0;margin:5px;display:none;" :id="'hr'+table.id"/>
         </div>
-      <!-- </draggable> -->
-
    </div>
 </template>
-
 <script type="text/javascript">
 import draggable from 'vuedraggable';
 import axios from 'axios';
@@ -208,22 +184,6 @@ export default {
     props: ['tmp', 'workers', 'availableMails', 'plan', 'works', 'selectedWorkers', 'opt', 'pid'],
     data() {
         return {
-
-            // head:null,
-            // id:null,
-            // type:null,
-            // disc:null,
-            // discP:null,
-            // tax:null,
-            // taxDub:null,
-            // taxP:null,
-            // taxPDub:null,
-            // netto:null,
-            // brutto:null,
-            // butDiscPerc:null,
-            // addtaxColapse:null,
-
-
             selectedTables:[],
             checked:false,
             tables:null,
@@ -233,62 +193,16 @@ export default {
             addInvoiceLoad:false,
             addSInvoiceLoad:false,
             customer_sub:[],
-            raports:[],
-            counter: -1,
-            moveToCopyRadio: 'Move',
-            moveToCopy: [],
-            tmpArr: [],
             color: [],
-            oldColor: [],
             nameofparts:null,
-            // nameofpart: null,
-            // folderInDocuments:null,
-            // folderInImages:null,
             shpart: null,
-            oldPartx: [],
-            // selectedWorkers: [],
-            searchWorker:'',
             selectedId: null,
             id_list:[],
             unitType: [],
-            numberforsub: null,
-            fieldsTableD: {
-                number: {
-                    label: 'Number',
-                    sortable: true
-                },
-                date: {
-                    label: 'Date',
-                    sortable: true
-                },
-                place: {
-                    label: 'Place',
-                    sortable: true
-                },
-                insurance_number: {
-                    label: 'Insurance Number',
-                    sortable: true
-                },
-
-                // other: {
-                //     label: 'Other',
-                //     sortable: true
-                // },
-               
-               
-
-                 status_set: {
-                    label: 'Status',
-                    sortable: true,
-                    class: 'status'
-                },
-
-              
-            },
+            numberforsub: null
         }
     },
 computed: {
-
     total: function() {
         var vm = this;
             return function(value) {
@@ -301,7 +215,6 @@ computed: {
                 return summa; //количество разрядов
             };
         },
-
   },
 mounted(){
     axios.get('/get_units').then(response => {
@@ -335,36 +248,55 @@ mounted(){
         var update_part_parametrs = (JSON.parse(data.data.split('update_part_parametrs:')[1]))
         this.$refs['table'+update_part_parametrs.table_id][0].update_part_parametrs(update_part_parametrs)
       }
-
     }
-
-
-
-
 },
 methods: {
+  linkForWorkersToCalcGroup(user, host, projectNumer, itemMenuImag){
+				this.tables.forEach((table) => {
+					if (table.id == this.selectedTables[0]) {
+						var notHaveFoolder = 1
+						itemMenuImag[0].children.forEach((folder) => {
+							if ((folder.name == table.name) & (notHaveFoolder == 1)) {
+								notHaveFoolder = 0
+								this.$clipboard('https://' + host + '/#/I/' + user + '/' + projectNumer + '/' + folder.name.replace(' ', '_'))
+							}
+						})
+						if (notHaveFoolder == 1) {
+							if (confirm('"' + table.name + '" ' + this.$t('projectDetail.notExist'))) {
+								axios.get('/add_images_menu', {
+									params: {
+										parent_id: '-1',
+										project: this.pid,
+										newName: table.name
+									}
+								}).then(response => {
+									this.$clipboard('https://' + host + '/#/I/' + user + '/' + projectNumer + '/' + response.data.name.replace(' ', '_'))
+								})
+							}
+							else {
+								this.$clipboard('https://' + host + '/#/I/' + user + '/' + projectNumer + '/' + 'General+Folder')
+							}
+						}
+					}
+				})
+	},
   getTablesInItem(id) {
 			axios.get('/get_tables_in_edit', {
 				params: {
 					id: id
 				}
 			}).then(response => {
-        // console.log(response.data)
 				this.tables = response.data;
         this.rowsLoading = false;
         this.rowsBusy = (response.data.length > 0) ? false : true;
 			})
 		},
-
-
 	seltable(id, e) {
-    // console.log(this.selectedTables)
       if (e){
         this.selectedTables.push(id)
       } else{
         this.selectedTables = this.selectedTables.filter( el => el !== id)
       }
-      // console.log(this.selectedTables)
       this.$emit('seltable', this.selectedTables)
   },
   addRow(count_row){
@@ -388,9 +320,7 @@ methods: {
         table_id: table_id
         }
     })
-    // console.log(id, dir, index)
   },
-
 exec(id){
   if (confirm(this.$t('alert.sure'))){
     axios.get('/plan_exec', {
@@ -426,10 +356,8 @@ detectExec(val){
       }
     }
   }
-
   var lastsend = this.$options.filters.dateInverse(val.lastsend).split(' ')[0].split('.')
   var last = new Date(lastsend[2]+'-'+lastsend[1]+'-'+lastsend[0])
-
   if (period < now){
     if(last < period){
       return ('danger')
@@ -456,36 +384,12 @@ if (id_list[id_list.length-1]){
 }
 return (year == nowYear)
 },
-        //   selectedDocs(event){
-        //   this.$emit('selectedDocs', event)
-        // },
-        // addPdf() {
-        //   this.$emit('addPdf')
-        // },
-        // printPdf() {
-        //   this.$emit('printPdf')
-        // },
-        // preview() {
-        //   this.$emit('preview')
-        // },
-        // printOffer() {
-        //   this.$emit('printOffer')
-        // },
-// hideWindowPrint(){
-//   this.$emit('hideWindowPrint')
-// },
-// openWindowPrint(){
-//   this.$emit('openWindowPrint')
-// },
 getSubCustomers(){
 axios.get('/customer_sub').then(response => {
                this.customer_sub=response.data;
                 this.$refs.addSub.show();
   })
-
-
 },
-
 updateItem(val, type, id, old) {
       if (old != val) {
         axios.get('/update_item_from_project', {
@@ -497,7 +401,6 @@ updateItem(val, type, id, old) {
         })
       }
 		},
-
     discOfPercent(){
       this.$emit('changeSum'); 
     },
@@ -510,7 +413,6 @@ updateItem(val, type, id, old) {
                       }
                   })
     },
-
       getOpt(){
        var opts = []
        this.opt.forEach((v)=>{
@@ -524,7 +426,6 @@ updateItem(val, type, id, old) {
           this.$refs.ids_sub.show();
         }else{
           axios.get('/detect_invoice').then(response => {
-            // console.log(response.data)
             this.id_list = response.data,
             this.selectedId = response.data[(response.data.length-1)].lastNumber,
             this.$refs.ids.show()
@@ -532,17 +433,14 @@ updateItem(val, type, id, old) {
         }}
 
         if(val=="Damage Description"){
-        // console.log(this.color)
         axios.get('/add_invoice', {
             params: {
                 id: this.tmp.id,
                 type: val,
                 number:this.color.join(),
                 labelForDelete:''
-
             }
             })
-
         }
         },
         okInvoice(newRange){
@@ -633,7 +531,6 @@ updateItem(val, type, id, old) {
 }
 </script>
 <style type="text/css">
- 
   .withoutbox input[type=checkbox] {
     display: none;
 }

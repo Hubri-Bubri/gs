@@ -1,6 +1,5 @@
 <template>
   <b-container>
-  
       <b-row align-v="center">
       <b-link style="text-decoration: none" @click="toog(table.id)">
         <div
@@ -18,19 +17,12 @@
         <span v-show="table.alt_summa!='0,00'" align-self="end" class="text-right" > {{$t('projectDetail.totalAlternative')}} {{table.alt_summa}} €</span>
         &nbsp;|&nbsp;
       </div>
-
       <div
         contenteditable
         class="diveditable"
         @click.prevent.self
         @blur="tableRename($event.target.innerText, table.id, table.device)"
         v-html="table.device"></div>
-
-      <!-- <b-icon
-        icon="trash"
-        aria-hidden="true"
-        @click="$emit('tableDelete', table.id, item_id)"
-        style="cursor: pointer" /> -->
     </b-row>
      <div visible :id="'dev'+table.id">
         <b-table-simple>
@@ -77,7 +69,6 @@
             <b-th colspan="2" class="text-center" style="white-space:nowrap;">{{$t('measurement.meterReading')}}</b-th>
             <b-th colspan="2"></b-th>
           </b-tr>
-
             <b-tr v-show="showRowFunc(content.id)" >
                 <b-td colspan="1" class="text-center">1</b-td>
                 <b-td colspan="2" class="text-center" style="padding-top: 5px;">{{$t('measurement.installation')}}</b-td>
@@ -101,12 +92,7 @@
                   @click="updateDeviceList(subIndex, worker, 'sworker', content.id, content.sworker);">
                   {{worker}}
                 </b-dropdown-item-button>
-                
               </b-dropdown>
-
-
-
-                  <!-- <b-form-select class="text-center" :value="content.sworker" :options="workers"  @change="updateDeviceList(subIndex, $event, 'sworker', content.id, content.sworker)"/> -->
                 </b-td>
                 <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.smReading.replace('.',',')"
                   @change="updateDeviceList(subIndex, $event.replace(',','.'), 'smReading', content.id, content.smReading.replace('.',','))"/></b-td>
@@ -136,12 +122,7 @@
                   @click="updateDeviceIntern(subIndex, index, worker, 'worker', row.id, row.worker);">
                   {{worker}}
                 </b-dropdown-item-button>
-                
               </b-dropdown>
-
-
-
-                  <!-- <b-form-select  class="text-center" :value="row.worker" :options="workers" @change="updateDeviceIntern(subIndex, index, $event, 'worker', row.id, row.worker)"/> -->
                 </b-td>
                 <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input :value="row.mReading.replace('.',',')"
                   @change="updateDeviceIntern(subIndex, index, $event.replace(',','.'), 'mReading', row.id ,row.mReading.replace('.',','))" style="text-align: center"/></b-td>
@@ -173,10 +154,7 @@
                   @click="updateDeviceList(subIndex, worker, 'fworker', content.id, content.fworker);">
                   {{worker}}
                 </b-dropdown-item-button>
-                
               </b-dropdown>
-
-                  <!-- <b-form-select class="text-center" :value="content.fworker" :options="workers" @change="updateDeviceList(subIndex, $event, 'fworker', content.id, content.fworker)"/> -->
                 </b-td>
                 <b-td colspan="2" class="text-center" style="white-space:nowrap;"><b-input class="cForm-input" style="text-align: center" :value="content.fmReading.replace('.',',')" @change="updateDeviceList(subIndex, $event.replace(',','.'), 'fmReading', content.id, content.fmReading.replace('.',','))"/></b-td>
                 <b-td colspan="2"></b-td>
@@ -199,7 +177,6 @@
     </div>
   </b-container>
 </template>
-
 <script type="text/javascript">
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
 import moment from 'moment';
@@ -220,19 +197,15 @@ export default {
     },
 
 fromTo(val){
-  
   function formatDate(date) {
   if (date!=undefined){
   let dd = date.getDate();
   dd < 10 ? dd = '0' + dd : '';
-
   let mm = date.getMonth() + 1;
   mm < 10 ? mm = '0' + mm : '';
-
   let yy = date.getFullYear();
   return  dd+'.'+mm+'.'+yy;
   }}
-  
   var from = [];
   var to =[];
   val.forEach((v)=>{
@@ -281,28 +254,17 @@ var d = Math.floor(seconds / (3600*24))
 var h = Math.floor(seconds % (3600*24) / 3600)
 var m = Math.floor(seconds % 3600 / 60)
 var s = Math.floor(seconds % 60)
-
 var dDisplay = d > 0 ? d + (d == 1 ? " day " : " days ") : ""
 var hDisplay = h +':'
 var mDisplay = m +'h'
 var result = dDisplay + hDisplay + mDisplay
-
 return result
-
   },
-  // toHours(v){
-  //   var partOfDays= v/24
-  //   var partOfHours = partOfDays.toString().split('.')[0]
-  //   var minusHaurs = partOfHours*24
-  //   return (v-minusHaurs)
-
-  // },
   difTime(start, end, t){
     var fend=end?end:moment().format("YYYY-MM-DD HH:mm:ss")
     var diffrent = moment(fend,"YYYY-MM-DD HH:mm").diff(moment(start,"YYYY-MM-DD HH:mm"), t)
     return diffrent
   },
-
   updateDeviceIntern(subIndex, index, newData, fild, id, old){
     if (old!=newData){
       axios.get('/updateDeviceIntern', {params: {
@@ -315,7 +277,6 @@ return result
       }})
     }
   },
-
   updateDeviceList(index, newData, fild, id, old){
      if (old!=newData){
       axios.get('/updateDeviceList', {
@@ -393,7 +354,6 @@ return result
       },
   },
   mounted() {
-    // unitPercent=((this.table.obj!='')&&(this.table.obj!=null))?this.table.obj.split(','):[];
     this.getRowsInDevice(this.table.id);
    }
 }

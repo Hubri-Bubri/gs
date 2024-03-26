@@ -13,7 +13,6 @@
               <b-dropdown  variant="primary" dropright>
                 <template #button-content>
                   {{$t('states.mode')}}
-                  <!-- <b-icon icon="list-check" aria-hidden="true"></b-icon>  -->
                 </template>
 
  <b-form-checkbox class="ml-2" style="width:200px;" switch @change="modeInvoice($event)">
@@ -39,23 +38,8 @@
               <b-dropdown  variant="primary" dropright>
                 <template #button-content>
                   {{$t('states.options')}}
-                  <!-- <b-icon icon="list-check" aria-hidden="true"></b-icon>  -->
                 </template>
 
-
-
-<!-- 
-            <b-form-checkbox-group 
-              class="m-2"
-              style="width:200px;"
-              switches
-              :value="selmode"
-              :options="typesForTablesOpt"
-              @change="keywordChange($event)">
-                
-              </b-form-checkbox-group> -->
-
-   
 <b-form-checkbox-group
                 class="m-2"
                 switches
@@ -276,32 +260,6 @@ export default {
       amount:null,
       op:[],
       comment:null,
-      // options: [
-      // {
-      //   value: 'Open',
-      //   text: 'Open'
-      // },
-      // {
-      //   value: 'Done',
-      //   text: 'Done'
-      // },
-      // {
-      //   value: 'Invoice',
-      //   text: 'Invoice'
-      // },
-      // {
-      //   value: 'Desiccation',
-      //   text: 'Desiccation'
-      // },
-      // {
-      //   value: 'Leakage_Detection',
-      //   text: 'Leakage Detection'
-      // },
-      // {
-      //   value: 'Restoration',
-      //   text: 'Restoration'
-      // }
-      // ],
       totalRows: 1,
       filter: null,
       filterOn: []
@@ -324,33 +282,7 @@ export default {
       var currentDate = `${year}-${month}-${day}`;
       return currentDate
     },
-    // calendar(){
-    //   return {'de':{
-    //                       labelPrevDecade: this.$t('calendar.labelPrevDecade'),
-    //                       labelPrevYear: this.$t('calendar.labelPrevYear'),
-    //                       labelPrevMonth: this.$t('calendar.labelPrevMonth'),
-    //                       labelCurrentMonth: this.$t('calendar.labelCurrentMonth'),
-    //                       labelNextMonth: this.$t('calendar.labelNextMonth'),
-    //                       labelNextYear: this.$t('calendar.labelNextYear'),
-    //                       labelNextDecade: this.$t('calendar.labelNextDecade'),
-    //                       labelToday: this.$t('calendar.labelToday'),
-    //                       labelSelected: this.$t('calendar.labelSelected'),
-    //                       labelNoDateSelected: this.$t('calendar.labelNoDateSelected'),
-    //                       labelCalendar: this.$t('calendar.labelCalendar'),
-    //                       labelNav: this.$t('calendar.labelNav'),
-    //                       labelHelp: this.$t('calendar.labelHelp')}}
-            
-    // },
-    // typesForTablesOpt(){
-    //   return [
-    //   (this.old_done[1]==0)?this.$t('alert.Invoices'):this.$t('states.subInvoices'),
-    //   (this.old_done[0]==0)?this.$t('states.unpaidInvoices'):this.$t('states.paidInvoices')
-    //   ]
-    // },
-
-    // selected(){
-    //   return []
-    // },
+   
     fieldsTable() {
       return [{
         key: 'number',
@@ -397,7 +329,6 @@ export default {
       {
         key: 'status_set',
         label: this.$t('fields.status'),
-        // sortable: true,
         variant: 'default'
       },
       {
@@ -465,11 +396,9 @@ export default {
       })
     },
     dataCharts(val){
-      // var valBruto = this.$options.filters.reThousandSeparator(val.brutto)
       var valBruto = parseFloat(val.brutto)
       var pay=this.summFromRow(val)*100/valBruto
       var withOut=100-(this.summFromRow(val)*100/valBruto)
-      // console.log(valBruto, pay, withOut)
       var t = 'i'
 
       if (val.type=='CREDIT'){
@@ -489,17 +418,14 @@ export default {
       return val
     },
     getBalance(mode){
-      // console.log(mode)
       axios.get('/balance', {
         params: {
           mode: mode
         }
       }).then(response => {
-        // console.log(response.data)
         var countSelect = 0
         this.items = response.data.filter((v)=>{
 
-          // console.log('2')
           v.date = this.$options.filters.dateInverse(v.date)
           v.days = this.difdate(v.date)
           v.status_set = (this.summFromRow(v)*66/v.brutto)+((34-(-this.difdate(v.date))*34/14)/2)
@@ -514,19 +440,11 @@ export default {
           if (v.type==30){
             v.type = 'DEBET'
             if((v.number.split(' ').length==1)|(v.number.split(' ').length==3)|(v.number.split(' ').length==5)){
-              // v.netto = this.$options.filters.thousandSeparator(v.netto)
-              // v.brutto = this.$options.filters.thousandSeparator(v.brutto)
+
             }
           }
           if (v.type==60){
-            // console.log('3')
             v.type = 'CREDIT' 
-            // v.netto = -v.netto
-            // console.log(v.brutto)
-            // v.brutto = -v.brutto
-            // console.log(v.brutto)
-            // v.netto = '-'+this.$options.filters.thousandSeparator(v.netto)
-            // v.brutto = '-'+this.$options.filters.thousandSeparator(v.brutto)
           }
           if (this.rowId!=null){
             this.items = this.items.filter((selected)=>{
@@ -540,10 +458,6 @@ export default {
             })
             
           }
-          // console.log(v.other=='TEC / 1 / 35.362 / 2022')
-          // if (v.id==552){
-          //   console.log(v)
-          // }
           return v
         });
         this.isBusy = false;
@@ -554,12 +468,11 @@ export default {
       })
     },
     summFromRow(row){
-      // console.log(row)
+
       var result = 0.0
       row.op.forEach((v)=>{
         result = parseFloat(result) + parseFloat(v.value)
-        // console.log(result)
-      })
+        })
       return result
     },
     difdate(val){
@@ -585,7 +498,7 @@ export default {
         this.items=[]
         this.getBalance(this.unpaid_all+this.me_sub+'|'+this.fd+'|'+this.td)
         this.old_done = this.unpaid_all+this.me_sub
-        // this.selmode=selected
+
       }
     },
     paid(e){
@@ -600,88 +513,10 @@ export default {
         this.items=[]
         this.getBalance(this.unpaid_all+this.me_sub+'|'+this.fd+'|'+this.td)
         this.old_done = this.unpaid_all+this.me_sub
-        // this.selmode=selected
+
       }
     },
 
-
-    // keywordChange(e){
-    //   // console.log(e)
-    //   var unpaid_all = '0'
-    //   var me_sub = '0'
-    //   var selected = []
-    //   var same = false
-    //   // var subinvoice = '0'
-
-    //   console.log(this.selmode)
-    //     e.forEach((v)=>{
-
-
-          
-    //       if(v==this.$t('states.unpaidInvoices')){
-    //           same = false
-    //           this.selmode.forEach((oldval)=>{
-    //             console.log(v, oldval, this.selmode)
-    //             if (v == oldval) {
-    //               same = true
-    //             }
-    //           })
-    //           if (same == false){
-    //             console.log('!')
-    //             unpaid_all='1'
-    //             selected.push(this.$t('states.paidInvoices'))
-    //           }
-    //         }
-
-    //         if(v==this.$t('states.paidInvoices')){
-    //           same = false
-    //           this.selmode.forEach((oldval)=>{
-    //             if (v == oldval) {
-    //               same = true
-    //             }
-    //           })
-    //           if (same == false){
-    //             unpaid_all='0'
-    //             selected.push(this.$t('states.unpaidInvoices'))
-    //           }
-    //         }
-
-    //         if(v==this.$t('states.subInvoices')){
-    //           same = false
-    //           this.selmode.forEach((oldval)=>{
-    //             if (v == oldval) {
-    //               same = true
-    //             }
-    //           })
-    //         if (same == false){
-    //             me_sub='0'
-    //             selected.push(this.$t('alert.Invoices'))
-    //           }
-    //         }
-
-    //         if(v==this.$t('alert.Invoices')){
-    //           same = false
-    //           this.selmode.forEach((oldval)=>{
-    //             if (v == oldval) {
-    //               same = true
-    //             }
-    //         })
-    //         if (same == false){
-    //             me_sub='1'
-    //             selected.push(this.$t('states.subInvoices'))
-    //           }
-    //         }
-    //     })
-
-      
-    //   if ((unpaid_all+me_sub+'|'+this.fd+'|'+this.td)!=this.old_done+'|'+this.fd+'|'+this.td){
-    //     this.op=[]
-    //     this.items=[]
-    //     this.getBalance(unpaid_all+me_sub+'|'+this.fd+'|'+this.td)
-    //     this.old_done = unpaid_all+me_sub
-    //     this.selmode=selected
-    //   }
-    // },
     updateBalance(val, operation, type) {
       if (operation.new){
         this.$set(operation, type, val)
@@ -721,7 +556,6 @@ export default {
       this.addPaymentState = true
     },
     addPayment(){
-      // console.log(Math.abs(this.amount),  Math.abs(this.summ()))
       var brutto = Math.abs(this.amount) - Math.abs(this.summ())
       var date = new Date();
       var getYear = date.toLocaleString("default", { year: "numeric" })
@@ -794,25 +628,18 @@ export default {
       return brutto
     },
     allbalance(){
-      // console.log(this.filter)
       var brutto = parseFloat(0.00)
       var gen_summa = parseFloat(0.00)
 
       this.items.filter((v)=>{
-        // v.brutto = v.brutto.replace('--', '-')
-        // v.netto = v.netto.replace('--', '-')
+    
         brutto = brutto + parseFloat(v.brutto)
         gen_summa = gen_summa + parseFloat(v.gen_summa)
-        // console.log(brutto, gen_summa)
+
       })
-     
-      // if (
-      //   (this.$security.account['id']==1) ||
-      //   (this.$security.account['id']==3)
-      // )
-      // {
+   
         return 'Netto '+this.$options.filters.thousandSeparator(gen_summa)+' €  Brutto '+this.$options.filters.thousandSeparator(brutto)+' €'
-      // }
+
     }
   },
   mounted(){

@@ -48,7 +48,6 @@
             <b-table stacked="lg" hover :items="items" :fields="getFields()" @row-clicked="inItemClick"
             show-empty :busy="isBusy" :filter="filter" :filter-included-fields="filterOn"
             @filtered="onFiltered" no-border-collapse>
-              <!-- :busy="(items.length==0)" -->
               <template #cell(in)="data">
                 <div class="text-center w-100">
                   {{ data.index + 1 }}
@@ -196,7 +195,6 @@ export default {
     },
     getCustomers(){
       axios.get('/customer').then(response => {
-        // v.date = this.$options.filters.dateInverse(v.date)
         this.items= response.data;
         this.items1=response.data;
         this.isBusy = false;
@@ -214,10 +212,8 @@ export default {
   },
   mounted(){
     this.totalRows = this.items.length
-    setTimeout(() => {
-      this.$socket.send('getCustomers')
-      this.$options.sockets.onmessage = (data) => (data.data=='getCustomers') ? this.getCustomers(): ''
-    },1000);
+    this.getCustomers()
+    this.$options.sockets.onmessage = (data) => (data.data=='getCustomers') ? this.getCustomers(): ''
   }
 }
 </script>

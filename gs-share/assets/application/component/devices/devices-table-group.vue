@@ -4,34 +4,7 @@
       <b-button size="sm" @click="$emit('openWindowPrint', 'Devices')">
           <b-icon icon="printer" aria-hidden="true"></b-icon>
         </b-button>
-    <!-- <print v-if="tmp.typeOfHead == 'Devices'"
-    :windowPrint="windowPrint"
-    :selectedCornty="selectedCornty"
-    :project="project" :tmp="tmp"
-    :account="account" :id="pid"
-
-    :partx="[]" :head="tmp.typeOfHead"
-    :addtaxColapsel="false"
-    :workers="workers" :comments="comments"
-    :customer="customer"
-    :person="person"
-    :selectCustomer="selectCustomer"
-    :selectPerson="selectPerson"
-    :selectedDocsList="selectedDocsList"
-    :addPdfs="addPdfs"
-    :makemodalpdf="makemodalpdf"
-    :typeDocsList="typeDocsList"
-    @selectedDocs="selectedDocs"
-    @addPdf="addPdf"
-    @addPdfSep="addPdfSep"
-    @printPdf="printPdf"
-    @preview="preview"
-    @printOffer="printOffer"
-    @hideWindowPrint="hideWindowPrint"
-    ref="print" 
-    >
-    </print> -->
-  </b-row>
+    </b-row>
     <div v-for="table in tables" :key="table.id">
       <devices-table
       :table="table"
@@ -61,31 +34,6 @@ export default {
       }
     },
   methods: {
-
-    // selectedDocs(event){
-    //   this.$emit('selectedDocs', event)
-    // },
-    // addPdf(){
-    //   this.$emit('addPdf')
-    // },
-    // addPdfSep(){
-    //   this.$emit('addPdfSep')
-    // },
-    // printPdf(){
-    //   this.$emit('printPdf')
-    // },
-    // preview(){
-    //   this.$emit('preview')
-    // },
-    // printOffer(){
-    //   this.$emit('printOffer')
-    // },
-    // hideWindowPrint(){
-    //   this.$emit('hideWindowPrint')
-    // },
-    // openWindowPrint(){
-    //   this.$emit('openWindowPrint')
-    // },
     updateNameDevice(newVal, id, partName) {
       if(newVal.target.innerText != partName){
         axios.get('/updateNameDevice', {
@@ -96,14 +44,6 @@ export default {
         })
       }
     }, 
-    // showTable(){
-    //   return this.value.filter((v)=>{
-    //     if(this.tmp.device.length>0){
-    //       return v
-    //     }
-    //   })
-    // },
-
 getTablesInDevices(id) {
   axios.get('/get_tables_in_devices', {
     params: {
@@ -118,10 +58,8 @@ getTablesInDevices(id) {
 }
 },
 mounted(){
-
     this.$options.sockets.onmessage = (data) => {
       var delimetr = data.data.split(':')
-
       if (delimetr[0] == 'update_part_device') {
         this.tables.filter((v)=>{
           if (v.id == delimetr[1]) {

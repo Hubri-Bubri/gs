@@ -5,33 +5,18 @@
         </container-header>
         <container-body>
      <b-modal size="md" centered id="move" ref="move" :title="$t('projectDetail.move')">
-        <!-- @change="moveToCopySelect($event, moveToCopyRadio)" v-model="moveToCopy" -->
          <b-form-select class="" id="move" v-model="selectedItems" :select-size="detectRowSise(items_menu)">
             <option v-for="item in detectItem(items_menu)" @click="selectedModal(item)">{{item.name}}</option>
          </b-form-select>
 
          <b-form-radio-group name="moveOrCopy" v-model="moveToCopyRadio" :options="[{'text':$t('company.copy'), 'value':'copy'}, {'text':$t('company.move'), 'value':'move'}]" />
          <template slot="modal-footer">
-<!--             <button type="button" class="btn btn-secondary" :disabled="counter==-1" @click="cancelPartx(counter)"><i class="fas fa-undo"></i> ({{(counter+1)}})</button>-->
             <button type="button" class="btn btn-primary" @click="okMoveToCopy">OK</button> 
          </template>
       </b-modal>
             <b-card :header="$t('projectDetail.reportList')" class="gs-container">
                  <container>
                     <container-body  style="overflow: unset;">
-                        <!-- <b-container fluid> -->
-                            <!-- <b-row>  -->
-                                <!-- <div style="padding:0;width:29%;height:70%;overflow-y:auto;overflow-x:hidden;position:fixed;">  -->
-      <!--                               <b-row class="border border-right-0 border-left-0" style="
-                                    padding: 0px;font-size: 12px; border-bottom: 2px solid #dee2e6 !important;
-                                    vertical-align: middle !important; border-spacing: 2px; border-color: grey;">
-                                     <b-col> <b> Tree </b> </b-col>
-                                    </b-row> -->
-
-<!--     <vue-drag-tree :data='items_menu' :allowDrag='allowDrag' :allowDrop='allowDrop'  disableDBClick
-    @drag="dragHandler" @drag-enter="dragEnterHandler"  @current-node-clicked="curNodeClicked"
-    @drag-leave="dragLeaveHandler" @drag-over="dragOverHandler" @drag-end="dragEndHandler"
-    @drop="dropHandler" :thrId="idNode" :parId="parId"></vue-drag-tree>  -->
 <b-row>
   <b-col cols="3" class="block-1">
    <vue-drag-tree
@@ -42,20 +27,12 @@
 
    disableDBClick
    @current-node-clicked='curNodeClicked'
-   @drag="dragHandler"
-   @drag-enter="dragEnterHandler"
-   @drag-leave="dragLeaveHandler"
-   @drag-over="dragOverHandler"
    @drag-end="dragEndHandler"
    @drop="dropHandler"
    >
-
     </vue-drag-tree>
-
 </b-col>
 <b-col cols="9" class="block-2">
-
-
 <div class="sticky-header-lg b-table-sticky-header m-0 p-0">
   <b-table-simple hover show-empty no-border-collapse stacked="lg">
   <b-thead>
@@ -63,7 +40,6 @@
       <b-th v-for="(fild, index) in fields" :key="fild.key">{{fild.label}}</b-th>
     </b-tr>
   </b-thead>
-
     <draggable  :element="'tbody'" :options="{handle:'.handle',  group:'a', animation:150}"
                   :no-transition-on-drag="true" @end="checkMove" >
     <b-tr v-for="(tr, index) in items"  :key="tr.key" :variant="tr._rowVariant">
@@ -76,38 +52,25 @@
         @blur="updateDate($event.target.innerHTML, 'pos_num', tr.id)"
         v-html="tr.pos_num" />
       </b-td>
-
-
-
       <b-td>
- 
-  <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'"
+   <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'"
   contenteditable="true" @click.prevent.self v-html="tr.service"
   @blur="updateDate($event.target.innerHTML, 'service', tr.id)" />
-
-
       </b-td>
-
       <b-td>
- 
- <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'"
+  <div :style="'max-width:'+(width/3.8)+'px;width:100%;padding-left:4px;'"
  contenteditable="true" @click.prevent.self v-html="tr.time"
  @blur="updateDate(parseFloat($event.target.innerHTML), 'time', tr.id)" />
-
-
      </b-td>
-      
-      <b-td><b-link @click="delRow(tr.id)"><b-icon icon="trash" aria-hidden="true"></b-icon></b-link></b-td>
+<b-td><b-link @click="delRow(tr.id)"><b-icon icon="trash" aria-hidden="true"></b-icon></b-link></b-td>
     </b-tr>
 </draggable>
 </b-table-simple>
 </div>
 </b-col>
 </b-row>
-
-                                    <div hidden>{{ selected }}</div>
-
-                    </container-body>
+<div hidden>{{ selected }}</div>
+</container-body>
                 </container>
                 <b-card-footer>
                     <b-col cols="12">
@@ -116,16 +79,12 @@
                                 <b-button @click="add">{{$t('projectDetail.plusPart')}}</b-button>
                                 <b-button @click="remove">{{$t('projectDetail.remove')}}</b-button>
                             </b-input-group-append>
-                           
                            <b-input-group-append>
                                 <b-button @click="addRow">{{$t('projectDetail.plusRow')}}</b-button>
                                 <b-button @click="mv_cp">{{$t('projectDetail.move')}}</b-button>
                             </b-input-group-append>
-
                                 <b-form-input class="sqare" v-model="nameNode" :style="nodeDis?'background-color:grey':''"
                                 @click.native="nodeDis?nodeDisTurn():''" @change="nodeDis=true;toModel(nameNode)"></b-form-input>
-                     
-                            
                         </b-input-group>
                     </b-col>
                 </b-card-footer>
@@ -160,7 +119,6 @@ export default {
           drag1: null,
           drag2: null
     }
-
   },
    computed: {
     fields(){
@@ -211,15 +169,12 @@ selectElementContents(el);
         value = '0.0'
       }
       value = value.replace(',','.')
-      // console.log(1, value)
       var value = parseFloat(value)
-      // console.log(2, value)
       value = value.toString()
       value = value.replace('.',',')
       value = (value=='NaN')?0:value
       if (value.length < 3){
         value = '&nbsp;&nbsp;'+value+'&nbsp;&nbsp;'
-        // console.log(4, value)
       }
       return value
     },
@@ -270,8 +225,6 @@ getLoocks(){
           if (this.stopDis==true) result = false
           return result
       },
-
-
       checkMove(event){
                      axios.get('/update_id_in_reports', {
                       params: {
@@ -308,7 +261,6 @@ getLoocks(){
                             this.items_menu.push(val);
                         }
                });
-
                 response.data.forEach((valResp)=>{
                   function findLevel(obj, id) {
                         obj.forEach((val)=>{
@@ -327,23 +279,17 @@ getLoocks(){
                });
             })
         },
-    
     allowDrag(model, component) {
         if (component.depth!=1){
-      // if (model.name === 'Node 0-1') {
-        // can't be dragged
         return true;
       }
-      // can be dragged
       return false;
     },
     
     allowDrop(model, component) {
       if (component.depth==1){
-        // can't be placed
         return true;
       }
-      // can be placed
       return false;
     },
      allowDragModal(model, component) {
@@ -357,8 +303,6 @@ getLoocks(){
         this.nameNode = model.name,
         this.idNode = model.id,
         this.parId = model.parrent
-        // console.log(this.idNode == this.oldId)
-        // console.log(this.idNode, this.oldId)
         if(this.idNode == this.oldId){
           if (this.items.length>0){
                 this.items=[]
@@ -405,7 +349,6 @@ getLoocks(){
                 }
             })
         }
-
         findLevel(this.items_menu, this.idNode)
     },
     remove(){
@@ -426,7 +369,6 @@ getLoocks(){
         }
     },
     add(){
-
       function findLevel(obj, id) {
         if (id==null){
             id=0,
@@ -446,11 +388,7 @@ getLoocks(){
                 }
             })
         }
-
         findLevel(this.items_menu, this.idNode)
-        
-        
-       
     },
     addRow(){
         if (this.idNode==null){
@@ -462,9 +400,7 @@ getLoocks(){
                 }
             })
         }
-
     location.href = "#finishList"
-
     },
     delRow(id){
         if (confirm(this.$t('alert.remove'))) {
@@ -542,7 +478,6 @@ getLoocks(){
                     } else{addCount=''}
             })
         }
-
         findLevel(items)  
         return returnArr.length
     },
@@ -561,24 +496,7 @@ getLoocks(){
                  }
              })
         }
-    },
-     dragHandler(model, component, e) {
-    
-    //    // console.log('dragHandler: ', model, component, e);
-     },
-    
-     dragEnterHandler(model, component, e) {
-    //    //  console.log('dragEnterHandler: ', model, component, e);
-     },
-    
-     dragLeaveHandler(model, component, e) {
-    //    // console.log('dragLeaveHandler: ', model, component, e);
-     },
-    
-     dragOverHandler(model, component, e) {
-    //    // console.log('dragOverHandler: ', model, component, e);
-     },
-    
+    },   
      dragEndHandler(model, component, e) {
       //console.log('dragEndHandler: ', model, component, e);
         this.drag1=model.id;
@@ -592,26 +510,19 @@ getLoocks(){
           this.drag2=null;          
         })
       },
-    
     dropHandler(model, component, e) {
-       // console.log('dropHandler: ', model, component, e);
         this.drag2=model.id;
     }
   },
   
     
 mounted(){
-    window.addEventListener('resize', this.updateWidth);
-    this.updateWidth();
-  setTimeout(() => {
-        this.$socket.send('getReports')
-        this.$options.sockets.onmessage = (data) => (data.data=='getReports') ? this.getReports(): ''
-        this.$options.sockets.onmessage = (data) => (data.data=='getLoocks') ? (this.getLoocks()): ''
-        },1000);
+    window.addEventListener('resize', this.updateWidth)
+    this.updateWidth()
+    this.getReports()
+    this.$options.sockets.onmessage = (data) => (data.data=='getReports') ? this.getReports(): ''
+    this.$options.sockets.onmessage = (data) => (data.data=='getLoocks') ? (this.getLoocks()): ''
 
         }
     }
 </script>
-/*<style type="text/css">
-
-</style>*/

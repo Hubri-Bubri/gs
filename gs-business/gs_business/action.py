@@ -38,8 +38,7 @@ from aiohttp_session import get_session
 from uuid import uuid4
 from aiohttp_security import remember, has_permission, login_required
 from gs_security.authorization import check_credentials
-# from gs_api.dictionary import (Application, User, Project, Projects, Offer, Invoice, add_same, Del_offer, Offers, Docs, Customer, Prices, Devices,
-#                                Damage, Personals, Balance, Sub, add_same_sub, SubInvoice, Del_offer_sub, Reports, System)
+
 from gs_api.dictionary import (User, Project, Projects, add_same, Del_offer, Docs, Customer, Prices, Devices, Damage, Personals, Balance, Reports, System, Invoice)
 from gs_api.langcore import language
 from asyncio import ensure_future, gather, shield
@@ -69,11 +68,8 @@ async def method (request):
 
 @routes.get('/logout')
 async def profile(request):
-    # await session.close()
     session = await get_session(request)
     session.clear()
-    # print(session)
-    # session["AIOHTTP_SECURITY"] = None
     return web.json_response('')
 
 
@@ -95,11 +91,6 @@ async def method (request):
 async def method (request):
     await System.general()
     return web.json_response('')
-
-# @routes.get('/remove_empty_percent!')
-# async def method (request):
-#     await System.remove_empty_percent()
-#     return web.json_response('')
 
 @routes.get('/check_for_percent_transfer!')
 async def method (request):
@@ -363,10 +354,6 @@ async def method (request):
 async def method (request):
     return web.json_response(await Projects.select_project_new(request.query['id']))
 
-# @routes.get('/get_tables')
-# async def method (request):
-#     return web.json_response(await Projects.get_tables(request.query['id']))
-
 @routes.get('/get_tables_for_docs')
 async def method (request):
     return web.json_response(await Projects.get_tables_for_docs(request.query['id']))
@@ -483,25 +470,14 @@ async def method (request):
         await client.send_str('getProjectDetail')
     return result
 
-# @routes.get('/update_id_in_one_table_reports')
-# async def method (request):
-#     result =  web.json_response(await Reports.update_id_in_one_table_reports(request.query['newIndex'], request.query['oldIndex'], request.query['newPart']))
-#     for client in ws_clients:
-#         await client.send_str('getProjectDetail')
-#     return result
-
 @routes.get('/update_id_in_one_damage')
 async def method (request):
     await Damage.update_id_in_one_damage(request.query['newIndex'], request.query['oldIndex'], request.query['newPart'])
-    # for client in ws_clients:
-    #     await client.send_str('getProjectDetail')
     return web.json_response('')
 
 @routes.get('/update_id_damage')
 async def method (request):
     await Damage.update_id_damage(request.query['newIndex'], request.query['newPart'], request.query['oldIndex'], request.query['oldPart'])
-    # for client in ws_clients:
-    #     await client.send_str('getProjectDetail')
     return web.json_response('')
 
 @routes.get('/update_id')
@@ -510,11 +486,6 @@ async def method (request):
     for client in ws_clients:
         await client.send_str('getProjectDetail')
     return result
-
-@routes.get('/update_id_reports')
-async def method (request):
-    await Reports.update_id_reports(request.query['newIndex'], request.query['newPart'], request.query['oldIndex'], request.query['oldPart'])
-    return web.json_response('')
 
 @routes.get('/update_id_in_prise')
 async def method (request):
@@ -541,45 +512,17 @@ async def method (request):
 
 @routes.get('/changeDisableTable')
 async def method (request):
-    # print(ws_clients)
-    # await Projects.changeDisableTable(
-    #     request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients)
-
-    # for client in ws_clients:
-    #     await client.send_str('getLoocks')
     return web.json_response('')
 
 @routes.get('/getLoocks')
 async def method (request):
-    #  return web.json_response(await Projects.getLoocks())
      return web.json_response('')
-
-# @routes.get('/paypal')
-# async def method (request):
-#     # with urllib.request.urlopen("https://www.paypal.com/de/signin") as url:
-#     #     s = url.read()
-#     #     # I'm guessing this would output the html source code ?
-    
-#     # print(str(s))
-#     fp = urllib.request.urlopen("https://www.paypal.com/de/signin")
-#     mybytes = fp.read()
-#     mystr = mybytes.decode("utf8")
-#     fp.close()
-
-#     mystr = mystr.replace('<head>', '<head><base target="_self"> ')
-#     mystr = mystr.replace('="/', '="/bfiles?url=/')
-#     mystr = mystr.replace(':"/', ':"/bfiles?url=/')
-#     mystr = mystr.replace('if (self === top || isEligibleIntegration()) {var antiClickjack = document.getElementById("antiClickjack");if (antiClickjack) {antiClickjack.parentNode.removeChild(antiClickjack);}} else {top.location = self.location;}', '')
-    
-#     print(mystr)
-#     return web.json_response(mystr)
 
 @routes.get('/bfiles')
 async def method (request):
     url = request.query['url']
     fp = urllib.request.urlopen("https://www.paypal.com"+url)
     mybytes = fp.read()
-    # print('run')
     resp = web.StreamResponse(headers={
          'CONTENT-DISPOSITION': 'inline'
         })
@@ -601,14 +544,6 @@ async def method (request):
 @routes.get('/get_files_company')
 async def method (request):
     return web.json_response(await Projects.get_files_company(request.query['id']))
-
-@routes.get('/domage_images_customer')
-async def method (request):
-    return web.json_response(await Projects.get_damage_images_customer(request.query['id']))
-
-@routes.get('/domage_images_person')
-async def method (request):
-    return web.json_response(await Projects.get_damage_images_person(request.query['id']))
 
 @routes.get('/get_files_firma')
 async def method (request):
@@ -659,7 +594,6 @@ async def method (request):
 @routes.get('/projects')
 async def method (request):
     return web.json_response(await Projects.select_projects(request.query['done']))
-    # return web.json_response(await Projects.select_projects(request.query['page']))
 @routes.get('/date_logo')
 async def method (request):
     return web.json_response(await Docs.date_logo())
@@ -675,7 +609,6 @@ async def method (request):
 @routes.get('/get_sub_emails')
 async def method (request):
     return web.json_response(await Customer.get_sub_emails(request.query['factory']))
-
 
 @routes.get('/add_project')
 async def method (request):
@@ -701,9 +634,6 @@ async def method (request):
     fild = str(fild)
     updateProjectSend = ''
 
-    # if((fild == 'person_id') | (fild == 'mail') | (fild == 'phone') | (fild == 'fax')):
-    #     # updateProjectSend = 'get_person' #get_person
-   
     if((fild == 'area') | (fild == 'zip1') | (fild == 'city1') | (fild == 'street1') | (fild == 'date') | (fild == 'other')):
         updateProjectSend = 'getProjectDetail'
 
@@ -718,13 +648,6 @@ async def method (request):
         await client.send_str('get_person')
     return result
 
-@routes.get('/table_data')
-async def method (request):
-    return web.json_response(await Project.table_data(request.query['id']))
-
-@routes.get('/invoice_data_table')
-async def method (request):
-    return web.json_response(await Project.invoice_data_table(request.query['id']))
 
 @routes.get('/update_table_data')
 async def method (request):
@@ -763,8 +686,6 @@ async def method (request):
 async def method (request):
     return web.json_response(await Project.update_table_data(request.query['id'], request.query['fild'], request.query['data']))
 
-
-
 @routes.get('/get_units')
 async def method (request):
     return web.json_response(await Project.get_units())
@@ -778,14 +699,11 @@ async def method (request):
             request.query['description_from_price'], request.query['count'], request.query['discount'], request.query['price'], request.query['status'], request.query['alttax'],
             request.query['summa'], request.query['unit'], request.query['without']
             ))
-#     # for client in ws_clients:
-#     #     await client.send_str('getProjectDetail')
      return result
     
 @routes.get('/add_person1')
 async def method (request):
     return web.json_response(await Project.add_person1())
-
 
 @routes.get('/add_person')
 async def method (request):
@@ -849,8 +767,6 @@ async def method (request):
     await Project.table_delete(request.query['id'], request.query['item_id'], ws_clients)
     return web.json_response('')
 
-
-
 @routes.get('/updateNameDevice')
 async def method (request):
     result= web.json_response(await Project.updateNameDevice(request.query['nameDevice'], request.query['id']))
@@ -886,16 +802,7 @@ async def method (request):
 
 @routes.get('/update_task')
 async def method (request):
-    # print(request.query['data'], request.query['fild'], request.query['id'])
     result= web.json_response(await Docs.update_task(request.query['data'], request.query['fild'], request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
-
-
-@routes.get('/add_task')
-async def method (request):
-    result = web.json_response(await Docs.add_task(request.query['name'], request.query['id'], request.query['start'], request.query['end']))
     for client in ws_clients:
         await client.send_str('getProjectDetail')
     return result
@@ -906,14 +813,6 @@ async def method (request):
     for client in ws_clients:
         await client.send_str('getProjectDetail')
     return result
-
-@routes.get('/workers_task')
-async def method (request):
-    result = web.json_response(await Project.workers_task(request.query['workers'], request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
-
 
 @routes.get('/add_customer_list')
 async def method (request):
@@ -966,7 +865,6 @@ async def method (request):
 
 @routes.get('/updateContact')
 async def method (request):
-    # print(request.query['id'], request.query['date'], request.query['type'])
 
     result= web.json_response(await Customer.updateContact(request.query['id'], request.query['date'], request.query['type']))
     for client in ws_clients:
@@ -1015,14 +913,6 @@ async def method (request):
         await client.send_str(update)
     return result
 
-@routes.get('/offer')
-async def method (request):
-    return web.json_response(await Offer.select_offer(request.query['id']))
-
-@routes.get('/invoice')
-async def method (request):
-    return web.json_response(await Invoice.select_invoice(request.query['id']))
-
 @routes.get('/detect_invoice')
 async def method (request):
     return web.json_response(await Invoice.detect_invoice())
@@ -1055,15 +945,6 @@ async def method (request):
     await Del_offer.del_item(request.query['id'], ws_clients)
     return web.json_response('')
     
-    
-# @routes.get('/offers')
-# async def method (request):
-#     return web.json_response(await Offers.select_offers(request.query['id']))
-
-@routes.get('/invoices')
-async def method (request):
-    return web.json_response(await Invoice.select_invoices(request.query['id']))
-
 @routes.get('/reports')
 async def method (request):
     return web.json_response(await Reports.select_reports(request.query['id']))
@@ -1095,7 +976,6 @@ async def method (request):
 @routes.get('/show_imgs')
 async def method (request):
     return web.json_response('')
-    # return web.json_response(await Docs.show_docs(request.query['id']))
 
 @routes.get('/price_menu')
 async def method (request):
@@ -1132,10 +1012,6 @@ async def method (request):
 @routes.get('/docs_personal_menu')
 async def method (request):
     return web.json_response(await Docs.docs_personal_menu(request.query['project']))
-
-# @routes.get('/get_files_sperson')
-# async def method (request):
-#     return web.json_response(await Docs.get_files_sperson(request.query['project']))
 
 @routes.get('/change_parrent_menu')
 async def method (request):
@@ -1268,11 +1144,6 @@ async def method (request):
     for client in ws_clients:
         await client.send_str('getPersonalFiles')
     return result
-
-@routes.get('/add_price_menu1')
-async def method (request):
-    return web.json_response(await Prices.add_price_menu1()) 
-
 
 @routes.get('/update_name_reports_menu')
 async def method (request):
@@ -1568,13 +1439,6 @@ async def method (request):
         await client.send_str('getDocs')
     return result
 
-# @routes.get('/mv_sub_images')
-# async def method (request):
-#     result = web.json_response(await Docs.mv_sub_images(request.query['files_ids'], request.query['new_menu']))
-#     for client in ws_clients:
-#         await client.send_str('getDocs')
-#     return result
-
 @routes.get('/mv_files_sub')
 async def method (request):
     result = web.json_response(await Docs.mv_files_sub(request.query['files_ids'], request.query['new_menu']))
@@ -1675,7 +1539,6 @@ async def method (request):
     result = web.json_response(await Project.updatefilename(request.query['val'], request.query['type'], request.query['id']))
     for client in ws_clients:
         await client.send_str('getDocs')
-                # await client.send_str('getProjectDetail')
     return result
 
 @routes.get('/updatefilename_company')
@@ -1705,7 +1568,6 @@ async def method (request):
         await Project.updatefilename(request.query['val'], request.query['type'], int(oneid))
     for client in ws_clients:
         await client.send_str('getDocs')
-                # await client.send_str('getProjectDetail')
     return web.json_response('')
 
 @routes.get('/updatedocname')
@@ -1713,7 +1575,6 @@ async def method (request):
     result = web.json_response(await Project.updatedocname(request.query['val'], request.query['type'], request.query['id']))
     for client in ws_clients:
         await client.send_str('getDocs')
-                # await client.send_str('getProjectDetail')
     return result
 
 @routes.get('/get_workers')
@@ -1724,8 +1585,6 @@ async def method (request):
 async def method (request):
     return web.json_response(await Project.get_type_works())
     
-
-# Personals
 @routes.get('/get_templates_for_factory')
 async def method (request):
     return web.json_response(await Personals.get_templates_for_factory())
@@ -1827,14 +1686,12 @@ async def method (request):
         await client.send_str('getPersonal')
     return result
 
-
 @routes.get('/remove_personal')
 async def method (request):
     result = web.json_response(await Personals.remove_personal(request.query['id'], request.query['type']))
     for client in ws_clients:
         await client.send_str('getPersonal')
     return result
-
 
 @routes.get('/remove_personal_menu')
 async def method (request):
@@ -1872,239 +1729,10 @@ async def method (request):
         await client.send_str('getReports')
     return result
 
-@routes.get('/getdata_personal')
-async def method (request):
-    return web.json_response(await Personals.getdata_personal()) 
-
-#end of Personals
-#start of Sub
-
-@routes.get('/sub_order')
-async def method (request):
-    return web.json_response(await Sub.sub_order())
-
-@routes.get('/send_price_sub')
-async def method (request):
-    result = web.json_response(await Sub.send_price(request.query['ids'], request.query['names']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/add_part_sub')
-async def method (request):
-    result= web.json_response(await Sub.add_part(request.query['part_name'], request.query['item_id']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/sub')
-async def method (request):
-    return web.json_response(await Sub.select_projects(request.query['page']))
-
-@routes.get('/sub_detail')
-async def method (request):
-    return web.json_response(await Sub.select_project(request.query['id']))
-
-@routes.get('/get_tables_sub')
-async def method (request):
-    return web.json_response(await Sub.get_tables(request.query['id']))
-
-
-@routes.get('/del_row_from_table_sub')
-async def method (request):
-    result =  web.json_response(await Sub.del_row_from_table(request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/update_id_in_one_table_sub')
-async def method (request):
-    result =  web.json_response(await Sub.update_id_in_one_table(request.query['newIndex'], request.query['oldIndex'], request.query['newPart']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/update_id_sub')
-async def method (request):
-    result =  web.json_response(await Sub.update_id(request.query['newIndex'], request.query['newPart'], request.query['oldIndex'], request.query['oldPart']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/update_id_table_sub')
-async def method (request):
-    result = web.json_response(await Sub.update_id_table(request.query['newIndex'], request.query['oldIndex'], request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/update_checkbox_table_sub')
-async def method (request):
-    result = web.json_response(await Sub.update_checkbox_table(request.query['id'], request.query['fild'], request.query['data']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/get_workers_sub')
-async def method (request):
-    return web.json_response(await Sub.get_workers())
-
-@routes.get('/getLoocks_sub')
-async def method (request):
-     return web.json_response(await Sub.getLoocks())
-
-@routes.get('/updateProjectTaxsSub')
-async def method (request):
-    result = web.json_response(await Sub.updateProjectTaxs(
-        request.query['id'],
-        request.query['tax'],
-        request.query['taxDub'],
-        request.query['taxP'],
-        request.query['taxPDub'],
-        request.query['disc'],
-        request.query['discP'],
-        request.query['butDiscPerc'],
-        request.query['addtaxColapse']
-        ))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/changeDisableTableSub')
-async def method (request):
-    # print(ws_clients)
-    await Sub.changeDisableTable(
-        request.query['type_operation'], request.query['fild'], request.query['id'], request.query['user'], ws_clients)
-
-    for client in ws_clients:
-        await client.send_str('getLoocksSub')
-    return web.json_response('')
-
-
-@routes.get('/sub_detail_new')
-async def method (request):
-    return web.json_response(await Sub.select_project_new(request.query['id']))
-
-@routes.get('/get_damage_sub')
-async def method (request):
-    return web.json_response(await Sub.get_damage(request.query['id']))
-
-@routes.get('/domage_images_sub')
-async def method (request):
-    return web.json_response(await Sub.get_damage_images(request.query['id'], request.query['project']))
-
-@routes.get('/get_images_sub')
-async def method (request):
-    return web.json_response(await Sub.get_images(request.query['id']))
-
-@routes.get('/add_sub')
-async def method (request):
-    result = web.json_response(await Sub.add_project(strftime("%Y", gmtime()), strftime("%Y-%m-%d", gmtime()), request.query['contry'], request.query['area'],  request.query['street'], request.query['zip']))
-    for client in ws_clients:
-        await client.send_str('getSub')
-    return result
-
-@routes.get('/updatSub')
-async def method (request):
-    # print(request.query['id'], request.query['date'], request.query['fild'])
-    result= web.json_response(await Sub.update(request.query['id'], request.query['date'], request.query['fild']))
-    fild = str(request.query['fild'])
-    updateSubSend = 'getSubDetail'
-
-    if((fild == 'person_id') | (fild == 'mail') | (fild == 'phone') | (fild == 'fax')):
-        updateSubSend = 'get_person' #get_person
-
-    if((fild == 'zip') | (fild == 'city') | (fild == 'street') | (fild == 'date')):
-        updateSubSend = 'project_sub_f'
-
-
-    # print(updateProjectSend)
-
-    for client in ws_clients:
-        await client.send_str(str(updateSubSend))
-    return result
-
-
-
-@routes.get('/update_table_data_sub')
-async def method (request):
-    result = web.json_response(await Sub.update_table_data(request.query['id'], request.query['fild'], request.query['data']))
-    for client in ws_clients:
-        await client.send_str('getSubDetail')
-    return result
-
-# @routes.get('/offer_sub')
-# async def method (request):
-#     return web.json_response(await SubOffer.select_offer(request.query['id']))
-
-@routes.get('/invoice_sub')
-async def method (request):
-    return web.json_response(await SubInvoice.select_invoice(request.query['id']))
-
-@routes.get('/detect_invoice_sub')
-async def method (request):
-    return web.json_response(await SubInvoice.detect_invoice())
-
-@routes.get('/get_reports_sub')
-async def method (request):
-    return web.json_response(await SubInvoice.get_reports(request.query['id']))
-
-@routes.get('/add_invoice_sub')
-async def method (request):
-    result = web.json_response(await Invoice.add_invoice(request.query['id'], request.query['type'], request.query['number'], request.query['newRange'], request.query['labelForDelete']))
-    for client in ws_clients:
-        await client.send_str('get_types_for_tables_f')
-    return result
-
-@routes.get('/add_same_sub')
-async def method (request):
-    return web.json_response(await add_same_sub.add_same(
-        request.query['add_number'],
-        request.query['add_work'],
-        request.query['add_insurance_number'],
-        request.query['add_place'],
-        request.query['add_comment'],
-        request.query['add_project_id'],
-        request.query['order_id'],
-        request.query['type'],
-        ))
-    
-# @routes.get('/del_item_sub')
-# async def method (request):
-#     result = web.json_response(await Del_offer_sub.del_item(request.query['id']))
-#     for client in ws_clients:
-#         await client.send_str('sub_detail_new_f')
-#     return result
-
-# @routes.get('/offers_sub')
-# async def method (request):
-#     return web.json_response(await SubOffers.select_offers(request.query['id']))
-
-@routes.get('/invoices_sub')
-async def method (request):
-    return web.json_response(await SubInvoice.select_invoices(request.query['id']))
-
-@routes.get('/update_item_from_sub')
-async def method (request):
-    result = web.json_response(await Sub.update_item(request.query['val'], request.query['type'], request.query['id']))
-    for client in ws_clients:
-        await client.send_str('getSub')
-        await client.send_str('getSubDetail')
-    return result
-
-@routes.get('/change_type_sub')
-async def method (request):
-    result =  web.json_response(await Sub.change_type(request.query['id'], request.query['type']))
-    for client in ws_clients:
-        await client.send_str('get_types_for_sub_tables_f')
-    return result
-
-# end of SUB
-#Offers
 @routes.get('/suggest')
 async def method (request):
     return web.json_response(await Projects.select_part(request.query['type'], request.query['mode']))
-# Balance
+
 @routes.get('/balance')
 async def method (request):
     return web.json_response(await Balance.select_balances(request.query['mode']))
@@ -2148,8 +1776,6 @@ async def method (request):
         await client.send_str('getBalance')
     return result
 
-# end of Balance
-
 @routes.get('/docs')
 async def method (request):
     return web.json_response(await Docs.select_docs(request.query['id']))
@@ -2177,7 +1803,6 @@ async def method (request):
     result= web.json_response(await Docs.delfile(request.query['id']))
     for client in ws_clients:
         await client.send_str('getDocs')
-        # await client.send_str('getProjectDetail')
     return result
 
 @routes.get('/delfile_company')
@@ -2226,61 +1851,6 @@ async def method (request):
         await client.send_str('getDocs')
     return result
 
-
-@routes.post('/load_img_in_group')
-async def method(request):
-    reader = await request.multipart()
-    part = await reader.next()
-    filename = part.filename
-    file_extension = os.path.splitext(filename)
-
-    group_id = request.headers.get('X-Group-Id')
-    arr = bytearray()
-
-    while True:
-        chunk = await part.read_chunk()  # 8192 bytes by default.
-
-        if not chunk:
-            break
-
-        arr.extend(chunk)
-        file = bytes(arr)
-
-        
-    added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-    #print(file, filename, group_id, added)
-    result= web.json_response(await Docs.upload_img_for_damages(
-        file, filename, group_id, added))
-    for client in ws_clients:
-        await client.send_str('getProjectDetail')
-    return result
-
-
-# @routes.post('/loadFiles')
-# async def method(request):
-#     reader = await request.multipart()
-#     part = await reader.next()
-
-#     filename = part.filename
-#     file_extension = os.path.splitext(filename)
-
-#     number = request.headers.get('number')
-#     group = request.headers.get('group')
-#     user = request.headers.get('user')
-#     arr = bytearray()
-
-#     print('= - =')
-
-#     print(request.content_length)
-
-#     result = await shield(part.read())
-#     print(result)
-#     print('= - =')
-
-#     return web.json_response('OK')
-
-
-
 @routes.post('/send_replace_image')
 async def method(request):
     form = await request.json()
@@ -2290,40 +1860,23 @@ async def method(request):
 
     new_data = image.replace('data:image/jpeg;base64,', '')
     imgdata = base64.b64decode(new_data)
-    # print(imgdata)
-
     return web.json_response(await Docs.send_replace_image(imgdata, id))
 
 @routes.post('/loadFiles')
 async def method(request):
-
- #   print(request)
     reader = await request.multipart()
- #   print('1')
     part = await reader.next()
- #   print('2')
     filename = part.filename
     file_extension = os.path.splitext(filename)
-    
-    #print('------------')
-    #print(request.headers)
-
     number = request.headers.get('X-Number')
     group = request.headers.get('X-Group')
     user = request.headers.get('X-User')
     folder = request.headers.get('X-Folder')
 
-# print(number)
-# print(group)
-# print(user)
-    # print(folder)
-
     arr = bytearray()
 
     while True:
-       # print('3')
         chunk = await part.read_chunk()  # 8192 bytes by default.
-  #      print(len(chunk))
         if not chunk:
             break
 
@@ -2342,8 +1895,6 @@ async def method(request):
            page_content = page_content + page.extractText().replace('\n', '<br />')
         
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-   # print('3.5')
-    
     result = (web.json_response(await Docs.upload_doc(
             file, filename, number, number_of_pages, group, added, user, page_content, folder)))
     for client in ws_clients:
@@ -2353,33 +1904,20 @@ async def method(request):
 @routes.post('/loadFilesWorkers')
 async def method(request):
 
- #   print(request)
     reader = await request.multipart()
- #   print('1')
     part = await reader.next()
- #   print('2')
     filename = part.filename
     file_extension = os.path.splitext(filename)
-    
-    #print('------------')
-    #print(request.headers)
-
     number = request.headers.get('X-Number')
     projet_id = request.headers.get('X-id')
     user = request.headers.get('X-User')
     folder = request.headers.get('X-Folder')
     group = None
-# print(number)
-# print(group)
-# print(user)
-    # print(folder)
 
     arr = bytearray()
 
     while True:
-       # print('3')
         chunk = await part.read_chunk()  # 8192 bytes by default.
-  #      print(len(chunk))
         if not chunk:
             break
 
@@ -2399,26 +1937,15 @@ async def method(request):
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
     added_foolder = strftime("%d.%m", gmtime())
 
-    # print('1 stage')
-    # print(folder, projet_id, added_foolder+' '+user)
-
     foolder_check = (await Docs.foolder_check(folder, projet_id, added_foolder+' '+user))
-    # print('2 stage')
-    # print(foolder_check)
 
     if (foolder_check == None):
-        # print('foolder_check == None')
-        # print(folder, projet_id, added_foolder+' '+user)
+    
         foolder_id = (await Docs.add_images_menu(folder, projet_id, added_foolder+' '+user))
     else:
-        # print('foolder_check != None')
         foolder_id = foolder_check
-    # print('3 stage')
-    # print(foolder_id)
     result = web.json_response(await Docs.upload_doc(file, filename, number, number_of_pages, group, added, user, page_content, foolder_id['id']))
-
     del_foolder = (await Docs.del_foolder(folder, projet_id, added_foolder+' '+user))
-
     for client in ws_clients:
             await client.send_str('getDocs')
     return result
@@ -2426,28 +1953,16 @@ async def method(request):
 @routes.post('/loadFilesToCompany')
 async def method(request):
  
- #   print(request)
     reader = await request.multipart()
- #   print('1')
     part = await reader.next()
- #   print('2')
     filename = part.filename
     file_extension = os.path.splitext(filename)
-    
-    #print('------------')
-    #print(request.headers)
-
     number = request.headers.get('X-Number')
-    # group = request.headers.get('X-Group')
     folder = request.headers.get('X-Folder')
     user = request.headers.get('X-User')
-   # print(user)
     arr = bytearray()
-
     while True:
-       # print('3')
         chunk = await part.read_chunk()  # 8192 bytes by default.
-  #      print(len(chunk))
         if not chunk:
             break
 
@@ -2466,46 +1981,28 @@ async def method(request):
            page_content = page_content + page.extractText().replace('\n', '<br />')
         
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-   # print('3.5')
     for client in ws_clients:
         await client.send_str('getPersonalFiles')
-   # print('4')
     return web.json_response(await Docs.upload_to_company(
         file, filename, number, number_of_pages, added, user, page_content, folder))
-
-# @routes.get('/pdf_check')
-# async def method (request):
-#     file_path = input('/var/www/it-vision.pro/html/pdfs/pdf.pdf')
-#     return web.json_response(os.path.exists(file_path))
 
 @routes.post('/loadFilesToCustomer')
 async def method(request):
  
- #   print(request)
     reader = await request.multipart()
- #   print('1')
     part = await reader.next()
- #   print('2')
     filename = part.filename
     file_extension = os.path.splitext(filename)
-    
-    #print('------------')
-    #print(request.headers)
 
     number = request.headers.get('X-Number')
-    # group = request.headers.get('X-Group')
     folder = request.headers.get('X-Folder')
     user = request.headers.get('X-User')
-   # print(user)
     arr = bytearray()
 
     while True:
-       # print('3')
         chunk = await part.read_chunk()  # 8192 bytes by default.
-  #      print(len(chunk))
         if not chunk:
             break
-
         arr.extend(chunk)
         file = bytes(arr)
         page_content=''
@@ -2521,45 +2018,25 @@ async def method(request):
            page_content = page_content + page.extractText().replace('\n', '<br />')
         
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-   # print('3.5')
     for client in ws_clients:
         await client.send_str('getCustomerFiles')
-   # print('4')
     return web.json_response(await Docs.upload_to_customer(
         file, filename, number, number_of_pages, added, user, page_content, folder))
-
-# @routes.get('/pdf_check')
-# async def method (request):
-#     file_path = input('/var/www/it-vision.pro/html/pdfs/pdf.pdf')
-#     return web.json_response(os.path.exists(file_path))
-
- 
 
 @routes.post('/loadFilesToPerson')
 async def method(request):
  
- #   print(request)
     reader = await request.multipart()
- #   print('1')
     part = await reader.next()
- #   print('2')
     filename = part.filename
     file_extension = os.path.splitext(filename)
-    
-    #print('------------')
-    #print(request.headers)
-
     number = request.headers.get('X-Number')
-    # group = request.headers.get('X-Group')
     folder = request.headers.get('X-Folder')
     user = request.headers.get('X-User')
-   # print(user)
     arr = bytearray()
 
     while True:
-       # print('3')
         chunk = await part.read_chunk()  # 8192 bytes by default.
-  #      print(len(chunk))
         if not chunk:
             break
 
@@ -2578,46 +2055,24 @@ async def method(request):
            page_content = page_content + page.extractText().replace('\n', '<br />')
         
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-   # print('3.5')
     for client in ws_clients:
         await client.send_str('getPersonFiles')
-   # print('4')
     return web.json_response(await Docs.upload_to_contact(
         file, filename, number, number_of_pages, added, user, page_content, folder))
 
 @routes.post('/loadFilesToSub')
 async def method(request):
- 
- #   print(request)
     reader = await request.multipart()
- #   print('1')
     part = await reader.next()
- #   print('2')
     filename = part.filename
     file_extension = os.path.splitext(filename)
-    
-    #print('------------')
-    #print(request.headers)
-
-   #  number = request.headers.get('X-Number')
-   #  # group = request.headers.get('X-Group')
-   #  user = request.headers.get('X-User')
-   #  folder = request.headers.get('X-Folder')
-   #  # print(folder)
-   # # print(user)+++
-
-
     number = request.headers.get('X-Number')
     group = request.headers.get('X-Group')
     user = request.headers.get('X-User')
     folder = request.headers.get('X-Folder')
-
     arr = bytearray()
-
     while True:
-       # print('3')
         chunk = await part.read_chunk()  # 8192 bytes by default.
-  #      print(len(chunk))
         if not chunk:
             break
 
@@ -2636,43 +2091,24 @@ async def method(request):
            page_content = page_content + page.extractText().replace('\n', '<br />')
         
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-   # print('3.5')
     for client in ws_clients:
         await client.send_str('getSubFiles')
-   # print('4')
     return web.json_response(await Docs.upload_to_sub(
         file, filename, number, number_of_pages, group, added, user, page_content, folder))
-
-
-
-
-
 
 @routes.post('/loadFilesToSperson')
 async def method(request):
  
- #   print(request)
     reader = await request.multipart()
- #   print('1')
     part = await reader.next()
- #   print('2')
     filename = part.filename
     file_extension = os.path.splitext(filename)
-    
-    #print('------------')
-    #print(request.headers)
-
     number = request.headers.get('X-Number')
     user = request.headers.get('X-User')
-    # group = request.headers.get('X-Group')
     folder = request.headers.get('X-Folder')
-   # print(user)
     arr = bytearray()
-
     while True:
-       # print('3')
         chunk = await part.read_chunk()  # 8192 bytes by default.
-  #      print(len(chunk))
         if not chunk:
             break
 
@@ -2691,70 +2127,10 @@ async def method(request):
            page_content = page_content + page.extractText().replace('\n', '<br />')
         
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-   # print('3.5')
     for client in ws_clients:
         await client.send_str('getSpersonFiles')
-   # print('4')
     return web.json_response(await Docs.upload_to_sperson(
         file, filename, number, number_of_pages, added, user, page_content, folder))
-
-
-
-@routes.get('/google')
-async def method (request):
-    link = request.query['link'].replace('|','?')
-    # print(link)
-    request_headers = {
-    "Accept-Language": "de-DE,de;q=0.5",
-    "User-Agent": "Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/60.0.3112.107 Mobile Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Referer": "http://thewebsite.com",
-    "Connection": "keep-alive" 
-    }
-    # response = urlopen(link)
-    req = urllib.request.Request(link, headers=request_headers)
-    response = urllib.request.urlopen(req)
-    html = response.read()
-    dec = html.decode("ISO-8859-1") 
-    dec = dec.replace('<head>','<head><base target="_self" href="https://www.google.com/">')
-    dec = dec.replace('target="_blank"','target="result"')
-    dec = dec.replace('<a','<a target="result"')
-    dec = dec.replace('<header','<header style="display:none"')
-    dec = dec.replace('<form','<form style="display:none"')
-
-    
-    
-    html = dec.encode('utf-8')
-    # print(html)
-    resp = web.StreamResponse(headers={
-        'CONTENT-DISPOSITION': 'inline'
-    })
-
-    resp.content_type ="text/html"
-    # html = html.encode('utf-8').replace('','')
-    await resp.prepare(request)
-    await resp.write(html)
-    return resp
-
-
-# @routes.get('/image_damage')
-# async def method (request):
-#         file = await Docs.select_image_damage(request.query['id'])
-
-#         if (file['newImage']==None):
-#             content = file['content']
-#         else:
-#             content = file['newImage']
-
-#         resp = web.StreamResponse(headers={
-#          'CONTENT-DISPOSITION': 'inline'
-#         })
-
-#         resp.content_type ="image/jpeg"
-
-#         await resp.prepare(request)
-#         await resp.write(content)
-#         return resp
 
 
 @routes.get('/image_damage')
@@ -2773,28 +2149,6 @@ async def method (request):
         except Exception as e:
             print("ex /image_damage")
 
-
-# @routes.get('/image_damage')
-# async def method (request):
-#         file = await Docs.select_image_damage(request.query['id'])
-
-#         if (file['newImage']==None):
-#             content = file['content']
-#         else:
-#             content = file['newImage']
-
-#         im = Image.open(io.BytesIO(content))
-#         im.thumbnail((500,500), Image.ANTIALIAS)
-#         stream = io.BytesIO()
-
-#         content_type ="image/jpeg"
-#         withoutdot = "JPEG"
-
-#         im.save(stream, withoutdot)
-
-#         return web.Response(body=stream.getvalue(), content_type=content_type)
-
-
 @routes.get('/image_edit')
 async def method (request):
         file = await Docs.select_image_damage(request.query['id'])
@@ -2812,36 +2166,12 @@ async def method (request):
         return resp
 
 
-# @routes.get('/image')
-# async def method (request):
-#         file = await Docs.select_file(request.query['id'])
-#         file_extension = os.path.splitext(file['name'])
-#         resp = web.StreamResponse(headers={
-#         'CONTENT-DISPOSITION': 'inline'
-#         })
-
-#         if file_extension[1] == '.pdf':
-#             resp.content_type ="application/pdf"
-#         if file_extension[1] == '.jpeg' or file_extension[1] == '.jpg':
-#             resp.content_type ="image/jpeg"
-#         if file_extension[1] == '.png':
-#             resp.content_type ="image/png"
-            
-#         await resp.prepare(request)
-#         await resp.write(file['content'])
-
-        
-        
-#         return resp
-
 @routes.get('/image')
 async def method (request):
-        # print("Executing coroutine")
         try:
             file = await Docs.select_file(request.query['id'])
             file_extension = os.path.splitext(file['name'])
             im = Image.open(io.BytesIO(file['content']))
-            # im.thumbnail((500,500), Image.ANTIALIAS)
             stream = io.BytesIO()
             if file_extension[1] == '.jpeg' or file_extension[1] == '.jpg':
                 content_type ="image/jpeg"
@@ -2853,53 +2183,6 @@ async def method (request):
             return web.Response(body=stream.getvalue(), content_type=content_type)
         except Exception as e:
             print("ex /image")
-                # break
-
-        #     print("Done waiting")
-
-        # print("Done executing coroutine")
-
-
-
-        # file = await Docs.select_file(request.query['id'])
-
-        
-
-
-        # print(image.size)
-        # thumb_img = image.copy()
-        # image.thumbnail((100, 100))
-        # print(thumb_img.size)
-        # print(image.size)
-
-        # image = Image.open(io.BytesIO(file['content']))
-        # MAX_SIZE = (100, 100) 
-        # image.thumbnail(MAX_SIZE)
-        # print(image.size)
-
-        # image.tobytes()
-        # image.show()
-        # img.thumbnail((500,500), Image.ANTIALIAS)
-        # bytes = img.tobytes()
-        # print(bytes)
-        # img.save('somepic.jpg')
-
-        # resp = web.StreamResponse(headers={
-        # 'CONTENT-DISPOSITION': 'inline'
-        # })
-
-        # if file_extension[1] == '.jpeg' or file_extension[1] == '.jpg':
-        #     resp.content_type ="image/jpeg"
-        # if file_extension[1] == '.png':
-        #     resp.content_type ="image/png"
-
-        # print(resp.content_type)
-
-        # response.content_type = 'image/png'
-        # await resp.prepare(request)
-        # return(io.BytesIO(thumb_img.tobytes()))
-        # return resp
-
 
 @routes.get('/image_company')
 async def method (request):
@@ -2958,12 +2241,10 @@ async def method (request):
 
 @routes.get('/image_sub')
 async def method (request):
-        # print("Executing coroutine")
         try:
             file = await Docs.select_file_sub(request.query['id'])
             file_extension = os.path.splitext(file['name'])
             im = Image.open(io.BytesIO(file['content']))
-            # im.thumbnail((500,500), Image.ANTIALIAS)
             stream = io.BytesIO()
             if file_extension[1] == '.jpeg' or file_extension[1] == '.jpg':
                 content_type ="image/jpeg"
@@ -2975,24 +2256,6 @@ async def method (request):
             return web.Response(body=stream.getvalue(), content_type=content_type)
         except Exception as e:
             print("ex /image_sub")
-
-# @routes.get('/image_sub')
-# async def method (request):
-#         file = await Docs.select_file_sub(request.query['id'])
-#         file_extension = os.path.splitext(file['name'])
-#         resp = web.StreamResponse(headers={
-#         'CONTENT-DISPOSITION': 'inline'
-#         })
-
-#         if file_extension[1] == '.pdf':
-#             resp.content_type ="application/pdf"
-#         if file_extension[1] == '.jpeg' or file_extension[1] == '.jpg':
-#             resp.content_type ="image/jpeg"
-#         if file_extension[1] == '.png':
-#             resp.content_type ="image/png"
-#         await resp.prepare(request)
-#         await resp.write(file['content'])
-#         return resp
 
 @routes.get('/image_sperson')
 async def method (request):
@@ -3030,7 +2293,6 @@ async def method (request):
 async def method (request):
     data = await request.post()
     file = await Docs.select_file(data['id'])
-    # print(file)
     file_extension = os.path.splitext(file['name'])
     resp = web.StreamResponse(headers={
         'CONTENT-DISPOSITION': 'inline'
@@ -3050,7 +2312,6 @@ async def method (request):
 @routes.post('/pdf_file_from_company')
 async def method (request):
     data = await request.post()
-    # print(data['id'])
     file = await Docs.select_file_company(data['id'])
 
     file_extension = os.path.splitext(file['name'])
@@ -3084,7 +2345,6 @@ async def method (request):
             resp.content_type ="image/jpeg"
     if file_extension[1] == '.png':
             resp.content_type ="image/png"    
-
     await resp.prepare(request)
     await resp.write(file['content'])
     return resp
@@ -3104,7 +2364,6 @@ async def method (request):
             resp.content_type ="image/jpeg"
     if file_extension[1] == '.png':
             resp.content_type ="image/png"    
-
     await resp.prepare(request)
     await resp.write(file['content'])
     return resp
@@ -3125,7 +2384,6 @@ async def method (request):
             resp.content_type ="image/jpeg"
     if file_extension[1] == '.png':
             resp.content_type ="image/png"    
-
     await resp.prepare(request)
     await resp.write(file['content'])
     return resp
@@ -3146,7 +2404,6 @@ async def method (request):
             resp.content_type ="image/jpeg"
     if file_extension[1] == '.png':
             resp.content_type ="image/png"    
-
     await resp.prepare(request)
     await resp.write(file['content'])
     return resp
@@ -3175,7 +2432,6 @@ async def websocket_handler(request):
         os.system("killall -9 python");
     ws_clients.remove(ws)
     return ws
-
 
 # register static routes
 routes.static('/static', f"{APPLICATION_DIR}/static")

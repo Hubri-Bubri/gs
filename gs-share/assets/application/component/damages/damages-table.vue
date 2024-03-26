@@ -1,7 +1,6 @@
 <template >
   <div v-if="damage_list.length>0">
 <b-row>
-
         <b-link style="text-decoration: none" @click="toog(table.id)">
         <div
           :id="'domageplus'+table.id"
@@ -11,16 +10,10 @@
         <div :id="'domageminus'+table.id" style="vertical-align: middle; padding-right: 10px">
           <b-icon icon="arrow-up" font-scale="1" /> 
         </div>
-        
       </b-link> {{table.name}}&nbsp;&nbsp;&nbsp;<b-icon icon="trash" aria-hidden="true" @click="delImageFromPart()"></b-icon>
-
     </b-row>
     <br>
-  
     <div :id="'damage'+table.id">
-      <!-- <draggable  v-model="value.parts.damage_content" :element="'div'" :options="{handle:'.handle', group:'a', animation:150}"
-      :no-transition-on-drag="true" @start="drag=true" @end="checkMove($event)" @choose="move()">  -->
-
       <b-container v-for="(content, subIndex) in damage_list" :key="content.id" >
           <b-row>
             <b-col cols="1" class="handle">{{(subIndex+1)}}</b-col>
@@ -51,11 +44,9 @@
             </b-col>
           </b-row>
         </b-container>
-      <!-- </draggable>  -->
     </div>
   </div>
 </template>
-
 <script type="text/javascript">
 import axios from 'axios';
 export default {
@@ -80,7 +71,6 @@ export default {
           })
         }
       },
-
     move(){
       this.oldarray =  JSON.parse(JSON.stringify(this.value.parts.damage_content))
       },
@@ -113,7 +103,6 @@ export default {
             }
          })
       },
-
     updateDamage(index, newData, fild, id, old){
       if (old!=newData){
         axios.get('/updateDamage', { params: {
@@ -128,7 +117,6 @@ export default {
     random(){
       return Math.random()*100;
     },
-
     subPartDel(subDel_id, subIndex) {
       if (confirm("Are you sure?")) {
         axios.get('/del_row_from_damage', {
@@ -174,10 +162,7 @@ export default {
       if (delimetr[0] == 'updateImageDamage') {
         this.updateImageDamage(delimetr[1])
       }
-
-
    };
-    
    }
 }
 </script>
