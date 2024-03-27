@@ -1895,11 +1895,9 @@ async def method(request):
            page_content = page_content + page.extractText().replace('\n', '<br />')
         
     added = strftime("%d-%m-%Y %H:%M:%S", gmtime())
-    result = (web.json_response(await Docs.upload_doc(
-            file, filename, number, number_of_pages, group, added, user, page_content, folder)))
-    for client in ws_clients:
-            await client.send_str('getDocs')
-    return result
+    await Docs.upload_doc(file, filename, number, number_of_pages, group, added, user, page_content, folder, ws_clients)
+    return web.json_response('')
+
 
 @routes.post('/loadFilesWorkers')
 async def method(request):
@@ -2414,8 +2412,24 @@ async def method (request):
 
 @routes.get('/pdf')
 async def method (request):
-    return await language.pdf(request, request.query['addPdf'], request.query['forPreview'], request.query['pid'], request.query['itemId'], request.query['type'], request.query['today'], request.query['stworks'], request.query['fworks'],
-                              request.query['dateForInspect'], request.query['byForInspect'], request.query['selectedDocsList'], ws_clients)
+    return await language.pdf(
+        request,
+        request.query['addPdf'],
+        request.query['forPreview'],
+        request.query['pid'],
+        request.query['itemId'],
+        request.query['type'],
+        request.query['user_first_name'],
+        request.query['user_second_name'],
+        request.query['user_phone'],
+        request.query['user_mail'],
+        request.query['today'],
+        request.query['stworks'],
+        request.query['fworks'],
+        request.query['dateForInspect'],
+        request.query['byForInspect'],
+        request.query['selectedDocsList'],
+        ws_clients)
  
 
 @routes.get('/ws')

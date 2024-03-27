@@ -123,8 +123,23 @@ export default {
     },
     methods: {
     makePdf(){
-        this.src = '/pdf?addPdf=false&forPreview='+this.forPreview+'&pid='+this.pid+'&itemId='+this.tmp.id+'&type='+this.type+'&today='+this.today+'&stworks='+this.stworks+'&fworks='+this.fworks+
-        '&dateForInspect='+this.dateForInspect+'&byForInspect='+this.byForInspect+'&selectedDocsList='+this.selectedDocsList.join();
+
+      this.src = '/pdf?addPdf=false&forPreview='+this.forPreview+
+                '&pid='+this.pid+
+                '&itemId='+this.tmp.id+
+                '&type='+this.type+
+                '&user_first_name='+this.$security.table.account.first_name+
+                '&user_second_name='+this.$security.table.account.second_name+
+                '&user_phone='+this.$security.table.account.tel+
+                '&user_mail='+this.$security.table.account.mail+
+                '&today='+this.today+
+                '&stworks='+this.stworks+
+                '&fworks='+this.fworks+
+                '&dateForInspect='+this.dateForInspect+
+                '&byForInspect='+this.byForInspect+
+                '&selectedDocsList='+this.selectedDocsList.join();
+      //   this.src = '/pdf?addPdf=false&forPreview='+this.forPreview+'&pid='+this.pid+'&itemId='+this.tmp.id+'&type='+this.type+'&user='+this.$security.table.account.first_name +'_'+ this.$security.table.account.second_name+'&today='+this.today+'&stworks='+this.stworks+'&fworks='+this.fworks+
+      //   '&dateForInspect='+this.dateForInspect+'&byForInspect='+this.byForInspect+'&selectedDocsList='+this.selectedDocsList.join();
     },
      
         previewPDFForm(type){
@@ -161,8 +176,25 @@ export default {
 					this.selectedDocsList = ['50']
 				}
 
-                this.src = '/pdf?addPdf=false&forPreview='+this.forPreview+'&pid='+this.pid+'&itemId='+this.tmp.id+'&type='+this.type+'&today='+this.today+'&stworks='+this.stworks+'&fworks='+this.fworks+
-                '&dateForInspect='+this.dateForInspect+'&byForInspect='+this.byForInspect+'&selectedDocsList='+this.selectedDocsList.join();
+
+
+            this.src = '/pdf?addPdf=false&forPreview='+this.forPreview+
+                '&pid='+this.pid+
+                '&itemId='+this.tmp.id+
+                '&type='+this.type+
+                '&user_first_name='+this.$security.table.account.first_name+
+                '&user_second_name='+this.$security.table.account.second_name+
+                '&user_phone='+this.$security.table.account.tel+
+                '&user_mail='+this.$security.table.account.mail+
+                '&today='+this.today+
+                '&stworks='+this.stworks+
+                '&fworks='+this.fworks+
+                '&dateForInspect='+this.dateForInspect+
+                '&byForInspect='+this.byForInspect+
+                '&selectedDocsList='+this.selectedDocsList.join();
+
+               //  this.src = '/pdf?addPdf=false&forPreview='+this.forPreview+'&pid='+this.pid+'&itemId='+this.tmp.id+'&type='+this.type+'&user='+this.$security.table.account.first_name +'_'+ this.$security.table.account.second_name+'&today='+this.today+'&stworks='+this.stworks+'&fworks='+this.fworks+
+               //  '&dateForInspect='+this.dateForInspect+'&byForInspect='+this.byForInspect+'&selectedDocsList='+this.selectedDocsList.join();
                 
 			})
         },
@@ -181,6 +213,10 @@ export default {
                pid:this.pid,
                itemId:this.tmp.id,
                type:this.type,
+               user_first_name:this.$security.table.account.first_name,
+               user_second_name:this.$security.table.account.second_name,
+               user_phone:this.$security.table.account.tel,
+               user_mail:this.$security.table.account.mail,
                today:this.today,
                stworks:this.stworks?this.stworks:'null',
                fworks:this.fworks?this.fworks:'null',
@@ -204,6 +240,10 @@ export default {
                pid:this.pid,
                itemId:this.tmp.id,
                type:this.type,
+               user_first_name:this.$security.table.account.first_name,
+               user_second_name:this.$security.table.account.second_name,
+               user_phone:this.$security.table.account.tel,
+               user_mail:this.$security.table.account.mail,
                today:this.today,
                stworks:this.stworks?this.stworks:'null',
                fworks:this.fworks?this.fworks:'null',

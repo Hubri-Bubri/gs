@@ -21,16 +21,15 @@
 			:id="'gencooment'+id" 
 			/>
 		<b-container v-if="tmp.number != null">
-			<b-input type="text" hidden v-model="tmp.typeOfHead" />
 			<b-row>
 				<b-col cols="12"><br></b-col>
 				<b-col lg="8" md="12">
 					<b-row>
 						<b-col lg="6" md="12" >
 							<b-form-group :label="$t('fields.number')+':'" label-cols="4" label-size="sm">
-								{{(tmp.typeOfHead=='Invoices')?(tmp.number.split(' ').length==5)?tmp.number.split(' ')[3]:
-								countDigitals(tmp.number.split(' ')[1])+'-'+tmp.number.split(' ')[0].split('-')[1]:(tmp.typeOfHead=='SUB')
-								?tmp.number.split(' ')[0]:(tmp.typeOfHead=='Sub Invoices')?tmp.number.split(' ')[3]:tmp.number}}
+								{{(tmp.type=='Invoices')?(tmp.number.split(' ').length==5)?tmp.number.split(' ')[3]:
+								countDigitals(tmp.number.split(' ')[1])+'-'+tmp.number.split(' ')[0].split('-')[1]:(tmp.type=='SUB')
+								?tmp.number.split(' ')[0]:(tmp.type=='Sub Invoices')?tmp.number.split(' ')[3]:tmp.number}}
 							</b-form-group>
 							<b-form-group :label="$t('edit.document')+':'" label-cols="4" label-size="sm">
 								<b-form-input  size="sm"
@@ -180,7 +179,6 @@ export default {
 	},
 	methods: {
 		linkForWorkersToEdit(user, host, projectNumer, itemMenuImag){
-			console.log(user, host, projectNumer, itemMenuImag)
 		this.$refs.calcGroup.linkForWorkersToCalcGroup(user, host, projectNumer, itemMenuImag)
 	},
     openWindowPrint(type){

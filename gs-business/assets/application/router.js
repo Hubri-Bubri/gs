@@ -18,7 +18,7 @@ import SubMaster from '@business/component/sub/master';
 import SubDetail from '@business/component/sub/detail';
 
 
-import Form from '@business/component/form/master';
+// import Form from '@business/component/form/master';
 
 import Error404 from '@share/component/special/error-404';
 
@@ -41,7 +41,7 @@ const router = new VueRouter({
         {path: "/contracts", component: ContractsMaster},
         {path: "/subcontracts", component: SubContractsMaster},
         
-        {path: "/form", component: Form},
+        // {path: "/form", component: Form},
         {path: "*", component: Error404},
         {path: "/sub", component: SubMaster},
         {path: "/sub/detail/:id", component: SubDetail, props: true}

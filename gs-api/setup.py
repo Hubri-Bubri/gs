@@ -10,5 +10,5 @@ setup(
     name='gs_api',
     install_requires=prod_requires,
     packages=['gs_api'],
-    version="0.1.23"
+    version="0.1.26"
 )

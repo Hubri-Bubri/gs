@@ -24,21 +24,24 @@ import nest_asyncio
 nest_asyncio.apply()
 class language:
     @classmethod
-    async def pdf(cls, request, addPdf, forPreview, pid, itemId, type, today, stworks, fworks, dateForInspect, byForInspect, selectedDocsList, ws_clients):
+
+    async def pdf(cls, request, addPdf, forPreview, pid, itemId, type, user_first_name, user_second_name, user_phone, user_mail, today, stworks, fworks, dateForInspect, byForInspect, selectedDocsList, ws_clients):
         # print(pid, item)
         project = await Project.select_project(pid)
         item = await General.get_item_for_pdf(itemId)
-        
-        num=''
-        nuls = (int(4)-int(len(str(project['project_number']))))
-        for x in range(0, int(nuls)):
-            num = str(num)+'0'
-
-        pNumer = (str(num)+str(project['project_number'])+'-'+str(project['project_number_year']))
+        pNumer = (str(language.nulsformat(project['project_number']))+str(project['project_number'])+'-'+str(project['project_number_year']))
 
         tables = []
         imagesForPdf=[]
-        if((type=='Orders')|(type=='Offers')|(type=='Invoices')):
+
+        if type=='Invoices':
+            invNum = item['number'].split(' ')
+            if len(invNum)==5:
+                item['number'] = invNum[3]
+            else:
+                 item['number'] = language.nulsformat(invNum[1])+invNum[1]+'-'+invNum[0].split('-')[1]
+
+        if((type=='Orders')|(type=='Offers')|(type=='Invoices')|(type=='SUB')):
             tables = (await Projects.get_tables_in_edit(itemId))
             for table in tables:
                 table['content'] = (await Projects.get_rows_in_table(table['id']))
@@ -68,7 +71,7 @@ class language:
             tables = (await Reports.get_tables_in_reports(itemId))
             for table in tables:
                 table['reports_content'] = (await Reports.get_reports_list(table['id']))
-      
+        # print(project['zip']+' '+project['city'])
         data={'dateInspect': item['dateInspect'],
                 'dateEvent': item['dateEvent'],
                 'customercontract': item['other'],
@@ -80,10 +83,10 @@ class language:
                 'getCustomerAdress1': project['zip']+' '+project['city'],
                 'offerHead': type,
                 # 'subHead': '',
-                'editor': project['first_name']+' '+project['second_name'],
-                'userTel': project['userTel'],
+                'editor': user_first_name+' '+user_second_name,
+                'userTel': user_phone,
                 'userFax': '',
-                'userMail': project['userMail'],
+                'userMail': user_mail,
                 'number': item['number'],
                 'date': datetime.strptime(today, '%Y-%m-%d').strftime("%d.%m.%Y"),
                 'work': item['work'],
@@ -395,3 +398,10 @@ class language:
                 # await client.send_str('getProjectDetail')
 
         return resp
+    
+    def nulsformat(val):
+        num=''
+        nuls = (int(4)-int(len(str(val))))
+        for x in range(0, int(nuls)):
+            num = str(num)+'0'
+        return num

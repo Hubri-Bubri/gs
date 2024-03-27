@@ -2481,15 +2481,6 @@ class Projects:
     @classmethod
     async def get_damage_images(cls, id, project):
         async with database.query() as Q:
-                items =  (await (Q()
-                    .tables(T.items & T.tables  & T.type_for_table).on((T.items.id == T.tables.item_id) & (T.items.type == T.type_for_table.id))
-                    .fields(
-                        T.type_for_table.type,
-                        T.tables.id,
-                        T.tables.name
-                    )
-                    .where(T.items.project_id == id)
-                    .selectall()))
                 result = list()              
                 files=(await (Q()
                     .tables(T.files)
@@ -2508,54 +2499,12 @@ class Projects:
                 for val in files:
                     full_name = path.basename(val['name'])
                     if path.splitext(full_name)[1]!='.pdf':
-
-                        if val['group']=='':
-                            group=0
-                        else:
-                            group=val['group']
                         if val['user']==None:
                             user = 'Undefind'
                         else:
                             user =  val['user']
-                        img={'id':'/image?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'], 'desc':'', 'user':user, 'group':group, '_rowVariant':'', 'folder_id':val['folder_id']}
+                        img={'id':'/image?id='+str(val['id']), 'file_name':val['name'], 'date':val['added'],  'user':user,  '_rowVariant':'', 'folder_id':val['folder_id']}
                         result.append(img)
-         
-                damages=(await (Q()
-                    .tables(T.items)
-                    .fields(
-                        T.items.id
-                    )
-                    .where((T.items.project_id == id) & (T.items.type == 4))
-                    .selectall()))
-
-                for val in damages:
-                    group=(await (Q()
-                    .tables(T.group_for_damages)
-                    .fields(
-                        T.group_for_damages.id,
-                        T.group_for_damages.name
-                    )
-                    .where(T.group_for_damages.item_id == val['id'])
-                    .selectall()))
-
-
-                    for val in group:
-                        images=(await (Q()
-                        .tables(T.images_for_group_damages)
-                        .fields(
-                            T.images_for_group_damages.id,
-                            T.images_for_group_damages.file_name,
-                            T.images_for_group_damages.date,
-                            T.images_for_group_damages.desc
-                        )
-                        .where(T.images_for_group_damages.group_id == val['id'])
-                        .selectall()))
-
-                        for img in images:
-                            img['id'] = '/image_damage?id='+str(img['id'])
-                            img['from']=val['name']
-                            img['type']='Damage'
-                            result.append(img)
                 return result
 
 
@@ -4583,9 +4532,9 @@ class Docs:
                 .delete())
 
     @classmethod
-    async def upload_doc(cls, file, name, number, number_of_pages, group, added, user, resp, folder):
+    async def upload_doc(cls, file, name, number, number_of_pages, group, added, user, resp, folder, ws_clients):
             async with database.query() as Q:
-                return await (Q()
+                await (Q()
                     .tables(T.files)
                     .insert({
                         T.files.content: file,
@@ -4599,6 +4548,8 @@ class Docs:
                         T.files.html: 'file',
                         T.files.folder_id: folder
                     }))
+                for client in ws_clients:
+                    await client.send_str('getDocs')
 
     @classmethod
     async def upload_to_company(cls, file, name, number, number_of_pages, added, user, resp, folder):

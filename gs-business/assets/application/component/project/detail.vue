@@ -1271,17 +1271,9 @@ export default {
 			return this.workers
 		}
 	},
-	sockets: {
-		connect: function () {
-			console.log('socket connected')
-		},
-		customEmit: function (val) {
-			console.log('this method fired by socket server. eg: io.emit("customEmit", data)')
-		}
-	},
 	methods: {
 	wasmade(type, number){
-		console.log(number)
+		// console.log(number)
 		this.$refs.calProject.wasMade(type, number)
 	},
     update_item(update){
@@ -2725,15 +2717,15 @@ export default {
 			}
 		},
 		docs2files() {
-			var retArr = []
-			var retArrs = []
-			var withOutGroup = []
-			var addgroup = []
-			var files1
+			// var retArr = []
+			// var retArrs = []
+			// var withOutGroup = []
+			// var addgroup = []
+			// var files1
 			var files = []
-			var retArr = []
-			var uniqueArray
-			var gallery
+			// var retArr = []
+			// var uniqueArray
+			// var gallery
 			axios.get('/docs', {
 				params: {
 					id: this.id
@@ -2764,59 +2756,28 @@ export default {
 						})
 					}
 					this.files = (this.files != response.data) ? response.data : this.files
-					var addFiles = []
+					
+					// var addFiles = []
 					mergedArr.forEach((item) => {
-						axios.get('/get_tables_for_docs', {
-							params: {
-								id: item.id
-							}
-						}).then(response => {
-							var filesarr = response.data
 							files = this.files.filter(function (val) {
-								var ret
-								filesarr.forEach((v) => {
-									ret = 1
-									if (val.name.split('.')[val.name.split('.').length - 1] == 'pdf') {
-										if (v.parts != undefined) {
-											if (val.group.split(',').length > 1) {
-												ret = 0
-												var subval = []
-												val.group.split(',').forEach((valGroup) => {
-													subval = JSON.parse(JSON.stringify(val))
-													subval.group = valGroup
-													if (subval.group == v.parts.id) {
-														subval.group = v.parts.part_name + ' from ' + item.type
-														addFiles.push(subval)
-													}
-												})
-											}
-											if (ret == 1) {
-												if (val.group == v.parts.id) {
-													val.group = v.parts.part_name + ' from ' + item.type
-												}
-											}
-										}
-									}
-								})
-								if (ret == 1) {
-									return val.name.split('.')[val.name.split('.').length - 1] == 'pdf'
-								}
+								return val.name.split('.')[val.name.split('.').length - 1] == 'pdf'
 							})
-							addgroup = []
-							if (addFiles.length != 0) files = files.concat(addFiles)
-							files1 = files.filter((file, i) => {
-								if (file.name.split('.')[file.name.split('.').length - 1] != 'pdf') {
-									if (file.group) {
-										file.group.split(',').forEach((g) => {
-											addgroup.push(this.partx[g].parts.part_name)
-										})
-									}
-									if (addgroup.join(', ')) {
-										file.name = file.name + ': ' + addgroup.join(', ')
-									}
-									return file
-								}
-							})
+
+							// addgroup = []
+							// if (addFiles.length != 0) files = files.concat(addFiles)
+							// files1 = files.filter((file, i) => {
+							// 	if (file.name.split('.')[file.name.split('.').length - 1] != 'pdf') {
+							// 		if (file.group) {
+							// 			file.group.split(',').forEach((g) => {
+							// 				addgroup.push(this.partx[g].parts.part_name)
+							// 			})
+							// 		}
+							// 		if (addgroup.join(', ')) {
+							// 			file.name = file.name + ': ' + addgroup.join(', ')
+							// 		}
+							// 		return file
+							// 	}
+							// })
 							var change = 0
 							if (this.responseFiles.length != this.docs.concat(files).length) {
 								change = 1
@@ -2831,11 +2792,12 @@ export default {
 									}
 								}
 							})
+							// console.log(this.responseFiles) 
 							if (change == 1) //хотя лучше элименты сравнить, что бы не закрывался фрейм с пдф
 							{
 								this.responseFiles = this.docs.concat(files)
 							}
-						})
+						
 					})
 				})
 			})
